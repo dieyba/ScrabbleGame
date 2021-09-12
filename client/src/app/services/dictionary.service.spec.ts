@@ -1,16 +1,16 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ValidationService } from '@app/services/validation.service';
+import { DictionaryService } from '@app/services/dictionary.service';
 
-describe('ValidationService', () => {
+describe('DictionaryService', () => {
     let httpMock: HttpTestingController;
-    let service: ValidationService;
+    let service: DictionaryService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
         });
-        service = TestBed.inject(ValidationService);
+        service = TestBed.inject(DictionaryService);
         httpMock = TestBed.inject(HttpTestingController);
     });
 

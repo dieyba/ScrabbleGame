@@ -1,31 +1,32 @@
 import { Injectable } from '@angular/core';
 import { Dictionary } from '@app/classes/dictionary';
-import { ScrabbleWord } from '@app/classes/scrabble-word';
-
-// TODO : Integrate other dictionnaries and choices
-let dict = './assets/dictionnary.json';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { DictionaryService } from '@app/services/dictionary.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ValidationService {
-    parseDictionary(): void {
-        let jsonObj: any = JSON.parse(dict); // string to generic object first
-        let dictionary: Dictionary = <Dictionary>jsonObj; // generic object to interface
-        console.log(dictionary);
+    private dictionary: Dictionary;
+    private word: string;
+
+    constructor(public dictionaryService: DictionaryService) {
+        this.dictionary = dictionaryService.currentDictionary;
+        // this.word = convertScrabbleWordToString(wordService...)
+        this.word = this.word.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 
-    // TODO
-    /*
-    Bleu pâle : LETTRE x2
-    Bleu foncé : LETTRE x3
-    Rose : MOT x2
-    Rouge : MOT x3
-    
-    1. Vérifier que mot est dans dictionnaire
-    2. Identifier points lettre par lettre
-	3. If case bleue, multiplier points lettre
-	4. Additionner points des lettres
-	5. If case rose, multiplier point mot
-    6. If 7 lettres utilisées, bonus 50 pts*/
+    convertScrabbleWordToString(scrabbleLetter: ScrabbleLetter[]): string {
+        let word = '';
+        scrabbleLetter.forEach((letter) => {
+            word += letter.character;
+        });
+        return word;
+    }
+
+    isWordValid(): boolean {
+        return this.dictionary.words.includes(this.word) && this.word.length >= 2 && !this.word.includes('-') && !this.word.includes("'")
+            ? true
+            : false;
+    }
 }
