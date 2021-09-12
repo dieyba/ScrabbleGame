@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Dictionary } from '@app/classes/dictionary';
+import { ScrabbleWord } from '@app/classes/scrabble-word';
 
 // TODO : Integrate other dictionnaries and choices
 let dict = './assets/dictionnary.json';
