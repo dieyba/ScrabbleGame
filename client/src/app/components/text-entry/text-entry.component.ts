@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-text-entry',
@@ -6,10 +6,19 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./text-entry.component.scss']
 })
 export class TextEntryComponent implements OnInit {
+  buttonPressed = '';
 
   constructor() { }
 
+  @HostListener('window:keydown', ['$event'])
+  buttonDetect(event: KeyboardEvent) {
+      this.buttonPressed += event.key;
+  }
+
+
+
   ngOnInit(): void {
+      this.buttonPressed = '';
   }
 
 }
