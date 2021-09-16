@@ -7,9 +7,9 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { StartingPageComponent } from '@app/pages/starting-page/starting-page.component';
 
 const routes: Routes = [
-    { path: '', redirectTo: '/home', pathMatch: 'full' },
+    { path: '', redirectTo: '/start', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
-    { path: 'start', component: StartingPageComponent},
+    { path: 'start', component: StartingPageComponent },
     { path: 'classic', component: ClassicModeComponent },
     { path: 'game', component: GamePageComponent },
     { path: 'material', component: MaterialPageComponent },
