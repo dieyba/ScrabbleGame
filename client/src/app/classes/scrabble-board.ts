@@ -82,14 +82,11 @@ export class ScrabbleBoard {
 
                         break;
                     }
-                    case this.boardSize / 2 - 1: {
-                        // Étoile
-                        this.squares[i][j].color = SquareColor.Pink;
-
+                
+                    default:{
+                        this.squares[i][j].color = SquareColor.None;
                         break;
                     }
-                    default:
-                        this.squares[i][j].color = SquareColor.None;
                 }
 
             switch (side) {
@@ -120,6 +117,39 @@ export class ScrabbleBoard {
         }
     }
     sideBonus(): void {
-        // TODO : add bonus on top, right, left and right side
+        //TEAL AND BLUE SIDE BONUSES
+        let i = 0;
+        let j = 3
+        let color = SquareColor.Teal;
+        for(let k = 0; k < 4; k++){
+            this.squares[i][j].color = color;
+            this.squares[j][i].color = color;
+            this.squares[i][this.boardSize-j-1].color = color;
+            this.squares[j][this.boardSize-i-1].color = color;
+            this.squares[this.boardSize-j-1][i].color = color;
+            this.squares[this.boardSize-i-1][j].color = color;
+            this.squares[this.boardSize-i-1][this.boardSize-j-1].color = color;
+            this.squares[this.boardSize-j-1][this.boardSize-i-1].color = color;
+            i++;
+            color = SquareColor.Teal;
+            if(k = 0){
+                j += 2;
+                color = SquareColor.DarkBlue;
+            }
+            else j++;
+        }
+        //Missing red bonuses
+        color = SquareColor.Red;
+        i = 0;
+        for(let l = 0; l < 3; l++){
+            this.squares[0][i].color = color;
+            if(i == ((this.boardSize-1)/2)){
+                color = SquareColor.Pink; //STAR
+            }
+            this.squares[(this.boardSize-1)/2][i].color = color;
+            color = SquareColor.Red;
+            this.squares[this.boardSize-1][i].color = color;
+            i += (this.boardSize-1)/2;
+        }
     }
 }
