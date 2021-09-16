@@ -14,11 +14,11 @@ export class ScrabbleWord {
             // Account for letter pale/dark blue bonuses
             let color = this.content[i].square.color;
             switch (color) {
-                case SquareColor.PaleBlue:
-                    this.content[i].paleBlueBonus();
+                case SquareColor.Teal:
+                    this.content[i].tealBonus();
                     break;
                 case SquareColor.DarkBlue:
-                    this.content[i].paleBlueBonus();
+                    this.content[i].darkBlueBonus();
                     break;
                 case SquareColor.Pink:
                     pinkBonusCount++;
@@ -30,6 +30,7 @@ export class ScrabbleWord {
             total += this.content[i].value;
         }
         // Word pink/red bonuses
+        // TODO : Export this into a new service.
         total = total * PINK_FACTOR * pinkBonusCount;
         total = total * RED_FACTOR * redBonusCount;
         return total;
