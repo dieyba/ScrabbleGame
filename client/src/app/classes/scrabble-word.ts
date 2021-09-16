@@ -5,20 +5,20 @@ const PINK_FACTOR = 2;
 const RED_FACTOR = 3;
 
 export class ScrabbleWord {
-    content: ScrabbleLetter[]; //Array of ScrabbleLetters continually growing to represent the word
+    content: ScrabbleLetter[]; // Array of ScrabbleLetters continually growing to represent the word
     totalValue(): number {
         let total = 0;
         let pinkBonusCount = 0;
         let redBonusCount = 0;
-        for (let i = 0; i < this.content.length; i++) {
+        for (const i of this.content) {
             // Account for letter pale/dark blue bonuses
-            let color = this.content[i].square.color;
+            const color = i.square.color;
             switch (color) {
                 case SquareColor.Teal:
-                    this.content[i].tealBonus();
+                    i.tealBonus();
                     break;
                 case SquareColor.DarkBlue:
-                    this.content[i].darkBlueBonus();
+                    i.darkBlueBonus();
                     break;
                 case SquareColor.Pink:
                     pinkBonusCount++;
@@ -27,7 +27,7 @@ export class ScrabbleWord {
                     redBonusCount++;
                     break;
             }
-            total += this.content[i].value;
+            total += i.value;
         }
         // Word pink/red bonuses
         // TODO : Export this into a new service.

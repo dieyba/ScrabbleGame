@@ -22,8 +22,8 @@ export class DictionaryService {
     }
 
     parseDictionary(dict: string): Dictionary {
-        let jsonObj: any = JSON.parse(dict); // string to generic object first
-        let dictionary: Dictionary = <Dictionary>jsonObj; // generic object to interface
-        return dictionary;
+        const jsonObj: unknown = JSON.parse(dict); // string to generic object first
+        const dictionaryParsed: Dictionary = jsonObj as Dictionary; // generic object to interface
+        return dictionaryParsed;
     }
 }
