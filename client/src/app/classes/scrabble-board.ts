@@ -13,6 +13,17 @@ export class ScrabbleBoard {
     squares: Square[][];
     boardSize: number = BOARD_SIZE;
 
+    constructor() {
+        this.squares = [];
+        for (let i = 0; i < this.boardSize; i++) {
+            this.squares[i] = [];
+            for (let j = 0; j < this.boardSize; j++) {
+                this.squares[i][j] = new Square();
+            }
+        }
+        this.generateBoard();
+    }
+
     generateBoard(): void {
         for (let i = 0; i < this.boardSize; i++) {
             for (let j = 0; j < this.boardSize; j++) {
@@ -29,7 +40,7 @@ export class ScrabbleBoard {
         this.crossBonus(Quadrant.SouthWest);
         this.crossBonus(Quadrant.NorthWest);
         this.crossBonus(Quadrant.SouthEast);
-        // Side bonuses
+        // +Side bonuses
         // TODO
     }
     crossBonus(side: Quadrant): void {

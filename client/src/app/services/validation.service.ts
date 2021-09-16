@@ -13,7 +13,9 @@ export class ValidationService {
     constructor(public dictionaryService: DictionaryService) {
         this.dictionary = dictionaryService.currentDictionary;
         // this.word = convertScrabbleWordToString(wordService...)
-        this.word = this.word.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (this.word) {
+            this.word = this.word.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
     }
 
     convertScrabbleWordToString(scrabbleLetter: ScrabbleLetter[]): string {

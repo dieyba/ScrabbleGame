@@ -6,6 +6,9 @@ const RED_FACTOR = 3;
 
 export class ScrabbleWord {
     content: ScrabbleLetter[]; // Array of ScrabbleLetters continually growing to represent the word
+    constructor() {
+        this.content = [];
+    }
     totalValue(): number {
         let total = 0;
         let pinkBonusCount = 0;
