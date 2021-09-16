@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Dictionary } from '@app/classes/dictionary';
 
 // TODO : Integrate other dictionnaries and choices
-import dict_url from '../../assets/dictionnary.json';
+import dict_url from 'src/assets/dictionnary.json';
 
 @Injectable({
     providedIn: 'root',
