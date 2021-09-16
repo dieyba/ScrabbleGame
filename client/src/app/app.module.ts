@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
@@ -20,8 +20,17 @@ import { StartingPageComponent } from '@app/pages/starting-page/starting-page.co
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, GamePageComponent, MainPageComponent, MaterialPageComponent, PlayAreaComponent, SidebarComponent, StartingPageComponent, ClassicModeComponent],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
+    declarations: [
+        AppComponent,
+        GamePageComponent,
+        MainPageComponent,
+        MaterialPageComponent,
+        PlayAreaComponent,
+        SidebarComponent,
+        StartingPageComponent,
+        ClassicModeComponent,
+    ],
+    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
     providers: [],
     bootstrap: [AppComponent],
 })
