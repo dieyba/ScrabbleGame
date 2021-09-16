@@ -13,6 +13,7 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { StartingPageComponent } from '@app/pages/starting-page/starting-page.component';
+import { FormComponent } from './components/form/form.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -29,6 +30,7 @@ import { StartingPageComponent } from '@app/pages/starting-page/starting-page.co
         SidebarComponent,
         StartingPageComponent,
         ClassicModeComponent,
+        FormComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
     providers: [],
