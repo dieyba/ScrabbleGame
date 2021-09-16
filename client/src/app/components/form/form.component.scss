@@ -1,3 +1,31 @@
 .container {
     display: none;
+    background: #fff;
+    width: 396px;
+    height: 307px;
+    padding: 30px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+.container .text {
+    font-family: 'Arial Bold', 'Arial', 'sans-serif';
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    color: #8c8c8c;
+    text-align: left;
+}
+.container hr.solid {
+    position: relative;
+    width: 118%;
+    left: -30px;
+    top: 10px;
+}
+.btn hr.solid {
+    position: relative;
+    left: -30px;
+    top: -15px;
+    width: 238%;
+}
+.container form {
+    margin-top: -20px;
 }
