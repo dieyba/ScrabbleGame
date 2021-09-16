@@ -1,3 +1,8 @@
 <!-- <div class="container"> -->
-    <div class="chat-display">inbox</div>
+    <div class="chat-display">
+        <div *ngFor="let entry of entries">
+            <p [ngStyle]="{'color': (entry.author == 'system') ? 'black' : (entry.author == 'adversary') ? 'red' : 'blue'}">
+                » {{ entry.message }}
+            </p>
+    </div>
 <!-- </div> -->
