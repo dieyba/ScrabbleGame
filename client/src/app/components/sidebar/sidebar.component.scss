@@ -2,6 +2,41 @@
     height: auto;
     min-height: 98vh;
     border: 1px solid black;
-    padding: 0 5px 0 5px;
-    margin-right: 5px;
+    padding: 5px;
+}
+
+.summary {
+    padding: 20px 10px;
+}
+
+.row {
+    margin: 10px 0px 10px 0px;
+}
+
+.info {
+    font-size: 18px;
+}
+.bold {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.card {
+    margin: 5px;
+    background-color: #dcecff;
+}
+
+.card-title {
+    margin: 20px;
+}
+
+.values {
+    font-size: 25px;
+    display: block;
+    text-align: center;
+}
+
+hr {
+    margin: 15px 5px;
+    border: 1px solid #6aa0e0;
 }

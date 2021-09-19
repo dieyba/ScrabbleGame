@@ -9,14 +9,19 @@ export enum SquareColor {
 }
 
 export class Square {
-    position: Vec2; // Where the square is on the board
-    color: SquareColor; // TO DO - replace string for Color enum
+    position: Vec2 = {x:0, y:0}; // Where the square is on the board
+    color: SquareColor; 
     occupied: boolean; // 0 if not occupied, 1 if it is
     // We should create an "id" to facilitate the *randomize bonuses* feature.
 
-    constructor() {
-        this.position = new Vec2();
+    constructor(horizontalPosition: number, verticalPosition: number) {
         this.color = SquareColor.None;
         this.occupied = false;
+        this.position.x = horizontalPosition;
+        this.position.y = verticalPosition;
+    }
+
+    getColor(): SquareColor {
+        return this.color;
     }
 }

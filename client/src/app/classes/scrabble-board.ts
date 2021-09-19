@@ -18,7 +18,7 @@ export class ScrabbleBoard {
         for (let i = 0; i < this.boardSize; i++) {
             this.squares[i] = [];
             for (let j = 0; j < this.boardSize; j++) {
-                this.squares[i][j] = new Square();
+                this.squares[i][j] = new Square(i, j);
             }
         }
         this.generateBoard();
