@@ -38,53 +38,53 @@ describe('ValidationService', () => {
     });
 
     it('convertScrabbleWordToString should return a string of the scrabble word', () => {
-        let firstLetter: ScrabbleLetter = new ScrabbleLetter();
+        const firstLetter: ScrabbleLetter = new ScrabbleLetter();
         firstLetter.character = 'D';
-        let secondLetter: ScrabbleLetter = new ScrabbleLetter();
+        const secondLetter: ScrabbleLetter = new ScrabbleLetter();
         secondLetter.character = 'é';
-        let thirdLetter: ScrabbleLetter = new ScrabbleLetter();
+        const thirdLetter: ScrabbleLetter = new ScrabbleLetter();
         thirdLetter.character = 'j';
-        let fourthLetter: ScrabbleLetter = new ScrabbleLetter();
+        const fourthLetter: ScrabbleLetter = new ScrabbleLetter();
         fourthLetter.character = 'à';
-        let word: ScrabbleLetter[] = [firstLetter, secondLetter, thirdLetter, fourthLetter];
+        const word: ScrabbleLetter[] = [firstLetter, secondLetter, thirdLetter, fourthLetter];
         expect(service.convertScrabbleWordToString(word)).toEqual('deja');
     });
 
     it('if words is not null, validateWordsAndCalculateScore should call convertScrabbleWordToString and isWordValid', () => {
-        let firstLetter: ScrabbleLetter = new ScrabbleLetter();
+        const firstLetter: ScrabbleLetter = new ScrabbleLetter();
         firstLetter.character = 'D';
-        let secondLetter: ScrabbleLetter = new ScrabbleLetter();
+        const secondLetter: ScrabbleLetter = new ScrabbleLetter();
         secondLetter.character = 'é';
-        let thirdLetter: ScrabbleLetter = new ScrabbleLetter();
+        const thirdLetter: ScrabbleLetter = new ScrabbleLetter();
         thirdLetter.character = 'j';
-        let fourthLetter: ScrabbleLetter = new ScrabbleLetter();
+        const fourthLetter: ScrabbleLetter = new ScrabbleLetter();
         fourthLetter.character = 'à';
-        let word1: ScrabbleWord = new ScrabbleWord();
+        const word1: ScrabbleWord = new ScrabbleWord();
         word1.content = [firstLetter, secondLetter, thirdLetter, fourthLetter];
-        let word2: ScrabbleWord = new ScrabbleWord();
+        const word2: ScrabbleWord = new ScrabbleWord();
         word2.content = [firstLetter, secondLetter, thirdLetter, fourthLetter];
-        let words: ScrabbleWord[] = [word1, word2];
+        const words: ScrabbleWord[] = [word1, word2];
         service.validateWordsAndCalculateScore(words);
         expect(convertScrabbleWordToStringSpy).toHaveBeenCalled();
         expect(isWordValidSpy).toHaveBeenCalled();
     });
 
     it('if one word is not valid, validateWordsAndCalculateScore should return 0', () => {
-        let firstLetter: ScrabbleLetter = new ScrabbleLetter();
+        const firstLetter: ScrabbleLetter = new ScrabbleLetter();
         firstLetter.character = 'J';
-        let secondLetter: ScrabbleLetter = new ScrabbleLetter();
+        const secondLetter: ScrabbleLetter = new ScrabbleLetter();
         secondLetter.character = "'";
-        let thirdLetter: ScrabbleLetter = new ScrabbleLetter();
+        const thirdLetter: ScrabbleLetter = new ScrabbleLetter();
         thirdLetter.character = 'a';
-        let fourthLetter: ScrabbleLetter = new ScrabbleLetter();
+        const fourthLetter: ScrabbleLetter = new ScrabbleLetter();
         fourthLetter.character = 'i';
-        let fifthLetter: ScrabbleLetter = new ScrabbleLetter();
+        const fifthLetter: ScrabbleLetter = new ScrabbleLetter();
         fourthLetter.character = 's';
-        let word1: ScrabbleWord = new ScrabbleWord();
+        const word1: ScrabbleWord = new ScrabbleWord();
         word1.content = [firstLetter, secondLetter, thirdLetter, fourthLetter]; // J'ai - non valide
-        let word2: ScrabbleWord = new ScrabbleWord();
+        const word2: ScrabbleWord = new ScrabbleWord();
         word2.content = [firstLetter, thirdLetter, fourthLetter, fifthLetter]; // Jais - valide
-        let words: ScrabbleWord[] = [word1, word2];
+        const words: ScrabbleWord[] = [word1, word2];
         expect(service.validateWordsAndCalculateScore(words)).toEqual(0);
     });
 });

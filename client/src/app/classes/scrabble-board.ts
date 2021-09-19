@@ -73,16 +73,13 @@ export class ScrabbleBoard {
                     case this.boardSize / 3: {
                         // case 5
                         this.squares[i][j].color = SquareColor.DarkBlue;
-
                         break;
                     }
                     case this.boardSize / 3 + 1: {
                         // case 6
                         this.squares[i][j].color = SquareColor.Teal;
-
                         break;
-                    }
-                
+                    }                
                     default:{
                         this.squares[i][j].color = SquareColor.None;
                         break;
