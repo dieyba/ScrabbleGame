@@ -2,14 +2,19 @@
 export enum AuthorType {
     System = 'System',
     Adversary = 'Adversary',
-    Player = 'Player'
+    Player = 'Player',
 }
 export enum ChatEntryColor {
     SystemColor = 'black',
     PlayerColor = 'blue',
-    AdversaryColor = 'red'
+    AdversaryColor = 'red',
 }
 
+export enum ErrorType {
+    SyntaxError,
+    InvalidCommand,
+    ImpossibleCommand,
+}
 export interface ChatDisplayEntry {
     authorType: AuthorType;
     color: ChatEntryColor;

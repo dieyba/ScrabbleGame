@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { ErrorType } from '@app/classes/chat-display-entry';
+import { ChatDisplayService } from './chat-display.service';
 
 const COMMAND_LIST = ['placer', 'échanger', 'passer', 'debug', 'réserve', 'aide'] as const;
 
@@ -6,6 +8,8 @@ const COMMAND_LIST = ['placer', 'échanger', 'passer', 'debug', 'réserve', 'aid
     providedIn: 'root',
 })
 export class TextEntryService {
+    constructor(private chatDisplayService: ChatDisplayService) {}
+
     /**
      * @description This function verifies if the input is a valid command or
      * just text. It doesn't check the command's arguments of the command.
@@ -16,13 +20,16 @@ export class TextEntryService {
         if (text.charAt(0) === '!') {
             if (this.isValidCommand(text)) {
                 // Send to command handler
-                console.log(text); // TODO replace by the command handler function
+                // TODO send to command handler function
             } else {
                 // TODO invalid command message
+                this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
             }
         } else {
             // Send to other player
-            console.log(text);
+            if (text !== '') {
+                this.chatDisplayService.addPlayerEntry(false, text);
+            }
         }
     }
 
