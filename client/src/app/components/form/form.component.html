@@ -1,27 +1,47 @@
 <div class="container" id="form">
     <!--formulaire mode solo-->
-    <form>
+    <form #form="ngForm">
         <div class="form-group">
             <label>NOM: </label>
-            <input type="text" class="form-control" name="nom" />
+            <input
+                pattern="[a-zA-Z]*"
+                [class.is-danger]="form.invalid"
+                type="text"
+                class="form-control"
+                name="nom"
+                [(ngModel)]="name"
+                placeholder="Entrez votre nom... ( 4 à 12 caractères)"
+                required
+                minlength="4"
+                maxlength="12"
+            />
+            <div *ngIf="form.invalid" class="tag is-danger is-light">le champ saisi ne doit contenir que des lettres</div>
         </div>
         <div class="form-group">
-            <label>Minuteur: </label>
-            <input type="text" name="minute" id="minute" value="1:00" />
+            <label>Minuteur(sec): </label>
+            <input type="text" name="minute" id="minute" [(ngModel)]="timer" />
         </div>
         <div>
             <label>Dictonnaire : </label>
-            <select class="form-control" name="dictionnaire">
-                <option selected>Français (défaut)</option>
+            <select class="form-control" name="dictionnaire" [(ngModel)]="dictionnary">
+                <option selected>{{ dictionnary }}</option>
                 <option>Autre</option>
             </select>
         </div>
         <div class="form-check">
-            <input class="form check-input" type="checkbox" name="bonus aléatoire" />
+            <input class="form check-input" type="checkbox" name="bonus" [(ngModel)]="bonus" />
             <label class="form check label">Bonus aléatoire</label>
         </div>
         <div>
-            <button class="form">Joueur Débutant</button>
+            <button class="form" (click)="randomPlayer(debutantNameList)">Joueur Débutant</button>
+            <div id="opponents">
+                <ul class="heroes">
+                    <li *ngFor="let hero of debutantNameList" (click)="onSelect(hero)" [class.selected]="hero === selectedPlayer">
+                        <option selected>{{ hero }}</option>
+                    </li>
+                </ul>
+            </div>
+            <div>Vous allez jouer contre {{ selectedPlayer }}</div>
             <button class="form">Joueur Expert</button>
         </div>
     </form>
