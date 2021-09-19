@@ -18,15 +18,15 @@ export class WordBuilderService {
   }
   */
 
-    /*This function builds a word, given a direction and the very first letter
+    /* This function builds a word, given a direction and the very first letter
 from the north, east, south or west position. Written to be used in conjunction
 with a function that would find all new edges of the scrabble board*/
     scoreWordInADirection(firstLetter: ScrabbleLetter, direction: number): ScrabbleWord {
-        if (direction == 0 || direction == 3) {
-            //If the direction is illegal
-            //throw exception (TODO)
+        if (direction === 0 || direction === 3) {
+            // If the direction is illegal
+            // throw exception (TODO)
         }
-        let wordInConstruction = new ScrabbleWord();
+        const wordInConstruction = new ScrabbleWord();
         wordInConstruction.content[0] = firstLetter;
 
         let i = 0;
@@ -38,7 +38,7 @@ with a function that would find all new edges of the scrabble board*/
         return wordInConstruction;
     }
 
-    /*scoreWordFromEdge(firstLetter : ScrabbleLetter) : ScrabbleWord[]{
+    /* scoreWordFromEdge(firstLetter : ScrabbleLetter) : ScrabbleWord[]{
     let wordsFormed = new ScrabbleWord[];
     let j = 0
     for(let i = 0; i < firstLetter.nextLetters.length; i++){
