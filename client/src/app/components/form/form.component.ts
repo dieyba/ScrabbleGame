@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+
 @Component({
     selector: 'app-form',
     templateUrl: './form.component.html',
@@ -22,21 +23,41 @@ export class FormComponent {
         this.debutantNameList = ['erika', 'etienne', 'sara'];
         this.expertNameList = ['dieyna', 'kevin', 'arianne'];
     }
+
     openForms(): void {
         document.getElementById('form')!.style.display = 'block';
     }
-    openList(): void {
-        document.getElementById('opponents')!.style.display = 'block';
-    }
+
     onSelect(opponent: string): void {
-        document.getElementById('opponents')!.style.display = 'block';
         this.selectedPlayer = opponent;
     }
-    randomPlayer(list: string[]): void {
+
+    /*randomPlayer(list: string[]): void {
         document.getElementById('opponents')!.style.display = 'block';
-        let randomFloat = Math.random() * (list.length + 1);
+        let randomFloat = Math.random() * list.length;
         this.random = randomFloat;
         this.selectedPlayer = list[Math.floor(randomFloat)];
+    } */
+
+    randomPlayer(list: string[]): void {
+        document.getElementById('opponents')!.style.display = 'block';
+        this.random = this.randomNumber(0, list.length);
+
+        while (this.name == list[this.random]) {
+            this.random = this.randomNumber(0, list.length);
+        }
+
+        this.selectedPlayer = list[this.random];
+    }
+
+    randomNumber(minimum: number, maximum: number): number {
+        let randomFloat = Math.random() * (maximum - minimum);
+        return Math.floor(randomFloat) + minimum;
+    }
+
+    closeForms(): void {
+        document.getElementById('form')!.style.display = 'none';
+        document.getElementById('opponents')!.style.display = 'none';
     }
 
     /**  ANCIENNE VERSION
@@ -49,12 +70,6 @@ export class FormComponent {
     error: boolean;
     errorMessage: String;
 
-    openForms(): void {
-        document.getElementById('form')!.style.display = 'block';
-    }
-    openList(): void {
-        document.getElementById('opponents')!.style.display = 'block';
-    }
     confirmName(): void {
         if (this.form.getName().length < 4 || this.form.getName().length > 12) {
             this.form.nameValid = false;

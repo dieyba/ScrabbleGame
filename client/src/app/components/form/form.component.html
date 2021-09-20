@@ -1,6 +1,6 @@
 <div class="container" id="form">
     <!--formulaire mode solo-->
-    <form #form="ngForm">
+    <form #form="ngForm" id="myForm">
         <div class="form-group">
             <label>NOM: </label>
             <input
@@ -10,9 +10,9 @@
                 class="form-control"
                 name="nom"
                 [(ngModel)]="name"
-                placeholder="Entrez votre nom... ( 4 à 12 caractères)"
+                placeholder="Entrez votre nom... ( 3 à 12 caractères)"
                 required
-                minlength="4"
+                minlength="3"
                 maxlength="12"
             />
             <div *ngIf="form.invalid" class="tag is-danger is-light">le champ saisi ne doit contenir que des lettres</div>
@@ -34,22 +34,22 @@
         </div>
         <div>
             <button class="form" (click)="randomPlayer(debutantNameList)">Joueur Débutant</button>
+            <button class="form">Joueur Expert</button>
             <div id="opponents">
                 <ul class="heroes">
-                    <li *ngFor="let hero of debutantNameList" (click)="onSelect(hero)" [class.selected]="hero === selectedPlayer">
-                        <option selected>{{ hero }}</option>
+                    <li *ngFor="let opponent of debutantNameList" (click)="onSelect(opponent)" [class.selected]="opponent === selectedPlayer">
+                        <option>{{ opponent }}</option>
                     </li>
                 </ul>
+                <div>Vous allez jouer contre {{ selectedPlayer }}</div>
             </div>
-            <div>Vous allez jouer contre {{ selectedPlayer }}</div>
-            <button class="form">Joueur Expert</button>
         </div>
     </form>
 
     <div>
         <button class="jouer">Commencer</button>
         <!-- ajouter un router link-->
-        <button class="annuler">Annuler</button>
+        <button class="annuler" (click)="closeForms()">Annuler</button>
         <!-- ajouter un router link-->
     </div>
 </div>
