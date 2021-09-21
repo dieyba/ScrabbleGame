@@ -1,53 +1,51 @@
 <div class="container" id="form">
     <!--formulaire mode solo-->
-    <form #form="ngForm" id="myForm">
+    <form [formGroup]="myForm">
+        <!--form #form="ngForm" id="myForm"-->
         <div class="form-group">
             <label>NOM: </label>
             <input
                 pattern="[a-zA-Z]*"
-                [class.is-danger]="form.invalid"
                 type="text"
                 class="form-control"
                 name="nom"
-                [(ngModel)]="name"
                 placeholder="Entrez votre nom... ( 3 à 12 caractères)"
-                required
-                minlength="3"
-                maxlength="12"
+                formControlName="name"
             />
-            <div *ngIf="form.invalid" class="tag is-danger is-light">le champ saisi ne doit contenir que des lettres</div>
+            <div *ngIf="myForm.controls['name'].invalid" class="tag is-danger is-light">le champ est requis</div>
         </div>
         <div class="form-group">
             <label>Minuteur(sec): </label>
-            <input type="text" name="minute" id="minute" [(ngModel)]="timer" />
+            <input type="text" name="minute" id="minute" formControlName="timer" />
         </div>
         <div>
             <label>Dictonnaire : </label>
-            <select class="form-control" name="dictionnaire" [(ngModel)]="dictionnary">
+            <select class="form-control" name="dictionnaire" formControlName="dictionnary">
                 <option selected>{{ dictionnary }}</option>
                 <option>Autre</option>
             </select>
         </div>
         <div class="form-check">
-            <input class="form check-input" type="checkbox" name="bonus" [(ngModel)]="bonus" />
+            <input class="form check-input" type="checkbox" name="bonus" formControlName="bonus" />
             <label class="form check label">Bonus aléatoire</label>
         </div>
         <div>
-            <button class="form" (click)="randomPlayer(debutantNameList)">Joueur Débutant</button>
-            <button class="form">Joueur Expert</button>
-            <div id="opponents">
-                <ul class="heroes">
+            <h3>Veuillez choisir le niveau de votre adversaire</h3>
+            <a class="form" (click)="randomPlayer(debutantNameList)" formControlName="niveau">Joueur Débutant</a>
+            <a class="form" formControlName="niveau">Joueur Expert</a>
+            <!--div id="opponents"-->
+            <!--ul class="heroes">
                     <li *ngFor="let opponent of debutantNameList" (click)="onSelect(opponent)" [class.selected]="opponent === selectedPlayer">
                         <option>{{ opponent }}</option>
                     </li>
-                </ul>
-                <div>Vous allez jouer contre {{ selectedPlayer }}</div>
-            </div>
+                </ul-->
+            <p>Vous allez jouer contre {{ selectedPlayer }}</p>
+            <!--/div-->
         </div>
     </form>
 
     <div>
-        <button class="jouer">Commencer</button>
+        <button class="jouer" routerLink="/game">Commencer</button>
         <!-- ajouter un router link-->
         <button class="annuler" (click)="closeForms()">Annuler</button>
         <!-- ajouter un router link-->
