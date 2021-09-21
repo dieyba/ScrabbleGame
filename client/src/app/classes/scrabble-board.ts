@@ -27,19 +27,54 @@ export class ScrabbleBoard {
     generateBoard(): void {
         for (let i = 0; i < this.boardSize; i++) {
             for (let j = 0; j < this.boardSize; j++) {
-                this.squares[i][j].occupied = false;
-                this.squares[i][j].position.x = i;
-                this.squares[i][j].position.y = j;
-                this.squares[i][j].color = SquareColor.None;
+                // Cross
+                if (i == j || i == BOARD_SIZE - 1 - j) {
+                    if (i === 0 || i === 14) {
+                        this.squares[i][j].color = SquareColor.Red;
+                    }
+                    if ((i > 0 && i < 5) || (i > 9 && i < 14) || i === 7) {
+                        this.squares[i][j].color = SquareColor.Pink;
+                    }
+                    if (i === 6 || i === 8) {
+                        this.squares[i][j].color = SquareColor.Teal;
+                    }
+                }
 
-                // Appliquer les boni par la suite avec un service de calcul de boni
+                // Red
+                if (Math.abs(i - j) === 7 && (i === 7 || j === 7)) {
+                    this.squares[i][j].color = SquareColor.Red;
+                }
+
+                // Dark blue
+                if (i === 5 || i === 9) {
+                    if (j === 1 || j === 5 || j === 9 || j === 13) {
+                        this.squares[i][j].color = SquareColor.DarkBlue;
+                    }
+                }
+                if (j === 5 || j === 9) {
+                    if (i === 1 || i === 5 || i === 9 || i === 13) {
+                        this.squares[i][j].color = SquareColor.DarkBlue;
+                    }
+                }
+
+                // Teal
+                if (i === 0 || i == 14) {
+                    if (j === 3 || j === 11) {
+                        this.squares[i][j].color = SquareColor.Teal;
+                    }
+                }
+                if (j === 0 || j == 14) {
+                    if (i === 3 || i === 11) {
+                        this.squares[i][j].color = SquareColor.Teal;
+                    }
+                }
             }
         }
         // Big cross
-        this.crossBonus(Quadrant.NorthEast);
-        this.crossBonus(Quadrant.SouthWest);
-        this.crossBonus(Quadrant.NorthWest);
-        this.crossBonus(Quadrant.SouthEast);
+        //this.crossBonus(Quadrant.NorthEast);
+        //this.crossBonus(Quadrant.SouthWest);
+        //this.crossBonus(Quadrant.NorthWest);
+        //this.crossBonus(Quadrant.SouthEast);
         // +Side bonuses
         // TODO
     }

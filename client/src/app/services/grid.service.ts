@@ -5,8 +5,8 @@ import { Square, SquareColor } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
 
 // TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
-export const DEFAULT_WIDTH = 800;
-export const DEFAULT_HEIGHT = 800;
+export const DEFAULT_WIDTH = 700;
+export const DEFAULT_HEIGHT = 700;
 const BOARD_SIZE = 15;
 const SQUARE_SIZE = DEFAULT_WIDTH / BOARD_SIZE - 2;
 const OFFSET = 30;
@@ -34,7 +34,7 @@ export class GridService {
         this.gridContext.fillStyle = 'black';
         for (let i = 1; i <= BOARD_SIZE; i++) {
             this.gridContext.fillText(String(i), (DEFAULT_WIDTH / BOARD_SIZE - 1) * i, 22);
-            this.gridContext.fillText(this.rowMainLetters[i - 1], 0, (DEFAULT_WIDTH / BOARD_SIZE) * i + 10);
+            this.gridContext.fillText(this.rowMainLetters[i - 1], 0, (DEFAULT_WIDTH / BOARD_SIZE) * i + 15);
         }
 
         for (let i = 0; i <= BOARD_SIZE; i++) {
@@ -52,7 +52,7 @@ export class GridService {
 
     drawColors(): void {
         this.gridContext.beginPath();
-        this.gridContext.font = '15px system-ui';
+        this.gridContext.font = '13px system-ui';
 
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
@@ -61,7 +61,7 @@ export class GridService {
                 switch (this.scrabbleBoard.squares[i][j].color) {
                     case SquareColor.DarkBlue:
                         this.gridContext.fillStyle = '#6AA0E0';
-                        this.gridContext.fillRect(startx, starty, SQUARE_SIZE, SQUARE_SIZE);                     
+                        this.gridContext.fillRect(startx, starty, SQUARE_SIZE, SQUARE_SIZE);
                         this.gridContext.fillStyle = 'black';
                         this.gridContext.fillText('LETTRE', startx + 2, starty + 20);
                         this.gridContext.fillText('x3', startx + 18, starty + 40);
@@ -77,8 +77,8 @@ export class GridService {
                         this.gridContext.fillStyle = '#FFA7C7';
                         this.gridContext.fillRect(startx, starty, SQUARE_SIZE, SQUARE_SIZE);
                         this.gridContext.fillStyle = 'black';
-                        this.gridContext.fillText('MOT', startx + 10, starty + 20);
-                        this.gridContext.fillText('x2', startx + 18, starty + 40);
+                        this.gridContext.fillText('MOT', startx + 8, starty + 20);
+                        this.gridContext.fillText('x2', startx + 16, starty + 40);
                         break;
                     case SquareColor.Red:
                         this.gridContext.fillStyle = '#C03E3E';
@@ -91,7 +91,7 @@ export class GridService {
             }
         }
 
-        // TEST
+        // TODO - Remove Test
         let letter1 = new ScrabbleLetter();
         letter1.character = 'a';
         letter1.square = new Square(8, 9);
@@ -130,11 +130,11 @@ export class GridService {
         let letter = scrabbleLetter.character.toUpperCase();
 
         // If colored square, hide text
-        if(scrabbleLetter.square.color != SquareColor.None) {
+        if (scrabbleLetter.square.color != SquareColor.None) {
             switch (scrabbleLetter.square.color) {
                 case SquareColor.DarkBlue:
                     this.gridContext.fillStyle = '#6AA0E0';
-                    this.gridContext.fillRect(positionX + 1, positionY + 1, SQUARE_SIZE, SQUARE_SIZE);     
+                    this.gridContext.fillRect(positionX + 1, positionY + 1, SQUARE_SIZE, SQUARE_SIZE);
                     break;
                 case SquareColor.Teal:
                     this.gridContext.fillStyle = '#ACE3EE';
@@ -152,10 +152,10 @@ export class GridService {
         }
         // Draw letter
         this.gridContext.fillStyle = 'black';
-        this.gridContext.font = '45px system-ui';
+        this.gridContext.font = '40px system-ui';
         this.gridContext.fillText(letter, positionX + 10, positionY + SQUARE_SIZE / 2 + 15);
 
-        // Draw letter value 
+        // Draw letter value
         this.gridContext.font = '15px system-ui';
         this.gridContext.fillText(String(scrabbleLetter.value), positionX + SQUARE_SIZE - 10, positionY + SQUARE_SIZE - 2);
     }

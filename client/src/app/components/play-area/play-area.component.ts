@@ -4,10 +4,10 @@ import { EaselService } from '@app/services/easel.service';
 import { GridService } from '@app/services/grid.service';
 
 // TODO : Avoir un fichier séparé pour les constantes!
-export const DEFAULT_WIDTH = 860;
-export const DEFAULT_HEIGHT = 860;
-export const EASEL_WIDTH = 700;
-export const EASEL_HEIGHT = 100;
+export const DEFAULT_WIDTH = 760;
+export const DEFAULT_HEIGHT = 760;
+export const EASEL_WIDTH = 600;
+export const EASEL_HEIGHT = 80;
 
 // TODO : Déplacer ça dans un fichier séparé accessible par tous
 export enum MouseButton {
