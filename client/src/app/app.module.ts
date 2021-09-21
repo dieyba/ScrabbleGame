@@ -14,6 +14,7 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { ChatBoxComponent } from './components/chat-box/chat-box.component';
 import { ChatDisplayComponent } from './components/chat-display/chat-display.component';
 import { TextEntryComponent } from './components/text-entry/text-entry.component';
+import { AutofocusDirective } from './directives/autofocus.directive';
 
 /**
  * Main module that is used in main.ts.
@@ -32,6 +33,7 @@ import { TextEntryComponent } from './components/text-entry/text-entry.component
         ChatBoxComponent,
         ChatDisplayComponent,
         TextEntryComponent,
+        AutofocusDirective,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
