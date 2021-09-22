@@ -2,7 +2,12 @@
     height:4vh;
     width: 96%;
     border: 1px solid black;
+    border-radius: 5px;
     padding: 0 5px 0 5px;
-    margin-top: 5px;
     overflow: auto;
+}
+
+.card {
+    margin: 10px;
+    padding: 10px;
 }

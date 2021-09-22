@@ -15,9 +15,9 @@
 .info {
     font-size: 18px;
 }
+
 .bold {
     font-size: 18px;
-    font-weight: bold;
 }
 
 .card {
@@ -44,4 +44,15 @@ hr {
     display: block;
     margin: 15px 0px;
     filter: grayscale(100%);
+}
+
+.return {
+    position:relative;
+    margin-top:100%;
+    font-size: 25px;
+    border-radius: 5px;
+    background-color: #6aa0e0;
+    border: 1px solid #6aa0e0;
+    padding: 5px;
+    width: 100%;
 }
