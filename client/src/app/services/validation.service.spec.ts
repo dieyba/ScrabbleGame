@@ -3,13 +3,13 @@ import { Dictionary } from '@app/classes/dictionary';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { ValidationService } from '@app/services/validation.service';
-import dictionary from '../../assets/dictionnary.json';
+import dictionary from 'src/assets/dictionnary.json';
 
 describe('ValidationService', () => {
     let service: ValidationService;
     let validationServiceSpy: jasmine.SpyObj<ValidationService>;
-    let isWordValidSpy: jasmine.SpyObj<any>;
-    let convertScrabbleWordToStringSpy: jasmine.SpyObj<any>;
+    let isWordValidSpy: jasmine.SpyObj<unknown>;
+    let convertScrabbleWordToStringSpy: jasmine.SpyObj<unknown>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -17,8 +17,8 @@ describe('ValidationService', () => {
         });
         service = TestBed.inject(ValidationService);
 
-        isWordValidSpy = spyOn<any>(service, 'isWordValid').and.callThrough();
-        convertScrabbleWordToStringSpy = spyOn<any>(service, 'convertScrabbleWordToString').and.callThrough();
+        isWordValidSpy = spyOn<unknown>(service, 'isWordValid').and.callThrough();
+        convertScrabbleWordToStringSpy = spyOn<unknown>(service, 'convertScrabbleWordToString').and.callThrough();
     });
 
     it('should be created', () => {
