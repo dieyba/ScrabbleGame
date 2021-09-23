@@ -15,6 +15,7 @@ export class SidebarComponent {
     player1LetterCount: number;
     player2: Player;
     player2LetterCount: number;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     lettersLeftCount: number = 15; // TODO - get actual value
     countDown: number;
     timer: string;

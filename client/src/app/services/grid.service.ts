@@ -98,12 +98,14 @@ export class GridService {
         // TODO - Remove Test
         const letter1 = new ScrabbleLetter();
         letter1.character = 'a';
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         letter1.square = new Square(8, 9);
         letter1.value = 1;
         this.drawLetter(letter1);
 
         const letter2 = new ScrabbleLetter();
         letter2.character = 'p';
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         letter2.square = new Square(9, 9);
         letter2.square.color = SquareColor.DarkBlue;
         letter2.value = 3;
@@ -112,18 +114,21 @@ export class GridService {
         const letter3 = new ScrabbleLetter();
         letter3.character = 'p';
         letter3.value = 3;
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         letter3.square = new Square(10, 9);
         this.drawLetter(letter3);
 
         const letter4 = new ScrabbleLetter();
         letter4.character = 'l';
         letter4.value = 1;
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         letter4.square = new Square(11, 9);
         this.drawLetter(letter4);
 
         const letter5 = new ScrabbleLetter();
         letter5.character = 'e';
         letter5.value = 2;
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         letter5.square = new Square(12, 9);
         this.drawLetter(letter5);
     }
