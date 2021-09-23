@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { Square } from '@app/classes/square';
 
-export const EASEL_WIDTH = 600;
-export const EASEL_HEIGHT = 80;
+export const RACK_WIDTH = 600;
+export const RACK_HEIGHT = 80;
 const MAX_LETTER_COUNT = 7;
 const LETTER_OFFSET = 13;
 const VALUE_OFFSET = 10;
@@ -11,17 +11,17 @@ const VALUE_OFFSET = 10;
 @Injectable({
     providedIn: 'root',
 })
-export class EaselService {
+export class RackService {
     gridContext: CanvasRenderingContext2D;
 
-    drawEasel() {
+    drawRack() {
         this.gridContext.beginPath();
         this.gridContext.strokeStyle = 'black';
         this.gridContext.lineWidth = 1;
 
         for (let i = 1; i < MAX_LETTER_COUNT; i++) {
-            this.gridContext.moveTo((EASEL_WIDTH * i) / MAX_LETTER_COUNT, 0);
-            this.gridContext.lineTo((EASEL_WIDTH * i) / MAX_LETTER_COUNT, EASEL_HEIGHT);
+            this.gridContext.moveTo((RACK_WIDTH * i) / MAX_LETTER_COUNT, 0);
+            this.gridContext.lineTo((RACK_WIDTH * i) / MAX_LETTER_COUNT, RACK_HEIGHT);
         }
 
         this.gridContext.stroke();
@@ -58,13 +58,13 @@ export class EaselService {
     }
 
     drawLetter(scrabbleLetter: ScrabbleLetter): void {
-        const positionX = (EASEL_WIDTH * scrabbleLetter.square.position.x) / MAX_LETTER_COUNT;
-        const positionY = (EASEL_HEIGHT * scrabbleLetter.square.position.y) / MAX_LETTER_COUNT;
+        const positionX = (RACK_WIDTH * scrabbleLetter.square.position.x) / MAX_LETTER_COUNT;
+        const positionY = (RACK_HEIGHT * scrabbleLetter.square.position.y) / MAX_LETTER_COUNT;
         const letter = scrabbleLetter.character.toUpperCase();
         this.gridContext.fillStyle = 'black';
         this.gridContext.font = '80px system-ui';
-        this.gridContext.fillText(letter, positionX + LETTER_OFFSET, positionY + EASEL_HEIGHT - LETTER_OFFSET);
+        this.gridContext.fillText(letter, positionX + LETTER_OFFSET, positionY + RACK_HEIGHT - LETTER_OFFSET);
         this.gridContext.font = '20px system-ui';
-        this.gridContext.fillText(String(scrabbleLetter.value), positionX + EASEL_HEIGHT - VALUE_OFFSET, positionY + EASEL_HEIGHT - VALUE_OFFSET / 2);
+        this.gridContext.fillText(String(scrabbleLetter.value), positionX + RACK_HEIGHT - VALUE_OFFSET, positionY + RACK_HEIGHT - VALUE_OFFSET / 2);
     }
 }
