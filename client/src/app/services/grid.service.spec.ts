@@ -56,7 +56,7 @@ describe('GridService', () => {
         expect(afterSize).toBeGreaterThan(beforeSize);
     });
 */
-    it(' drawGrid should call moveTo and lineTo 4 times', () => {
+    it(' drawGrid should call moveTo and lineTo 32 times', () => {
         const expectedCallTimes = 32;
         const moveToSpy = spyOn(service.gridContext, 'moveTo').and.callThrough();
         const lineToSpy = spyOn(service.gridContext, 'lineTo').and.callThrough();

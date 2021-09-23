@@ -1,13 +1,13 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
-import { EaselService } from '@app/services/easel.service';
 import { GridService } from '@app/services/grid.service';
+import { RackService } from '@app/services/rack.service';
 
 // TODO : Avoir un fichier séparé pour les constantes!
 export const DEFAULT_WIDTH = 760;
 export const DEFAULT_HEIGHT = 760;
-export const EASEL_WIDTH = 600;
-export const EASEL_HEIGHT = 80;
+export const RACK_WIDTH = 600;
+export const RACK_HEIGHT = 80;
 
 // TODO : Déplacer ça dans un fichier séparé accessible par tous
 export enum MouseButton {
@@ -25,14 +25,14 @@ export enum MouseButton {
 })
 export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
-    @ViewChild('easelCanvas', { static: false }) private easelCanvas!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('rackCanvas', { static: false }) private rackCanvas!: ElementRef<HTMLCanvasElement>;
 
     mousePosition: Vec2 = { x: 0, y: 0 };
     buttonPressed = '';
     private canvasSize = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
-    private easelSize = { x: EASEL_WIDTH, y: EASEL_HEIGHT };
+    private rackSize = { x: RACK_WIDTH, y: RACK_HEIGHT };
 
-    constructor(private readonly gridService: GridService, private readonly easelService: EaselService) {}
+    constructor(private readonly gridService: GridService, private readonly rackService: RackService) {}
 
     @HostListener('keydown', ['$event'])
     buttonDetect(event: KeyboardEvent) {
@@ -41,10 +41,10 @@ export class PlayAreaComponent implements AfterViewInit {
 
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        this.easelService.gridContext = this.easelCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        this.rackService.gridContext = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.gridService.drawGrid();
         this.gridService.drawColors();
-        this.easelService.drawEasel();
+        this.rackService.drawRack();
         this.gridCanvas.nativeElement.focus();
     }
 
@@ -56,12 +56,12 @@ export class PlayAreaComponent implements AfterViewInit {
         return this.canvasSize.y;
     }
 
-    get easelWidth(): number {
-        return this.easelSize.x;
+    get rackWidth(): number {
+        return this.rackSize.x;
     }
 
-    get easelHeight(): number {
-        return this.easelSize.y;
+    get rackHeight(): number {
+        return this.rackSize.y;
     }
 
     // TODO : déplacer ceci dans un service de gestion de la souris!

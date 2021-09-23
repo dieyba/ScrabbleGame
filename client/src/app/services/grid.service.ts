@@ -137,10 +137,12 @@ export class GridService {
         const positionX = (this.width * scrabbleLetter.square.position.x) / BOARD_SIZE + BOARD_OFFSET;
         const positionY = (this.height * scrabbleLetter.square.position.y) / BOARD_SIZE + BOARD_OFFSET;
         const letter = scrabbleLetter.character.toUpperCase();
+        const i = scrabbleLetter.square.position.x;
+        const j = scrabbleLetter.square.position.y;
 
         // If colored square, hide text
-        if (scrabbleLetter.square.color !== SquareColor.None) {
-            switch (scrabbleLetter.square.color) {
+        if (this.scrabbleBoard.squares[i][j].color !== SquareColor.None) {
+            switch (this.scrabbleBoard.squares[i][j].color) {
                 case SquareColor.DarkBlue:
                     this.gridContext.fillStyle = '#6AA0E0';
                     this.gridContext.fillRect(positionX + 1, positionY + 1, SQUARE_SIZE, SQUARE_SIZE);

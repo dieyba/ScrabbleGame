@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { EaselService } from './easel.service';
+import { RackService } from './rack.service';
 
-describe('EaselService', () => {
-    let service: EaselService;
+describe('RackService', () => {
+    let service: RackService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(EaselService);
+        service = TestBed.inject(RackService);
     });
 
     it('should be created', () => {
