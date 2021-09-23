@@ -5,6 +5,8 @@ import { Square } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
+import { DebugCmd, PassTurnCmd, PlaceCmd, SwitchLettersCmd} from '@app/classes/commands';
+
 
 const COMMAND_LIST = ['placer', 'échanger', 'passer', 'debug', 'réserve', 'aide'] as const;
 
@@ -37,6 +39,13 @@ export class TextEntryService {
             if (text !== '') {
                 this.chatDisplayService.addPlayerEntry(false, text);
             }
+
+            // TODO: test command to remove when handler works
+            new DebugCmd().execute();
+            new PassTurnCmd().execute();
+            new PlaceCmd({x:50, y:100}, text).execute();
+            new SwitchLettersCmd(text).execute();
+
         }
     }
 
