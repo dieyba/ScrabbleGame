@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ChatDisplayEntry } from '@app/classes/chat-display-entry';
 import { ChatDisplayService } from '@app/services/chat-display.service';
 
@@ -8,15 +8,29 @@ import { ChatDisplayService } from '@app/services/chat-display.service';
     styleUrls: ['./chat-display.component.scss'],
 })
 export class ChatDisplayComponent {
+    @ViewChild('chatDisplayBox') private chatDisplayBox!: ElementRef;
     entries: ChatDisplayEntry[] = [];
+    lastEntry: ChatDisplayEntry;
 
     constructor(private chatDisplayService: ChatDisplayService) {
         this.entries = this.chatDisplayService.entries;
-        this.chatDisplayService.addNewEntryCallback(this.scrollDown);
+    }
+
+    updateScroll(entry: ChatDisplayEntry) {
+        if (this.isNewEntry(entry)) {
+            this.lastEntry = entry;
+            this.scrollDown();
+        }
     }
 
     scrollDown() {
-        const chatBox: HTMLElement = document.getElementById('chat-display-box') as HTMLElement;
-        chatBox.scrollTop = chatBox.scrollHeight;
+        this.chatDisplayBox.nativeElement.scrollTop = this.chatDisplayBox.nativeElement.scrollHeight;
+    }
+
+    isNewEntry(entry: ChatDisplayEntry) {
+        if (!this.lastEntry || entry !== this.lastEntry) {
+            return true;
+        }
+        return false;
     }
 }

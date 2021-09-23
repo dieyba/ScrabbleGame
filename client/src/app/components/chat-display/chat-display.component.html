@@ -1,5 +1,6 @@
-<div class="chat-display" id="chat-display-box">
-    <div *ngFor="let entry of entries">
+<div class="chat-display" #chatDisplayBox>
+    <div *ngFor="let entry of entries; let isLast = last">
         <p [ngStyle]="{ color: entry.color }">» {{ entry.message }}</p>
+        {{ isLast ? updateScroll(entry) : '' }}
     </div>
 </div>
