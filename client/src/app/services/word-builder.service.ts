@@ -1,11 +1,29 @@
 import { Injectable } from '@angular/core';
-import { Axis, Direction, ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { Axis, invertAxis, Direction, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 
 @Injectable({
     providedIn: 'root',
 })
 export class WordBuilderService {
+    allWordsCreated(newLetters: ScrabbleLetter[], axis: Axis): ScrabbleWord[] {
+        const wordList: ScrabbleWord[] = [];
+        let i = 0;
+        const horizontalResult = this.completeWordInADirection(newLetters[0], axis);
+        if (horizontalResult.content !== []) {
+            wordList[i] = horizontalResult;
+            i++;
+        }
+        for (const index of newLetters) {
+            const verticalResult = this.completeWordInADirection(index, invertAxis[axis]);
+            if (verticalResult.content !== []) {
+                wordList[i] = verticalResult;
+                i++;
+            }
+        }
+        return wordList;
+    }
+
     // THIS FUNCTION WILL BREAK WHEN CODE STRUCTURE CHANGES. BEWARE.
     completeWordInADirection(firstLetter: ScrabbleLetter, direction: Axis): ScrabbleWord {
         const wordInConstruction = new ScrabbleWord();
