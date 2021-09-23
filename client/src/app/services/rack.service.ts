@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Square } from '@app/classes/square';
+import { ScrabbleRack } from '@app/classes/scrabble-rack';
 
 export const RACK_WIDTH = 600;
 export const RACK_HEIGHT = 80;
@@ -12,7 +12,12 @@ const VALUE_OFFSET = 10;
     providedIn: 'root',
 })
 export class RackService {
+    scrabbleRack: ScrabbleRack;
     gridContext: CanvasRenderingContext2D;
+
+    constructor() {
+        this.scrabbleRack = new ScrabbleRack();
+    }
 
     drawRack() {
         this.gridContext.beginPath();
@@ -29,42 +34,43 @@ export class RackService {
         const letter1 = new ScrabbleLetter();
         letter1.character = 'a';
         letter1.value = 1;
-        letter1.square = new Square(0, 0);
         this.drawLetter(letter1);
 
         const letter2 = new ScrabbleLetter();
         letter2.character = 'o';
         letter2.value = 2;
-        letter2.square = new Square(1, 0);
         this.drawLetter(letter2);
 
         const letter3 = new ScrabbleLetter();
         letter3.character = 'p';
         letter3.value = 3;
-        letter3.square = new Square(2, 0);
         this.drawLetter(letter3);
 
         const letter4 = new ScrabbleLetter();
         letter4.character = 'k';
         letter4.value = 2;
-        letter4.square = new Square(3, 0);
         this.drawLetter(letter4);
 
         const letter5 = new ScrabbleLetter();
         letter5.character = 'g';
         letter5.value = 1;
-        letter5.square = new Square(3 + 1, 0);
         this.drawLetter(letter5);
     }
 
     drawLetter(scrabbleLetter: ScrabbleLetter): void {
-        const positionX = (RACK_WIDTH * scrabbleLetter.square.position.x) / MAX_LETTER_COUNT;
-        const positionY = (RACK_HEIGHT * scrabbleLetter.square.position.y) / MAX_LETTER_COUNT;
-        const letter = scrabbleLetter.character.toUpperCase();
-        this.gridContext.fillStyle = 'black';
-        this.gridContext.font = '80px system-ui';
-        this.gridContext.fillText(letter, positionX + LETTER_OFFSET, positionY + RACK_HEIGHT - LETTER_OFFSET);
-        this.gridContext.font = '20px system-ui';
-        this.gridContext.fillText(String(scrabbleLetter.value), positionX + RACK_HEIGHT - VALUE_OFFSET, positionY + RACK_HEIGHT - VALUE_OFFSET / 2);
+        for (let i = 0; i < MAX_LETTER_COUNT; i++) {
+            if (!this.scrabbleRack.squares[i].occupied) {
+                this.scrabbleRack.squares[i].letter = scrabbleLetter;
+                this.scrabbleRack.squares[i].occupied = true;
+                const positionX = (RACK_WIDTH * i) / MAX_LETTER_COUNT;
+                const letter = scrabbleLetter.character.toUpperCase();
+                this.gridContext.fillStyle = 'black';
+                this.gridContext.font = '80px system-ui';
+                this.gridContext.fillText(letter, positionX + LETTER_OFFSET, 0 + RACK_HEIGHT - LETTER_OFFSET);
+                this.gridContext.font = '20px system-ui';
+                this.gridContext.fillText(String(scrabbleLetter.value), positionX + RACK_HEIGHT - VALUE_OFFSET, 0 + RACK_HEIGHT - VALUE_OFFSET / 2);
+                return;
+            }
+        }
     }
 }

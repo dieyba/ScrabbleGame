@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Square, SquareColor } from '@app/classes/square';
+import { SquareColor } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
+
+enum Colors {
+    Teal = '#ACE3EE',
+    DarkBlue = '#6AA0E0',
+    Pink = '#FFA7C7',
+    Red = '#C03E3E',
+}
 
 // TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
 export const DEFAULT_WIDTH = 700;
@@ -22,6 +29,8 @@ export class GridService {
     scrabbleBoard: ScrabbleBoard;
     rowMainLetters: string = 'ABCDEFGHIJKLMNO';
     gridContext: CanvasRenderingContext2D;
+    letterFont: string = '40px system-ui';
+    valueFont: string = '15px system-ui';
     private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
 
     constructor() {
@@ -60,115 +69,106 @@ export class GridService {
 
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
-                const startx = (this.width * i) / BOARD_SIZE + 1 + BOARD_OFFSET;
-                const starty = (this.height * j) / BOARD_SIZE + 1 + BOARD_OFFSET;
-                switch (this.scrabbleBoard.squares[i][j].color) {
-                    case SquareColor.DarkBlue:
-                        this.gridContext.fillStyle = '#6AA0E0';
-                        this.gridContext.fillRect(startx, starty, SQUARE_SIZE, SQUARE_SIZE);
-                        this.gridContext.fillStyle = 'black';
-                        this.gridContext.fillText('LETTRE', startx + 2, starty + SMALL_OFFSET_Y);
-                        this.gridContext.fillText('x3', startx + BIG_OFFSET_X, starty + BIG_OFFSET_Y);
-                        break;
-                    case SquareColor.Teal:
-                        this.gridContext.fillStyle = '#ACE3EE';
-                        this.gridContext.fillRect(startx, starty, SQUARE_SIZE, SQUARE_SIZE);
-                        this.gridContext.fillStyle = 'black';
-                        this.gridContext.fillText('LETTRE', startx + 2, starty + SMALL_OFFSET_Y);
-                        this.gridContext.fillText('x2', startx + BIG_OFFSET_X, starty + BIG_OFFSET_Y);
-                        break;
-                    case SquareColor.Pink:
-                        this.gridContext.fillStyle = '#FFA7C7';
-                        this.gridContext.fillRect(startx, starty, SQUARE_SIZE, SQUARE_SIZE);
-                        this.gridContext.fillStyle = 'black';
-                        this.gridContext.fillText('MOT', startx + SMALL_OFFSET_X, starty + SMALL_OFFSET_Y);
-                        this.gridContext.fillText('x2', startx + BIG_OFFSET_X, starty + BIG_OFFSET_Y);
-                        break;
-                    case SquareColor.Red:
-                        this.gridContext.fillStyle = '#C03E3E';
-                        this.gridContext.fillRect(startx, starty, SQUARE_SIZE, SQUARE_SIZE);
-                        this.gridContext.fillStyle = 'black';
-                        this.gridContext.fillText('MOT', startx + SMALL_OFFSET_X, starty + SMALL_OFFSET_Y);
-                        this.gridContext.fillText('x3', startx + BIG_OFFSET_X, starty + BIG_OFFSET_Y);
-                        break;
-                }
+                const startX = (this.width * i) / BOARD_SIZE + 1 + BOARD_OFFSET;
+                const startY = (this.height * j) / BOARD_SIZE + 1 + BOARD_OFFSET;
+                this.drawSingleSquareColor(i, j, startX, startY);
             }
         }
-
-        // TODO - Remove Test
-        const letter1 = new ScrabbleLetter();
-        letter1.character = 'a';
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        letter1.square = new Square(8, 9);
-        letter1.value = 1;
-        this.drawLetter(letter1);
-
-        const letter2 = new ScrabbleLetter();
-        letter2.character = 'p';
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        letter2.square = new Square(9, 9);
-        letter2.square.color = SquareColor.DarkBlue;
-        letter2.value = 3;
-        this.drawLetter(letter2);
-
-        const letter3 = new ScrabbleLetter();
-        letter3.character = 'p';
-        letter3.value = 3;
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        letter3.square = new Square(10, 9);
-        this.drawLetter(letter3);
-
-        const letter4 = new ScrabbleLetter();
-        letter4.character = 'l';
-        letter4.value = 1;
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        letter4.square = new Square(11, 9);
-        this.drawLetter(letter4);
-
-        const letter5 = new ScrabbleLetter();
-        letter5.character = 'e';
-        letter5.value = 2;
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        letter5.square = new Square(12, 9);
-        this.drawLetter(letter5);
     }
 
-    drawLetter(scrabbleLetter: ScrabbleLetter): void {
-        const positionX = (this.width * scrabbleLetter.square.position.x) / BOARD_SIZE + BOARD_OFFSET;
-        const positionY = (this.height * scrabbleLetter.square.position.y) / BOARD_SIZE + BOARD_OFFSET;
-        const letter = scrabbleLetter.character.toUpperCase();
-        const i = scrabbleLetter.square.position.x;
-        const j = scrabbleLetter.square.position.y;
-
+    drawSingleSquareColor(i: number, j: number, startX: number, startY: number) {
         // If colored square, hide text
         if (this.scrabbleBoard.squares[i][j].color !== SquareColor.None) {
             switch (this.scrabbleBoard.squares[i][j].color) {
                 case SquareColor.DarkBlue:
-                    this.gridContext.fillStyle = '#6AA0E0';
-                    this.gridContext.fillRect(positionX + 1, positionY + 1, SQUARE_SIZE, SQUARE_SIZE);
+                    this.gridContext.fillStyle = Colors.DarkBlue;
+                    this.gridContext.fillRect(startX, startY, SQUARE_SIZE, SQUARE_SIZE);
+                    if (!this.scrabbleBoard.squares[i][j].occupied) {
+                        this.gridContext.fillStyle = 'black';
+                        this.gridContext.fillText('LETTRE', startX + 2, startY + SMALL_OFFSET_Y);
+                        this.gridContext.fillText('x3', startX + BIG_OFFSET_X, startY + BIG_OFFSET_Y);
+                    }
                     break;
                 case SquareColor.Teal:
-                    this.gridContext.fillStyle = '#ACE3EE';
-                    this.gridContext.fillRect(positionX + 1, positionY + 1, SQUARE_SIZE, SQUARE_SIZE);
+                    this.gridContext.fillStyle = Colors.Teal;
+                    this.gridContext.fillRect(startX, startY, SQUARE_SIZE, SQUARE_SIZE);
+                    if (!this.scrabbleBoard.squares[i][j].occupied) {
+                        this.gridContext.fillStyle = 'black';
+                        this.gridContext.fillText('LETTRE', startX + 2, startY + SMALL_OFFSET_Y);
+                        this.gridContext.fillText('x2', startX + BIG_OFFSET_X, startY + BIG_OFFSET_Y);
+                    }
                     break;
                 case SquareColor.Pink:
-                    this.gridContext.fillStyle = '#FFA7C7';
-                    this.gridContext.fillRect(positionX + 1, positionY + 1, SQUARE_SIZE, SQUARE_SIZE);
+                    this.gridContext.fillStyle = Colors.Pink;
+                    this.gridContext.fillRect(startX, startY, SQUARE_SIZE, SQUARE_SIZE);
+                    if (!this.scrabbleBoard.squares[i][j].occupied) {
+                        this.gridContext.fillStyle = 'black';
+                        this.gridContext.fillText('MOT', startX + SMALL_OFFSET_X, startY + SMALL_OFFSET_Y);
+                        this.gridContext.fillText('x2', startX + BIG_OFFSET_X, startY + BIG_OFFSET_Y);
+                    }
                     break;
                 case SquareColor.Red:
-                    this.gridContext.fillStyle = '#C03E3E';
-                    this.gridContext.fillRect(positionX + 1, positionY + 1, SQUARE_SIZE, SQUARE_SIZE);
+                    this.gridContext.fillStyle = Colors.Red;
+                    this.gridContext.fillRect(startX, startY, SQUARE_SIZE, SQUARE_SIZE);
+                    if (!this.scrabbleBoard.squares[i][j].occupied) {
+                        this.gridContext.fillStyle = 'black';
+                        this.gridContext.fillText('MOT', startX + SMALL_OFFSET_X, startY + SMALL_OFFSET_Y);
+                        this.gridContext.fillText('x3', startX + BIG_OFFSET_X, startY + BIG_OFFSET_Y);
+                        break;
+                    }
                     break;
             }
         }
+    }
+
+    // Draw single letters
+    drawLetter(scrabbleLetter: ScrabbleLetter, i: number, j: number): void {
+        scrabbleLetter.color = this.scrabbleBoard.squares[i][j].color;
+        this.scrabbleBoard.squares[i][j].letter = scrabbleLetter;
+        this.scrabbleBoard.squares[i][j].occupied = true;
+        const letter = scrabbleLetter.character.toUpperCase();
+        const startX = (this.width * i) / BOARD_SIZE + BOARD_OFFSET + 1;
+        const startY = (this.height * j) / BOARD_SIZE + BOARD_OFFSET + 1;
+
+        // Draw background
+        this.drawSingleSquareColor(i, j, startX, startY);
+
         // Draw letter
         this.gridContext.fillStyle = 'black';
-        this.gridContext.font = '40px system-ui';
-        this.gridContext.fillText(letter, positionX + SMALL_OFFSET_X + 2, positionY + SQUARE_SIZE / 2 + BOARD_SIZE);
+        this.gridContext.font = this.letterFont;
+        this.gridContext.fillText(letter, startX + SMALL_OFFSET_X + 2, startY + SQUARE_SIZE / 2 + BOARD_SIZE);
 
         // Draw letter value
-        this.gridContext.font = '15px system-ui';
-        this.gridContext.fillText(String(scrabbleLetter.value), positionX + SQUARE_SIZE - SMALL_OFFSET_X - 2, positionY + SQUARE_SIZE - 2);
+        this.gridContext.font = this.valueFont;
+        this.gridContext.fillText(String(scrabbleLetter.value), startX + SQUARE_SIZE - SMALL_OFFSET_X - 2, startY + SQUARE_SIZE - 2);
+    }
+
+    // Draw all letters
+    drawLetters(): void {
+        for (let i = 0; i < BOARD_SIZE; i++) {
+            for (let j = 0; j < BOARD_SIZE; j++) {
+                if (this.scrabbleBoard.squares[i][j].letter != null) {
+                    const positionX = (this.width * i) / BOARD_SIZE + BOARD_OFFSET;
+                    const positionY = (this.height * j) / BOARD_SIZE + BOARD_OFFSET;
+
+                    this.gridContext.fillStyle = 'black';
+                    this.gridContext.font = this.letterFont;
+                    this.gridContext.fillText(
+                        this.scrabbleBoard.squares[i][j].letter.character.toUpperCase(),
+                        positionX + SMALL_OFFSET_X + 2,
+                        positionY + SQUARE_SIZE / 2 + BOARD_SIZE,
+                    );
+
+                    // Draw letter value
+                    this.gridContext.font = this.valueFont;
+                    this.gridContext.fillText(
+                        String(this.scrabbleBoard.squares[i][j].letter.value),
+                        positionX + SQUARE_SIZE - SMALL_OFFSET_X - 2,
+                        positionY + SQUARE_SIZE - 2,
+                    );
+                }
+            }
+        }
     }
 
     get width(): number {
@@ -180,10 +180,22 @@ export class GridService {
     }
 
     sizeUpLetters(): void {
-        // TODO
+        // TODO : Implement max font size and font size increment intervals
+        this.letterFont = '40px system-ui';
+        this.valueFont = '15px system-ui';
+        this.gridContext.clearRect(0, 0, DEFAULT_WIDTH + 2 * BOARD_OFFSET, DEFAULT_HEIGHT + 2 * BOARD_OFFSET);
+        this.drawGrid();
+        this.drawColors();
+        this.drawLetters();
     }
 
     sizeDownLetters(): void {
-        // TODO
+        // TODO : Implement min font size and font size decrement intervals
+        this.letterFont = '30px system-ui';
+        this.valueFont = '10px system-ui';
+        this.gridContext.clearRect(0, 0, DEFAULT_WIDTH + 2 * BOARD_OFFSET, DEFAULT_HEIGHT + 2 * BOARD_OFFSET);
+        this.drawGrid();
+        this.drawColors();
+        this.drawLetters();
     }
 }

@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
 import { RackService } from '@app/services/rack.service';
@@ -44,7 +45,39 @@ export class PlayAreaComponent implements AfterViewInit {
         this.rackService.gridContext = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.gridService.drawGrid();
         this.gridService.drawColors();
+
+        // TODO - Remove Test
+        const letter1 = new ScrabbleLetter();
+        letter1.character = 'a';
+        letter1.value = 1;
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        this.gridService.drawLetter(letter1, 8, 9);
+
+        const letter2 = new ScrabbleLetter();
+        letter2.character = 'p';
+        letter2.value = 3;
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        this.gridService.drawLetter(letter2, 9, 9);
+
+        const letter3 = new ScrabbleLetter();
+        letter3.character = 'p';
+        letter3.value = 3;
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        this.gridService.drawLetter(letter3, 10, 9);
+
+        const letter4 = new ScrabbleLetter();
+        letter4.character = 'l';
+        letter4.value = 1;
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        this.gridService.drawLetter(letter4, 11, 9);
+
+        const letter5 = new ScrabbleLetter();
+        letter5.character = 'e';
+        letter5.value = 2;
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        this.gridService.drawLetter(letter5, 12, 9);
         this.rackService.drawRack();
+
         this.gridCanvas.nativeElement.focus();
     }
 
@@ -73,5 +106,9 @@ export class PlayAreaComponent implements AfterViewInit {
 
     sizeUpLetters(): void {
         this.gridService.sizeUpLetters();
+    }
+
+    sizeDownLetters(): void {
+        this.gridService.sizeDownLetters();
     }
 }

@@ -3,6 +3,7 @@ import { Dictionary } from '@app/classes/dictionary';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { DictionaryService } from '@app/services/dictionary.service';
+import { GridService } from './grid.service';
 
 const BONUS_LETTER_COUNT = 7;
 const BONUS_POINTS = 50;
@@ -14,7 +15,7 @@ export class ValidationService {
     dictionary: Dictionary;
     words: string[];
 
-    constructor(public dictionaryService: DictionaryService, public newWords: ScrabbleWord[]) {
+    constructor(public dictionaryService: DictionaryService, public newWords: ScrabbleWord[], public gridService: GridService) {
         this.dictionary = dictionaryService.currentDictionary;
         this.validateWordsAndCalculateScore(newWords);
     }
@@ -55,13 +56,8 @@ export class ValidationService {
         return this.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
     }
 
-    newLettersCount(scrabbleLetter: ScrabbleLetter[]): number {
-        let validWordsLetters = 0;
-        scrabbleLetter.forEach((letter) => {
-            if (letter.fixed === false) {
-                validWordsLetters++;
-            }
-        });
-        return validWordsLetters;
+    newLettersCount(/* scrabbleLetters: ScrabbleLetter[]*/): number {
+        // TODO
+        return 1;
     }
 }
