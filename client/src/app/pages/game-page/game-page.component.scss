@@ -13,3 +13,10 @@
     width: min-content;
     outline: none;
 }
+
+.chat-container {
+    height: auto;
+    width: 20vw;
+    display: flex;
+    flex-direction: column;
+}
