@@ -5,10 +5,10 @@ import { GridService } from '@app/services/grid.service';
 import { RackService } from '@app/services/rack.service';
 
 // TODO : Avoir un fichier séparé pour les constantes!
-export const DEFAULT_WIDTH = 760;
-export const DEFAULT_HEIGHT = 760;
-export const RACK_WIDTH = 600;
-export const RACK_HEIGHT = 80;
+export const DEFAULT_WIDTH = 640;
+export const DEFAULT_HEIGHT = 640;
+export const RACK_WIDTH = 500;
+export const RACK_HEIGHT = 60;
 
 // TODO : Déplacer ça dans un fichier séparé accessible par tous
 export enum MouseButton {
@@ -55,7 +55,7 @@ export class PlayAreaComponent implements AfterViewInit {
 
         const letter2 = new ScrabbleLetter();
         letter2.character = 'p';
-        letter2.value = 3;
+        letter2.value = 10;
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         this.gridService.drawLetter(letter2, 9, 9);
 

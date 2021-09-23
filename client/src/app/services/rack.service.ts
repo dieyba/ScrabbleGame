@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 
-export const RACK_WIDTH = 600;
-export const RACK_HEIGHT = 80;
+export const RACK_WIDTH = 500;
+export const RACK_HEIGHT = 60;
 const MAX_LETTER_COUNT = 7;
-const LETTER_OFFSET = 13;
-const VALUE_OFFSET = 10;
+const OFFSET = 5;
+const DOUBLE_DIGIT = 10;
 
 @Injectable({
     providedIn: 'root',
@@ -42,8 +42,8 @@ export class RackService {
         this.drawLetter(letter2);
 
         const letter3 = new ScrabbleLetter();
-        letter3.character = 'p';
-        letter3.value = 3;
+        letter3.character = 'w';
+        letter3.value = 10;
         this.drawLetter(letter3);
 
         const letter4 = new ScrabbleLetter();
@@ -65,10 +65,14 @@ export class RackService {
                 const positionX = (RACK_WIDTH * i) / MAX_LETTER_COUNT;
                 const letter = scrabbleLetter.character.toUpperCase();
                 this.gridContext.fillStyle = 'black';
-                this.gridContext.font = '80px system-ui';
-                this.gridContext.fillText(letter, positionX + LETTER_OFFSET, 0 + RACK_HEIGHT - LETTER_OFFSET);
-                this.gridContext.font = '20px system-ui';
-                this.gridContext.fillText(String(scrabbleLetter.value), positionX + RACK_HEIGHT - VALUE_OFFSET, 0 + RACK_HEIGHT - VALUE_OFFSET / 2);
+                this.gridContext.font = '60px system-ui';
+                this.gridContext.fillText(letter, positionX + OFFSET, 0 + RACK_HEIGHT - OFFSET);
+                this.gridContext.font = '18px system-ui';
+                if (scrabbleLetter.value >= DOUBLE_DIGIT) {
+                    this.gridContext.fillText(String(scrabbleLetter.value), positionX + RACK_HEIGHT - OFFSET * 2, 0 + RACK_HEIGHT - OFFSET);
+                } else {
+                    this.gridContext.fillText(String(scrabbleLetter.value), positionX + RACK_HEIGHT - OFFSET, 0 + RACK_HEIGHT - OFFSET);
+                }
                 return;
             }
         }

@@ -12,15 +12,16 @@ enum Colors {
 }
 
 // TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
-export const DEFAULT_WIDTH = 700;
-export const DEFAULT_HEIGHT = 700;
+export const DEFAULT_WIDTH = 600;
+export const DEFAULT_HEIGHT = 600;
 const BOARD_SIZE = 15;
 const SQUARE_SIZE = DEFAULT_WIDTH / BOARD_SIZE - 2;
-const BOARD_OFFSET = 30;
+const BOARD_OFFSET = 20;
 const SMALL_OFFSET_Y = 20;
-const BIG_OFFSET_Y = 40;
-const SMALL_OFFSET_X = 8;
-const BIG_OFFSET_X = 18;
+const BIG_OFFSET_Y = 35;
+const SMALL_OFFSET_X = 6;
+const BIG_OFFSET_X = 15;
+const DOUBLE_DIGIT = 10;
 
 @Injectable({
     providedIn: 'root',
@@ -29,8 +30,8 @@ export class GridService {
     scrabbleBoard: ScrabbleBoard;
     rowMainLetters: string = 'ABCDEFGHIJKLMNO';
     gridContext: CanvasRenderingContext2D;
-    letterFont: string = '40px system-ui';
-    valueFont: string = '15px system-ui';
+    letterFont: string = '33px system-ui';
+    valueFont: string = '13px system-ui';
     private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
 
     constructor() {
@@ -43,11 +44,11 @@ export class GridService {
         this.gridContext.strokeStyle = 'black';
         this.gridContext.lineWidth = 1;
 
-        this.gridContext.font = '25px system-ui';
+        this.gridContext.font = '20px system-ui';
         this.gridContext.fillStyle = 'black';
         for (let i = 1; i <= BOARD_SIZE; i++) {
-            this.gridContext.fillText(String(i), (DEFAULT_WIDTH / BOARD_SIZE - 1) * i, SMALL_OFFSET_Y + 2);
-            this.gridContext.fillText(this.rowMainLetters[i - 1], 0, (DEFAULT_WIDTH / BOARD_SIZE) * i + BOARD_SIZE);
+            this.gridContext.fillText(String(i), (DEFAULT_WIDTH / BOARD_SIZE - 1) * i, BOARD_SIZE + 1);
+            this.gridContext.fillText(this.rowMainLetters[i - 1], 0, (DEFAULT_WIDTH / BOARD_SIZE) * i + BOARD_OFFSET / 2);
         }
 
         for (let i = 0; i <= BOARD_SIZE; i++) {
@@ -65,7 +66,7 @@ export class GridService {
 
     drawColors(): void {
         this.gridContext.beginPath();
-        this.gridContext.font = '13px system-ui';
+        this.gridContext.font = '11px system-ui';
 
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
@@ -136,11 +137,15 @@ export class GridService {
         // Draw letter
         this.gridContext.fillStyle = 'black';
         this.gridContext.font = this.letterFont;
-        this.gridContext.fillText(letter, startX + SMALL_OFFSET_X + 2, startY + SQUARE_SIZE / 2 + BOARD_SIZE);
+        this.gridContext.fillText(letter, startX + 2, startY + SQUARE_SIZE / 2 + BOARD_SIZE);
 
         // Draw letter value
         this.gridContext.font = this.valueFont;
-        this.gridContext.fillText(String(scrabbleLetter.value), startX + SQUARE_SIZE - SMALL_OFFSET_X - 2, startY + SQUARE_SIZE - 2);
+        if (scrabbleLetter.value >= DOUBLE_DIGIT) {
+            this.gridContext.fillText(String(scrabbleLetter.value), startX + SQUARE_SIZE - BIG_OFFSET_X, startY + SQUARE_SIZE - 2);
+        } else {
+            this.gridContext.fillText(String(scrabbleLetter.value), startX + SQUARE_SIZE - SMALL_OFFSET_X - 2, startY + SQUARE_SIZE - 2);
+        }
     }
 
     // Draw all letters
@@ -155,17 +160,25 @@ export class GridService {
                     this.gridContext.font = this.letterFont;
                     this.gridContext.fillText(
                         this.scrabbleBoard.squares[i][j].letter.character.toUpperCase(),
-                        positionX + SMALL_OFFSET_X + 2,
+                        positionX + 2,
                         positionY + SQUARE_SIZE / 2 + BOARD_SIZE,
                     );
 
                     // Draw letter value
                     this.gridContext.font = this.valueFont;
-                    this.gridContext.fillText(
-                        String(this.scrabbleBoard.squares[i][j].letter.value),
-                        positionX + SQUARE_SIZE - SMALL_OFFSET_X - 2,
-                        positionY + SQUARE_SIZE - 2,
-                    );
+                    if (this.scrabbleBoard.squares[i][j].letter.value >= DOUBLE_DIGIT) {
+                        this.gridContext.fillText(
+                            String(this.scrabbleBoard.squares[i][j].letter.value),
+                            positionX + SQUARE_SIZE - BIG_OFFSET_X,
+                            positionY + SQUARE_SIZE - 2,
+                        );
+                    } else {
+                        this.gridContext.fillText(
+                            String(this.scrabbleBoard.squares[i][j].letter.value),
+                            positionX + SQUARE_SIZE - SMALL_OFFSET_X - 2,
+                            positionY + SQUARE_SIZE - 2,
+                        );
+                    }
                 }
             }
         }
