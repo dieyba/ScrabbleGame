@@ -20,8 +20,8 @@ export class ValidationService {
     }
 
     validateWordsAndCalculateScore(newWords: ScrabbleWord[]): number {
-        let totalScore: number = 0;
-        let newLetters: number = 0;
+        let totalScore = 0;
+        let newLetters = 0;
 
         for (let i = 0; i < newWords.length; i++) {
             this.words[i] = this.convertScrabbleWordToString(newWords[i].content);

@@ -5,14 +5,14 @@ import { Square } from '@app/classes/square';
 export const EASEL_WIDTH = 600;
 export const EASEL_HEIGHT = 80;
 const MAX_LETTER_COUNT = 7;
+const LETTER_OFFSET = 13;
+const VALUE_OFFSET = 10;
 
 @Injectable({
     providedIn: 'root',
 })
 export class EaselService {
     gridContext: CanvasRenderingContext2D;
-
-    constructor() {}
 
     drawEasel() {
         this.gridContext.beginPath();
@@ -26,45 +26,45 @@ export class EaselService {
 
         this.gridContext.stroke();
         // TODO : Remove test
-        let letter1 = new ScrabbleLetter();
+        const letter1 = new ScrabbleLetter();
         letter1.character = 'a';
         letter1.value = 1;
         letter1.square = new Square(0, 0);
         this.drawLetter(letter1);
 
-        let letter2 = new ScrabbleLetter();
+        const letter2 = new ScrabbleLetter();
         letter2.character = 'o';
         letter2.value = 2;
         letter2.square = new Square(1, 0);
         this.drawLetter(letter2);
 
-        let letter3 = new ScrabbleLetter();
+        const letter3 = new ScrabbleLetter();
         letter3.character = 'p';
         letter3.value = 3;
         letter3.square = new Square(2, 0);
         this.drawLetter(letter3);
 
-        let letter4 = new ScrabbleLetter();
+        const letter4 = new ScrabbleLetter();
         letter4.character = 'k';
         letter4.value = 2;
         letter4.square = new Square(3, 0);
         this.drawLetter(letter4);
 
-        let letter5 = new ScrabbleLetter();
+        const letter5 = new ScrabbleLetter();
         letter5.character = 'g';
         letter5.value = 1;
-        letter5.square = new Square(4, 0);
+        letter5.square = new Square(3 + 1, 0);
         this.drawLetter(letter5);
     }
 
     drawLetter(scrabbleLetter: ScrabbleLetter): void {
-        let positionX = (EASEL_WIDTH * scrabbleLetter.square.position.x) / MAX_LETTER_COUNT;
-        let positionY = (EASEL_HEIGHT * scrabbleLetter.square.position.y) / MAX_LETTER_COUNT;
-        let letter = scrabbleLetter.character.toUpperCase();
+        const positionX = (EASEL_WIDTH * scrabbleLetter.square.position.x) / MAX_LETTER_COUNT;
+        const positionY = (EASEL_HEIGHT * scrabbleLetter.square.position.y) / MAX_LETTER_COUNT;
+        const letter = scrabbleLetter.character.toUpperCase();
         this.gridContext.fillStyle = 'black';
         this.gridContext.font = '80px system-ui';
-        this.gridContext.fillText(letter, positionX + 13, positionY + EASEL_HEIGHT - 13);
+        this.gridContext.fillText(letter, positionX + LETTER_OFFSET, positionY + EASEL_HEIGHT - LETTER_OFFSET);
         this.gridContext.font = '20px system-ui';
-        this.gridContext.fillText(String(scrabbleLetter.value), positionX + EASEL_HEIGHT - 10, positionY + EASEL_HEIGHT - 5);
+        this.gridContext.fillText(String(scrabbleLetter.value), positionX + EASEL_HEIGHT - VALUE_OFFSET, positionY + EASEL_HEIGHT - VALUE_OFFSET / 2);
     }
 }

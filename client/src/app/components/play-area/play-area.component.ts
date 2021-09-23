@@ -30,7 +30,7 @@ export class PlayAreaComponent implements AfterViewInit {
     mousePosition: Vec2 = { x: 0, y: 0 };
     buttonPressed = '';
     private canvasSize = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
-    private easelSize = { x: EASEL_WIDTH, y: EASEL_HEIGHT};
+    private easelSize = { x: EASEL_WIDTH, y: EASEL_HEIGHT };
 
     constructor(private readonly gridService: GridService, private readonly easelService: EaselService) {}
 

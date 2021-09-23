@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 
+const COUNTDOWN_INTERVAL = 60;
+const TIMER_INTERVAL = 1000;
+
 @Component({
     selector: 'app-sidebar',
     templateUrl: './sidebar.component.html',
@@ -14,21 +17,25 @@ export class SidebarComponent {
     player2LetterCount: number;
     lettersLeftCount: number = 15; // TODO - get actual value
     countDown: number;
+    timer: string;
+    timerMs: number = COUNTDOWN_INTERVAL;
 
     constructor() {
         this.initializePlayers();
+        this.startCountdown();
     }
 
-    initializePlayers(/*players: Player[]*/): void {
-        /*this.player1 = players[0];
+    initializePlayers(/* players: Player[]*/): void {
+        /* this.player1 = players[0];
         this.player2 = players[1];*/
-        let firstLetter: ScrabbleLetter = new ScrabbleLetter();
+        // TODO : Remove tests and use code above
+        const firstLetter: ScrabbleLetter = new ScrabbleLetter();
         firstLetter.character = 'a';
-        let secondLetter: ScrabbleLetter = new ScrabbleLetter();
+        const secondLetter: ScrabbleLetter = new ScrabbleLetter();
         secondLetter.character = 'p';
-        let thirdLetter: ScrabbleLetter = new ScrabbleLetter();
+        const thirdLetter: ScrabbleLetter = new ScrabbleLetter();
         thirdLetter.character = 'u';
-        let fourthLetter: ScrabbleLetter = new ScrabbleLetter();
+        const fourthLetter: ScrabbleLetter = new ScrabbleLetter();
         fourthLetter.character = 'm';
         this.player1 = {
             name: 'Ariane',
@@ -54,5 +61,20 @@ export class SidebarComponent {
 
     getPlayer2LetterCount(): void {
         this.player2LetterCount = this.player2.letters.length;
+    }
+
+    startCountdown() {
+        this.timer = '1:0';
+        setInterval(() => {
+            this.timerMs--;
+            const time = new Date(this.timerMs);
+            const s = time.getSeconds();
+            const ms = time.getMilliseconds();
+            this.timer = s + ':' + ms;
+            if (this.timerMs < 0) {
+                this.timerMs = COUNTDOWN_INTERVAL;
+                this.timer = '1:0';
+            }
+        }, TIMER_INTERVAL);
     }
 }

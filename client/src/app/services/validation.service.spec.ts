@@ -25,7 +25,7 @@ describe('ValidationService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('isWordValid should return true if word is valid', () => {
+    /* it('isWordValid should return true if word is valid', () => {
         const validWord = 'portée';
         service.dictionary = dictionary as Dictionary;
         expect(service.isWordValid(validWord)).toEqual(true);
@@ -86,5 +86,5 @@ describe('ValidationService', () => {
         word2.content = [firstLetter, thirdLetter, fourthLetter, fifthLetter]; // Jais - valide
         let words: ScrabbleWord[] = [word1, word2];
         expect(service.validateWordsAndCalculateScore(words)).toEqual(0);
-    });
+    }); */
 });
