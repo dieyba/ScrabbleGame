@@ -34,7 +34,7 @@ export class ValidationService {
                 // Words are all valid
                 // Add word's value to player's score
                 totalScore += newWords[i].totalValue();
-                newLetters += this.newLettersCount(newWords[i].content);
+                newLetters += this.newLettersCount(/* newWords[i].content*/);
             }
         }
         if (newLetters === BONUS_LETTER_COUNT) {
