@@ -10,9 +10,9 @@ export class ScrabbleLetter {
     square: Square; // Square to which the letter is assigned. Null if not placed    
     fixed: boolean; //If letter is fixed on square (word validated), true
 
-    constructor() {
-        this.character = 'VIDE';
-        this.value = 0;
+    constructor(letter: string, value: number) {
+        this.character = letter;
+        this.value = value;
         this.nextLetters = [];
         this.square = new Square(0, 0);
         this.fixed = false;

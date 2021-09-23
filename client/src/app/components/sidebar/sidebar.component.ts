@@ -22,14 +22,14 @@ export class SidebarComponent {
     initializePlayers(/*players: Player[]*/): void {
         /*this.player1 = players[0];
         this.player2 = players[1];*/
-        let firstLetter: ScrabbleLetter = new ScrabbleLetter();
-        firstLetter.character = 'a';
-        let secondLetter: ScrabbleLetter = new ScrabbleLetter();
-        secondLetter.character = 'p';
-        let thirdLetter: ScrabbleLetter = new ScrabbleLetter();
-        thirdLetter.character = 'u';
-        let fourthLetter: ScrabbleLetter = new ScrabbleLetter();
-        fourthLetter.character = 'm';
+        let firstLetter: ScrabbleLetter = new ScrabbleLetter('a', 1);
+        //firstLetter.character = 'a';
+        let secondLetter: ScrabbleLetter = new ScrabbleLetter('p', 3);
+        //secondLetter.character = 'p';
+        let thirdLetter: ScrabbleLetter = new ScrabbleLetter('u', 4);
+        //thirdLetter.character = 'u';
+        let fourthLetter: ScrabbleLetter = new ScrabbleLetter('m', 2);
+        //fourthLetter.character = 'm';
         this.player1 = {
             name: 'Ariane',
             score: 73,

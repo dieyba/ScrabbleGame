@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@
 import { Vec2 } from '@app/classes/vec2';
 import { EaselService } from '@app/services/easel.service';
 import { GridService } from '@app/services/grid.service';
+import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 
 // TODO : Avoir un fichier séparé pour les constantes!
 export const DEFAULT_WIDTH = 860;
@@ -31,6 +32,7 @@ export class PlayAreaComponent implements AfterViewInit {
     buttonPressed = '';
     private canvasSize = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
     private easelSize = { x: EASEL_WIDTH, y: EASEL_HEIGHT};
+    private game = new GamePageComponent(this.easelService);
 
     constructor(private readonly gridService: GridService, private readonly easelService: EaselService) {}
 
@@ -45,6 +47,7 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.easelService.drawEasel();
+        this.game.distributeLetters();
         this.gridCanvas.nativeElement.focus();
     }
 
