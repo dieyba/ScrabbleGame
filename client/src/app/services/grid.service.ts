@@ -30,13 +30,17 @@ export class GridService {
     scrabbleBoard: ScrabbleBoard;
     rowMainLetters: string = 'ABCDEFGHIJKLMNO';
     gridContext: CanvasRenderingContext2D;
-    letterFont: string = '33px system-ui';
-    valueFont: string = '13px system-ui';
+    letterFonts: string[] = ['27px system-ui', '30px system-ui', '33px system-ui', '35px system-ui'];
+    valueFonts: string[] = ['9px system-ui', '11px system-ui', '13px system-ui', '15px system-ui'];
+    currentLetterFont: string;
+    currentValueFont: string;
     private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
 
     constructor() {
         this.scrabbleBoard = new ScrabbleBoard();
         this.scrabbleBoard.generateBoard();
+        this.currentLetterFont = this.letterFonts[2];
+        this.currentValueFont = this.valueFonts[2];
     }
 
     drawGrid() {
@@ -136,11 +140,11 @@ export class GridService {
 
         // Draw letter
         this.gridContext.fillStyle = 'black';
-        this.gridContext.font = this.letterFont;
+        this.gridContext.font = this.currentLetterFont;
         this.gridContext.fillText(letter, startX + 2, startY + SQUARE_SIZE / 2 + BOARD_SIZE);
 
         // Draw letter value
-        this.gridContext.font = this.valueFont;
+        this.gridContext.font = this.currentValueFont;
         if (scrabbleLetter.value >= DOUBLE_DIGIT) {
             this.gridContext.fillText(String(scrabbleLetter.value), startX + SQUARE_SIZE - BIG_OFFSET_X, startY + SQUARE_SIZE - 2);
         } else {
@@ -157,7 +161,7 @@ export class GridService {
                     const positionY = (this.height * j) / BOARD_SIZE + BOARD_OFFSET;
 
                     this.gridContext.fillStyle = 'black';
-                    this.gridContext.font = this.letterFont;
+                    this.gridContext.font = this.currentLetterFont;
                     this.gridContext.fillText(
                         this.scrabbleBoard.squares[i][j].letter.character.toUpperCase(),
                         positionX + 2,
@@ -165,7 +169,7 @@ export class GridService {
                     );
 
                     // Draw letter value
-                    this.gridContext.font = this.valueFont;
+                    this.gridContext.font = this.currentValueFont;
                     if (this.scrabbleBoard.squares[i][j].letter.value >= DOUBLE_DIGIT) {
                         this.gridContext.fillText(
                             String(this.scrabbleBoard.squares[i][j].letter.value),
@@ -193,9 +197,13 @@ export class GridService {
     }
 
     sizeUpLetters(): void {
-        // TODO : Implement max font size and font size increment intervals
-        this.letterFont = '40px system-ui';
-        this.valueFont = '15px system-ui';
+        for (let i = 0; i < this.letterFonts.length; i++) {
+            if (this.currentLetterFont === this.letterFonts[i] && i !== this.letterFonts.length - 1) {
+                this.currentLetterFont = this.letterFonts[i + 1];
+                this.currentValueFont = this.valueFonts[i + 1];
+                break;
+            }
+        }
         this.gridContext.clearRect(0, 0, DEFAULT_WIDTH + 2 * BOARD_OFFSET, DEFAULT_HEIGHT + 2 * BOARD_OFFSET);
         this.drawGrid();
         this.drawColors();
@@ -203,9 +211,13 @@ export class GridService {
     }
 
     sizeDownLetters(): void {
-        // TODO : Implement min font size and font size decrement intervals
-        this.letterFont = '30px system-ui';
-        this.valueFont = '10px system-ui';
+        for (let i = 0; i < this.letterFonts.length; i++) {
+            if (this.currentLetterFont === this.letterFonts[i] && i !== 0) {
+                this.currentLetterFont = this.letterFonts[i - 1];
+                this.currentValueFont = this.valueFonts[i - 1];
+                break;
+            }
+        }
         this.gridContext.clearRect(0, 0, DEFAULT_WIDTH + 2 * BOARD_OFFSET, DEFAULT_HEIGHT + 2 * BOARD_OFFSET);
         this.drawGrid();
         this.drawColors();
