@@ -24,8 +24,7 @@ export class FormComponent {
     submitted = false;
     dictionnary: string;
     selected = 'select';
-    private router: Router;
-    constructor(private dialog: MatDialogRef<FormComponent>) {
+    constructor(private dialog: MatDialogRef<FormComponent>, private router: Router) {
         this.niveau = ['Joeur Débutant', ' Joueur Expert'];
         this.dictionnary = 'Francais(defaut)';
         this.debutantNameList = ['erika', 'etienne', 'sara'];
@@ -48,6 +47,7 @@ export class FormComponent {
             alert('votre partie commence');
             this.closeDialog();
             this.router.navigate(['/game']);
+            console.log('pourquoiiiiiiiii');
         } else {
             alert('les parametres sont invalides');
         }
