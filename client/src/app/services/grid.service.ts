@@ -92,34 +92,34 @@ export class GridService {
         }
 
         // TEST
-        let letter1 = new ScrabbleLetter();
-        letter1.character = 'a';
+        let letter1 = new ScrabbleLetter('a', 1);
+        //letter1.character = 'a';
         letter1.square = new Square(8, 9);
-        letter1.value = 1;
+        //letter1.value = 1;
         this.drawLetter(letter1);
 
-        let letter2 = new ScrabbleLetter();
-        letter2.character = 'p';
+        let letter2 = new ScrabbleLetter('p', 3);
+        //letter2.character = 'p';
         letter2.square = new Square(9, 9);
         letter2.square.color = SquareColor.DarkBlue;
-        letter2.value = 3;
+        //letter2.value = 3;
         this.drawLetter(letter2);
 
-        let letter3 = new ScrabbleLetter();
-        letter3.character = 'p';
-        letter3.value = 3;
+        let letter3 = new ScrabbleLetter('p', 3);
+        //letter3.character = 'p';
+        //letter3.value = 3;
         letter3.square = new Square(10, 9);
         this.drawLetter(letter3);
 
-        let letter4 = new ScrabbleLetter();
-        letter4.character = 'l';
-        letter4.value = 1;
+        let letter4 = new ScrabbleLetter('l', 1);
+        //letter4.character = 'l';
+        //letter4.value = 1;
         letter4.square = new Square(11, 9);
         this.drawLetter(letter4);
 
-        let letter5 = new ScrabbleLetter();
-        letter5.character = 'e';
-        letter5.value = 2;
+        let letter5 = new ScrabbleLetter('e', 2);
+        //letter5.character = 'e';
+        //letter5.value = 2;
         letter5.square = new Square(12, 9);
         this.drawLetter(letter5);
     }
