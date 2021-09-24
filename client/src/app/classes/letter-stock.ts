@@ -1,21 +1,20 @@
 import { ScrabbleLetter } from './scrabble-letter';
 
 export class LetterStock {
-
     getInstance(): LetterStock {
         if (this.instance == null) {
-            this.instance = new LetterStock()
+            this.instance = new LetterStock();
         }
         return this.instance;
     }
 
-    private constructor() {
+    constructor() {
         this.letterStock = [];
         this.addLettersToStock(new ScrabbleLetter(), 9); // A
         this.addLettersToStock(new ScrabbleLetter(), 2); // B
         this.addLettersToStock(new ScrabbleLetter(), 2); // C
         this.addLettersToStock(new ScrabbleLetter(), 3); // D
-        this.addLettersToStock(new ScrabbleLetter(), 15);// E
+        this.addLettersToStock(new ScrabbleLetter(), 15); // E
         this.addLettersToStock(new ScrabbleLetter(), 2); // F
         this.addLettersToStock(new ScrabbleLetter(), 2); // G
         this.addLettersToStock(new ScrabbleLetter(), 2); // H
@@ -38,14 +37,14 @@ export class LetterStock {
         this.addLettersToStock(new ScrabbleLetter(), 1); // Y
         this.addLettersToStock(new ScrabbleLetter(), 1); // Z
         this.addLettersToStock(new ScrabbleLetter(), 2); // *
-    };
+    }
 
     private letterStock: ScrabbleLetter[];
     private sizeStock: number = 0;
     private instance: LetterStock;
 
-    addLettersToStock(letter: ScrabbleLetter, number: number): void{
-        for (let i:number = 0; i < number; i++) {
+    addLettersToStock(letter: ScrabbleLetter, number: number): void {
+        for (let i: number = 0; i < number; i++) {
             this.letterStock.push(letter);
             this.sizeStock++;
         }
@@ -57,9 +56,8 @@ export class LetterStock {
         for (let i: number = 0; i < number; i++) {
             // Si la réserve est vide, qu'est ce qu'on fait ?
             if (this.isEmpty()) {
-                window.alert("Il n'y a plus de lettre dans la réserve.")
-            }
-            else {
+                window.alert("Il n'y a plus de lettre dans la réserve.");
+            } else {
                 let index = this.randomNumber(0, this.sizeStock);
                 lettersRemovedFromStock[i] = this.letterStock[index];
                 this.resize(i);

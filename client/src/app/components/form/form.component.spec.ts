@@ -1,16 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatSelectModule } from '@angular/material/select';
 import { FormComponent } from './form.component';
 
 describe('FormComponent', () => {
     let component: FormComponent;
     let fixture: ComponentFixture<FormComponent>;
+    let dialog: jasmine.SpyObj<MatDialogRef<FormComponent>>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [FormComponent],
-            imports: [FormsModule, ReactiveFormsModule],
+            imports: [MatSelectModule, FormsModule, ReactiveFormsModule, MatDialogModule],
         }).compileComponents();
+        dialog = TestBed.get(MatDialogRef);
     });
 
     beforeEach(() => {
@@ -22,38 +26,31 @@ describe('FormComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-
-    it('should return a value between the minimum and the maxmimum', () => {
-        const minimum: number = 3;
-        const maximum: number = 10;
-
-        expect(component.randomNumber(minimum, maximum)).toBeLessThan(maximum);
-        expect(component.randomNumber(minimum, maximum)).toBeGreaterThanOrEqual(minimum);
+    it('should call openDialog', () => {
+        spyOn(dialog, 'close');
+        component.closeDialog();
+        expect(dialog.close()).toHaveBeenCalled;
     });
 
-    it('should call randomNumber() method', () => {
-        const spy = spyOn(component, 'randomNumber');
-        let expertNameList: string[] = ['dieyna', 'kevin', 'arianne'];
+    // it('should return a value between the minimum and the maxmimum', () => {
+    //     const minimum: number = 3;
+    //     const maximum: number = 10;
 
-        component.randomPlayer(expertNameList);
-        expect(spy).toHaveBeenCalled();
-    });
+    //     expect(component.randomNumber(minimum, maximum)).toBeLessThan(maximum);
+    //     expect(component.randomNumber(minimum, maximum)).toBeGreaterThanOrEqual(minimum);
+    // });
 
-    it('check initial form value', () => {
-        let initialForm = new FormComponent();
-        initialForm.name = '';
-        initialForm.timer = 60;
-        initialForm.bonus = false;
-        initialForm.dictionnary = 'Francais(defaut)';
-        initialForm.debutantNameList = ['erika', 'etienne', 'sara'];
-        initialForm.expertNameList = ['dieyna', 'kevin', 'arianne'];
+    // it('should call randomNumber() method', () => {
+    //     const spy = spyOn(component, 'randomNumber');
+    //     let expertNameList: string[] = ['dieyna', 'kevin', 'arianne'];
 
-        //expect(component).toEqual(initialForm);
-        expect(component.name).toEqual(initialForm.name);
-        expect(component.timer).toEqual(initialForm.timer);
-        expect(component.bonus).toEqual(initialForm.bonus);
-        expect(component.dictionnary).toEqual(initialForm.dictionnary);
-        expect(component.debutantNameList).toEqual(initialForm.debutantNameList);
-        expect(component.expertNameList).toEqual(initialForm.expertNameList);
-    });
+    //     component.randomPlayer(expertNameList);
+    //     expect(spy).toHaveBeenCalled();
+    // });
+
+    // it('should call closeDialog', () => {
+    //     const fixture = TestBed.createComponent(FormComponent);
+    //     const app = fixture.componentInstance;
+    //     app.closeDialog();
+    // });
 });
