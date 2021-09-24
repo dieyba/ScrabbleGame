@@ -40,8 +40,8 @@ export class LetterStock {
         this.addLettersToStock(new ScrabbleLetter('*', 0), 2); // *
     };
 
-    private letterStock: ScrabbleLetter[];
-    private sizeStock: number = 0;
+    letterStock: ScrabbleLetter[];
+    sizeStock: number = 0;
     //private instance: LetterStock;
 
     addLettersToStock(letter: ScrabbleLetter, number: number): void{
@@ -58,12 +58,12 @@ export class LetterStock {
             // Si la réserve est vide, qu'est ce qu'on fait ?
             if (this.isEmpty()) {
                 window.alert("Il n'y a plus de lettre dans la réserve.")
+                break;
             }
             else {
                 let index = this.randomNumber(0, this.sizeStock);
                 lettersRemovedFromStock[i] = this.letterStock[index];
                 this.resize(i);
-                this.sizeStock--;
             }
         }
 
@@ -74,6 +74,8 @@ export class LetterStock {
         for (let i: number = 0; i < this.sizeStock; i++) {
             this.letterStock[index] = this.letterStock[index + 1];
         }
+        this.letterStock.pop();
+        this.sizeStock--;
     }
 
     // duplication de code, cette fonction existe dans forms.ts

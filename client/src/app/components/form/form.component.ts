@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { /*FormControl,*/ FormGroup, /*Validators*/ } from '@angular/forms';
 @Component({
     selector: 'app-form',
     templateUrl: './form.component.html',
@@ -7,11 +7,11 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 })
 export class FormComponent {
     myForm = new FormGroup({
-        name: new FormControl('', [Validators.required, Validators.maxLength(12), Validators.minLength(3)]),
-        timer: new FormControl('', Validators.required),
-        bonus: new FormControl('', Validators.required),
-        dictionnary: new FormControl('', Validators.required),
-        niveau: new FormControl('', Validators.required),
+        // name: new FormControl('', [Validators.required, Validators.maxLength(12), Validators.minLength(3)]),
+        // timer: new FormControl('', Validators.required),
+        // bonus: new FormControl('', Validators.required),
+        // dictionnary: new FormControl('', Validators.required),
+        // niveau: new FormControl('', Validators.required),
     });
     debutantNameList: string[];
     expertNameList: string[];
