@@ -1,10 +1,8 @@
-
 export interface ChatDisplayEntry {
     authorType: AuthorType;
     color: ChatEntryColor;
     message: string;
 }
-
 
 // TODO : Déplacer (ou supprimer) enums dans un fichier séparé au besoin
 
@@ -28,4 +26,3 @@ export enum ErrorType {
     InvalidCommand,
     ImpossibleCommand,
 }
-

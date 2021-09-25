@@ -1,26 +1,25 @@
 import { Injectable } from '@angular/core';
-TODO: // import actual game service
-import { Command, GameService } from '../classes/commands'; 
-import { Vec2 } from '../classes/vec2';
+// TODO: import actual game service
+import { Command } from '../classes/commands'; 
 
 @Injectable({
   providedIn: 'root'
 })
 
-type cmdParam = {position: Vec2, orientation:string,letters:string} | {lettersToExchange: string};
+type GameService = {};
 
 export class CommandInvokerService {
-  private gameService: GameService;
-  constructor(gameService: GameService){
-    this.gameService = gameService
-  };
+    private gameService: GameService;
 
-  public executeCommand(cmd: Command): void {
-    cmd.execute();
-  }
-  
-  // public createCommand():Command{
-  // }
+    constructor(gameService: GameService){
+        this.gameService = gameService;
+    }
 
+    executeCommand(cmd: Command): void {
+      // if(cmd.execute !== undefined){
+        cmd.execute();
+      // }
+    }
 
 }
+
