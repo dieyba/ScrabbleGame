@@ -6,6 +6,7 @@
 .play-area-container {
     overflow: auto;
     flex: 1 1 auto;
+    background-color: #dcecff;
 }
 
 .play-area {
@@ -14,7 +15,8 @@
     outline: none;
 }
 
-.chat-container {
+.chat-box-container {
+    background-color: #dcecff;
     height: auto;
     width: 20vw;
     display: flex;
