@@ -22,13 +22,15 @@ const BIG_OFFSET_Y = 35;
 const SMALL_OFFSET_X = 6;
 const BIG_OFFSET_X = 15;
 const DOUBLE_DIGIT = 10;
+const DEFAULT_LETTER_FONT_INDEX = 2;
+const DEFAULT_VALUE_FONT_INDEX = 2;
+const ROW_MAIN_LETTERS = 'ABCDEFGHIJKLMNO';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GridService {
     scrabbleBoard: ScrabbleBoard;
-    rowMainLetters: string = 'ABCDEFGHIJKLMNO';
     gridContext: CanvasRenderingContext2D;
     letterFonts: string[] = ['27px system-ui', '30px system-ui', '33px system-ui', '35px system-ui'];
     valueFonts: string[] = ['9px system-ui', '11px system-ui', '13px system-ui', '15px system-ui'];
@@ -39,8 +41,8 @@ export class GridService {
     constructor() {
         this.scrabbleBoard = new ScrabbleBoard();
         this.scrabbleBoard.generateBoard();
-        this.currentLetterFont = this.letterFonts[2];
-        this.currentValueFont = this.valueFonts[2];
+        this.currentLetterFont = this.letterFonts[DEFAULT_LETTER_FONT_INDEX];
+        this.currentValueFont = this.valueFonts[DEFAULT_VALUE_FONT_INDEX];
     }
 
     drawGrid() {
@@ -52,7 +54,7 @@ export class GridService {
         this.gridContext.fillStyle = 'black';
         for (let i = 1; i <= BOARD_SIZE; i++) {
             this.gridContext.fillText(String(i), (DEFAULT_WIDTH / BOARD_SIZE - 1) * i, BOARD_SIZE + 1);
-            this.gridContext.fillText(this.rowMainLetters[i - 1], 0, (DEFAULT_WIDTH / BOARD_SIZE) * i + BOARD_OFFSET / 2);
+            this.gridContext.fillText(ROW_MAIN_LETTERS[i - 1], 0, (DEFAULT_WIDTH / BOARD_SIZE) * i + BOARD_OFFSET / 2);
         }
 
         for (let i = 0; i <= BOARD_SIZE; i++) {
