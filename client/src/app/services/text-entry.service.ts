@@ -1,20 +1,14 @@
 import { Injectable } from '@angular/core';
-import { ErrorType } from '@app/classes/chat-display-entry';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Square } from '@app/classes/square';
-import { Vec2 } from '@app/classes/vec2';
+import { CommandHandler } from '@app/classes/command-handler';
 import { ChatDisplayService } from './chat-display.service';
-import { GridService } from './grid.service';
-import { DebugCmd, PassTurnCmd, PlaceCmd, SwitchLettersCmd} from '@app/classes/commands';
 
-
-const COMMAND_LIST = ['placer', 'échanger', 'passer', 'debug', 'réserve', 'aide'] as const;
+// const COMMAND_LIST = ['placer', 'échanger', 'passer', 'debug', 'réserve', 'aide'] as const;
 
 @Injectable({
     providedIn: 'root',
 })
 export class TextEntryService {
-    constructor(private chatDisplayService: ChatDisplayService, private gridService: GridService) {}
+    constructor(private chatDisplayService: ChatDisplayService) {}
 
     /**
      * @description This function verifies if the input is a valid command or
@@ -22,100 +16,106 @@ export class TextEntryService {
      *
      * @param text Text input from user
      */
-    handleInput(text: string) {
+    handleInput(text: string) {   
+        this.trimStartSpace(text);     
         if (text.charAt(0) === '!') {
-            if (this.isValidCommandTest(text)) {
-                // Send to command handler
-                // TODO send to command handler function
-                this.handleCommand(text);
-            } else if (this.isValidCommand(text)) {
-                // Test, erase
-            } else {
-                // TODO invalid command message
-                this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
-            }
+    
+            //TODO : to remove or to add command handler as attribute actually
+            let tempCmdHandler: CommandHandler = new CommandHandler();
+            tempCmdHandler.handleCommand(text);
+            
+            // get command's result and if its invalid send invalid commmand error msg to chat display
+            // (impossible command error is sent from receiver to game service to chat display ig?)
+            // this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
+            
         } else {
-            // Send to other player
+            // Display text entered as regular chat message
             if (text !== '') {
+                // TODO: define how to check which player sent the message
                 this.chatDisplayService.addPlayerEntry(false, text);
             }
-
-            // TODO: test command to remove when handler works
-            new DebugCmd().execute();
-            new PassTurnCmd().execute();
-            new PlaceCmd({x:50, y:100}, text).execute();
-            new SwitchLettersCmd(text).execute();
-
+            
         }
     }
 
-    isValidCommandTest(text: string) {
-        // Extracting the command name
-        let commandTemp = text.substr(1);
-        commandTemp = commandTemp.split(' ')[0];
-
-        // Checking if the command exist
-        // for (const COMMAND of COMMAND_LIST) {
-        //     if (commandTemp === COMMAND) {
-        //         return true;
-        //     }
-        // }
-        if (commandTemp === COMMAND_LIST[0]) {
-            return true;
+    // add validation for empty text entered
+    // finish validation for empty white space at the beginning (to trim it)s
+    trimStartSpace(text: string): void{
+        let startIndex = 0;
+        if(text.length!=0 && text.includes(' ', startIndex)){
+            
         }
-
-        return false;
+        text.substring(startIndex);
+        console.log(text);
     }
 
-    isValidCommand(text: string) {
-        // Extracting the command name
-        let commandTemp = text.substr(1);
-        commandTemp = commandTemp.split(' ')[0];
 
-        // Checking if the command exist
-        for (const COMMAND of COMMAND_LIST) {
-            if (commandTemp === COMMAND) {
-                return true;
-            }
-        }
+    // isValidCommandTest(text: string) {
+    //     // Extracting the command name
+    //     let commandTemp = text.substr(1);
+    //     commandTemp = commandTemp.split(' ')[0];
 
-        return false;
-    }
+    //     // Checking if the command exist
+    //     // for (const COMMAND of COMMAND_LIST) {
+    //     //     if (commandTemp === COMMAND) {
+    //     //         return true;
+    //     //     }
+    //     // }
+    //     if (commandTemp === COMMAND_LIST[0]) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
-    handleCommand(command: string) {
-        let coord: Vec2;
+    // isValidCommand(text: string) {
+    //     // Extracting the command name
+    //     let commandTemp = text.substr(1);
+    //     commandTemp = commandTemp.split(' ')[0];
 
-        const row = command[8];
-        console.log(command.substring(9, 11));
-        const column = parseInt(command.substring(9, 11));
-        coord = this.getCoordinates(row, column);
+    //     // Checking if the command exist
+    //     for (const COMMAND of COMMAND_LIST) {
+    //         if (commandTemp === COMMAND) {
+    //             return true;
+    //         }
+    //     }
 
-        const word: string = command.substring(13);
-        if (command[11] === 'v') {
-            for (let i = 0; i < word.length; i++) {
-                const scrabbleLetter = new ScrabbleLetter();
-                scrabbleLetter.character = word[i];
-                scrabbleLetter.value = 42;
-                scrabbleLetter.square = new Square(coord.x - 1, coord.y + i);
-                this.gridService.drawLetter(scrabbleLetter);
-            }
-        } else {
-            for (let i = 0; i < word.length; i++) {
-                const scrabbleLetter = new ScrabbleLetter();
-                scrabbleLetter.character = word[i];
-                scrabbleLetter.value = 42;
-                scrabbleLetter.square = new Square(coord.x - 1 + i, coord.y);
-                this.gridService.drawLetter(scrabbleLetter);
-            }
-        }
-    }
+    //     return false;
+    // }
 
-    getCoordinates(row: string, column: number) {
-        const resultingCoord = new Vec2();
+    // handleCommand(command: string) {
+    //     let coord: Vec2;
 
-        resultingCoord.x = column;
-        resultingCoord.y = row.charCodeAt(0) - 97;
-        console.log(resultingCoord);
-        return resultingCoord;
-    }
+    //     const row = command[8];
+    //     console.log(command.substring(9, 11));
+    //     const column = parseInt(command.substring(9, 11));
+    //     coord = this.getCoordinates(row, column);
+
+    //     const word: string = command.substring(13);
+    //     if (command[11] === 'v') {
+    //         for (let i = 0; i < word.length; i++) {
+    //             const scrabbleLetter = new ScrabbleLetter();
+    //             scrabbleLetter.character = word[i];
+    //             scrabbleLetter.value = 42;
+    //             scrabbleLetter.square = new Square(coord.x - 1, coord.y + i);
+    //             this.gridService.drawLetter(scrabbleLetter);
+    //         }
+    //     } else {
+    //         for (let i = 0; i < word.length; i++) {
+    //             const scrabbleLetter = new ScrabbleLetter();
+    //             scrabbleLetter.character = word[i];
+    //             scrabbleLetter.value = 42;
+    //             scrabbleLetter.square = new Square(coord.x - 1 + i, coord.y);
+    //             this.gridService.drawLetter(scrabbleLetter);
+    //         }
+    //     }
+    // }
+
+    // getCoordinates(row: string, column: number) {
+    //     const resultingCoord = new Vec2();
+
+    //     resultingCoord.x = column;
+    //     resultingCoord.y = row.charCodeAt(0) - 97;
+    //     console.log(resultingCoord);
+    //     return resultingCoord;
+    // }
 }

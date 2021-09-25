@@ -7,7 +7,8 @@ export interface Command {
 
 // TODO: put commands in their own file
 // create the actual receivers class and implement the function to execute
-// add receiver as attritube to its command class
+// add receiver as attritube to its command class.
+// Game service will most likely be the invoker/the sender creating commands and calling execute()
 export class PlaceCmd implements Command {
     private posititon: Vec2;
     private word: string;
