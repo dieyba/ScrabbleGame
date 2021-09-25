@@ -15,7 +15,7 @@ export class ScrabbleWord {
         let redBonusCount = 0;
         for (const i of this.content) {
             // Account for letter pale/dark blue bonuses
-            const color = i.square.color;
+            const color = i.color;
             switch (color) {
                 case SquareColor.Teal:
                     i.tealBonus();

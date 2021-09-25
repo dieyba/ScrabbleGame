@@ -1,5 +1,9 @@
-<div class="chat-display" id="chat-display-box">
-    <div *ngFor="let entry of entries">
-        <p [ngStyle]="{ color: entry.color }">» {{ entry.message }}</p>
-    </div>
+<div>
+    <mat-card class="card">
+        <div class="chat-display" id="chat-display-box">
+            <div *ngFor="let entry of entries">
+                <p [ngStyle]="{ color: entry.color }">» {{ entry.message }}</p>
+            </div>
+        </div>
+    </mat-card>
 </div>
