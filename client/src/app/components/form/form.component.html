@@ -19,17 +19,18 @@
         <div>
             <mat-form-field appearance="fill" class="papy">
                 <mat-label>Dictonnaire :</mat-label>
-                <mat-select formControlName="dictionnary1" [(value)]="selected">
-                    <mat-option value="select">{{ dictionnary }}</mat-option>
+                <mat-select formControlName="dictionaryForm">
+                    <mat-option value="0">{{ dictionary }}</mat-option>
                 </mat-select>
-                <div class="error" *ngIf="dictionnary1.invalid">Le champ est requis</div>
+                <div class="error" *ngIf="dictionaryForm.invalid">Le champ est requis</div>
             </mat-form-field>
         </div>
         <div>
             <mat-form-field appearance="fill" class="papy">
                 <mat-label>Minuteur :</mat-label>
-                <mat-select formControlName="timer" [(value)]="selected">
-                    <mat-option value="select">1:00</mat-option>
+                <mat-select formControlName="timer">
+                    <mat-option value="30">30 secondes</mat-option>
+                    <mat-option value="60">60 secondes</mat-option>
                 </mat-select>
                 <div class="error" *ngIf="timer.invalid">Le champ est requis</div>
             </mat-form-field>
@@ -42,7 +43,7 @@
         <div>
             <p>Veuillez choisir le niveau de votre adversaire</p>
             <mat-radio-group formControlName="level" (click)="randomPlayer(debutantNameList)">
-                <mat-radio-button value="easy">Joeur Débutant</mat-radio-button>
+                <mat-radio-button value="easy">Joueur Débutant</mat-radio-button>
                 <mat-radio-button value="difficult">Joueur Expert</mat-radio-button>
             </mat-radio-group>
         </div>

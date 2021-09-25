@@ -15,7 +15,7 @@ import { FormComponent } from './form.component';
 describe('FormComponent', () => {
     let component: FormComponent;
     let fixture: ComponentFixture<FormComponent>;
-    let list: string[] = ['dieyna', 'kevin', 'arianne'];
+    let list: string[] = ['dieyna', 'kevin', 'ariane'];
     let dialog: jasmine.SpyObj<MatDialogRef<FormComponent>> = jasmine.createSpyObj('dialog', ['close']);
     beforeEach(async () => {
         await TestBed.configureTestingModule({

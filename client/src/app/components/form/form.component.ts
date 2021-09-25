@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { SoloGameService } from '@app/services/solo-game.service';
+
 @Component({
     selector: 'app-form',
     templateUrl: './form.component.html',
@@ -14,15 +16,16 @@ export class FormComponent {
     bonus: FormControl;
     level: FormControl;
     opponent: FormControl;
-    dictionnary1: FormControl;
+    dictionaryForm: FormControl;
     debutantNameList: string[];
     selectedPlayer: string;
     random: number;
-    dictionnary: string;
+    dictionary: string;
     selected = 'select';
-    constructor(private dialog: MatDialogRef<FormComponent>, private router: Router) {
-        this.dictionnary = 'Francais(defaut)';
-        this.debutantNameList = ['erika', 'etienne', 'sara'];
+
+    constructor(private dialog: MatDialogRef<FormComponent>, private router: Router, private soloGameService: SoloGameService) {
+        this.dictionary = 'Francais(defaut)';
+        this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
     }
 
     ngOnInit() {
@@ -35,7 +38,7 @@ export class FormComponent {
         this.name = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z]*')]);
         this.timer = new FormControl('', [Validators.required]);
         this.bonus = new FormControl('');
-        this.dictionnary1 = new FormControl('', [Validators.required]);
+        this.dictionaryForm = new FormControl('', [Validators.required]);
         this.opponent = new FormControl('');
     }
 
@@ -44,7 +47,7 @@ export class FormComponent {
             name: this.name,
             timer: this.timer,
             bonus: this.bonus,
-            dictionnary1: this.dictionnary1,
+            dictionaryForm: this.dictionaryForm,
             level: this.level,
             opponent: this.opponent,
         });
@@ -53,6 +56,7 @@ export class FormComponent {
     closeDialog() {
         this.dialog.close();
     }
+
     randomNumber(minimum: number, maximum: number): number {
         let randomFloat = Math.random() * (maximum - minimum);
         return Math.floor(randomFloat) + minimum;
@@ -76,6 +80,7 @@ export class FormComponent {
         if (this.myForm.valid) {
             this.closeDialog();
             this.router.navigate(['/game']);
+            this.soloGameService.initializeGame(this.myForm);
         } else {
             //fait rien
         }

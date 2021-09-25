@@ -1,10 +1,17 @@
 import { Player } from './player';
 
-export class VirtualPlayer extends Player {
+export enum PlayerType {
+    Easy = 'easy',
+    Difficult = 'difficult',
+}
 
-    constructor(name: string) {
+export class VirtualPlayer extends Player {
+    type: PlayerType;
+
+    constructor(name: string, type: PlayerType) {
         super(name);
+        this.type = type;
     }
-    
+
     playTurn() {}
 }
