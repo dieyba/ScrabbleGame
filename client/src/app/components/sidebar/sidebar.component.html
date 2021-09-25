@@ -1,32 +1,32 @@
 <div class="container">
     <img src="https://bit.ly/3m206ss" width="300" height="60" class="logo" alt="Logo Scrabble" />
     <hr />
-    <mat-card class="card" [ngStyle]="{ 'background-color': player1.isActive ? '#8ABBF5' : '#DCECFF' }">
-        <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': player1.isActive ? 'bold' : 'semi-bold' }">{{
-            player1.name
-        }}</mat-card-title>
-        <mat-card-content class="card">
-            <div>
-                <div class="row">
-                    <label class="info">Points: {{ player1.score }}</label>
-                </div>
-                <div class="row" *ngIf="player2LetterCount < 7">
-                    <label class="info">Nombre de lettres: {{ player1LetterCount }}</label>
-                </div>
-            </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="card" [ngStyle]="{ 'background-color': player2.isActive ? '#8ABBF5' : '#DCECFF' }">
-        <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': player2.isActive ? 'bold' : 'normal' }">{{
-            player2.name
+    <mat-card class="card" [ngStyle]="{ 'background-color': isPlayer1Active() ? '#8ABBF5' : '#DCECFF' }">
+        <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': isPlayer1Active() ? 'bold' : 'semi-bold' }">{{
+            player1Name
         }}</mat-card-title>
         <mat-card-content>
             <div>
                 <div class="row">
-                    <label class="info">Points: {{ player2.score }}</label>
+                    <label class="info">Points: {{ getPlayer1Score() }}</label>
                 </div>
-                <div class="row" *ngIf="player2LetterCount < 7">
-                    <label class="info">Nombre de lettres: {{ player2LetterCount }}</label>
+                <div class="row" *ngIf="getPlayer1LetterCount() < 7">
+                    <label class="info">Nombre de lettres: {{ getPlayer1LetterCount() }}</label>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <mat-card class="card" [ngStyle]="{ 'background-color': isPlayer2Active() ? '#8ABBF5' : '#DCECFF' }">
+        <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': isPlayer2Active() ? 'bold' : 'semi-bold' }">{{
+            player2Name
+        }}</mat-card-title>
+        <mat-card-content>
+            <div>
+                <div class="row">
+                    <label class="info">Points: {{ getPlayer2Score() }}</label>
+                </div>
+                <div class="row" *ngIf="getPlayer2LetterCount() < 7">
+                    <label class="info">Nombre de lettres: {{ getPlayer2LetterCount() }}</label>
                 </div>
             </div>
         </mat-card-content>
@@ -39,7 +39,7 @@
     <mat-card class="card">
         <mat-card-title class="card-title" align="center">Temps restant</mat-card-title>
         <mat-card-content>
-            <label class="values">{{ timer }}</label>
+            <label class="values">{{ getTimer() }}</label>
         </mat-card-content>
     </mat-card>
     <button class="return" routerLink="/classic">Quitter la partie</button>

@@ -77,4 +77,8 @@ export class RackService {
             }
         }
     }
+
+    clearRack() {
+        this.scrabbleRack = new ScrabbleRack();
+    }
 }

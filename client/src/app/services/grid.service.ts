@@ -225,4 +225,8 @@ export class GridService {
         this.drawColors();
         this.drawLetters();
     }
+
+    clearBoard() {
+        this.scrabbleBoard = new ScrabbleBoard();
+    }
 }
