@@ -1,6 +1,12 @@
 import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
@@ -15,6 +21,7 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { StartingPageComponent } from '@app/pages/starting-page/starting-page.component';
 import { ChatBoxComponent } from './components/chat-box/chat-box.component';
 import { ChatDisplayComponent } from './components/chat-display/chat-display.component';
+import { FormComponent } from './components/form/form.component';
 import { TextEntryComponent } from './components/text-entry/text-entry.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
 
@@ -38,8 +45,26 @@ import { AutofocusDirective } from './directives/autofocus.directive';
         AutofocusDirective,
         StartingPageComponent,
         ClassicModeComponent,
+        StartingPageComponent,
+        ClassicModeComponent,
+        FormComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    imports: [
+        MatRadioModule,
+        MatCardModule,
+        MatCheckboxModule,
+        MatSelectModule,
+        MatInputModule,
+        MatFormFieldModule,
+        AppMaterialModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        ReactiveFormsModule,
+    ],
     providers: [],
     bootstrap: [AppComponent],
 })

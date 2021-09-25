@@ -34,18 +34,18 @@ describe('GridService', () => {
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
-    it(' drawWord should not call fillText if word is empty', () => {
-        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        service.drawWord('');
-        expect(fillTextSpy).toHaveBeenCalledTimes(0);
-    });
+//     it(' drawWord should not call fillText if word is empty', () => {
+//         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+//         service.drawWord('');
+//         expect(fillTextSpy).toHaveBeenCalledTimes(0);
+//     });
 
-    it(' drawWord should call fillText as many times as letters in a word', () => {
-        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        const word = 'test';
-        service.drawWord(word);
-        expect(fillTextSpy).toHaveBeenCalledTimes(word.length);
-    });
+//     it(' drawWord should call fillText as many times as letters in a word', () => {
+//         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+//         const word = 'test';
+//         service.drawWord(word);
+//         expect(fillTextSpy).toHaveBeenCalledTimes(word.length);
+//     });
 
     it(' drawWord should color pixels on the canvas', () => {
         let imageData = service.gridContext.getImageData(0, 0, service.width, service.height).data;

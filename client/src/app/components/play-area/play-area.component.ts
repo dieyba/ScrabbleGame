@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { Vec2 } from '@app/classes/vec2';
+import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { GridService } from '@app/services/grid.service';
 import { RackService } from '@app/services/rack.service';
 
@@ -32,6 +33,7 @@ export class PlayAreaComponent implements AfterViewInit {
     buttonPressed = '';
     private canvasSize = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
     private rackSize = { x: RACK_WIDTH, y: RACK_HEIGHT };
+    private game = new GamePageComponent(this.rackService);
 
     constructor(private readonly gridService: GridService, private readonly rackService: RackService) {}
 
@@ -78,6 +80,8 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawLetter(letter5, 12, 9);
         this.rackService.drawRack();
 
+        this.rackService.drawRack();
+        this.game.distributeLetters();
         this.gridCanvas.nativeElement.focus();
     }
 
