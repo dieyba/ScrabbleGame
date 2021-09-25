@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleWord } from '@app/classes/scrabble-word';
 
 @Injectable({
     providedIn: 'root',
@@ -17,10 +15,10 @@ export class WordBuilderService {
     }
   }
   */
-
     /* This function builds a word, given a direction and the very first letter
 from the north, east, south or west position. Written to be used in conjunction
 with a function that would find all new edges of the scrabble board*/
+    /*
     scoreWordInADirection(firstLetter: ScrabbleLetter, direction: number): ScrabbleWord {
         if (direction === 0 || direction === 3) {
             // If the direction is illegal
@@ -36,8 +34,7 @@ with a function that would find all new edges of the scrabble board*/
         }
 
         return wordInConstruction;
-    }
-
+    }*/
     /* scoreWordFromEdge(firstLetter : ScrabbleLetter) : ScrabbleWord[]{
     let wordsFormed = new ScrabbleWord[];
     let j = 0
