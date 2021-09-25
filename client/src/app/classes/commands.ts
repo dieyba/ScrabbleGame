@@ -1,58 +1,94 @@
 import { Vec2 } from "./vec2";
 
-export interface Command {
-    execute(): void;
+// TODO: return when command failed, send error msg to chat
+
+export class GameService {
+    passTurn(): void{
+        console.log("Passing turn");
+    }
+
+    place(posititon:Vec2, letters:string, orientation:string):void{
+        // calling necessary receivers
+        console.log("Position x: " + posititon.x);
+        console.log("Position y: " + posititon.y);
+        console.log("Orientation:" + orientation);
+        console.log("Letters to place: " + letters);
+    }
+
+    debug():void{
+        // calling necessary receivers
+        console.log("Changing debug state");
+    }
+
+    exchangeLetters(letters: string):void{
+        // calling necessary receivers
+        console.log("Exchanging these letters:" + letters);
+    }
+};
+
+
+
+export abstract class Command {
+    gameService: GameService;
+
+    constructor(gameService: GameService){
+        this.gameService = gameService;        
+    }
+
+    abstract execute():void;
 }
 
 
-// TODO: put commands in their own file
-// create the actual receivers class and implement the function to execute
-// add receiver as attritube to its command class.
-// Game service will most likely be the invoker/the sender creating commands and calling execute()
-export class PlaceCmd implements Command {
-    private posititon: Vec2;
-    private word: string;
 
-    constructor(posititon: Vec2, word: string) {
-        this.posititon = posititon;
-        this.word = word;
+export class PassTurnCmd extends Command {
+    public execute(): void {
+        this.gameService.passTurn();
+    }
+}
+
+
+
+export class PlaceCmd extends Command {
+    private position: Vec2;
+    private letters: string;
+    private orientation : string;
+    // TODO: add attribute to check if sender player can place
+
+    constructor(gameService:GameService, position: Vec2, letters: string, orientation: string) {
+        super(gameService);
+        this.position = position;
+        this.letters = letters;
+        this.orientation = orientation;
     }
 
     public execute(): void {
-        // this.receiver.place(this.posititon, this.word);
-        console.log("Position x: " + this.posititon.x);
-        console.log("Position y: " + this.posititon.y);
-        console.log("Word to place: " + this.word);
+        this.gameService.place(this.position,this.letters,this.orientation);
     }
 }
 
 
-export class DebugCmd implements Command {
+
+export class DebugCmd extends Command {
+    constructor(gameService: GameService){
+        super(gameService);
+    }
+
     public execute(): void {
-        // this.receiver.debug();
-        console.log("changing debug state");
+        this.gameService.debug();
     }
 }
 
 
 
-export class PassTurnCmd implements Command {
-    public execute(): void {
-        // this.receiver.passTurn();
-        console.log("passing turn");
-    }
-}
-
-
-export class SwitchLettersCmd implements Command {
+export class ExchangeCmd extends Command {
     private letters: string;
 
-    constructor(letters: string) {
+    constructor(gameService: GameService, letters: string) {
+        super(gameService);
         this.letters = letters;
     }
 
     public execute(): void {
-        // this.receiver.switchLetters(letters);
-        console.log("letters to switch: " + this.letters);
+        this.gameService.exchangeLetters(this.letters);
     }
 }
