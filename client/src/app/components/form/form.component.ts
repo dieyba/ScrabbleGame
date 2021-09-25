@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -8,72 +8,76 @@ import { Router } from '@angular/router';
     styleUrls: ['./form.component.scss'],
 })
 export class FormComponent {
-    @Input() myForm = new FormGroup({
-        name: new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z]*')]),
-        timer: new FormControl(''),
-        bonus: new FormControl('60'),
-        dictionnary: new FormControl(''),
-    });
-    @Output() nameChange = new EventEmitter<string>();
-    niveau: string[];
+    myForm: FormGroup;
+    name: FormControl;
+    timer: FormControl;
+    bonus: FormControl;
+    level: FormControl;
+    opponent: FormControl;
+    dictionnary1: FormControl;
     debutantNameList: string[];
-    expertNameList: string[];
     selectedPlayer: string;
-    selectedNiveau: string;
     random: number;
-    submitted = false;
     dictionnary: string;
     selected = 'select';
     constructor(private dialog: MatDialogRef<FormComponent>, private router: Router) {
-        this.niveau = ['Joeur Débutant', ' Joueur Expert'];
         this.dictionnary = 'Francais(defaut)';
         this.debutantNameList = ['erika', 'etienne', 'sara'];
-        this.expertNameList = ['dieyna', 'kevin', 'arianne'];
     }
-    // getErrorMessage() {
-    //     if (this.myForm.controls['name'].value.hasError('pattern')) {
-    //         return 'You cant enter a number';
-    //     }
 
-    //     return this.myForm.controls['name'].value.hasError('name') ? 'Not a valid name' : '';
-    // }
+    ngOnInit() {
+        this.createFormControl();
+        this.createForm();
+    }
+
+    createFormControl() {
+        this.level = new FormControl('', [Validators.required]);
+        this.name = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z]*')]);
+        this.timer = new FormControl('', [Validators.required]);
+        this.bonus = new FormControl('');
+        this.dictionnary1 = new FormControl('', [Validators.required]);
+        this.opponent = new FormControl('');
+    }
+
+    createForm() {
+        this.myForm = new FormGroup({
+            name: this.name,
+            timer: this.timer,
+            bonus: this.bonus,
+            dictionnary1: this.dictionnary1,
+            level: this.level,
+            opponent: this.opponent,
+        });
+    }
+
     closeDialog() {
         this.dialog.close();
     }
-
-    submit(): void {
-        this.submitted = true;
-        if (this.myForm.valid) {
-            alert('votre partie commence');
-            this.closeDialog();
-            this.router.navigate(['/game']);
-            console.log('pourquoiiiiiiiii');
-        } else {
-            alert('les parametres sont invalides');
-        }
-    }
-
-    onSelect(opponent: string): void {
-        this.selectedPlayer = opponent;
-        this.selectedNiveau = opponent;
-    }
-    isActive(difficulty: string) {
-        return this.selectedNiveau === difficulty;
+    randomNumber(minimum: number, maximum: number): number {
+        let randomFloat = Math.random() * (maximum - minimum);
+        return Math.floor(randomFloat) + minimum;
     }
 
     randomPlayer(list: string[]): void {
         document.getElementById('opponents')!.style.display = 'block';
         this.random = this.randomNumber(0, list.length);
-        while (this.myForm.controls['name'].value == list[this.random]) {
-            this.random = this.randomNumber(0, list.length);
-            this.nameChange.emit(list[this.random]);
-        }
-
         this.selectedPlayer = list[this.random];
+        this.myForm.controls['opponent'].setValue(this.selectedPlayer);
     }
 
-    randomNumber(minimum: number, maximum: number): number {
-        let randomFloat = Math.random() * (maximum - minimum);
-        return Math.floor(randomFloat) + minimum;
+    changeName(list: string[]): void {
+        if (this.name.value == this.selectedPlayer) {
+            this.randomPlayer(list);
+            this.myForm.controls['opponent'].setValue(this.selectedPlayer);
+        }
+    }
+
+    submit(): void {
+        if (this.myForm.valid) {
+            this.closeDialog();
+            this.router.navigate(['/game']);
+        } else {
+            //fait rien
+        }
     }
 }

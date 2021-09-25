@@ -4,32 +4,29 @@
     height: 600px;
 }
 
-.container .text {
-    font-family: 'Arial Bold', 'Arial', 'sans-serif';
-    font-size: 24px;
-    font-weight: 700;
-    text-align: center;
-    color: #8c8c8c;
-    text-align: left;
-}
-.container hr.solid {
-    position: relative;
-    width: 118%;
-    left: -30px;
-    top: 10px;
-}
 .papy {
     width: 100%;
 }
+
 .btn hr.solid {
     position: relative;
     left: -30px;
     top: -15px;
     width: 238%;
 }
-.ng-valid[required],
-.ng-valid.required {
-    border-left: 5px solid #42a948; /* green */
+
+.error {
+    font-size: 10px;
+}
+mat-radio-group {
+    top: 20px;
+    position: relative;
+}
+mat-radio-button {
+    position: relative;
+    margin: 20px;
+    margin-left: 100px;
+    display: inline-block;
 }
 
 #opponents {
@@ -78,32 +75,10 @@
     opacity: 1;
     transition: 0.3s;
 }
-a {
-    padding: 1rem;
-    text-decoration: none;
-    margin-top: 10px;
-    display: inline-block;
-    color: black;
-    background-color: grey;
-    border-radius: 4px;
-    margin-left: 100px;
-}
+
 p {
     position: relative;
     margin-left: 150px;
     top: 25px;
     font-size: large;
-}
-.active a {
-    padding: 1rem;
-    text-decoration: none;
-    margin-top: 10px;
-    display: inline-block;
-    background-color: green;
-    color: black;
-    border-radius: 4px;
-}
-
-.active a:hover {
-    color: #42545c;
 }

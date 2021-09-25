@@ -1,9 +1,11 @@
 import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -18,6 +20,7 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { StartingPageComponent } from '@app/pages/starting-page/starting-page.component';
 import { FormComponent } from './components/form/form.component';
+
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -36,7 +39,10 @@ import { FormComponent } from './components/form/form.component';
         ClassicModeComponent,
         FormComponent,
     ],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
     imports: [
+        MatRadioModule,
+        MatCardModule,
         MatCheckboxModule,
         MatSelectModule,
         MatInputModule,

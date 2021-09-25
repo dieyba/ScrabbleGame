@@ -1,51 +1,52 @@
 <div class="container">
-    <!--formulaire mode solo-->
     <form [formGroup]="myForm" class="papy">
-        <!--form #form="ngForm" id="myForm"-->
         <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill" class="papy">
             <mat-label>entrer votre nom</mat-label>
-            <input matInput #input maxlength="10" #input2 minlength="3" placeholder="Ex. Nougat" formControlName="name" required />
+            <input
+                matInput
+                #input
+                maxlength="10"
+                (change)="changeName(debutantNameList)"
+                #input2
+                minlength="3"
+                placeholder="Ex. Nougat"
+                formControlName="name"
+            />
             <mat-hint align="end">{{ input.value?.length || 0 }}/10</mat-hint>
-            <div *ngIf="this.myForm.controls['name'].value.errors?.pattern">Name is required.</div>
-            <!--mat-error *ngIf="this.myForm.controls['name'].value.invalid">{{ getErrorMessage() }}</mat-error-->
+            <div class="error" *ngIf="name.errors?.pattern">Le nom ne doit pas contenir de chiffres et de caracteres</div>
         </mat-form-field>
 
         <div>
             <mat-form-field appearance="fill" class="papy">
                 <mat-label>Dictonnaire :</mat-label>
-                <mat-select FormControlName="dictionnary" [(value)]="selected">
+                <mat-select formControlName="dictionnary1" [(value)]="selected">
                     <mat-option value="select">{{ dictionnary }}</mat-option>
                 </mat-select>
+                <div class="error" *ngIf="dictionnary1.invalid">Le champ est requis</div>
             </mat-form-field>
         </div>
         <div>
             <mat-form-field appearance="fill" class="papy">
                 <mat-label>Minuteur :</mat-label>
-                <mat-select FormControlName="timer" [(value)]="selected">
+                <mat-select formControlName="timer" [(value)]="selected">
                     <mat-option value="select">1:00</mat-option>
                 </mat-select>
+                <div class="error" *ngIf="timer.invalid">Le champ est requis</div>
             </mat-form-field>
         </div>
-        <div class="form-check">
-            <mat-checkbox class="form check-input">Bonus aléatoire</mat-checkbox>
-        </div>
-        <h3>Veuillez choisir le niveau de votre adversaire</h3>
-        <span
-            *ngFor="let difficulty of niveau"
-            (click)="onSelect(difficulty); randomPlayer(debutantNameList)"
-            [ngClass]="{ active: isActive(difficulty) }"
-        >
-            <a>{{ difficulty }}</a>
-        </span>
 
+        <div class="form-check">
+            <mat-checkbox formControlName="bonus" class="form check-input">Bonus aléatoire</mat-checkbox>
+        </div>
+
+        <div>
+            <p>Veuillez choisir le niveau de votre adversaire</p>
+            <mat-radio-group formControlName="level" (click)="randomPlayer(debutantNameList)">
+                <mat-radio-button value="easy">Joeur Débutant</mat-radio-button>
+                <mat-radio-button value="difficult">Joueur Expert</mat-radio-button>
+            </mat-radio-group>
+        </div>
         <div id="opponents">
-            <!--a class="form" (click)="randomPlayer(debutantNameList)" formControlName="niveau">Joueur Débutant</a>
-            <a class="form" formControlName="niveau">Joueur Expert</a-->
-            <!--ul class="heroes">
-                    <li *ngFor="let opponent of debutantNameList" (click)="onSelect(opponent)" [class.selected]="opponent === selectedPlayer">
-                        <option selected>{{ opponent }}</option>
-                    </li>
-                </ul-->
             <p>
                 Vous allez jouer contre <strong>{{ selectedPlayer }}</strong>
             </p>
@@ -54,8 +55,6 @@
 
     <div>
         <button class="jouer" (click)="submit()">Commencer</button>
-        <!-- ajouter un router link-->
         <button class="annuler" (click)="closeDialog()">Annuler</button>
-        <!-- ajouter un router link-->
     </div>
 </div>
