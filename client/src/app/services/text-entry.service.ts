@@ -1,14 +1,22 @@
 import { Injectable } from '@angular/core';
-import { CommandHandler } from '@app/classes/command-handler';
 import { ChatDisplayService } from './chat-display.service';
+import { Vec2 } from '../classes/vec2';
+// import { GameService, Command } from '../classes/commands';
 
-// const COMMAND_LIST = ['placer', 'échanger', 'passer', 'debug', 'réserve', 'aide'] as const;
+const COMMAND_LIST = ['placer', 'échanger', 'passer', 'debug', 'réserve', 'aide'] as const;
+const EMPTY_STRING = "";
+const SPACE_CHAR = ' ';
 
 @Injectable({
     providedIn: 'root',
 })
 export class TextEntryService {
-    constructor(private chatDisplayService: ChatDisplayService) {}
+    commandNames : Set<string>;
+
+    constructor(private chatDisplayService: ChatDisplayService) {
+        this.commandNames = new Set;
+        
+    }
 
     /**
      * @description This function verifies if the input is a valid command or
@@ -17,40 +25,66 @@ export class TextEntryService {
      * @param text Text input from user
      */
     handleInput(text: string) {   
-        this.trimStartSpace(text);     
-        if (text.charAt(0) === '!') {
-    
-            //TODO : to remove or to add command handler as attribute actually
-            let tempCmdHandler: CommandHandler = new CommandHandler();
-            tempCmdHandler.handleCommand(text);
+
+        // if they dont wont us to trim the start, just use it trimStart for if condition without changing text value     
+        text = this.trimStart(text); 
+        if(text!==EMPTY_STRING){
             
-            // get command's result and if its invalid send invalid commmand error msg to chat display
-            // (impossible command error is sent from receiver to game service to chat display ig?)
-            // this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
-            
-        } else {
-            // Display text entered as regular chat message
-            if (text !== '') {
-                // TODO: define how to check which player sent the message
+            if(text.startsWith("!")) {
+                // TODO: check if the command name entered is valid. Send error message if not.
+                this.isValidCmd(text);
+                
+                //TODO:create new command if its valid.           
+
+
+            } else {
+                // TODO: decide how to check which player sent the message
                 this.chatDisplayService.addPlayerEntry(false, text);
             }
-            
         }
     }
 
-    // add validation for empty text entered
-    // finish validation for empty white space at the beginning (to trim it)s
-    trimStartSpace(text: string): void{
-        let startIndex = 0;
-        if(text.length!=0 && text.includes(' ', startIndex)){
-            
-        }
-        text.substring(startIndex);
-        console.log(text);
+    isValidCmd(enteredCommand:string): Boolean{
+        enteredCommand = this.removeFirstChar(enteredCommand);
+        let commandName = enteredCommand.split(SPACE_CHAR,1)[0];
+        console.log("commandName:"+ commandName);
+        console.log("command is valid:"+ commandName in COMMAND_LIST);
+        return ;
+    } 
+
+    isValidSyntax(enteredCommand:string):Boolean{
+        return true;
     }
 
 
-    // isValidCommandTest(text: string) {
+    /**
+     * Removes white spaces at the beginning of a string.
+     * @param text Text input from user
+     * @returns String without spaces at the beginning. Returns empty string if it only had white spaces
+     */
+    trimStart(text: string): string {
+        while(text.startsWith(SPACE_CHAR)){
+            text = this.removeFirstChar(text);
+        }
+        return text;
+    }
+
+    removeFirstChar(text:string):string{
+        return text.substring(1);
+    }
+
+
+    getCoordinates(row: string, column: number) {
+        const resultingCoord = new Vec2();
+
+        resultingCoord.x = column;
+        resultingCoord.y = row.charCodeAt(0) - 97;
+        console.log("resulting coord:" + resultingCoord);
+        return resultingCoord;
+    }
+
+
+  // isValidCommandTest(text: string) {
     //     // Extracting the command name
     //     let commandTemp = text.substr(1);
     //     commandTemp = commandTemp.split(' ')[0];
@@ -110,12 +144,5 @@ export class TextEntryService {
     //     }
     // }
 
-    // getCoordinates(row: string, column: number) {
-    //     const resultingCoord = new Vec2();
 
-    //     resultingCoord.x = column;
-    //     resultingCoord.y = row.charCodeAt(0) - 97;
-    //     console.log(resultingCoord);
-    //     return resultingCoord;
-    // }
 }
