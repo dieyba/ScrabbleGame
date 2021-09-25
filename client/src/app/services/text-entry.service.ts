@@ -15,7 +15,7 @@ export class TextEntryService {
 
     constructor(private chatDisplayService: ChatDisplayService) {
         this.commandNames = new Set;
-        
+
     }
 
     /**
@@ -49,7 +49,7 @@ export class TextEntryService {
         let commandName = enteredCommand.split(SPACE_CHAR,1)[0];
         console.log("commandName:"+ commandName);
         console.log("command is valid:"+ commandName in COMMAND_LIST);
-        return ;
+        return true;
     } 
 
     isValidSyntax(enteredCommand:string):Boolean{

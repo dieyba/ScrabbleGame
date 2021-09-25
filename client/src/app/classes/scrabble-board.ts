@@ -2,13 +2,6 @@ import { Square, SquareColor } from './square';
 
 const BOARD_SIZE = 15;
 
-/* export enum Quadrant {
-    NorthEast = 0,
-    NorthWest = 1,
-    SouthEast = 2,
-    SouthWest = 4,
-}*/
-
 export enum Row {
     A = 0,
     B = 1,
@@ -63,29 +56,26 @@ export class ScrabbleBoard {
     generateBoard(): void {
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
-                // Cross
-                if (i === j || i === this.actualBoardSize - j) {
-                    if (i === Column.One || i === this.actualBoardSize) {
-                        this.squares[i][j].color = SquareColor.Red;
-                    }
-                    if ((i > Column.One && i < Column.Six) || (i > Column.Ten && i < Column.Fifteen) || i === Column.Eight) {
-                        this.squares[i][j].color = SquareColor.Pink;
-                    }
-                    if (i === Column.Seven || i === Column.Nine) {
-                        this.squares[i][j].color = SquareColor.Teal;
-                    }
-                }
+                this.generateCrossSquares(i, j);
                 this.generateRedSquares(i, j);
                 this.generateDarkBlueSquares(i, j);
                 this.generateTealSquares(i, j);
             }
         }
-        // Big cross
-        // this.crossBonus(Quadrant.NorthEast);
-        // this.crossBonus(Quadrant.SouthWest);
-        // this.crossBonus(Quadrant.NorthWest);
-        // this.crossBonus(Quadrant.SouthEast);
-        // +Side bonuses
+    }
+
+    generateCrossSquares(i: number, j: number) {
+        if (i === j || i === this.actualBoardSize - j) {
+            if (i === Column.One || i === this.actualBoardSize) {
+                this.squares[i][j].color = SquareColor.Red;
+            }
+            if ((i > Column.One && i < Column.Six) || (i > Column.Ten && i < Column.Fifteen) || i === Column.Eight) {
+                this.squares[i][j].color = SquareColor.Pink;
+            }
+            if (i === Column.Seven || i === Column.Nine) {
+                this.squares[i][j].color = SquareColor.Teal;
+            }
+        }
     }
 
     generateRedSquares(i: number, j: number) {
@@ -118,84 +108,5 @@ export class ScrabbleBoard {
                 this.squares[i][j].color = SquareColor.Teal;
             }
         }
-    }
-    /* crossBonus(side: Quadrant): void {
-        // does northeast quadrant
-        let i = 0;
-        let j = 0;
-        switch (side) {
-            case Quadrant.NorthEast:
-                i = this.boardSize - 1;
-                break;
-            case Quadrant.SouthWest:
-                j = this.boardSize - 1;
-                break;
-            case Quadrant.SouthEast: {
-                i = this.boardSize - 1;
-                j = this.boardSize - 1;
-                break;
-            }
-            default:
-                // NorthWest nothing, since we start at x = 0, y = 0.
-                break;
-        }
-        for (let addedFactor = 0; addedFactor < this.boardSize / 2; addedFactor++) {
-            if (addedFactor === 0) {
-                this.squares[i][j].color = SquareColor.Red;
-            } else if (addedFactor < this.boardSize / 3 && addedFactor !== 0) {
-                this.squares[i][j].color = SquareColor.Pink;
-            } else
-                switch (addedFactor) {
-                    case this.boardSize / 3: {
-                        // case 5
-                        this.squares[i][j].color = SquareColor.DarkBlue;
-
-                        break;
-                    }
-                    case this.boardSize / 3 + 1: {
-                        // case 6
-                        this.squares[i][j].color = SquareColor.Teal;
-
-                        break;
-                    }
-                    case this.boardSize / 2 - 1: {
-                        // Étoile
-                        this.squares[i][j].color = SquareColor.Pink;
-
-                        break;
-                    }
-                    default:
-                        this.squares[i][j].color = SquareColor.None;
-                }
-
-            switch (side) {
-                case Quadrant.NorthWest: {
-                    i++;
-                    j++;
-                    break;
-                }
-                case Quadrant.NorthEast: {
-                    i--;
-                    j++;
-                    break;
-                }
-                case Quadrant.SouthWest: {
-                    i++;
-                    j--;
-                    break;
-                }
-                case Quadrant.SouthEast: {
-                    i--;
-                    j--;
-                    break;
-                }
-                default:
-                    // side undefined, throw error
-                    break;
-            }
-        }
-    }*/
-    sideBonus(): void {
-        // TODO : add bonus on top, right, left and right side
     }
 }
