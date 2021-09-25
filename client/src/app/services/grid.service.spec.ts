@@ -6,13 +6,13 @@ describe('GridService', () => {
     let service: GridService;
     let ctxStub: CanvasRenderingContext2D;
 
-    const CANVAS_WIDTH = 500;
-    const CANVAS_HEIGHT = 500;
+    const DEFAULT_WIDTH = 600;
+    const DEFAULT_HEIGHT = 600;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(GridService);
-        ctxStub = CanvasTestHelper.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
+        ctxStub = CanvasTestHelper.createCanvas(DEFAULT_WIDTH, DEFAULT_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
         service.gridContext = ctxStub;
     });
 
@@ -21,13 +21,13 @@ describe('GridService', () => {
     });
 
     it(' width should return the width of the grid canvas', () => {
-        expect(service.width).toEqual(CANVAS_WIDTH);
+        expect(service.width).toEqual(DEFAULT_WIDTH);
     });
 
     it(' height should return the height of the grid canvas', () => {
-        expect(service.width).toEqual(CANVAS_HEIGHT);
+        expect(service.width).toEqual(DEFAULT_HEIGHT);
     });
-
+    /*
     it(' drawWord should call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
         service.drawWord('test');
@@ -55,9 +55,9 @@ describe('GridService', () => {
         const afterSize = imageData.filter((x) => x !== 0).length;
         expect(afterSize).toBeGreaterThan(beforeSize);
     });
-
-    it(' drawGrid should call moveTo and lineTo 4 times', () => {
-        const expectedCallTimes = 4;
+*/
+    it(' drawGrid should call moveTo and lineTo 32 times', () => {
+        const expectedCallTimes = 32;
         const moveToSpy = spyOn(service.gridContext, 'moveTo').and.callThrough();
         const lineToSpy = spyOn(service.gridContext, 'lineTo').and.callThrough();
         service.drawGrid();
