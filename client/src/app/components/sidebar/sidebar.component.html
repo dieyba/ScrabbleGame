@@ -2,7 +2,7 @@
     <img src="https://bit.ly/3m206ss" width="300" height="60" class="logo" alt="Logo Scrabble" />
     <hr />
     <mat-card class="card" [ngStyle]="{ 'background-color': isPlayer1Active() ? '#8ABBF5' : '#DCECFF' }">
-        <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': isPlayer1Active() ? 'bold' : 'semi-bold' }">{{
+        <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': isPlayer1Active() ? 'bold' : 'normal' }">{{
             player1Name
         }}</mat-card-title>
         <mat-card-content>
@@ -17,7 +17,7 @@
         </mat-card-content>
     </mat-card>
     <mat-card class="card" [ngStyle]="{ 'background-color': isPlayer2Active() ? '#8ABBF5' : '#DCECFF' }">
-        <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': isPlayer2Active() ? 'bold' : 'semi-bold' }">{{
+        <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': isPlayer2Active() ? 'bold' : 'normal' }">{{
             player2Name
         }}</mat-card-title>
         <mat-card-content>

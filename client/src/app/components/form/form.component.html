@@ -1,7 +1,7 @@
 <div class="container">
     <form [formGroup]="myForm" class="papy">
         <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill" class="papy">
-            <mat-label>entrer votre nom</mat-label>
+            <mat-label>Entrez votre nom</mat-label>
             <input
                 matInput
                 #input
@@ -13,7 +13,7 @@
                 formControlName="name"
             />
             <mat-hint align="end">{{ input.value?.length || 0 }}/10</mat-hint>
-            <div class="error" *ngIf="name.errors?.pattern">Le nom ne doit pas contenir de chiffres et de caracteres</div>
+            <div class="error" *ngIf="name.errors?.pattern">Le nom ne doit pas contenir de chiffres et de caractères</div>
         </mat-form-field>
 
         <div>

@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Dictionary } from '@app/classes/dictionary';
 import { LetterStock } from '@app/classes/letter-stock';
 import { LocalPlayer } from '@app/classes/local-player';
 import { VirtualPlayer } from '@app/classes/virtual-player';
+import { NewTurnComponent } from '@app/components/new-turn/new-turn.component';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 
@@ -23,7 +25,7 @@ export class SoloGameService {
     timerMs: number;
     stock: LetterStock = new LetterStock();
 
-    constructor(private gridService: GridService, private rackService: RackService) {}
+    constructor(private gridService: GridService, private rackService: RackService, public dialog: MatDialog) {}
 
     initializeGame(gameInfo: FormGroup) {
         this.localPlayer = new LocalPlayer(gameInfo.controls.name.value);
@@ -41,16 +43,17 @@ export class SoloGameService {
         this.rackService.clearRack();
         this.gridService.clearBoard();
         this.drawRackLetters();
-        this.startCountdown();
+        this.openDialog();
     }
 
     startCountdown() {
         this.secondsToMinutes();
-        setInterval(() => {
+        const timeValue = setInterval(() => {
             this.timerMs--;
             if (this.timerMs < 0) {
-                this.timerMs = this.totalCountDown;
+                this.timerMs = 0;
                 this.secondsToMinutes();
+                clearInterval(timeValue);
                 this.changeActivePlayer();
             }
             this.secondsToMinutes();
@@ -61,17 +64,37 @@ export class SoloGameService {
         let time = new Date(this.timerMs);
         let s = time.getSeconds();
         let ms = time.getMilliseconds();
-        this.timer = s + ':' + ms;
+        if (ms < 10) {
+            this.timer = s + ':' + 0 + ms;
+        } else {
+            this.timer = s + ':' + ms;
+        }
     }
 
     changeActivePlayer() {
-        if (this.localPlayer.isActive === true) {
+        let isLocalPlayerActive = this.localPlayer.isActive;
+        if (isLocalPlayerActive) {
             this.localPlayer.isActive = false;
             this.virtualPlayer.isActive = true;
+            this.timerMs = +this.totalCountDown;
+            this.secondsToMinutes();
+            this.startCountdown();
         } else {
             this.virtualPlayer.isActive = false;
             this.localPlayer.isActive = true;
+            this.openDialog();
         }
+    }
+
+    openDialog(): void {
+        this.dialog.open(NewTurnComponent, {});
+    }
+
+    closeDialog() {
+        this.dialog.closeAll();
+        this.timerMs = +this.totalCountDown;
+        this.secondsToMinutes();
+        this.startCountdown();
     }
 
     drawRackLetters(): void {
