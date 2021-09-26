@@ -1,11 +1,6 @@
 import { Injectable } from '@angular/core';
-import { AuthorType, ChatDisplayEntry, ChatEntryColor, ErrorType } from '@app/classes/chat-display-entry';
-
-const ERROR_MESSAGES = new Map([
-    [ErrorType.SyntaxError, 'Syntax error'],
-    [ErrorType.InvalidCommand, 'Invalid command'],
-    [ErrorType.ImpossibleCommand, 'Impossible command'],
-]);
+import { AuthorType, ChatDisplayEntry, ChatEntryColor } from '@app/classes/chat-display-entry';
+import { ErrorType, ERROR_MESSAGES } from '@app/classes/errors';
 
 @Injectable({
     providedIn: 'root',
@@ -16,7 +11,6 @@ export class ChatDisplayService {
         return;
     };
 
-    // TODO: calculer valeur de isAdversary selon l'identite de l'auteur du message
     /**
      * @description Add normal text and validated commands.
      *
