@@ -2,15 +2,22 @@ import { Vec2 } from './vec2';
 
 // TODO: return when command failed, send error msg to chat
 
+// TODO: Add the player name who sent the command or not?
+export interface PlaceParams {
+    position: Vec2;
+    orientation: string;
+    letters:string;
+}
+
 export class GameService {
     passTurn(): void {
         console.log('Passing turn');
     }
 
-    place(posititon: Vec2, letters: string, orientation: string): void {
+    place(position:Vec2, orientation:string, letters:string): void {
         // calling necessary receivers
-        console.log('Position x: ' + posititon.x);
-        console.log('Position y: ' + posititon.y);
+        console.log('Position x: ' + position.x);
+        console.log('Position y: ' + position.y);
         console.log('Orientation:' + orientation);
         console.log('Letters to place: ' + letters);
     }
@@ -25,6 +32,8 @@ export class GameService {
         console.log('Exchanging these letters:' + letters);
     }
 }
+
+
 
 export abstract class Command {
     gameService: GameService;
@@ -44,19 +53,18 @@ export class PassTurnCmd extends Command {
 
 export class PlaceCmd extends Command {
     private position: Vec2;
-    private letters: string;
     private orientation: string;
-    // TODO: add attribute to check if sender player can place?
+    private letters: string;
 
-    constructor(gameService: GameService, position: Vec2, letters: string, orientation: string) {
+    constructor(gameService: GameService, params:PlaceParams) {
         super(gameService);
-        this.position = position;
-        this.letters = letters;
-        this.orientation = orientation;
+        this.position = params.position;
+        this.orientation = params.orientation;
+        this.letters = params.letters;
     }
 
     execute(): void {
-        this.gameService.place(this.position, this.letters, this.orientation);
+        this.gameService.place(this.position, this.orientation, this.letters);
     }
 }
 

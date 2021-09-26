@@ -1,21 +1,33 @@
 import { Injectable } from '@angular/core';
 import { ChatDisplayService } from './chat-display.service';
-import { Vec2 } from '../classes/vec2';
-// import { GameService, Command } from '../classes/commands';
+import { ErrorType } from '@app/classes/errors';
+import { GameService } from '../classes/commands';
+// import { Vec2 } from '../classes/vec2';
 
+// TODO: voir leurs consignes pour les constantes
 const COMMAND_LIST = ['placer', 'échanger', 'passer', 'debug', 'réserve', 'aide'] as const;
-const EMPTY_STRING = "";
 const SPACE_CHAR = ' ';
+
+interface CommandInput{
+    name:string;
+    params:string[];
+};
+
+
 
 @Injectable({
     providedIn: 'root',
 })
 export class TextEntryService {
     commandNames : Set<string>;
+    fakeGameService : GameService; 
 
     constructor(private chatDisplayService: ChatDisplayService) {
+        this.fakeGameService = new GameService;
         this.commandNames = new Set;
-
+        for(let i in COMMAND_LIST){
+            this.commandNames.add(COMMAND_LIST[i].toString());
+        }
     }
 
     /**
@@ -24,125 +36,94 @@ export class TextEntryService {
      *
      * @param text Text input from user
      */
-    handleInput(text: string) {   
+    handleInput(userInput: string) {   
 
+        // TODO: trim start spaces?
         // if they dont wont us to trim the start, just use it trimStart for if condition without changing text value     
-        text = this.trimStart(text); 
-        if(text!==EMPTY_STRING){
-            
-            if(text.startsWith("!")) {
-                // TODO: check if the command name entered is valid. Send error message if not.
-                this.isValidCmd(text);
+        userInput = this.trimStartSpaces(userInput); 
+        
+        if(!this.isEmpty(userInput)){
+            if(userInput.startsWith("!")) {
+                userInput = userInput.substring(1);
+                const commandInput: CommandInput = this.splitInput(userInput);  
                 
-                //TODO:create new command if its valid.           
-
+                if(this.isValidCmd(commandInput.name)){
+                    if(this.isValidSyntax(commandInput.params)){
+                        
+                        // TODO: check if the player who sent the input can pass that command
+                        // create a map with a command to create each cmd?
+                        // how do i pass params to the function?
+                        
+                    }else{
+                        this.chatDisplayService.addErrorMessage(ErrorType.SyntaxError)
+                    }
+                }else{
+                    this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
+                }
 
             } else {
                 // TODO: decide how to check which player sent the message
-                this.chatDisplayService.addPlayerEntry(false, text);
+                let isAdversaryMessage = false;
+                this.chatDisplayService.addPlayerEntry(isAdversaryMessage, userInput);
             }
         }
     }
 
-    isValidCmd(enteredCommand:string): Boolean{
-        enteredCommand = this.removeFirstChar(enteredCommand);
-        let commandName = enteredCommand.split(SPACE_CHAR,1)[0];
-        console.log("commandName:"+ commandName);
-        console.log("command is valid:"+ commandName in COMMAND_LIST);
+    
+    isValidSyntax(enteredParams:string[]):Boolean{
+        // TODO: check params syntax
+        // check if it only has the proper params after cmd name. Nothing more after either
+        // create map with command name and function to call to check the params syntax?
+        // return result of that function execution
         return true;
-    } 
+    }
+    
+    isValidCmd(enteredCmd:string): Boolean{
+        return this.commandNames.has(enteredCmd);;
+    }
 
-    isValidSyntax(enteredCommand:string):Boolean{
-        return true;
+    
+    splitInput(enteredCommand:string):CommandInput{
+        const result: CommandInput = {name:"", params:[]};
+        if(!this.isEmpty(enteredCommand)){
+            let splitInput = enteredCommand.split(SPACE_CHAR);
+            result.name = splitInput.shift() as string;
+            result.params = splitInput;
+        }
+        return result;
     }
 
 
     /**
      * Removes white spaces at the beginning of a string.
-     * @param text Text input from user
+     * @param text Input from the user
      * @returns String without spaces at the beginning. Returns empty string if it only had white spaces
      */
-    trimStart(text: string): string {
+     trimStartSpaces(text: string): string {
         while(text.startsWith(SPACE_CHAR)){
-            text = this.removeFirstChar(text);
+            text = text.substring(1);
         }
         return text;
     }
 
-    removeFirstChar(text:string):string{
-        return text.substring(1);
+    /**
+     * Checks if a string is empty.
+     * @param text 
+     * @returns True if empty string or white space only string
+     */
+    isEmpty(userInput:string){
+        userInput = this.trimStartSpaces(userInput);
+        return (userInput === "");
     }
 
 
-    getCoordinates(row: string, column: number) {
-        const resultingCoord = new Vec2();
+    // convertToCoordinates(row: string, column: number) {
+    //     const resultingCoord = new Vec2();
 
-        resultingCoord.x = column;
-        resultingCoord.y = row.charCodeAt(0) - 97;
-        console.log("resulting coord:" + resultingCoord);
-        return resultingCoord;
-    }
-
-
-  // isValidCommandTest(text: string) {
-    //     // Extracting the command name
-    //     let commandTemp = text.substr(1);
-    //     commandTemp = commandTemp.split(' ')[0];
-
-    //     // Checking if the command exist
-    //     // for (const COMMAND of COMMAND_LIST) {
-    //     //     if (commandTemp === COMMAND) {
-    //     //         return true;
-    //     //     }
-    //     // }
-    //     if (commandTemp === COMMAND_LIST[0]) {
-    //         return true;
-    //     }
-    //     return false;
+    //     resultingCoord.x = column;
+    //     resultingCoord.y = row.charCodeAt(0) - 97;
+    //     console.log("resulting coord:" + resultingCoord);
+    //     return resultingCoord;
     // }
-
-    // isValidCommand(text: string) {
-    //     // Extracting the command name
-    //     let commandTemp = text.substr(1);
-    //     commandTemp = commandTemp.split(' ')[0];
-
-    //     // Checking if the command exist
-    //     for (const COMMAND of COMMAND_LIST) {
-    //         if (commandTemp === COMMAND) {
-    //             return true;
-    //         }
-    //     }
-
-    //     return false;
-    // }
-
-    // handleCommand(command: string) {
-    //     let coord: Vec2;
-
-    //     const row = command[8];
-    //     console.log(command.substring(9, 11));
-    //     const column = parseInt(command.substring(9, 11));
-    //     coord = this.getCoordinates(row, column);
-
-    //     const word: string = command.substring(13);
-    //     if (command[11] === 'v') {
-    //         for (let i = 0; i < word.length; i++) {
-    //             const scrabbleLetter = new ScrabbleLetter();
-    //             scrabbleLetter.character = word[i];
-    //             scrabbleLetter.value = 42;
-    //             scrabbleLetter.square = new Square(coord.x - 1, coord.y + i);
-    //             this.gridService.drawLetter(scrabbleLetter);
-    //         }
-    //     } else {
-    //         for (let i = 0; i < word.length; i++) {
-    //             const scrabbleLetter = new ScrabbleLetter();
-    //             scrabbleLetter.character = word[i];
-    //             scrabbleLetter.value = 42;
-    //             scrabbleLetter.square = new Square(coord.x - 1 + i, coord.y);
-    //             this.gridService.drawLetter(scrabbleLetter);
-    //         }
-    //     }
-    // }
-
 
 }
