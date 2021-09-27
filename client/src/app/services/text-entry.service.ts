@@ -1,12 +1,24 @@
 import { Injectable } from '@angular/core';
 import { ChatDisplayService } from './chat-display.service';
 import { ErrorType } from '@app/classes/errors';
-import { GameService } from '../classes/commands';
+import { GameService, Command, DebugCmd } from '../classes/commands';
 // import { Vec2 } from '../classes/vec2';
 
 // TODO: voir leurs consignes pour les constantes
-const COMMAND_LIST = ['placer', 'échanger', 'passer', 'debug', 'réserve', 'aide'] as const;
+const DEBUG_CMD = 'debug';
+const EXCHANGE_CMD = 'échanger';
+const PASS_CMD = 'passer';
+const PLACE_CMD = 'placer';
+const COMMAND_LIST = [DEBUG_CMD,EXCHANGE_CMD,PASS_CMD,PLACE_CMD];
+
 const SPACE_CHAR = ' ';
+const A_CHAR = 'a'.charCodeAt(0);
+const Z_CHAR = 'z'.charCodeAt(0);
+// const HORIZONTAL = 'h';
+// const VERTICAL = 'v';
+// const ROW_INDEX = ;
+// const COL_INDEX = ;
+const ASTERISK_CHAR = '*'.charCodeAt(0);
 
 interface CommandInput{
     name:string;
@@ -37,49 +49,99 @@ export class TextEntryService {
      * @param text Text input from user
      */
     handleInput(userInput: string) {   
-
-        // TODO: trim start spaces?
-        // if they dont wont us to trim the start, just use it trimStart for if condition without changing text value     
-        userInput = this.trimStartSpaces(userInput); 
-        
+        // TODO: game service is the one checking if the player can play the command. When multiplayer, check who sends message
+        let isAdversaryMessage = false;
+        // TODO: trim beginning and end?
+        userInput = this.trimStartSpaces(userInput);       
         if(!this.isEmpty(userInput)){
             if(userInput.startsWith("!")) {
-                userInput = userInput.substring(1);
-                const commandInput: CommandInput = this.splitInput(userInput);  
-                
-                if(this.isValidCmd(commandInput.name)){
-                    if(this.isValidSyntax(commandInput.params)){
-                        
-                        // TODO: check if the player who sent the input can pass that command
-                        // create a map with a command to create each cmd?
-                        // how do i pass params to the function?
-                        
-                    }else{
-                        this.chatDisplayService.addErrorMessage(ErrorType.SyntaxError)
-                    }
-                }else{
-                    this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
+                let command = this.createCommande(this.splitInput(userInput.substring(1)));
+                if(command){
+                    command.execute()?
+                    this.chatDisplayService.addPlayerEntry(isAdversaryMessage, userInput):
+                    this.chatDisplayService.addErrorMessage(ErrorType.ImpossibleCommand);
                 }
-
             } else {
-                // TODO: decide how to check which player sent the message
-                let isAdversaryMessage = false;
                 this.chatDisplayService.addPlayerEntry(isAdversaryMessage, userInput);
             }
         }
     }
 
-    
-    isValidSyntax(enteredParams:string[]):Boolean{
-        // TODO: check params syntax
-        // check if it only has the proper params after cmd name. Nothing more after either
-        // create map with command name and function to call to check the params syntax?
-        // return result of that function execution
+
+    createCommande(commandInput:CommandInput):Command|undefined{
+        if(this.isValidCommand(commandInput)){
+            // TODO: Create the proper command base on command name
+            return new DebugCmd(this.fakeGameService);
+        }
+        return undefined;
+    }
+
+
+
+    /**
+     * Checks if the command entered has a valid name and syntax. Sends error message if not.
+     * @param commandInput the command name and parameters entered by the player
+     * @returns True if valid name and syntax
+     */
+    isValidCommand(commandInput:CommandInput):Boolean{
+        if(this.commandNames.has(commandInput.name)){
+            if(this.isValidSyntax(commandInput)){
+                return true;
+            }else{
+                this.chatDisplayService.addErrorMessage(ErrorType.SyntaxError)
+            }
+        }else{
+            this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
+        }
+        return false;
+    }
+
+
+    isValidSyntax(commandInput:CommandInput):Boolean|undefined{
+        // TODO: transform in a map
+        if(commandInput.name === EXCHANGE_CMD){
+            return this.isValidExchangeParams(commandInput.params);
+        }
+        else if(commandInput.name === PLACE_CMD){
+            return this.isValidPlaceParams(commandInput.params);
+        }
+        else if(commandInput.name === DEBUG_CMD||PASS_CMD){
+            return (commandInput.params.length == 0);
+        }
+        return undefined;
+    }
+
+    isValidPlaceParams(enteredParams:string[]):Boolean{
+        // TODO: place cmd validation
         return true;
     }
-    
-    isValidCmd(enteredCmd:string): Boolean{
-        return this.commandNames.has(enteredCmd);;
+
+
+    isValidExchangeParams(enteredParams:string[]):Boolean{
+        if(enteredParams.length === 1){
+            let letters = enteredParams[0];
+            if(!this.isEmpty(letters)){
+                let isValidAmount = (letters.length > 0) && (letters.length < 8);
+                if(isValidAmount){
+                    for(let letter of letters){
+                        if(!this.isValidLetter(letter)){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    isValidLetter(letter:string):Boolean{
+        if(!this.isEmpty(letter)){
+            let charCode = letter.toLowerCase().charCodeAt(0);
+            return  (charCode >= A_CHAR && charCode <= Z_CHAR)|| (charCode == ASTERISK_CHAR);
+        }
+        return false;
     }
 
     
