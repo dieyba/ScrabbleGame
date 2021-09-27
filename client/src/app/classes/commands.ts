@@ -1,8 +1,7 @@
 import { Vec2 } from './vec2';
 
-// TODO: return when command failed, send error msg to chat
+// TODO: Add way to know who sent the command? To add when multiplayer
 
-// TODO: Add the player name who sent the command or not?
 export interface PlaceParams {
     position: Vec2;
     orientation: string;
@@ -10,26 +9,30 @@ export interface PlaceParams {
 }
 
 export class GameService {
-    passTurn(): void {
+    passTurn(): Boolean {
         console.log('Passing turn');
+        return true;
     }
 
-    place(position:Vec2, orientation:string, letters:string): void {
+    place(position:Vec2, orientation:string, letters:string): Boolean {
         // calling necessary receivers
         console.log('Position x: ' + position.x);
         console.log('Position y: ' + position.y);
         console.log('Orientation:' + orientation);
         console.log('Letters to place: ' + letters);
+        return true;
     }
 
-    debug(): void {
+    debug(): Boolean {
         // calling necessary receivers
         console.log('Changing debug state');
+        return true;
     }
 
-    exchangeLetters(letters: string): void {
+    exchangeLetters(letters: string): Boolean {
         // calling necessary receivers
         console.log('Exchanging these letters:' + letters);
+        return true;
     }
 }
 
@@ -42,12 +45,12 @@ export abstract class Command {
         this.gameService = gameService;
     }
 
-    abstract execute(): void;
+    abstract execute(): Boolean;
 }
 
 export class PassTurnCmd extends Command {
-    execute(): void {
-        this.gameService.passTurn();
+    execute(): Boolean {
+        return this.gameService.passTurn();
     }
 }
 
@@ -63,8 +66,8 @@ export class PlaceCmd extends Command {
         this.letters = params.letters;
     }
 
-    execute(): void {
-        this.gameService.place(this.position, this.orientation, this.letters);
+    execute(): Boolean {
+        return this.gameService.place(this.position, this.orientation, this.letters);
     }
 }
 
@@ -73,8 +76,8 @@ export class DebugCmd extends Command {
         super(gameService);
     }
 
-    execute(): void {
-        this.gameService.debug();
+    execute(): Boolean {
+        return this.gameService.debug();
     }
 }
 
@@ -86,7 +89,7 @@ export class ExchangeCmd extends Command {
         this.letters = letters;
     }
 
-    execute(): void {
-        this.gameService.exchangeLetters(this.letters);
+    execute(): Boolean {
+        return this.gameService.exchangeLetters(this.letters);
     }
 }
