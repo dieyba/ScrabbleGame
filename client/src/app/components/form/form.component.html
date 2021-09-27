@@ -19,7 +19,7 @@
         <div>
             <mat-form-field appearance="fill" class="papy">
                 <mat-label>Dictonnaire :</mat-label>
-                <mat-select formControlName="dictionaryForm">
+                <mat-select formControlName="dictionaryForm" [(ngModel)]="defaultDictionary" [placeholder]="defaultDictionary">
                     <mat-option value="0">{{ dictionary }}</mat-option>
                 </mat-select>
                 <div class="error" *ngIf="dictionaryForm.invalid">Le champ est requis</div>
@@ -28,9 +28,18 @@
         <div>
             <mat-form-field appearance="fill" class="papy">
                 <mat-label>Minuteur :</mat-label>
-                <mat-select formControlName="timer">
-                    <mat-option value="30">30 secondes</mat-option>
-                    <mat-option value="60">60 secondes</mat-option>
+                <mat-select formControlName="timer" [(ngModel)]="defaultTimer" [placeholder]="defaultTimer">
+                    <mat-option value="30">0:30 secondes</mat-option>
+                    <mat-option value="60">1:00 minute</mat-option>
+                    <mat-option value="90">1:30 minutes</mat-option>
+                    <mat-option value="120">1:30 minutes</mat-option>
+                    <mat-option value="150">2:00 minutes</mat-option>
+                    <mat-option value="180">2:30 minutes</mat-option>
+                    <mat-option value="210">3:00 minutes</mat-option>
+                    <mat-option value="240">3:30 minutes</mat-option>
+                    <mat-option value="270">4:00 minutes</mat-option>
+                    <mat-option value="300">4:30 minutes</mat-option>
+                    <mat-option value="330">5:00 minutes</mat-option>
                 </mat-select>
                 <div class="error" *ngIf="timer.invalid">Le champ est requis</div>
             </mat-form-field>

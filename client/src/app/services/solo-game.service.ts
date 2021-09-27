@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { Dictionary } from '@app/classes/dictionary';
 import { LetterStock } from '@app/classes/letter-stock';
 import { LocalPlayer } from '@app/classes/local-player';
 import { VirtualPlayer } from '@app/classes/virtual-player';
-import { NewTurnComponent } from '@app/components/new-turn/new-turn.component';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 
@@ -24,8 +22,9 @@ export class SoloGameService {
     timer: string;
     timerMs: number;
     stock: LetterStock = new LetterStock();
+    intervalValue: NodeJS.Timeout;
 
-    constructor(private gridService: GridService, private rackService: RackService, public dialog: MatDialog) {}
+    constructor(private gridService: GridService, private rackService: RackService) {}
 
     initializeGame(gameInfo: FormGroup) {
         this.localPlayer = new LocalPlayer(gameInfo.controls.name.value);
@@ -43,17 +42,17 @@ export class SoloGameService {
         this.rackService.clearRack();
         this.gridService.clearBoard();
         this.drawRackLetters();
-        this.openDialog();
+        this.startCountdown();
     }
 
     startCountdown() {
         this.secondsToMinutes();
-        const timeValue = setInterval(() => {
+        this.intervalValue = setInterval(() => {
             this.timerMs--;
             if (this.timerMs < 0) {
                 this.timerMs = 0;
                 this.secondsToMinutes();
-                clearInterval(timeValue);
+                clearInterval(this.intervalValue);
                 this.changeActivePlayer();
             }
             this.secondsToMinutes();
@@ -82,19 +81,14 @@ export class SoloGameService {
         } else {
             this.virtualPlayer.isActive = false;
             this.localPlayer.isActive = true;
-            this.openDialog();
         }
     }
 
-    openDialog(): void {
-        this.dialog.open(NewTurnComponent, {});
-    }
-
-    closeDialog() {
-        this.dialog.closeAll();
-        this.timerMs = +this.totalCountDown;
+    passTurn() {
+        this.timerMs = 0;
         this.secondsToMinutes();
-        this.startCountdown();
+        clearInterval(this.intervalValue);
+        this.changeActivePlayer();
     }
 
     drawRackLetters(): void {

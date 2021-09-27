@@ -73,6 +73,14 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridCanvas.nativeElement.focus();
     }
 
+    passTurn() {
+        this.soloGameService.passTurn();
+    }
+
+    isLocalPlayerActive(): boolean {
+        return this.soloGameService.localPlayer.isActive;
+    }
+
     get width(): number {
         return this.canvasSize.x;
     }

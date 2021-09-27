@@ -24,7 +24,6 @@ import { ChatDisplayComponent } from './components/chat-display/chat-display.com
 import { FormComponent } from './components/form/form.component';
 import { TextEntryComponent } from './components/text-entry/text-entry.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
-import { NewTurnComponent } from './components/new-turn/new-turn.component';
 
 /**
  * Main module that is used in main.ts.
@@ -49,7 +48,6 @@ import { NewTurnComponent } from './components/new-turn/new-turn.component';
         StartingPageComponent,
         ClassicModeComponent,
         FormComponent,
-        NewTurnComponent,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     imports: [

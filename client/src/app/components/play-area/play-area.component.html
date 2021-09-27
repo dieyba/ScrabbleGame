@@ -10,11 +10,15 @@
         </div>
         <div class="column">
             <button class="size-btn" (click)="sizeUpLetters()">
-                <img src="https://img.icons8.com/ios-glyphs/30/000000/collapse-arrow.png"/>
+                <img src="https://img.icons8.com/ios-glyphs/30/000000/collapse-arrow.png" />
             </button>
             <button class="size-btn" (click)="sizeDownLetters()">
-                <img src="https://img.icons8.com/ios-glyphs/30/000000/expand-arrow--v1.png"/>
+                <img src="https://img.icons8.com/ios-glyphs/30/000000/expand-arrow--v1.png" />
             </button>
+            <div class="row">
+                <button class="btn" (click)="passTurn()" *ngIf="isLocalPlayerActive()">Passer mon tour</button>
+                <button class="btn" disabled="true" *ngIf="!isLocalPlayerActive()" style="opacity: 1;">Passer mon tour</button>
+            </div>
         </div>
     </div>
     <!--<div id="mouse-position-display">

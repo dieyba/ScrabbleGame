@@ -21,10 +21,11 @@ export class FormComponent {
     selectedPlayer: string;
     random: number;
     dictionary: string;
-    selected = 'select';
+    defaultTimer = '60';
+    defaultDictionary = '0';
 
     constructor(private dialog: MatDialogRef<FormComponent>, private router: Router, private soloGameService: SoloGameService) {
-        this.dictionary = 'Francais(defaut)';
+        this.dictionary = 'Français';
         this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
     }
 
@@ -63,7 +64,7 @@ export class FormComponent {
     }
 
     randomPlayer(list: string[]): void {
-        document.getElementById('opponents')!.style.display = 'block';
+        document.getElementById('opponents')!.style.visibility = 'visible';
         this.random = this.randomNumber(0, list.length);
         this.selectedPlayer = list[this.random];
         this.myForm.controls['opponent'].setValue(this.selectedPlayer);
