@@ -12,9 +12,6 @@ const ERROR_MESSAGES = new Map([
 })
 export class ChatDisplayService {
     entries: ChatDisplayEntry[] = [];
-    newEntryCallback: CallableFunction = (): void => {
-        return;
-    };
 
     // TODO: calculer valeur de isAdversary selon l'identite de l'auteur du message
     /**
@@ -29,7 +26,6 @@ export class ChatDisplayService {
             color: isAdversary ? ChatEntryColor.AdversaryColor : ChatEntryColor.PlayerColor,
             message: playerMessage,
         });
-        this.newEntryCallback();
     }
 
     /**
@@ -45,10 +41,5 @@ export class ChatDisplayService {
             color: ChatEntryColor.SystemColor,
             message: ERROR_MESSAGES.get(errorType) as string,
         });
-        this.newEntryCallback();
-    }
-
-    addNewEntryCallback(callback: CallableFunction) {
-        this.newEntryCallback = callback;
     }
 }
