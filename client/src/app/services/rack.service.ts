@@ -24,7 +24,7 @@ export class RackService {
         this.gridContext.strokeStyle = 'black';
         this.gridContext.lineWidth = 1;
 
-        for (let i = 1; i < MAX_LETTER_COUNT; i++) {
+        for (let i = 1; i < MAX_LETTER_COUNT - 1; i++) {
             this.gridContext.moveTo((RACK_WIDTH * i) / MAX_LETTER_COUNT, 0);
             this.gridContext.lineTo((RACK_WIDTH * i) / MAX_LETTER_COUNT, RACK_HEIGHT);
         }
@@ -48,12 +48,14 @@ export class RackService {
     }
 
     drawLetter(scrabbleLetter: ScrabbleLetter): void {
+        
         for (let i = 0; i < MAX_LETTER_COUNT; i++) {
             if (!this.scrabbleRack.squares[i].occupied) {
                 this.scrabbleRack.squares[i].letter = scrabbleLetter;
                 this.scrabbleRack.squares[i].occupied = true;
                 const positionX = (RACK_WIDTH * i) / MAX_LETTER_COUNT;
                 const letter = scrabbleLetter.character.toUpperCase();
+                this.gridContext.beginPath();
                 this.gridContext.fillStyle = 'black';
                 this.gridContext.font = '60px system-ui';
                 this.gridContext.fillText(letter, positionX + OFFSET, 0 + RACK_HEIGHT - OFFSET);
@@ -66,9 +68,5 @@ export class RackService {
                 return;
             }
         }
-    }
-
-    clearRack() {
-        this.scrabbleRack = new ScrabbleRack();
     }
 }

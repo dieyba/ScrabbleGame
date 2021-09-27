@@ -1,5 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
 import { RackService } from '@app/services/rack.service';
@@ -34,12 +33,11 @@ export class PlayAreaComponent implements AfterViewInit {
     private canvasSize = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
     private rackSize = { x: RACK_WIDTH, y: RACK_HEIGHT };
 
-    constructor(private readonly gridService: GridService, private readonly rackService: RackService, public soloGameService: SoloGameService) {}
-
-    @HostListener('keydown', ['$event'])
-    buttonDetect(event: KeyboardEvent) {
-        this.buttonPressed = event.key;
-    }
+    constructor(
+        private readonly gridService: GridService,
+        private readonly rackService: RackService,
+        private readonly soloGameService: SoloGameService,
+    ) {}
 
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
@@ -47,28 +45,6 @@ export class PlayAreaComponent implements AfterViewInit {
         this.soloGameService.createNewGame();
         this.gridService.drawGrid();
         this.gridService.drawColors();
-
-        // TODO - Remove Test
-        const letter1 = new ScrabbleLetter('a', 1);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        this.gridService.drawLetter(letter1, 8, 9);
-
-        const letter2 = new ScrabbleLetter('p', 10);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        this.gridService.drawLetter(letter2, 9, 9);
-
-        const letter3 = new ScrabbleLetter('p', 3);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        this.gridService.drawLetter(letter3, 10, 9);
-
-        const letter4 = new ScrabbleLetter('l', 1);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        this.gridService.drawLetter(letter4, 11, 9);
-
-        const letter5 = new ScrabbleLetter('e', 2);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        this.gridService.drawLetter(letter5, 12, 9);
-
         this.rackService.drawRack();
         this.gridCanvas.nativeElement.focus();
     }
@@ -95,13 +71,6 @@ export class PlayAreaComponent implements AfterViewInit {
 
     get rackHeight(): number {
         return this.rackSize.y;
-    }
-
-    // TODO : déplacer ceci dans un service de gestion de la souris!
-    mouseHitDetect(event: MouseEvent) {
-        if (event.button === MouseButton.Left) {
-            this.mousePosition = { x: event.offsetX, y: event.offsetY };
-        }
     }
 
     sizeUpLetters(): void {

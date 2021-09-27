@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 import { SoloGameService } from '@app/services/solo-game.service';
-import { GridService } from '@app/services/grid.service';
-import { RackService } from '@app/services/rack.service';
 
 @Component({
     selector: 'app-sidebar',
@@ -14,7 +12,7 @@ export class SidebarComponent {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     lettersLeftCount: number = 15; // TODO - get actual value
 
-    constructor(public sologameService: SoloGameService, public rackService: RackService, public gridService: GridService) {
+    constructor(public sologameService: SoloGameService) {
         this.player1Name = this.sologameService.localPlayer.name;
         this.player2Name = this.sologameService.virtualPlayer.name;
     }

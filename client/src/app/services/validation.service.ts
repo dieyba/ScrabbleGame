@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Dictionary } from '@app/classes/dictionary';
+import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { DictionaryService } from '@app/services/dictionary.service';
-import { GridService } from './grid.service';
 
 const BONUS_LETTER_COUNT = 7;
 const BONUS_POINTS = 50;
@@ -15,9 +13,18 @@ export class ValidationService {
     dictionary: Dictionary;
     words: string[];
 
-    constructor(public dictionaryService: DictionaryService, public newWords: ScrabbleWord[], public gridService: GridService) {
-        this.dictionary = dictionaryService.currentDictionary;
-        this.validateWordsAndCalculateScore(newWords);
+    constructor() {
+        this.dictionary = new Dictionary(DictionaryType.Default);
+        let firstLetter: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        let secondLetter: ScrabbleLetter = new ScrabbleLetter('é', 2);
+        let thirdLetter: ScrabbleLetter = new ScrabbleLetter('j', 4);
+        let fourthLetter: ScrabbleLetter = new ScrabbleLetter('à', 3);
+        let word1: ScrabbleWord = new ScrabbleWord();
+        word1.content = [firstLetter, secondLetter, thirdLetter, fourthLetter];
+        let word2: ScrabbleWord = new ScrabbleWord();
+        word2.content = [firstLetter, secondLetter, thirdLetter, fourthLetter];
+        let words: ScrabbleWord[] = [word1, word2];
+        this.validateWordsAndCalculateScore(words);
     }
 
     validateWordsAndCalculateScore(newWords: ScrabbleWord[]): number {

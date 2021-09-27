@@ -121,7 +121,6 @@ export class GridService {
                         this.gridContext.fillStyle = 'black';
                         this.gridContext.fillText('MOT', startX + SMALL_OFFSET_X, startY + SMALL_OFFSET_Y);
                         this.gridContext.fillText('x3', startX + BIG_OFFSET_X, startY + BIG_OFFSET_Y);
-                        break;
                     }
                     break;
             }
@@ -224,9 +223,5 @@ export class GridService {
         this.drawGrid();
         this.drawColors();
         this.drawLetters();
-    }
-
-    clearBoard() {
-        this.scrabbleBoard = new ScrabbleBoard();
     }
 }

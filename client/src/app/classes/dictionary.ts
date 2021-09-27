@@ -23,7 +23,7 @@ export class Dictionary {
     }
 
     initializeDictionary(dict: Dictionary) {
-        let currentDictionary = dict_path as Dictionary;
+        let currentDictionary = dict;
         this.title = currentDictionary.title;
         this.description = currentDictionary.description;
         this.words = currentDictionary.words;
