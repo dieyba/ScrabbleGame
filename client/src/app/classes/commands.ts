@@ -7,6 +7,8 @@ export interface PlaceParams {
     orientation: string;
     letters:string;
 }
+export type ExchangeParams = string;
+export type ExtractedParams = PlaceParams|ExchangeParams|undefined;
 
 export class GameService {
     passTurn(): boolean {
@@ -41,15 +43,43 @@ export class GameService {
 
 export abstract class Command {
     gameService: GameService;
-
-    constructor(gameService: GameService) {
+    isFromLocalPlayer:boolean;
+    
+    constructor(gameService: GameService, isFromLocalPlayer:boolean) {
         this.gameService = gameService;
+        this.isFromLocalPlayer = isFromLocalPlayer;
     }
-
+    
     abstract execute(): boolean;
 }
 
+export class DebugCmd extends Command {
+    constructor(gameService: GameService, isFromLocalPlayer:boolean) {
+        super(gameService,isFromLocalPlayer);
+    }
+    
+    execute(): boolean {
+        return this.gameService.debug();
+    }
+}
+
+export class ExchangeCmd extends Command {
+    private letters: string;
+
+    constructor(gameService: GameService,isFromLocalPlayer:boolean, letters: string) {
+        super(gameService,isFromLocalPlayer);
+        this.letters = letters;
+    }
+
+    execute(): boolean {
+        return this.gameService.exchangeLetters(this.letters);
+    }
+}
+
 export class PassTurnCmd extends Command {
+    constructor(gameService:GameService,isFromLocalPlayer:boolean){
+        super(gameService,isFromLocalPlayer)
+    }
     execute(): boolean {
         return this.gameService.passTurn();
     }
@@ -60,39 +90,50 @@ export class PlaceCmd extends Command {
     private orientation: string;
     private letters: string;
 
-    constructor(gameService: GameService, params:PlaceParams) {
-        super(gameService);
+    constructor(gameService: GameService,isFromLocalPlayer:boolean, params:PlaceParams) {
+        super(gameService,isFromLocalPlayer);
         this.position = new Vec2;
         this.position.x = params.position.x;
         this.position.y = params.position.y;
         this.orientation = params.orientation;
         this.letters = params.letters;
     }
-
+    
     execute(): boolean {
         return this.gameService.place(this.position, this.orientation, this.letters);
     }
 }
 
-export class DebugCmd extends Command {
-    constructor(gameService: GameService) {
-        super(gameService);
-    }
 
-    execute(): boolean {
-        return this.gameService.debug();
+// TODO: move extractParams methods too
+export const createDebugCmd = function (gameService : GameService,isFromLocalPlayer:boolean,paramsInput:string[]){
+    if(paramsInput.length==0){
+        return new DebugCmd(gameService,isFromLocalPlayer);
     }
+    return undefined;
+};
+
+export const createExchangeCmd = function(gameService : GameService,isFromLocalPlayer:boolean,paramsInput:string[]){
+    // const extractedParams = this.extractExchangeParams(paramsInput);
+    const extractedParams = paramsInput[0];
+    if(extractedParams){
+        return new ExchangeCmd(gameService,isFromLocalPlayer,extractedParams);
+    }
+    return undefined;
 }
 
-export class ExchangeCmd extends Command {
-    private letters: string;
-
-    constructor(gameService: GameService, letters: string) {
-        super(gameService);
-        this.letters = letters;
+export const createPassCmd = function(gameService : GameService,isFromLocalPlayer:boolean,paramsInput:string[]){
+    if(paramsInput.length==0){
+        return new PassTurnCmd(gameService,isFromLocalPlayer);
     }
+    return undefined;
+}
 
-    execute(): boolean {
-        return this.gameService.exchangeLetters(this.letters);
+export const createPlaceCmd = function(gameService : GameService,isFromLocalPlayer:boolean,paramsInput:string[]){
+    // const extractedParams = this.extractPlaceParams(paramsInput);
+    const extractedParams = {position:{x:100,y:100},orientation:"h",letters:paramsInput[1]};
+    if(extractedParams){
+        return new PlaceCmd(gameService,isFromLocalPlayer,extractedParams);
     }
+    return undefined;
 }

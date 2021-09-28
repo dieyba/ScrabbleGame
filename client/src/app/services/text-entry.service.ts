@@ -2,7 +2,7 @@ import { ThisReceiver } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 import { ErrorType } from '@app/classes/errors';
 import { Column, Row } from '@app/classes/scrabble-board';
-import { Command, DebugCmd, ExchangeCmd, GameService, PassTurnCmd, PlaceCmd, PlaceParams } from '../classes/commands';
+import { Command, GameService, PlaceParams, ExtractedParams, createDebugCmd,createExchangeCmd,createPassCmd,createPlaceCmd } from '../classes/commands';
 import { Vec2 } from '../classes/vec2';
 import { ChatDisplayService } from './chat-display.service';
 
@@ -23,33 +23,6 @@ const Z_CHAR = 'z'.charCodeAt(0);
 const ASTERISK_CHAR = '*'.charCodeAt(0);
 // const ACCEPTED_LETTERS = something;
 
-// to refactor
-type ExtractedParams = PlaceParams|string|undefined;
-type CommandParams = GameService|ExtractedParams;
-
-// TODO: move to appropriate file
-let createDebugCmd = function (gameService:GameService){
-    return new DebugCmd(gameService);
-}
-
-let createExchangeCmd = function(gameService:GameService,letters:string){
-    return new ExchangeCmd(gameService,letters);
-}
-
-let createPlaceCmd = function(gameService:GameService, placeParams:PlaceParams){
-    const command = new PlaceCmd(gameService,placeParams);
-    if(command){
-        return command;
-    }
-    return undefined;
-}
-
-let createPassCmd = function(gameService:GameService){
-    return new PassTurnCmd(gameService);
-}
-
-
-
 @Injectable({
     providedIn: 'root',
 })
@@ -69,8 +42,6 @@ export class TextEntryService {
     }
 
     
-    
-
     /**
      * @description This function verifies if the input is a valid command or
      * just text. It doesn't check the command's arguments of the command.
@@ -78,50 +49,62 @@ export class TextEntryService {
      * @param text Text input from user
      */
     handleInput(userInput: string) {    
-        const isAdversaryMessage = false; // TODO: Check who sent the message. Change isAdversary to isLocalPLayer
+        const isLocalPLayer = true; // TODO: for now only the local player can send input to text entry?
         userInput = this.trimSpaces(userInput); // TODO: trim beginning and end?
 
         if(!this.isEmpty(userInput)){
             if(userInput.startsWith("!")) {
                 const splitInput = this.splitInput(userInput.substring(1));
-                const commandCreated = this.createCommand(splitInput);
-
+                const commandCreated = this.createCommand(splitInput,isLocalPLayer);
                 if(commandCreated){
                     commandCreated.execute()?
-                    this.chatDisplayService.addPlayerEntry(isAdversaryMessage, userInput):
+                    this.chatDisplayService.addPlayerEntry(isLocalPLayer, userInput):
                     this.chatDisplayService.addErrorMessage(ErrorType.ImpossibleCommand);
-                }else{
-                    this.chatDisplayService.addErrorMessage(ErrorType.SyntaxError);
                 }
             } else {
-                this.chatDisplayService.addPlayerEntry(isAdversaryMessage, userInput);
+                this.chatDisplayService.addPlayerEntry(isLocalPLayer, userInput);
             }
         }
     }
 
     
-    createCommand(commandInput:string[]):Command|undefined{
+    createCommand(commandInput:string[],isLocalPLayer:boolean):Command|undefined{
         const commandName = commandInput.shift() as string;
-        const commandParams: CommandParams[]= [this.fakeGameService, undefined];
-        if(this.isValidCommandName(commandName)){
-
-            // TODO: create a general extractParams
-            const extractedParams = this.extractPlaceParams(commandInput);
-            if(extractedParams){
-                commandParams[1] = extractedParams;
+        if(this.commands.has(commandName)){
+            const createCmdFunction:Function = this.commands.get(commandName) as Function;
+            // TODO:is it fine to use ThisReceiver
+            const command = createCmdFunction.call(ThisReceiver,this.fakeGameService,isLocalPLayer,commandInput);
+            if(command) {
+                return command;
             }
-            // TODO: fix how to check if enough params. Add validation function? kind feels pointelss when i have to extract them after
-            const createFunction:Function|undefined = this.commands.get(commandName);
-            if(createFunction){
-                return createFunction.call(ThisReceiver,...commandParams);
+            else{
+                this.chatDisplayService.addErrorMessage(ErrorType.SyntaxError);
             }
+        }else{
+            this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
         }
         return undefined;
     }
 
+    
+    /**
+     * Checks if the command entered has a valid name. Sends error message if not.
+     * @param commandInput string[] of the command entered split at the white spaces
+     * @returns True if valid name
+    //  */
+    //  isValidCommandName(commandName:string):boolean{
+    //     if(!this.commands.has(commandName)){
+    //         this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
+    //         return false;
+    //     }
+    //     return true;
+    // }
+
 
     // !placer a15v mot
-    extractPlaceParams(paramsInput:string[]):ExtractedParams{
+    
+
+    public extractPlaceParams(paramsInput:string[]):ExtractedParams{
         if(paramsInput.length==2){
             const word = paramsInput[1];
             const positionOrientation = paramsInput[0];
@@ -141,7 +124,21 @@ export class TextEntryService {
         return undefined;
     }
     
-
+    
+    // !échanger lettres
+    public extractExchangeParams(paramsInput:string[]): ExtractedParams{
+        if(paramsInput.length === 1){
+            const letters = paramsInput[0];
+            const isValidLetterAmount = (letters.length > 0) && (letters.length < 8);
+            if(isValidLetterAmount){
+                if(this.isValidWord(letters)){
+                    return letters;
+                }
+            }
+        }
+        return undefined;
+    }
+    
     /**
      * Converts the string row and columns to coordinates with x and y between 0 to 14.
      * @param row String of the row number in letters
@@ -157,21 +154,6 @@ export class TextEntryService {
             const isValidColumn = columnNumber >= Column.One && columnNumber <= Column.Fifteen;
             if(isValidRow && isValidColumn){
                 return {x:rowNumber,y:columnNumber};
-            }
-        }
-        return undefined;
-    }
-
-
-    // !échanger lettres
-    extractExchangeParams(paramsInput:string[]): ExtractedParams{
-        if(paramsInput.length === 1){
-            const letters = paramsInput[0];
-            const isValidLetterAmount = (letters.length > 0) && (letters.length < 8);
-            if(isValidLetterAmount){
-                if(this.isValidWord(letters)){
-                    return letters;
-                }
             }
         }
         return undefined;
@@ -198,20 +180,6 @@ export class TextEntryService {
             return  (charCode >= A_CHAR && charCode <= Z_CHAR)|| (charCode == ASTERISK_CHAR);
         }
         return false;
-    }
-
-    
-    /**
-     * Checks if the command entered has a valid name. Sends error message if not.
-     * @param commandInput string[] of the command entered split at the white spaces
-     * @returns True if valid name
-     */
-     isValidCommandName(commandName:string):boolean{
-        if(!this.commands.has(commandName)){
-            this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
-            return false;
-        }
-        return true;
     }
 
 
