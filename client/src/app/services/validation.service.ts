@@ -14,7 +14,7 @@ const BONUS_POINTS = 50;
 export class ValidationService {
     dictionary: Dictionary;
     words: string[];
-//Problem in constructor?
+    // Problem in constructor?
     constructor(public dictionaryService: DictionaryService, @Inject(ScrabbleWord) public newWords: ScrabbleWord[], public gridService: GridService) {
         this.dictionary = dictionaryService.currentDictionary;
         this.validateWordsAndCalculateScore(newWords);
