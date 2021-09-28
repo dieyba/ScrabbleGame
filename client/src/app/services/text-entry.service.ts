@@ -1,16 +1,17 @@
+import { ThisReceiver } from '@angular/compiler';
 import { Injectable } from '@angular/core';
-import { ChatDisplayService } from './chat-display.service';
 import { ErrorType } from '@app/classes/errors';
-import { GameService, Command, DebugCmd, ExchangeCmd, PassTurnCmd, PlaceCmd, PlaceParams } from '../classes/commands';
+import { Column, Row } from '@app/classes/scrabble-board';
+import { Command, DebugCmd, ExchangeCmd, GameService, PassTurnCmd, PlaceCmd, PlaceParams } from '../classes/commands';
 import { Vec2 } from '../classes/vec2';
-import { Row, Column } from '@app/classes/scrabble-board';
+import { ChatDisplayService } from './chat-display.service';
 
-// TODO: voir leurs consignes pour les constantes
+// TODO: voir leurs consignes pour les constantes. Faire le ménage dans les constantes ig
 const DEBUG_CMD = 'debug';
 const EXCHANGE_CMD = 'échanger';
 const PASS_CMD = 'passer';
 const PLACE_CMD = 'placer';
-const COMMAND_LIST = [DEBUG_CMD,EXCHANGE_CMD,PASS_CMD,PLACE_CMD];
+
 const EMPTY_STRING = '';
 const SPACE_CHAR = ' ';
 const ROW_OFFSET = 'a'.charCodeAt(0);
@@ -20,24 +21,55 @@ const VERTICAL = 'v';
 const A_CHAR = 'a'.charCodeAt(0);
 const Z_CHAR = 'z'.charCodeAt(0);
 const ASTERISK_CHAR = '*'.charCodeAt(0);
+// const ACCEPTED_LETTERS = something;
 
+// to refactor
 type ExtractedParams = PlaceParams|string|undefined;
+type CommandParams = GameService|ExtractedParams;
+
+// TODO: move to appropriate file
+let createDebugCmd = function (gameService:GameService){
+    return new DebugCmd(gameService);
+}
+
+let createExchangeCmd = function(gameService:GameService,letters:string){
+    return new ExchangeCmd(gameService,letters);
+}
+
+let createPlaceCmd = function(gameService:GameService, placeParams:PlaceParams){
+    const command = new PlaceCmd(gameService,placeParams);
+    if(command){
+        return command;
+    }
+    return undefined;
+}
+
+let createPassCmd = function(gameService:GameService){
+    return new PassTurnCmd(gameService);
+}
+
 
 
 @Injectable({
     providedIn: 'root',
 })
-export class TextEntryService {
-    commandNames : Set<string>;
-    fakeGameService : GameService; 
 
+
+export class TextEntryService {
+    fakeGameService : GameService; 
+    commands: Map<string, Function>
+    
     constructor(private chatDisplayService: ChatDisplayService) {
         this.fakeGameService = new GameService;
-        this.commandNames = new Set;
-        for(const i in COMMAND_LIST){
-            this.commandNames.add(COMMAND_LIST[i].toString());
-        }
+        this.commands = new Map;
+        this.commands.set(DEBUG_CMD,createDebugCmd);
+        this.commands.set(EXCHANGE_CMD,createExchangeCmd);
+        this.commands.set(PASS_CMD, createPassCmd);
+        this.commands.set(PLACE_CMD,createPlaceCmd);
     }
+
+    
+    
 
     /**
      * @description This function verifies if the input is a valid command or
@@ -45,20 +77,21 @@ export class TextEntryService {
      *
      * @param text Text input from user
      */
-    handleInput(userInput: string) {   
-        // TODO: Check who sent the message
-        const isAdversaryMessage = false;
-        // TODO: trim beginning and end?
-        userInput = this.trimSpaces(userInput);
+    handleInput(userInput: string) {    
+        const isAdversaryMessage = false; // TODO: Check who sent the message. Change isAdversary to isLocalPLayer
+        userInput = this.trimSpaces(userInput); // TODO: trim beginning and end?
 
         if(!this.isEmpty(userInput)){
             if(userInput.startsWith("!")) {
                 const splitInput = this.splitInput(userInput.substring(1));
-                const command = this.createCommand(splitInput);
-                if(command){
-                    command.execute()?
+                const commandCreated = this.createCommand(splitInput);
+
+                if(commandCreated){
+                    commandCreated.execute()?
                     this.chatDisplayService.addPlayerEntry(isAdversaryMessage, userInput):
                     this.chatDisplayService.addErrorMessage(ErrorType.ImpossibleCommand);
+                }else{
+                    this.chatDisplayService.addErrorMessage(ErrorType.SyntaxError);
                 }
             } else {
                 this.chatDisplayService.addPlayerEntry(isAdversaryMessage, userInput);
@@ -67,33 +100,21 @@ export class TextEntryService {
     }
 
     
-    // TODO: do that with a map and write a create commands for each commands?
     createCommand(commandInput:string[]):Command|undefined{
         const commandName = commandInput.shift() as string;
+        const commandParams: CommandParams[]= [this.fakeGameService, undefined];
         if(this.isValidCommandName(commandName)){
-            if(commandName === DEBUG_CMD){
-                if(commandInput.length==0){
-                    return new DebugCmd(this.fakeGameService);
-                }
+
+            // TODO: create a general extractParams
+            const extractedParams = this.extractPlaceParams(commandInput);
+            if(extractedParams){
+                commandParams[1] = extractedParams;
             }
-            else if(commandName === EXCHANGE_CMD){
-                const params = this.extractExchangeParams(commandInput);
-                if(params){
-                    return new ExchangeCmd(this.fakeGameService,params as string);
-                }
+            // TODO: fix how to check if enough params. Add validation function? kind feels pointelss when i have to extract them after
+            const createFunction:Function|undefined = this.commands.get(commandName);
+            if(createFunction){
+                return createFunction.call(ThisReceiver,...commandParams);
             }
-            else if(commandName === PASS_CMD){
-                if(commandInput.length==0){
-                    return new PassTurnCmd(this.fakeGameService);
-                }
-            }
-            else if(commandName === PLACE_CMD){
-                const params = this.extractPlaceParams(commandInput);
-                if(params){
-                    return new PlaceCmd(this.fakeGameService,params as PlaceParams);
-                }
-            }
-            this.chatDisplayService.addErrorMessage(ErrorType.SyntaxError);
         }
         return undefined;
     }
@@ -101,8 +122,6 @@ export class TextEntryService {
 
     // !placer a15v mot
     extractPlaceParams(paramsInput:string[]):ExtractedParams{
-        console.log(paramsInput);
-
         if(paramsInput.length==2){
             const word = paramsInput[1];
             const positionOrientation = paramsInput[0];
@@ -114,7 +133,6 @@ export class TextEntryService {
                     const orientation = positionOrientation.slice(-1).toLowerCase();
                     if(orientation === HORIZONTAL || orientation === VERTICAL){
                         const params: PlaceParams = {position: coordinates, orientation:orientation, letters:word};
-                        console.log(params);
                         return params;
                     }
                 }
@@ -189,7 +207,7 @@ export class TextEntryService {
      * @returns True if valid name
      */
      isValidCommandName(commandName:string):boolean{
-        if(!this.commandNames.has(commandName)){
+        if(!this.commands.has(commandName)){
             this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
             return false;
         }

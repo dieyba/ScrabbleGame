@@ -9,13 +9,14 @@ export interface PlaceParams {
 }
 
 export class GameService {
-    passTurn(): Boolean {
-        console.log('Passing turn');
+    passTurn(): boolean {
+        console.log('Passing turn...');
         return true;
     }
 
-    place(position:Vec2, orientation:string, letters:string): Boolean {
+    place(position:Vec2, orientation:string, letters:string): boolean {
         // calling necessary receivers
+        console.log("Placing letters...");
         console.log('Position x: ' + position.x);
         console.log('Position y: ' + position.y);
         console.log('Orientation:' + orientation);
@@ -23,15 +24,15 @@ export class GameService {
         return true;
     }
 
-    debug(): Boolean {
+    debug(): boolean {
         // calling necessary receivers
-        console.log('Changing debug state');
+        console.log('Changing debug state...');
         return true;
     }
 
-    exchangeLetters(letters: string): Boolean {
+    exchangeLetters(letters: string): boolean {
         // calling necessary receivers
-        console.log('Exchanging these letters:' + letters);
+        console.log('Exchanging these letters:' + letters + " ...");
         return true;
     }
 }
@@ -45,11 +46,11 @@ export abstract class Command {
         this.gameService = gameService;
     }
 
-    abstract execute(): Boolean;
+    abstract execute(): boolean;
 }
 
 export class PassTurnCmd extends Command {
-    execute(): Boolean {
+    execute(): boolean {
         return this.gameService.passTurn();
     }
 }
@@ -61,12 +62,14 @@ export class PlaceCmd extends Command {
 
     constructor(gameService: GameService, params:PlaceParams) {
         super(gameService);
-        this.position = params.position;
+        this.position = new Vec2;
+        this.position.x = params.position.x;
+        this.position.y = params.position.y;
         this.orientation = params.orientation;
         this.letters = params.letters;
     }
 
-    execute(): Boolean {
+    execute(): boolean {
         return this.gameService.place(this.position, this.orientation, this.letters);
     }
 }
@@ -76,7 +79,7 @@ export class DebugCmd extends Command {
         super(gameService);
     }
 
-    execute(): Boolean {
+    execute(): boolean {
         return this.gameService.debug();
     }
 }
@@ -89,7 +92,7 @@ export class ExchangeCmd extends Command {
         this.letters = letters;
     }
 
-    execute(): Boolean {
+    execute(): boolean {
         return this.gameService.exchangeLetters(this.letters);
     }
 }
