@@ -14,10 +14,11 @@ export class ChatDisplayService {
      * @param isAdversary Bool that indicates if the message comes from adversary
      * @param playerMessage Text or executed command
      */
-    addPlayerEntry(isAdversary: boolean, playerMessage: string): void {
+    addPlayerEntry(isLocalPlayer: boolean, playerMessage: string): void {
         this.entries.push({
-            authorType: isAdversary ? AuthorType.Adversary : AuthorType.Player,
-            color: isAdversary ? ChatEntryColor.AdversaryColor : ChatEntryColor.PlayerColor,
+            // TODO:see if keep author type or juste take a player object to get his name and whether hes active or not.
+            authorType: isLocalPlayer ? AuthorType.LocalPlayer : AuthorType.RemotePlayer,
+            color: isLocalPlayer ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer,
             message: playerMessage,
         });
     }
