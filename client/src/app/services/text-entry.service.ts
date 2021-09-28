@@ -1,8 +1,12 @@
-import { ThisReceiver } from '@angular/compiler';
+// import { ThisReceiver } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 import { ErrorType } from '@app/classes/errors';
 import { Column, Row } from '@app/classes/scrabble-board';
-import { Command, GameService, PlaceParams, ExtractedParams, createDebugCmd,createExchangeCmd,createPassCmd,createPlaceCmd } from '../classes/commands';
+import { Command, CommandParams, DefaultCommandParams, GameService } from '../classes/commands';
+import { createDebugCmd } from '../classes/debugCommand';
+import { createExchangeCmd } from '../classes/exchangeCommand';
+import { createPassCmd } from '../classes/passCommand';
+import { createPlaceCmd } from '../classes/placeCommand';
 import { Vec2 } from '../classes/vec2';
 import { ChatDisplayService } from './chat-display.service';
 
@@ -30,17 +34,26 @@ const ASTERISK_CHAR = '*'.charCodeAt(0);
 
 export class TextEntryService {
     fakeGameService : GameService; 
-    commands: Map<string, Function>
+    commandsMap: Map<string, Function>;
+    paramsMap: Map<string, Function>;
     
     constructor(private chatDisplayService: ChatDisplayService) {
         this.fakeGameService = new GameService;
-        this.commands = new Map;
-        this.commands.set(DEBUG_CMD,createDebugCmd);
-        this.commands.set(EXCHANGE_CMD,createExchangeCmd);
-        this.commands.set(PASS_CMD, createPassCmd);
-        this.commands.set(PLACE_CMD,createPlaceCmd);
+        this.commandsMap = new Map;
+        this.paramsMap = new Map;
+
+        this.commandsMap.set(DEBUG_CMD,createDebugCmd);
+        this.commandsMap.set(EXCHANGE_CMD,createExchangeCmd);
+        this.commandsMap.set(PASS_CMD, createPassCmd);
+        this.commandsMap.set(PLACE_CMD,createPlaceCmd);
+
+        this.paramsMap.set(DEBUG_CMD,this.isWithoutParams);
+        this.paramsMap.set(EXCHANGE_CMD, this.extractExchangeParams);
+        this.paramsMap.set(PLACE_CMD, this.extractPlaceParams);
+        this.paramsMap.set(PASS_CMD,this.isWithoutParams);
     }
 
+    
     
     /**
      * @description This function verifies if the input is a valid command or
@@ -68,14 +81,14 @@ export class TextEntryService {
     }
 
     
-    createCommand(commandInput:string[],isLocalPLayer:boolean):Command|undefined{
+    createCommand(commandInput:string[],isLocalPlayer:boolean):Command|undefined{
         const commandName = commandInput.shift() as string;
-        if(this.commands.has(commandName)){
-            const createCmdFunction:Function = this.commands.get(commandName) as Function;
-            // TODO:is it fine to use ThisReceiver
-            const command = createCmdFunction.call(ThisReceiver,this.fakeGameService,isLocalPLayer,commandInput);
-            if(command) {
-                return command;
+        if(this.commandsMap.has(commandName)){
+            const createCmdFunction:Function = this.commandsMap.get(commandName) as Function;
+            const defaultParams = {gameService:this.fakeGameService,isFromLocalPlayer:isLocalPlayer};
+            const commandParams = this.extractCommandParams(defaultParams,commandName,commandInput);
+            if(commandParams){
+                return createCmdFunction.call(this,commandParams);
             }
             else{
                 this.chatDisplayService.addErrorMessage(ErrorType.SyntaxError);
@@ -87,36 +100,50 @@ export class TextEntryService {
     }
 
     
+
     /**
-     * Checks if the command entered has a valid name. Sends error message if not.
-     * @param commandInput string[] of the command entered split at the white spaces
-     * @returns True if valid name
-    //  */
-    //  isValidCommandName(commandName:string):boolean{
-    //     if(!this.commands.has(commandName)){
-    //         this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
-    //         return false;
-    //     }
-    //     return true;
-    // }
+     * Returns the parameters specific to the command entered if the syntax was valid
+     * @param commandName string of the command to execute
+     * @param paramsInput string[] split at the spaces of the command input (without the command name)
+     * @returns 
+     */
+    extractCommandParams(defaultParams:DefaultCommandParams,commandName:string,paramsInput:string[]):CommandParams|undefined{
+        console.log("is in general extract params");
+        if(this.paramsMap.has(commandName)){
+            const createCmdFunction:Function = this.paramsMap.get(commandName) as Function;
+            const params = createCmdFunction.call(this,defaultParams,paramsInput);
+            if(params) {
+                return params;
+            }
+        }
+        return undefined;
+    }
+
+    /**
+     * Validates that for commands only needing a command name, only the command name was entered after the !
+     */
+    isWithoutParams(defaultParams:DefaultCommandParams,paramsInput:string[]):CommandParams{
+        if(paramsInput.length==0){
+            return defaultParams;
+        }
+        return undefined;
+    }
 
 
-    // !placer a15v mot
-    
-
-    public extractPlaceParams(paramsInput:string[]):ExtractedParams{
+    extractPlaceParams(defaultParams:DefaultCommandParams,paramsInput:string[]):CommandParams{
         if(paramsInput.length==2){
             const word = paramsInput[1];
             const positionOrientation = paramsInput[0];
             if(this.isValidWord(word)){
                 const row = positionOrientation.slice(0,1);
-                const column = positionOrientation.slice(1,-1); //a_h or a__h
+                const column = positionOrientation.slice(1,-1);
                 const coordinates = this.convertToCoordinates(row, column);
                 if(coordinates){
                     const orientation = positionOrientation.slice(-1).toLowerCase();
                     if(orientation === HORIZONTAL || orientation === VERTICAL){
-                        const params: PlaceParams = {position: coordinates, orientation:orientation, letters:word};
-                        return params;
+                        const placeParams = {position: coordinates, orientation:orientation, word:word};
+                        const commandParams = {defaultParams:defaultParams,specificParams:placeParams};
+                        return commandParams;
                     }
                 }
             }
@@ -126,19 +153,20 @@ export class TextEntryService {
     
     
     // !échanger lettres
-    public extractExchangeParams(paramsInput:string[]): ExtractedParams{
+    extractExchangeParams(defaultParams:DefaultCommandParams,paramsInput:string[]): CommandParams{
         if(paramsInput.length === 1){
             const letters = paramsInput[0];
             const isValidLetterAmount = (letters.length > 0) && (letters.length < 8);
             if(isValidLetterAmount){
                 if(this.isValidWord(letters)){
-                    return letters;
+                    return {defaultParams:defaultParams,specificParams:letters};
                 }
             }
         }
         return undefined;
     }
     
+
     /**
      * Converts the string row and columns to coordinates with x and y between 0 to 14.
      * @param row String of the row number in letters
@@ -183,7 +211,6 @@ export class TextEntryService {
     }
 
 
-
     splitInput(commandInput:string):string[]{
         if(!this.isEmpty(commandInput)){
             return commandInput.split(SPACE_CHAR);
@@ -207,6 +234,7 @@ export class TextEntryService {
         
         return userInput;
     }
+
 
     /**
      * Checks if a string is empty.
