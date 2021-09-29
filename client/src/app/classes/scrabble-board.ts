@@ -18,6 +18,7 @@ export enum Row {
     M = 12,
     N = 13,
     O = 14,
+    Length,
 }
 
 export enum Column {
@@ -36,6 +37,7 @@ export enum Column {
     Thirteen = 12,
     Fourteen = 13,
     Fifteen = 14,
+    Length,
 }
 
 export class ScrabbleBoard {
@@ -108,5 +110,14 @@ export class ScrabbleBoard {
                 this.squares[i][j].color = SquareColor.Teal;
             }
         }
+    }
+
+    isWordInsideBoard(word: string, i: number, j: number, orientation: string): boolean {
+        if (orientation === 'h' && i + word.length > Row.Length) {
+            return false;
+        } else if (orientation === 'v' && j + word.length > Column.Length) {
+            return false;
+        }
+        return true;
     }
 }
