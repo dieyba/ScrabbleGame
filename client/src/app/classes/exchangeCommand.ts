@@ -1,5 +1,5 @@
-
 import { Command , DefaultCommandParams, ExchangeParams } from "./commands";
+import { ErrorType } from "./errors";
 
 export class ExchangeCmd extends Command {
     private letters: string;
@@ -9,7 +9,7 @@ export class ExchangeCmd extends Command {
         this.letters = letters;
     }
 
-    execute(): boolean {
+    execute(): ErrorType {
         return this.gameService.exchangeLetters(this.letters);
     }
 }

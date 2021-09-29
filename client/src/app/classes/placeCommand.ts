@@ -1,4 +1,5 @@
 import { Command , DefaultCommandParams, PlaceParams } from "./commands";
+import { ErrorType } from "./errors";
 import { Vec2 } from "./vec2";
 
 
@@ -16,7 +17,7 @@ export class PlaceCmd extends Command {
         this.letters = params.word;
     }
     
-    execute(): boolean {
+    execute(): ErrorType {
         return this.gameService.place(this.position, this.orientation, this.letters);
     }
 }

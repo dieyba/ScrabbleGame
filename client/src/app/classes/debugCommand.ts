@@ -1,12 +1,12 @@
 import { Command , DefaultCommandParams } from "./commands";
-
+import { ErrorType } from "./errors";
 
 export class DebugCmd extends Command {
     constructor(defaultParams:DefaultCommandParams) {
         super(defaultParams);
     }
     
-    execute(): boolean {
+    execute(): ErrorType {
         return this.gameService.debug();
     }
 }

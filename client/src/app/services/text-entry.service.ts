@@ -2,7 +2,8 @@
 import { Injectable } from '@angular/core';
 import { ErrorType } from '@app/classes/errors';
 import { Column, Row } from '@app/classes/scrabble-board';
-import { Command, CommandParams, DefaultCommandParams, GameService } from '../classes/commands';
+import { Command, CommandParams, DefaultCommandParams } from '../classes/commands';
+import { SoloGameService } from './solo-game.service';
 import { createDebugCmd } from '../classes/debugCommand';
 import { createExchangeCmd } from '../classes/exchangeCommand';
 import { createPassCmd } from '../classes/passCommand';
@@ -10,24 +11,16 @@ import { createPlaceCmd } from '../classes/placeCommand';
 import { Vec2 } from '../classes/vec2';
 import { ChatDisplayService } from './chat-display.service';
 
-// TODO: if conditions do they absolutely want isSOmething or we can directly put the conditon in the ()
-// TODO: voir leurs consignes pour les constantes. Faire le ménage dans les constantes ig
 const DEBUG_CMD = 'debug';
 const EXCHANGE_CMD = 'échanger';
 const PASS_CMD = 'passer';
 const PLACE_CMD = 'placer';
 // TODO:add les autres pour les prochains sprint sans les implémenter? aka make it so they wont send an invalid command error message
 
-const EMPTY_STRING = '';
-const SPACE_CHAR = ' ';
 const ROW_OFFSET = 'a'.charCodeAt(0);
 const COLUMN_OFFSET = 1;
 const HORIZONTAL = 'h';
 const VERTICAL = 'v';
-const A_CHAR = 'a'.charCodeAt(0);
-const Z_CHAR = 'z'.charCodeAt(0);
-const ASTERISK_CHAR = '*'.charCodeAt(0);
-// const ACCEPTED_LETTERS = something;
 
 @Injectable({
     providedIn: 'root',
@@ -35,16 +28,13 @@ const ASTERISK_CHAR = '*'.charCodeAt(0);
 
 
 export class TextEntryService {
-    fakeGameService : GameService; 
     commandsMap: Map<string, Function>;
     paramsMap: Map<string, Function>;
     
-    constructor(private chatDisplayService: ChatDisplayService) {
-        this.fakeGameService = new GameService;
+    constructor(private chatDisplayService: ChatDisplayService, private gameService:SoloGameService) {
         this.commandsMap = new Map;
         this.paramsMap = new Map;
 
-        //TODO:create a separate file to add remove command from the maps? 
         this.commandsMap.set(DEBUG_CMD,createDebugCmd);
         this.commandsMap.set(EXCHANGE_CMD,createExchangeCmd);
         this.commandsMap.set(PASS_CMD, createPassCmd);
@@ -65,16 +55,22 @@ export class TextEntryService {
      * @param text Text input from user
      */
     handleInput(userInput: string) {    
-        const isLocalPLayer = true; // TODO: for now only the local player can send input to text entry?
+        // For this sprint, we assume only the local player enters input in the chat box.
+        const isLocalPLayer = true;
+
         userInput = this.trimSpaces(userInput);
         if(!this.isEmpty(userInput)){
             if(userInput.startsWith("!")) {
                 const splitInput = this.splitInput(userInput.substring(1));
                 const commandCreated = this.createCommand(splitInput,isLocalPLayer);
                 if(commandCreated){
-                    commandCreated.execute()?
-                    this.chatDisplayService.addPlayerEntry(isLocalPLayer, userInput):
-                    this.chatDisplayService.addErrorMessage(ErrorType.ImpossibleCommand);
+                    const commandResult = commandCreated.execute();
+                    if(commandResult === ErrorType.NoError){
+                        this.chatDisplayService.addPlayerEntry(isLocalPLayer, userInput);
+                    }else{
+                        // TODO: add user input to the error message.
+                        this.chatDisplayService.addErrorMessage(commandResult);
+                    }
                 }
             } else {
                 this.chatDisplayService.addPlayerEntry(isLocalPLayer, userInput);
@@ -83,12 +79,11 @@ export class TextEntryService {
     }
 
     
-    // TODO: will probably have to change where the error messages are called, especially if execute can return an error type.
     createCommand(commandInput:string[],isLocalPlayer:boolean):Command|undefined{
         const commandName = commandInput.shift() as string;
         if(this.commandsMap.has(commandName)){
             const createCmdFunction:Function = this.commandsMap.get(commandName) as Function;
-            const defaultParams = {gameService:this.fakeGameService,isFromLocalPlayer:isLocalPlayer};
+            const defaultParams = {gameService:this.gameService,isFromLocalPlayer:isLocalPlayer};
             const commandParams = this.extractCommandParams(defaultParams,commandName,commandInput);
             if(commandParams){
                 return createCmdFunction.call(this,commandParams);
@@ -186,10 +181,7 @@ export class TextEntryService {
         return undefined;
     }
     
-    
-    // TODO: add a function to replace and call it in extract param before validating place/exchange letters.
-    // À à	Â â	Æ æ	Ç ç	É é	È è	Ê ê	Ë ë
-    // Î î	Ï ï	Ô ô	Œ œ	Ù ù	Û û	Ü ü	Ÿ ÿ
+    // TODO: there are duplicate methods (in validation service)?
     removeAccents(letters:string):string{
         return letters.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
     }
@@ -218,7 +210,7 @@ export class TextEntryService {
         if(!this.isEmpty(letters)){
             if(this.isAllLowerLetters(letters)){
                 for(const letter of letters){
-                    isValid = this.isValidLetter(letter) || letter.charCodeAt(0) == ASTERISK_CHAR;
+                    isValid = this.isValidLetter(letter) || letter.charCodeAt(0) == '*'.charCodeAt(0);
                     if(!isValid){
                         break;
                     }
@@ -230,13 +222,13 @@ export class TextEntryService {
 
 
     /**
-     * Returns true if it is  a letter. False if it is not or has an accent or ç
+     * Returns true if it is  a letter. False if it is not or has an accent or ç (replace accents and ç before using)
      */
     isValidLetter(letter:string):boolean{
         if(!this.isEmpty(letter) && letter.length == 1){
             const charCode = letter.toLowerCase().charCodeAt(0);
-            // TODO:add accent letters and ç. Should i accept -? i'd say no
-            return  (charCode >= A_CHAR && charCode <= Z_CHAR);
+            const isALetter = (charCode >= 'a'.charCodeAt(0) && charCode <= 'z'.charCodeAt(0));
+            return isALetter;
         }
         return false;
     }
@@ -272,7 +264,7 @@ export class TextEntryService {
      */
     splitInput(commandInput:string):string[]{
         if(!this.isEmpty(commandInput)){
-            return commandInput.split(SPACE_CHAR);
+            return commandInput.split(' ');
         }
         return [];
     }
@@ -284,10 +276,10 @@ export class TextEntryService {
      * @returns String without beginning and ending spaces. Returns empty string if it only had white spaces
      */
      trimSpaces(userInput: string): string {
-        while(userInput.startsWith(SPACE_CHAR)){
+        while(userInput.startsWith(' ')){
             userInput = userInput.substring(1);
         }
-        while(userInput.endsWith(SPACE_CHAR)){
+        while(userInput.endsWith(' ')){
             userInput = userInput.substring(0,userInput.length-1);
         }
         
@@ -302,7 +294,7 @@ export class TextEntryService {
      */
     isEmpty(userInput:string){
         userInput = this.trimSpaces(userInput);
-        return (userInput === EMPTY_STRING);
+        return (userInput === '');
     }
 
     isAllLowerLetters(letters:string):boolean{

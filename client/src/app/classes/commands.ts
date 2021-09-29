@@ -1,7 +1,9 @@
 import { Vec2 } from './vec2';
+import {ErrorType} from './errors'
+import { SoloGameService } from '../services/solo-game.service';
 
 export interface DefaultCommandParams {
-    gameService: GameService;
+    gameService: SoloGameService;
     isFromLocalPlayer:boolean;
 }
 
@@ -20,41 +22,8 @@ export type CommandParams =
     undefined;
 
 
-
-
-export class GameService {
-    passTurn(): boolean {
-        console.log('Passing turn...');
-        return true;
-    }
-
-    place(position:Vec2, orientation:string, letters:string): boolean {
-        // calling necessary receivers
-        console.log("Placing letters...");
-        console.log('Position x: ' + position.x);
-        console.log('Position y: ' + position.y);
-        console.log('Orientation:' + orientation);
-        console.log('Letters to place: ' + letters);
-        return true;
-    }
-
-    debug(): boolean {
-        // calling necessary receivers
-        console.log('Changing debug state...');
-        return true;
-    }
-
-    exchangeLetters(letters: string): boolean {
-        // calling necessary receivers
-        console.log('Exchanging these letters:' + letters + " ...");
-        return true;
-    }
-}
-
-
-
 export abstract class Command {
-    gameService: GameService;
+    gameService: SoloGameService;
     isFromLocalPlayer:boolean;
     
     constructor(defaultCommandParams: DefaultCommandParams) {
@@ -62,7 +31,7 @@ export abstract class Command {
         this.isFromLocalPlayer = defaultCommandParams.isFromLocalPlayer;
     }
     
-    abstract execute(): boolean;
+    abstract execute(): ErrorType;
 }
 
 

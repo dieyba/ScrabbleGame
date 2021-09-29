@@ -1,4 +1,5 @@
 export enum ErrorType {
+    NoError,
     SyntaxError,
     InvalidCommand,
     ImpossibleCommand,
