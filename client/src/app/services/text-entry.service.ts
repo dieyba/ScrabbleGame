@@ -145,8 +145,9 @@ export class TextEntryService {
      */
     extractPlaceParams(defaultParams:DefaultCommandParams,paramsInput:string[]):CommandParams{
         if(paramsInput.length==2){
-            const word = paramsInput[1];
+            const word = this.removeAccents(paramsInput[1]);
             const positionOrientation = paramsInput[0];
+
             if(this.isValidWord(word) && this.isAllLowerLetters(positionOrientation)){
                 const row = positionOrientation.slice(0,1);
                 const column = positionOrientation.slice(1,-1);
@@ -174,7 +175,7 @@ export class TextEntryService {
      */
     extractExchangeParams(defaultParams:DefaultCommandParams,paramsInput:string[]): CommandParams{
         if(paramsInput.length === 1){
-            const letters = paramsInput[0];
+            const letters = this.removeAccents(paramsInput[0]);
             const isValidLetterAmount = (letters.length > 0) && (letters.length < 8);
             if(isValidLetterAmount){
                 if(this.isValidExchangeWord(letters)){
@@ -189,13 +190,8 @@ export class TextEntryService {
     // TODO: add a function to replace and call it in extract param before validating place/exchange letters.
     // À à	Â â	Æ æ	Ç ç	É é	È è	Ê ê	Ë ë
     // Î î	Ï ï	Ô ô	Œ œ	Ù ù	Û û	Ü ü	Ÿ ÿ
-    replaceSpecialLetters(letters:string):string{
-        // for char in ACCEPTED_CHAR{
-            // check if it has that char and replace it with the proper version:
-            // }
-        // }
-        // or juste create a map? and then i can juste check for each if its in the map and return the letter to replace it with.
-        return letters;
+    removeAccents(letters:string):string{
+        return letters.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
     }
 
     /**
