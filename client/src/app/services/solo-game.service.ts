@@ -113,11 +113,8 @@ export class SoloGameService {
     }
 
     debug(): ErrorType {
-        if(this.localPlayer.isActive){
-            console.log('Changing debug state...');
-            return ErrorType.NoError;
-        }
-        return ErrorType.ImpossibleCommand;
+        console.log('Changing debug state...');
+        return ErrorType.NoError;
     }
 
     exchangeLetters(letters: string): ErrorType {
