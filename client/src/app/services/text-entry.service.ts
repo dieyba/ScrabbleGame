@@ -1,8 +1,7 @@
-// import { ThisReceiver } from '@angular/compiler';
 import { Injectable } from '@angular/core';
-import { ErrorType } from '@app/classes/errors';
-import { Column, Row } from '@app/classes/scrabble-board';
-import { Command, CommandType , CommandParams, DefaultCommandParams } from '../classes/commands';
+import { ErrorType } from '../classes/errors';
+import { Column, Row } from '../classes/scrabble-board';
+import { Command , CommandParams, DefaultCommandParams } from '../classes/commands';
 import { SoloGameService } from './solo-game.service';
 import { createDebugCmd } from '../classes/debugCommand';
 import { createExchangeCmd, ExchangeCmd } from '../classes/exchangeCommand';

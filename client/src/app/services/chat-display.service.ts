@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { AuthorType, ChatDisplayEntry, ChatEntryColor } from '@app/classes/chat-display-entry';
-import { ErrorType, ERROR_MESSAGES } from '@app/classes/errors';
+import { AuthorType, ChatDisplayEntry, ChatEntryColor } from '../classes/chat-display-entry';
+import { ErrorType, ERROR_MESSAGES } from '../classes/errors';
 
 @Injectable({
     providedIn: 'root',
@@ -15,7 +15,7 @@ export class ChatDisplayService {
      * @param playerMessage Text or executed command
      */
     addPlayerEntry(isLocalPlayer: boolean, username:string, playerMessage: string): void {
-        playerMessage = username.concat(": ").concat(playerMessage);
+        playerMessage = username.concat(" >> ").concat(playerMessage);
         this.entries.push({
             authorType: isLocalPlayer ? AuthorType.LocalPlayer : AuthorType.RemotePlayer,
             color: isLocalPlayer ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer,
@@ -47,7 +47,7 @@ export class ChatDisplayService {
 
     createExchangeMessage(isLocalPLayer:boolean, userInput:string): string{
         let exchangeMessage:string = "";
-        if(!isLocalPLayer) {
+        if(isLocalPLayer) {
             exchangeMessage = userInput;
         }
         else {
