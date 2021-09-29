@@ -9,6 +9,7 @@ enum Colors {
     DarkBlue = '#6AA0E0',
     Pink = '#FFA7C7',
     Red = '#C03E3E',
+    None = 'white',
 }
 
 // TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
@@ -122,6 +123,10 @@ export class GridService {
                         this.gridContext.fillText('MOT', startX + SMALL_OFFSET_X, startY + SMALL_OFFSET_Y);
                         this.gridContext.fillText('x3', startX + BIG_OFFSET_X, startY + BIG_OFFSET_Y);
                     }
+                    break;
+                case SquareColor.None:
+                    this.gridContext.fillStyle = Colors.None;
+                    this.gridContext.fillRect(startX, startY, SQUARE_SIZE, SQUARE_SIZE);
                     break;
             }
         }
