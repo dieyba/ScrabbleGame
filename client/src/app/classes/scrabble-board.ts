@@ -113,11 +113,22 @@ export class ScrabbleBoard {
     }
 
     isWordInsideBoard(word: string, i: number, j: number, orientation: string): boolean {
-        if (orientation === 'h' && i + word.length > Row.Length) {
-            return false;
-        } else if (orientation === 'v' && j + word.length > Column.Length) {
+        // Verifying if coordinates are good
+        if (Column.One < i && i < Column.Fifteen) {
             return false;
         }
+        if (Row.A < j && j < Row.O) {
+            return false;
+        }
+
+        // Verifying if word is too long to stay inside board
+        if (orientation === 'h' && i + word.length > Row.Length) {
+            return false;
+        }
+        if (orientation === 'v' && j + word.length > Column.Length) {
+            return false;
+        }
+
         return true;
     }
 }
