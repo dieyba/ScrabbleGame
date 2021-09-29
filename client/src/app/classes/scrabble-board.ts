@@ -100,15 +100,23 @@ export class ScrabbleBoard {
     }
 
     generateTealSquares(i: number, j: number) {
-        if (i === Column.One || i === Column.Fifteen) {
-            if (j === Row.D || j === Row.L) {
-                this.squares[i][j].color = SquareColor.Teal;
-            }
+        if ((i === Column.One || i === Column.Fifteen) && (j === Row.D || j === Row.L)) {
+            this.squares[i][j].color = SquareColor.Teal;
         }
-        if (j === Row.A || j === Row.O) {
-            if (i === Column.Four || i === Column.Twelve) {
-                this.squares[i][j].color = SquareColor.Teal;
-            }
+        if ((j === Row.A || j === Row.O) && (i === Column.Four || i === Column.Twelve)) {
+            this.squares[i][j].color = SquareColor.Teal;
+        }
+        if ((i === Column.Seven || i === Column.Nine) && (j === Row.C || j === Row.M)) {
+            this.squares[i][j].color = SquareColor.Teal;
+        }
+        if ((j === Row.G || j === Row.I) && (i === Column.Three || i === Column.Thirteen)) {
+            this.squares[i][j].color = SquareColor.Teal;
+        }
+        if (i === Column.Eight && (j === Row.D || j === Row.L)) {
+            this.squares[i][j].color = SquareColor.Teal;
+        }
+        if (j === Row.H && (i === Column.Four || i === Column.Twelve)) {
+            this.squares[i][j].color = SquareColor.Teal;
         }
     }
 
