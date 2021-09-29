@@ -14,9 +14,9 @@ export class ChatDisplayService {
      * @param isAdversary Bool that indicates if the message comes from adversary
      * @param playerMessage Text or executed command
      */
-    addPlayerEntry(isLocalPlayer: boolean, playerMessage: string): void {
+    addPlayerEntry(isLocalPlayer: boolean, username:string, playerMessage: string): void {
+        playerMessage = username.concat(": ").concat(playerMessage);
         this.entries.push({
-            // TODO:see if keep author type or juste take a player object to get his name and whether hes active or not.
             authorType: isLocalPlayer ? AuthorType.LocalPlayer : AuthorType.RemotePlayer,
             color: isLocalPlayer ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer,
             message: playerMessage,
@@ -30,11 +30,31 @@ export class ChatDisplayService {
      *
      * @param errorMessage Error message to be sent by "system"
      */
-    addErrorMessage(errorType: ErrorType): void {
+    addErrorMessage(errorType: ErrorType, commandInput:string): void {
         this.entries.push({
             authorType: AuthorType.System,
             color: ChatEntryColor.SystemColor,
-            message: ERROR_MESSAGES.get(errorType) as string,
+            message: this.createErrorMessage(errorType, commandInput),
         });
+    }
+
+    createErrorMessage(errorType: ErrorType, commandInput:string): string{
+        const error = ERROR_MESSAGES.get(errorType) as string;
+        const inputAndError = commandInput.concat(" : ").concat(error);
+        return inputAndError;
+    }
+
+
+    createExchangeMessage(isLocalPLayer:boolean, userInput:string): string{
+        let exchangeMessage:string = "";
+        if(!isLocalPLayer) {
+            exchangeMessage = userInput;
+        }
+        else {
+            const letters = userInput.split(" ")[1];
+            const lettersNum = letters.length.toString();
+            exchangeMessage = lettersNum.concat(" letter(s) were exchanged");
+        }
+        return exchangeMessage;
     }
 }

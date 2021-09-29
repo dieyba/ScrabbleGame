@@ -1,5 +1,5 @@
 export interface ChatDisplayEntry {
-    authorType: AuthorType;
+    authorType: AuthorType; //name
     color: ChatEntryColor;
     message: string;
 }

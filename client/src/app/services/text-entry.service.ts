@@ -2,20 +2,20 @@
 import { Injectable } from '@angular/core';
 import { ErrorType } from '@app/classes/errors';
 import { Column, Row } from '@app/classes/scrabble-board';
-import { Command, CommandParams, DefaultCommandParams } from '../classes/commands';
+import { Command, CommandType , CommandParams, DefaultCommandParams } from '../classes/commands';
 import { SoloGameService } from './solo-game.service';
 import { createDebugCmd } from '../classes/debugCommand';
-import { createExchangeCmd } from '../classes/exchangeCommand';
+import { createExchangeCmd, ExchangeCmd } from '../classes/exchangeCommand';
 import { createPassCmd } from '../classes/passCommand';
 import { createPlaceCmd } from '../classes/placeCommand';
 import { Vec2 } from '../classes/vec2';
 import { ChatDisplayService } from './chat-display.service';
 
+
 const DEBUG_CMD = 'debug';
 const EXCHANGE_CMD = 'échanger';
 const PASS_CMD = 'passer';
 const PLACE_CMD = 'placer';
-// TODO:add les autres pour les prochains sprint sans les implémenter? aka make it so they wont send an invalid command error message
 
 const ROW_OFFSET = 'a'.charCodeAt(0);
 const COLUMN_OFFSET = 1;
@@ -45,7 +45,6 @@ export class TextEntryService {
         this.paramsMap.set(PLACE_CMD, this.extractPlaceParams);
         this.paramsMap.set(PASS_CMD,this.isWithoutParams);
     }
-
     
     
     /**
@@ -54,45 +53,50 @@ export class TextEntryService {
      *
      * @param text Text input from user
      */
-    handleInput(userInput: string) {    
-        // For this sprint, we assume only the local player enters input in the chat box.
-        const isLocalPLayer = true;
+    handleInput(userInput: string, isLocalPlayer:boolean) {    
+        const playerName = isLocalPlayer?
+            this.gameService.localPlayer.name:
+            this.gameService.virtualPlayer.name;;
 
         userInput = this.trimSpaces(userInput);
         if(!this.isEmpty(userInput)){
             if(userInput.startsWith("!")) {
-                const splitInput = this.splitInput(userInput.substring(1));
-                const commandCreated = this.createCommand(splitInput,isLocalPLayer);
+                const commandCreated = this.createCommand(userInput,isLocalPlayer);
                 if(commandCreated){
                     const commandResult = commandCreated.execute();
                     if(commandResult === ErrorType.NoError){
-                        this.chatDisplayService.addPlayerEntry(isLocalPLayer, userInput);
+                        if(commandCreated instanceof ExchangeCmd){
+                            const message= this.chatDisplayService.createExchangeMessage(isLocalPlayer, userInput);
+                            this.chatDisplayService.addPlayerEntry(isLocalPlayer,playerName,message);
+                        }
+                        else {
+                            this.chatDisplayService.addPlayerEntry(isLocalPlayer, playerName,userInput);
+                        }
                     }else{
-                        // TODO: add user input to the error message.
-                        this.chatDisplayService.addErrorMessage(commandResult);
+                        this.chatDisplayService.addErrorMessage(commandResult,userInput);
                     }
                 }
             } else {
-                this.chatDisplayService.addPlayerEntry(isLocalPLayer, userInput);
+                this.chatDisplayService.addPlayerEntry(isLocalPlayer, playerName, userInput);
             }
         }
     }
-
     
-    createCommand(commandInput:string[],isLocalPlayer:boolean):Command|undefined{
-        const commandName = commandInput.shift() as string;
+    createCommand(commandInput:string,isLocalPlayer:boolean):Command|undefined{
+        const splitInput = this.splitInput(commandInput.substring(1));
+        const commandName = splitInput.shift() as string;
         if(this.commandsMap.has(commandName)){
             const createCmdFunction:Function = this.commandsMap.get(commandName) as Function;
             const defaultParams = {gameService:this.gameService,isFromLocalPlayer:isLocalPlayer};
-            const commandParams = this.extractCommandParams(defaultParams,commandName,commandInput);
+            const commandParams = this.extractCommandParams(defaultParams,commandName,splitInput);
             if(commandParams){
                 return createCmdFunction.call(this,commandParams);
             }
             else{
-                this.chatDisplayService.addErrorMessage(ErrorType.SyntaxError);
+                this.chatDisplayService.addErrorMessage(ErrorType.SyntaxError, commandInput);
             }
         }else{
-            this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand);
+            this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand, commandInput);
         }
         return undefined;
     }

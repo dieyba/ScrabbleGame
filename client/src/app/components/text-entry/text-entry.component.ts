@@ -11,7 +11,8 @@ export class TextEntryComponent {
     constructor(private textEntryService: TextEntryService) {}
 
     onKeyUpEnter() {
-        this.textEntryService.handleInput(this.inputText);
+        //onKeyUp events are always from the local player.
+        this.textEntryService.handleInput(this.inputText, true); 
         this.inputText = '';
     }
 }
