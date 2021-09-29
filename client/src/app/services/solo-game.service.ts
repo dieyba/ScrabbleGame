@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Dictionary } from '@app/classes/dictionary';
-import { LetterStock } from '@app/classes/letter-stock';
 import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { VirtualPlayer } from '@app/classes/virtual-player';
-import { GridService } from './grid.service';
-import { RackService } from './rack.service';
 import { ErrorType } from '../classes/errors';
 import { Vec2 } from '../classes/vec2';
+import { GridService } from './grid.service';
+import { LetterStock } from './letter-stock.service';
+import { RackService } from './rack.service';
 
 const TIMER_INTERVAL = 1000;
 const DEFAULT_LETTER_COUNT = 7;
@@ -49,6 +50,7 @@ export class SoloGameService {
         this.rackService.scrabbleRack = new ScrabbleRack();
         this.gridService.scrabbleBoard = new ScrabbleBoard();
         this.drawRackLetters();
+        console.log('local player letters :', this.localPlayer.letters);
         this.startCountdown();
     }
 
@@ -94,26 +96,26 @@ export class SoloGameService {
     }
 
     passTurn() {
-        if(this.localPlayer.isActive){
+        if (this.localPlayer.isActive) {
             this.timerMs = 0;
             this.secondsToMinutes();
             clearInterval(this.intervalValue);
             this.changeActivePlayer();
-                return ErrorType.NoError;
+            return ErrorType.NoError;
         }
         return ErrorType.ImpossibleCommand;
     }
 
 
-    place(position:Vec2, orientation:string, letters:string): ErrorType {
-        if(this.localPlayer.isActive){
+    place(position: Vec2, orientation: string, letters: string): ErrorType {
+        if (this.localPlayer.isActive) {
             console.log("Placing letters...");
             return ErrorType.NoError;
-        }return ErrorType.ImpossibleCommand
+        } return ErrorType.ImpossibleCommand
     }
 
     debug(): ErrorType {
-        if(this.localPlayer.isActive){
+        if (this.localPlayer.isActive) {
             console.log('Changing debug state...');
             return ErrorType.NoError;
         }
@@ -121,14 +123,29 @@ export class SoloGameService {
     }
 
     exchangeLetters(letters: string): ErrorType {
-        if(this.localPlayer.isActive){
+        console.log('local player letters dans méthode :', this.localPlayer.letters);
+        if (this.localPlayer.isActive && this.stock.letterStock.length > 7) {
             console.log('Exchanging these letters:' + letters + " ...");
-            return ErrorType.NoError;
+            let lettersToRemove: ScrabbleLetter[] = [];
+            if (this.localPlayer.removeLetter(letters) == true) {
+                // Ajouter la fonction qui enleve les lettres de la vue
+
+                for (let i: number = 0; i < letters.length; i++) {
+                    lettersToRemove[i] = new ScrabbleLetter(letters[i], 1);
+                }
+
+                let lettersToAdd: ScrabbleLetter[] = this.stock.exchangeLetters(lettersToRemove);
+                for (let i: number = 0; i < lettersToAdd.length; i++) {
+                    this.localPlayer.addLetter(lettersToAdd[i]);
+                    this.rackService.drawLetter(lettersToAdd[i]);
+                    console.log("letters to add :", lettersToAdd);
+                }
+                return ErrorType.NoError;
+            }
+            console.log("LETTERS TO REMOVE : ", lettersToRemove);
         }
         return ErrorType.ImpossibleCommand;
     }
-
-
 
 
     drawRackLetters(): void {
