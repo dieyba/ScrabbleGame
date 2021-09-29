@@ -24,46 +24,38 @@ export class RackService {
         this.gridContext.strokeStyle = 'black';
         this.gridContext.lineWidth = 1;
 
-        for (let i = 1; i < MAX_LETTER_COUNT; i++) {
+        for (let i = 1; i < MAX_LETTER_COUNT - 1; i++) {
             this.gridContext.moveTo((RACK_WIDTH * i) / MAX_LETTER_COUNT, 0);
             this.gridContext.lineTo((RACK_WIDTH * i) / MAX_LETTER_COUNT, RACK_HEIGHT);
         }
 
         this.gridContext.stroke();
         // TODO : Remove test
-        const letter1 = new ScrabbleLetter();
-        letter1.character = 'a';
-        letter1.value = 1;
+        const letter1 = new ScrabbleLetter('a', 1);
         this.drawLetter(letter1);
 
-        const letter2 = new ScrabbleLetter();
-        letter2.character = 'o';
-        letter2.value = 2;
+        const letter2 = new ScrabbleLetter('o', 2);
         this.drawLetter(letter2);
 
-        const letter3 = new ScrabbleLetter();
-        letter3.character = 'w';
-        letter3.value = 10;
+        const letter3 = new ScrabbleLetter('w', 10);
         this.drawLetter(letter3);
 
-        const letter4 = new ScrabbleLetter();
-        letter4.character = 'k';
-        letter4.value = 2;
+        const letter4 = new ScrabbleLetter('k', 2);
         this.drawLetter(letter4);
 
-        const letter5 = new ScrabbleLetter();
-        letter5.character = 'g';
-        letter5.value = 1;
+        const letter5 = new ScrabbleLetter('g', 1);
         this.drawLetter(letter5);
     }
 
     drawLetter(scrabbleLetter: ScrabbleLetter): void {
+        
         for (let i = 0; i < MAX_LETTER_COUNT; i++) {
             if (!this.scrabbleRack.squares[i].occupied) {
                 this.scrabbleRack.squares[i].letter = scrabbleLetter;
                 this.scrabbleRack.squares[i].occupied = true;
                 const positionX = (RACK_WIDTH * i) / MAX_LETTER_COUNT;
                 const letter = scrabbleLetter.character.toUpperCase();
+                this.gridContext.beginPath();
                 this.gridContext.fillStyle = 'black';
                 this.gridContext.font = '60px system-ui';
                 this.gridContext.fillText(letter, positionX + OFFSET, 0 + RACK_HEIGHT - OFFSET);

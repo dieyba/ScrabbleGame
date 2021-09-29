@@ -33,16 +33,32 @@
 
 .column {
     flex: 50%;
-    position:relative;
+    position: relative;
     margin-top: 20px;
+}
+
+.btn {
+    white-space: nowrap;
+    position: relative;
+    margin-top: 690px;
+    font-size: 20px;
+    border-radius: 5px;
+    background-color: #6aa0e0;
+    border: 1px solid #6aa0e0;
+    padding: 5px 10px;
+}
+
+.btn:hover {
+    opacity: 0.6;
 }
 
 .size-btn {
     margin-bottom: 10px;
+    margin-left: 5px;
     border-radius: 5px;
     background-color: #6aa0e0;
     border: 1px solid #6aa0e0;
-    width: 100%;
+    width: 25%;
 }
 
 .size-btn:hover {

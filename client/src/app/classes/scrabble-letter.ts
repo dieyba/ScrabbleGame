@@ -9,9 +9,9 @@ export class ScrabbleLetter {
     nextLetters: ScrabbleLetter[]; // Neighbouring letters (0: N, 1: E, 2: S, 3: W) of the letter. WATCH OUT : don't go over four
     color: SquareColor;
 
-    constructor() {
-        this.character = 'VIDE';
-        this.value = 0;
+    constructor(letter: string, value: number) {
+        this.character = letter;
+        this.value = value;
         this.nextLetters = [];
         this.color = SquareColor.None;
     }
