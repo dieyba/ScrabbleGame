@@ -13,6 +13,7 @@ export class ScrabbleWord {
         let string = "";
         for(let i = 0; i < this.content.length; i++){
             string += this.content[i].character;
+            //TODO: Modify for blank pieces
         }
         return string;
     }

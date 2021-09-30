@@ -4,8 +4,8 @@ import { Axis, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { Square } from '@app/classes/square';
-import { WordBuilderService } from './word-builder.service';
 import { ValidationService } from './validation.service';
+import { Vec2 } from '@app/classes/vec2';
 
 export enum Probability{
   EndTurn = 10,
@@ -21,7 +21,7 @@ export class VirtualPlayerService {
   board : ScrabbleBoard;
   rack : ScrabbleRack; //Replace this for implementation
 
-  constructor(private wordBuilderService : WordBuilderService, private validationService : ValidationService) {    //TODO Implement timer (3s and 20s limit)
+  constructor(private validationService : ValidationService) {    //TODO Implement timer (3s and 20s limit)
     this.board = new ScrabbleBoard;
     this.rack = new ScrabbleRack;
     let currentMove = this.getRandomIntInclusive(1, 100);
@@ -80,7 +80,8 @@ export class VirtualPlayerService {
     return possibleMoves;
 
   }
-  possibleMoves(points : number) : ScrabbleWord[]{
+
+  possibleMoves(points : number, axis : Axis) : ScrabbleWord[]{
     let listLength = 4; //How many words we should aim for
     let list = [];
     for (let i = 0; i < listLength; i++) {
@@ -98,6 +99,7 @@ export class VirtualPlayerService {
                 list.splice(l);
               }
               //TODO : Verify if move is valid on the board and simulate placement to calculate points
+              if(this.validationService.isPlacable(list[l], this.findPosition(list[l], axis), axis))
               //Verify if points are respected
               if (list[l].totalValue() > points || list[l].totalValue() < points-POINTS_INTERVAL){
                 list.splice(l);
@@ -115,13 +117,13 @@ export class VirtualPlayerService {
     let currentMove = this.getRandomIntInclusive(1, 100);
     if(currentMove <= 40){
       //40% chance to go for moves that earn 6 points or less
-      this.possibleMoves(6); //WIP
+      this.possibleMoves(6, Axis.V);
     } else if(currentMove <= 70){
       //30% chance to go for moves that score 7-12 points
-      this.possibleMoves(12);
+      this.possibleMoves(12, Axis.V);
     } else{
       //30% chance to go for moves that score 13-18 points
-      this.possibleMoves(18);
+      this.possibleMoves(18, Axis.V);
     }
     return 0;
   }
@@ -140,16 +142,16 @@ export class VirtualPlayerService {
         } else message += letter.character; //displays character
         if(j == moves[i].content.length-1){
           message += ' '; //If it's the last letter
-        } else message += "  "; //If not
+        } else message += "  "; //If it's not
       }
       message += moves[i].totalValue + "\n"; //Add score for each move
 
     }
     return message;
   }
-  displayMoveChat(moves : ScrabbleWord[]) : string{
-    let message = "";
-    return message; //WIP
+  displayMoveChat(move : ScrabbleWord, position : Vec2, axis : Axis) : string{
+    let message = "!placer " + position.y/*convert this to letters*/ + position.x + axis + " " + move.stringify();
+    return message;
   }
   wordify(letters : ScrabbleLetter[]) : ScrabbleWord{
     let word = new ScrabbleWord;
@@ -161,6 +163,24 @@ export class VirtualPlayerService {
     min = Math.ceil(min);
     max = Math.ceil(max);
     return Math.floor(Math.random()*(max-min+1)+min); 
+  }
+  findPosition(word : ScrabbleWord, axis : Axis) : Vec2{
+    let origin = new ScrabbleLetter; //Convert position
+    let index : number;
+    for (index = 0; index < word.content.length; index++){
+      if(word.content[index].tile.occupied){
+        origin = word.content[index];
+      }
+    }
+    let position = new Vec2;
+    if(axis == Axis.V){
+      position.y = origin.tile.position.y - index;
+      position.x = origin.tile.position.x; 
+    } else {
+      position.y = origin.tile.position.y;
+      position.x = origin.tile.position.x - index;
+    }
+    return position;
   }
   chooseTilesFromRack() : Square[]{
     let numberOfTiles = this.getRandomIntInclusive(1,this.rack.squares.length);

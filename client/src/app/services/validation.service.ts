@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@angular/core';
 import { Dictionary } from '@app/classes/dictionary';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { Axis, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
+import { Vec2 } from '@app/classes/vec2';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { GridService } from './grid.service';
 
@@ -18,6 +19,17 @@ export class ValidationService {
     constructor(public dictionaryService: DictionaryService, @Inject(ScrabbleWord) public newWords: ScrabbleWord[], public gridService: GridService) {
         this.dictionary = dictionaryService.currentDictionary;
         this.validateWordsAndCalculateScore(newWords);
+    }
+
+    isPlacable(word : ScrabbleWord, position : Vec2, axis : Axis) : boolean{ //Dummy function
+        //if (vec2 is not on board)
+         return false;
+        //if (vec2 + word.length in axis direction is not on board)
+         return false;
+        //if (any of the letters' places are occupied)
+         return false;
+        //else
+         return true;
     }
 
     validateWordsAndCalculateScore(newWords: ScrabbleWord[]): number {
