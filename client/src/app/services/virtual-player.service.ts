@@ -12,6 +12,7 @@ export enum Probability{
   ExchangeTile = 10,
   MakeAMove = 80,
 }
+const POINTS_INTERVAL = 5;
 
 @Injectable({
   providedIn: 'root'
@@ -92,12 +93,18 @@ export class VirtualPlayerService {
         for(let k = 0; k <= this.board.actualBoardSize; k++){
           if(this.board.squares[j][k].occupied){
             list = this.movesWithGivenLetter(this.board.squares[j][k].letter)
-            movesFound++;
+            //TODO : Verify if move is valid on the board.
+            movesFound += list.length;
           }
         }
       }
     }
-    return list;
+    for(let l = 0; l < list.length; l++){
+      if (list[l].totalValue() > points && list[l].totalValue() < points-POINTS_INTERVAL){
+        list.splice(l);
+      }
+    }
+    return list; //list contains movesFound elements
   }
   makeMoves() : number{
     let currentMove = this.getRandomIntInclusive(1, 100);
