@@ -47,7 +47,7 @@ export class RackService {
                 this.scrabbleRack.squares[i].occupied = true;
                 this.scrabbleRack.squares[i].position = { x: i, y: 0 };
                 const positionX = (RACK_WIDTH * i) / MAX_LETTER_COUNT;
-                const letter = scrabbleLetter.character.toUpperCase();
+                const letter = scrabbleLetter.getLetter().toUpperCase();
                 this.gridContext.beginPath();
                 this.gridContext.fillStyle = 'black';
                 this.gridContext.font = '60px system-ui';
@@ -65,7 +65,7 @@ export class RackService {
 
     removeLetter(scrabbleLetter: ScrabbleLetter) {
         for (let i = 0; i < this.scrabbleRack.squares.length; i++) {
-            if (this.scrabbleRack.squares[i].letter.character === scrabbleLetter.character) {
+            if (this.scrabbleRack.squares[i].letter.getLetter() === scrabbleLetter.getLetter()) {
                 this.scrabbleRack.squares[i] = new Square(i, 0);
                 break;
             }

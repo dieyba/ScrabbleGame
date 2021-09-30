@@ -1,8 +1,11 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
+import { ValidationService } from '@app/services/validation.service';
 
 // TODO : Avoir un fichier séparé pour les constantes!
 export const DEFAULT_WIDTH = 640;
@@ -37,6 +40,7 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly gridService: GridService,
         private readonly rackService: RackService,
         private readonly soloGameService: SoloGameService,
+        private readonly validationService: ValidationService,
     ) {}
 
     ngAfterViewInit(): void {
@@ -46,6 +50,32 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
+        let letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        this.gridService.drawLetter(letter1, 0, 0);
+        let letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
+        this.gridService.drawLetter(letter2, 1, 0);
+        let letter3: ScrabbleLetter = new ScrabbleLetter('j', 4);
+        this.gridService.drawLetter(letter3, 2, 0);
+        let letter4: ScrabbleLetter = new ScrabbleLetter('à', 3);
+        this.gridService.drawLetter(letter4, 3, 0);
+        let letter5: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        this.gridService.drawLetter(letter5, 0, 0);
+        let letter6: ScrabbleLetter = new ScrabbleLetter('é', 2);
+        this.gridService.drawLetter(letter6, 0, 1);
+        let letter7: ScrabbleLetter = new ScrabbleLetter('j', 4);
+        this.gridService.drawLetter(letter7, 0, 2);
+        let letter8: ScrabbleLetter = new ScrabbleLetter('à', 3);
+        this.gridService.drawLetter(letter8, 0, 3);
+        let word1: ScrabbleWord = new ScrabbleWord();
+        word1.content = [letter1, letter2, letter3, letter4];
+        word1.startPosition = { x: 0, y: 0 };
+        word1.orientation = WordOrientation.Horizontal;
+        let word2: ScrabbleWord = new ScrabbleWord();
+        word2.content = [letter5, letter6, letter7, letter8];
+        word2.startPosition = { x: 0, y: 0 };
+        word2.orientation = WordOrientation.Vertical;
+        let words: ScrabbleWord[] = [word1, word2];
+        console.log(this.validationService.validateWordsAndCalculateScore(words));
         this.gridCanvas.nativeElement.focus();
     }
 

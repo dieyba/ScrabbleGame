@@ -15,7 +15,7 @@ export enum Colors {
 // TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
 export const DEFAULT_WIDTH = 600;
 export const DEFAULT_HEIGHT = 600;
-const BOARD_SIZE = 15;
+export const BOARD_SIZE = 15;
 const SQUARE_SIZE = DEFAULT_WIDTH / BOARD_SIZE - 2;
 const BOARD_OFFSET = 20;
 const SMALL_OFFSET_Y = 20;
@@ -137,7 +137,7 @@ export class GridService {
         scrabbleLetter.color = this.scrabbleBoard.squares[i][j].color;
         this.scrabbleBoard.squares[i][j].letter = scrabbleLetter;
         this.scrabbleBoard.squares[i][j].occupied = true;
-        const letter = scrabbleLetter.character.toUpperCase();
+        const letter = scrabbleLetter.getLetter().toUpperCase();
         const startX = (this.width * i) / BOARD_SIZE + BOARD_OFFSET + 1;
         const startY = (this.height * j) / BOARD_SIZE + BOARD_OFFSET + 1;
 
@@ -169,7 +169,7 @@ export class GridService {
                     this.gridContext.fillStyle = 'black';
                     this.gridContext.font = this.currentLetterFont;
                     this.gridContext.fillText(
-                        this.scrabbleBoard.squares[i][j].letter.character.toUpperCase(),
+                        this.scrabbleBoard.squares[i][j].letter.getLetter().toUpperCase(),
                         positionX + 2,
                         positionY + SQUARE_SIZE / 2 + BOARD_SIZE,
                     );
