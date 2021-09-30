@@ -63,9 +63,9 @@ export class RackService {
         }
     }
 
-    removeLetter(pos: number) {
+    removeLetter(scrabbleLetter: ScrabbleLetter) {
         for (let i = 0; i < MAX_LETTER_COUNT; i++) {
-            if (i === pos) {
+            if (this.scrabbleRack.squares[i].letter.character === scrabbleLetter.character) {
                 this.scrabbleRack.squares[i] = new Square(i, 0);
                 break;
             }
