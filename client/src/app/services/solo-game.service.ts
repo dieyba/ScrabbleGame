@@ -6,10 +6,10 @@ import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { VirtualPlayer } from '@app/classes/virtual-player';
-import { GridService } from './grid.service';
-import { RackService } from './rack.service';
 import { ErrorType } from '../classes/errors';
 import { Vec2 } from '../classes/vec2';
+import { GridService } from './grid.service';
+import { RackService } from './rack.service';
 
 const TIMER_INTERVAL = 1000;
 const DEFAULT_LETTER_COUNT = 7;
@@ -111,11 +111,6 @@ export class SoloGameService {
             console.log("Placing letters...");
             return ErrorType.NoError;
         }return ErrorType.ImpossibleCommand
-    }
-
-    debug(): ErrorType {
-        console.log('Changing debug state...');
-        return ErrorType.NoError;
     }
 
     exchangeLetters(letters: string): ErrorType {

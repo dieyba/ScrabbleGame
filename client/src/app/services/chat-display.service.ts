@@ -41,7 +41,6 @@ export class ChatDisplayService {
         });
     }
 
-    // TODO:change string for some fixed specific messages?
     addVirtalPlayerEntry(playername:string,commandInput:string, debugMessages:string[]){
         this.addPlayerEntry(false, playername,commandInput); //display command entered
         this.addDebugMessages(debugMessages);
@@ -71,9 +70,9 @@ export class ChatDisplayService {
         this.addSystemEntry(errorAndInput);
     }
 
-    createExchangeMessage(isLocalPLayer:boolean, userInput:string): string{
+    createExchangeMessage(isFromLocalPLayer:boolean, userInput:string): string{
         let exchangeMessage:string = "";
-        if(isLocalPLayer) {
+        if(isFromLocalPLayer) {
             exchangeMessage = userInput;
         }
         else {
@@ -83,7 +82,7 @@ export class ChatDisplayService {
             const lettersNum = letters.length.toString();
             exchangeMessage = commandName.concat(" ");
             exchangeMessage = exchangeMessage.concat(lettersNum);
-            exchangeMessage = exchangeMessage.concat(" letter(s)");
+            exchangeMessage = exchangeMessage.concat(" lettre(s)");
         }
         return exchangeMessage;
     }

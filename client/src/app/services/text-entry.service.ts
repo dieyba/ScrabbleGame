@@ -52,11 +52,10 @@ export class TextEntryService {
      *
      * @param text Text input from user
      */
-    handleInput(userInput: string, isLocalPlayer:boolean) {    
+    handleInput(userInput: string, isLocalPlayer:boolean) {  
         const playerName = isLocalPlayer?
             this.gameService.localPlayer.name:
-            this.gameService.virtualPlayer.name;;
-
+            this.gameService.virtualPlayer.name; 
         userInput = this.trimSpaces(userInput);
         if(!this.isEmpty(userInput)){
             if(userInput.startsWith("!")) {
@@ -64,33 +63,34 @@ export class TextEntryService {
                 if(commandCreated){
                     const commandResult = commandCreated.execute();
                     if(commandResult === ErrorType.NoError){
-                        // send successful exchange command execution message
                         if(commandCreated instanceof ExchangeCmd){
-                            const message= this.chatDisplayService.createExchangeMessage(isLocalPlayer, userInput);
-                            this.chatDisplayService.addPlayerEntry(isLocalPlayer,playerName,message);
+                            // Only exchange success message depends on who called the command
+                            userInput= this.chatDisplayService.createExchangeMessage(isLocalPlayer, userInput);
                         }
-                        else {
-                            // send successful command execution message
-                            this.chatDisplayService.addPlayerEntry(isLocalPlayer, playerName,userInput);
-                        }
+                        // Command executed successfully
+                        this.chatDisplayService.addPlayerEntry(isLocalPlayer,playerName,userInput);
                     }else{
-                        // send unsuccesful command execution message
+                        // Command not executed successfully
                         this.chatDisplayService.addErrorMessage(commandResult,userInput);
                     }
                 }
             } else {
-                // send normal chat message
+                // Not a command input. Send normal chat message
                 this.chatDisplayService.addPlayerEntry(isLocalPlayer, playerName, userInput);
             }
         }
     }
     
-    createCommand(commandInput:string,isLocalPlayer:boolean):Command|undefined{
+    
+   private createCommand(commandInput:string,isLocalPlayer:boolean):Command|undefined{
         const splitInput = this.splitCommandInput(commandInput);
         const commandName = splitInput.shift() as string;
+        // Validate command name entered after the !
         if(this.commandsMap.has(commandName)){
+            // Get the function to create the command
             const createCmdFunction:Function = this.commandsMap.get(commandName) as Function;
             const defaultParams = {gameService:this.gameService,isFromLocalPlayer:isLocalPlayer};
+            // Validate and return the command parameters
             const commandParams = this.extractCommandParams(defaultParams,commandName,splitInput);
             if(commandParams){
                 return createCmdFunction.call(this,commandParams);
@@ -112,7 +112,7 @@ export class TextEntryService {
      * @param paramsInput string[] split at the spaces of the command input (without the command name)
      * @returns Default parameters and the command specific parameters if it has some
      */
-    extractCommandParams(defaultParams:DefaultCommandParams,commandName:string,paramsInput:string[]):CommandParams|undefined{
+     private extractCommandParams(defaultParams:DefaultCommandParams,commandName:string,paramsInput:string[]):CommandParams|undefined{
         if(this.paramsMap.has(commandName)){
             const createCmdFunction:Function = this.paramsMap.get(commandName) as Function;
             const params = createCmdFunction.call(this,defaultParams,paramsInput);
@@ -129,14 +129,14 @@ export class TextEntryService {
      * @param paramsInput the params entered after the command name, empty if none were entered
      * @returns Default parameteres if there wasn't any text after the command name
      */
-    isWithoutParams(defaultParams:DefaultCommandParams,paramsInput:string[]):CommandParams{
+     private isWithoutParams(defaultParams:DefaultCommandParams,paramsInput:string[]):CommandParams{
         if(paramsInput.length==0){
             return defaultParams;
         }
         return undefined;
     }
 
-    extractDebugParams(defaultParams:DefaultCommandParams,paramsInput:string[]):CommandParams{
+    private extractDebugParams(defaultParams:DefaultCommandParams,paramsInput:string[]):CommandParams{
         const isdefaultParams = this.isWithoutParams(defaultParams,paramsInput);
         if(isdefaultParams){
             return {defaultParams:defaultParams,specificParams:this.chatDisplayService};
@@ -151,7 +151,7 @@ export class TextEntryService {
      *  the placing parameters and the word to place.
      * @returns Default parameteres and place commands parameters. If invalid syntax, returns undefined
      */
-    extractPlaceParams(defaultParams:DefaultCommandParams,paramsInput:string[]):CommandParams{
+     private extractPlaceParams(defaultParams:DefaultCommandParams,paramsInput:string[]):CommandParams{
         if(paramsInput.length==2){
             const word = this.removeAccents(paramsInput[1]);
             const positionOrientation = paramsInput[0];
@@ -181,7 +181,7 @@ export class TextEntryService {
      *  Should only have 1 element, the letters to exchange.
      * @returns Default parameteres and a string for the letters to exchange. If invalid syntax, returns undefined
      */
-    extractExchangeParams(defaultParams:DefaultCommandParams,paramsInput:string[]): CommandParams{
+     private extractExchangeParams(defaultParams:DefaultCommandParams,paramsInput:string[]): CommandParams{
         if(paramsInput.length === 1){
             const letters = paramsInput[0];
             const hasAccents = (letters !== this.removeAccents(letters));
@@ -201,7 +201,7 @@ export class TextEntryService {
     /**
      * Checks if the word is not empty and only has valid letters
      */
-    isValidWordInput(word:string):boolean{
+     private isValidWordInput(word:string):boolean{
         let isValid:boolean = false;
         if(!this.isEmpty(word)){
             for(const letter of word){
@@ -217,7 +217,7 @@ export class TextEntryService {
     /**
      * Checks if the word is not empty and only has valid letters including *
      */
-    isValidExchangeWord(letters:string){
+     private isValidExchangeWord(letters:string):boolean{
         let isValid:boolean = false;
         if(!this.isEmpty(letters)){
             if(this.isAllLowerLetters(letters)){
@@ -233,14 +233,14 @@ export class TextEntryService {
     }
 
 
-    removeAccents(letters:string):string{
+    private removeAccents(letters:string):string{
         return letters.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
     }
 
     /**
-     * Returns true if it is  a letter. False if it is not or has an accent or ç (replace accents and ç before using)
+     * Returns true if it is  a letter. False if it is not or has an accent or ç
      */
-    isValidLetter(letter:string):boolean{
+     private isValidLetter(letter:string):boolean{
         if(!this.isEmpty(letter) && letter.length == 1){
             const charCode = letter.toLowerCase().charCodeAt(0);
             const isALetter = (charCode >= 'a'.charCodeAt(0) && charCode <= 'z'.charCodeAt(0));
@@ -257,7 +257,7 @@ export class TextEntryService {
      * @param column string of the column number
      * @returns Vec2 of numbers x and y
      */
-     convertToCoordinates(row: string, column: string):Vec2|undefined {
+    private convertToCoordinates(row: string, column: string):Vec2|undefined {
         let columnNumber = parseInt(column);
         if(columnNumber !== null){
             columnNumber = columnNumber - COLUMN_OFFSET;
@@ -278,7 +278,7 @@ export class TextEntryService {
      * @param commandInput the string to split
      * @returns sintrg[]. Returns empty array if the input was empty or only had white spaces
      */
-    splitCommandInput(commandInput:string):string[]{
+     private splitCommandInput(commandInput:string):string[]{
         if(commandInput.startsWith('!')){
             return commandInput.substring(1).split(' ');
         }
@@ -291,7 +291,7 @@ export class TextEntryService {
      * @param userInput string Input from the user
      * @returns String without beginning and ending spaces. Returns empty string if it only had white spaces
      */
-     trimSpaces(userInput: string): string {
+     private trimSpaces(userInput: string): string {
         while(userInput.startsWith(' ')){
             userInput = userInput.substring(1);
         }
@@ -308,12 +308,12 @@ export class TextEntryService {
      * @param userInput string Input from the user
      * @returns True if empty string or white space only string
      */
-    isEmpty(userInput:string){
+     private isEmpty(userInput:string){
         userInput = this.trimSpaces(userInput);
         return (userInput === '');
     }
     
-    isAllLowerLetters(letters:string):boolean{
+    private isAllLowerLetters(letters:string):boolean{
         return (letters.toLowerCase() === letters);
     }
 
