@@ -51,9 +51,13 @@ export class ChatDisplayService {
             exchangeMessage = userInput;
         }
         else {
-            const letters = userInput.split(" ")[1];
+            const splitCommand = userInput.split(" ");
+            const commandName = splitCommand[0];
+            const letters = splitCommand[1];
             const lettersNum = letters.length.toString();
-            exchangeMessage = lettersNum.concat(" letter(s) were exchanged");
+            exchangeMessage = commandName.concat(" ");
+            exchangeMessage = exchangeMessage.concat(lettersNum);
+            exchangeMessage = exchangeMessage.concat(" letter(s)");
         }
         return exchangeMessage;
     }
