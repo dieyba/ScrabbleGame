@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { Axis, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { Square } from '@app/classes/square';
@@ -71,8 +71,8 @@ export class VirtualPlayerService {
       possibleMoves[i] = this.wordify([]);
     }
     let movesFound = 0;
-    for(let j = 0; j < permutations.length; j++){
-      if(permutations[j].toString()){ //if(permutations[j].toString().isValid && numberOfPoints)
+    for(let j = 0; j < permutations.length; j++){ 
+      if(this.validationService.isWordValid(permutations[j].toString())){
         possibleMoves[movesFound] = this.wordify(permutations[j]);
         movesFound++;
       }
@@ -81,7 +81,7 @@ export class VirtualPlayerService {
 
   }
   possibleMoves(points : number) : ScrabbleWord[]{
-    let listLength = 4; //How many words we should aim for in a point
+    let listLength = 4; //How many words we should aim for
     let list = [];
     for (let i = 0; i < listLength; i++) {
       list[i] = new ScrabbleWord;
@@ -93,16 +93,21 @@ export class VirtualPlayerService {
         for(let k = 0; k <= this.board.actualBoardSize; k++){
           if(this.board.squares[j][k].occupied){
             list = this.movesWithGivenLetter(this.board.squares[j][k].letter)
-            //TODO : Verify if move is valid on the board.
-            movesFound += list.length;
+            for(let l = 0; l < list.length; l++){
+              if(!this.validationService.isWordValid(list[l].stringify())){
+                list.splice(l);
+              }
+              //TODO : Verify if move is valid on the board and simulate placement to calculate points
+              //Verify if points are respected
+              if (list[l].totalValue() > points || list[l].totalValue() < points-POINTS_INTERVAL){
+                list.splice(l);
+              }
+              movesFound += list.length;
+            }
           }
         }
       }
-    }
-    for(let l = 0; l < list.length; l++){
-      if (list[l].totalValue() > points && list[l].totalValue() < points-POINTS_INTERVAL){
-        list.splice(l);
-      }
+
     }
     return list; //list contains movesFound elements
   }

@@ -9,6 +9,13 @@ export class ScrabbleWord {
     constructor() {
         this.content = [];
     }
+    stringify() : string{
+        let string = "";
+        for(let i = 0; i < this.content.length; i++){
+            string += this.content[i].character;
+        }
+        return string;
+    }
     totalValue(): number {
         let total = 0;
         let pinkBonusCount = 0;
