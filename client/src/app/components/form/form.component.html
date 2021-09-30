@@ -6,11 +6,11 @@
                 matInput
                 #input
                 maxlength="10"
-                (change)="changeName(debutantNameList)"
                 #input2
                 minlength="3"
                 placeholder="Ex. Nougat"
                 formControlName="name"
+                (change)="changeName(debutantNameList)"
             />
             <mat-hint align="end">{{ input.value?.length || 0 }}/10</mat-hint>
             <div class="error" *ngIf="name.errors?.pattern">Le nom ne doit pas contenir de chiffres et de caractères</div>
@@ -51,9 +51,9 @@
 
         <div>
             <p>Veuillez choisir le niveau de votre adversaire</p>
-            <mat-radio-group formControlName="level" (click)="randomPlayer(debutantNameList)">
-                <mat-radio-button value="easy">Joueur Débutant</mat-radio-button>
-                <mat-radio-button value="difficult">Joueur Expert</mat-radio-button>
+            <mat-radio-group formControlName="level">
+                <mat-radio-button value="easy" (click)="randomPlayer(debutantNameList)">Joueur Débutant</mat-radio-button>
+                <mat-radio-button disabled value="difficult">Joueur Expert</mat-radio-button>
             </mat-radio-group>
         </div>
         <div id="opponents">

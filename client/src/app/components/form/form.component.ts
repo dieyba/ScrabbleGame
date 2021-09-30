@@ -36,7 +36,7 @@ export class FormComponent {
 
     createFormControl() {
         this.level = new FormControl('', [Validators.required]);
-        this.name = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z]*')]);
+        this.name = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
         this.timer = new FormControl('', [Validators.required]);
         this.bonus = new FormControl('');
         this.dictionaryForm = new FormControl('', [Validators.required]);
@@ -66,6 +66,11 @@ export class FormComponent {
     randomPlayer(list: string[]): void {
         document.getElementById('opponents')!.style.visibility = 'visible';
         this.random = this.randomNumber(0, list.length);
+        do {
+            this.random = this.randomNumber(0, list.length);
+            this.selectedPlayer = list[this.random];
+        } while (this.name.value === this.selectedPlayer);
+
         this.selectedPlayer = list[this.random];
         this.myForm.controls['opponent'].setValue(this.selectedPlayer);
     }
