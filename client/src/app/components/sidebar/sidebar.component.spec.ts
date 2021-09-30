@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { PlayerType } from '@app/classes/virtual-player';
 import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { SoloGameService } from '@app/services/solo-game.service';
-import { PlayerType } from '@app/classes/virtual-player';
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('SidebarComponent', () => {
     let component: SidebarComponent;
     let fixture: ComponentFixture<SidebarComponent>;
@@ -22,7 +23,6 @@ describe('SidebarComponent', () => {
         const fourthLetter: ScrabbleLetter = new ScrabbleLetter('m', 3);
         soloGameServiceSpy.localPlayer = {
             name: 'Ariane',
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             score: 73,
             letters: [firstLetter, secondLetter, thirdLetter, fourthLetter],
             isActive: false,
@@ -30,12 +30,15 @@ describe('SidebarComponent', () => {
 
         soloGameServiceSpy.virtualPlayer = {
             name: 'Sara',
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             score: 70,
             letters: [firstLetter, thirdLetter, firstLetter],
             isActive: true,
             type: PlayerType.Easy,
-            playTurn() {}
+            // eslint-disable-next-line no-empty-function
+            // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
+            playTurn() {
+                /* Nothing */
+            },
         };
     });
 

@@ -4,6 +4,7 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { SquareColor } from '@app/classes/square';
 import { GridService } from '@app/services/grid.service';
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('GridService', () => {
     let service: GridService;
     let ctxStub: CanvasRenderingContext2D;
@@ -52,21 +53,21 @@ describe('GridService', () => {
 
     it('drawLetter should call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        let letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        const letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
         service.drawLetter(letter, 5, 6);
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
     it('drawLetter should handle double digits', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        let letter: ScrabbleLetter = new ScrabbleLetter('D', 11);
+        const letter: ScrabbleLetter = new ScrabbleLetter('D', 11);
         service.drawLetter(letter, 5, 6);
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
     it('drawLetters should handle double digits', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        let letter: ScrabbleLetter = new ScrabbleLetter('D', 11);
+        const letter: ScrabbleLetter = new ScrabbleLetter('D', 11);
         service.scrabbleBoard.squares[5][6].letter = letter;
         service.drawLetters();
         expect(fillTextSpy).toHaveBeenCalled();
@@ -74,7 +75,7 @@ describe('GridService', () => {
 
     it('drawLetters should call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        let letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        const letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
         service.scrabbleBoard.squares[5][6].letter = letter;
         service.drawLetters();
         expect(fillTextSpy).toHaveBeenCalled();
@@ -95,6 +96,6 @@ describe('GridService', () => {
     it('drawSingleSquareColor should change fillStyle to white', () => {
         service.scrabbleBoard.squares[6][6].color = SquareColor.None;
         service.drawSingleSquareColor(6, 6);
-        expect(service.gridContext.fillStyle).toEqual('#000000');
+        expect(service.gridContext.fillStyle).toEqual('#ffffff');
     });
 });
