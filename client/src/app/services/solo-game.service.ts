@@ -43,6 +43,7 @@ export class SoloGameService {
     }
 
     createNewGame() {
+        // Empty board and stack
         this.rackService.scrabbleRack = new ScrabbleRack();
         this.gridService.scrabbleBoard = new ScrabbleBoard();
         this.drawRackLetters();
