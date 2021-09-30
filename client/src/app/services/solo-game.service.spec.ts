@@ -63,7 +63,7 @@ describe('GameService', () => {
         expect(service.randomBonus).toEqual(false);
     });
 
-    it('createNewGame should clear scrabble board ans fill rack', () => {
+    it('createNewGame should clear scrabble board and fill rack', () => {
         service.localPlayer = new LocalPlayer('Ariane');
         const firstLetter: ScrabbleLetter = new ScrabbleLetter('D', 1);
         const secondLetter: ScrabbleLetter = new ScrabbleLetter('e', 2);

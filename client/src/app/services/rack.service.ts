@@ -64,7 +64,7 @@ export class RackService {
     }
 
     removeLetter(scrabbleLetter: ScrabbleLetter) {
-        for (let i = 0; i < MAX_LETTER_COUNT; i++) {
+        for (let i = 0; i < this.scrabbleRack.squares.length; i++) {
             if (this.scrabbleRack.squares[i].letter.character === scrabbleLetter.character) {
                 this.scrabbleRack.squares[i] = new Square(i, 0);
                 break;
@@ -76,7 +76,7 @@ export class RackService {
     }
 
     replaceLetters() {
-        for (let i = 0; i < MAX_LETTER_COUNT - 1; i++) {
+        for (let i = 0; i < this.scrabbleRack.squares.length - 1; i++) {
             if (this.scrabbleRack.squares[i].letter === undefined) {
                 this.scrabbleRack.squares[i].letter = this.scrabbleRack.squares[i + 1].letter;
                 this.scrabbleRack.squares[i + 1] = new Square(i + 1, 0);

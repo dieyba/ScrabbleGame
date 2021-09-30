@@ -6,6 +6,8 @@ const RED_FACTOR = 3;
 
 export class ScrabbleWord {
     content: ScrabbleLetter[]; // Array of ScrabbleLetters continually growing to represent the word
+    value: number;
+
     constructor() {
         this.content = [];
     }
@@ -39,6 +41,7 @@ export class ScrabbleWord {
         if (redBonusCount !== 0) {
             total = total * RED_FACTOR * redBonusCount;
         }
+        this.value = total;
         return total;
     }
 }

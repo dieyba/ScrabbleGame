@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { SquareColor } from '@app/classes/square';
 import { GridService } from '@app/services/grid.service';
 
 describe('GridService', () => {
@@ -89,5 +90,11 @@ describe('GridService', () => {
         service.sizeDownLetters();
         expect(service.currentLetterFont).toEqual('30px system-ui');
         expect(service.currentValueFont).toEqual('11px system-ui');
+    });
+
+    it('drawSingleSquareColor should change fillStyle to white', () => {
+        service.scrabbleBoard.squares[6][6].color = SquareColor.None;
+        service.drawSingleSquareColor(6, 6);
+        expect(service.gridContext.fillStyle).toEqual('#000000');
     });
 });

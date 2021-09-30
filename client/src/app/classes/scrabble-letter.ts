@@ -1,7 +1,7 @@
 import { SquareColor } from './square';
 
-export const DARK_BLUE_FACTOR = 2;
-export const PALE_BLUE_FACTOR = 3;
+export const DARK_BLUE_FACTOR = 3;
+export const PALE_BLUE_FACTOR = 2;
 
 export class ScrabbleLetter {
     character: string; // One word string, depending on which letter it is

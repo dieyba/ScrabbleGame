@@ -22,8 +22,4 @@ export class Square {
         this.position.x = horizontalPosition;
         this.position.y = verticalPosition;
     }
-
-    getColor(): SquareColor {
-        return this.color;
-    }
 }
