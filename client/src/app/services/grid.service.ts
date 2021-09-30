@@ -4,7 +4,7 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { SquareColor } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
 
-enum Colors {
+export enum Colors {
     Teal = '#ACE3EE',
     DarkBlue = '#6AA0E0',
     Pink = '#FFA7C7',
@@ -77,14 +77,14 @@ export class GridService {
 
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
-                const startX = (this.width * i) / BOARD_SIZE + 1 + BOARD_OFFSET;
-                const startY = (this.height * j) / BOARD_SIZE + 1 + BOARD_OFFSET;
-                this.drawSingleSquareColor(i, j, startX, startY);
+                this.drawSingleSquareColor(i, j);
             }
         }
     }
 
-    drawSingleSquareColor(i: number, j: number, startX: number, startY: number) {
+    drawSingleSquareColor(i: number, j: number) {
+        const startX = (this.width * i) / BOARD_SIZE + 1 + BOARD_OFFSET;
+        const startY = (this.height * j) / BOARD_SIZE + 1 + BOARD_OFFSET;
         // If colored square, hide text
         if (this.scrabbleBoard.squares[i][j].color !== SquareColor.None) {
             switch (this.scrabbleBoard.squares[i][j].color) {
@@ -142,7 +142,7 @@ export class GridService {
         const startY = (this.height * j) / BOARD_SIZE + BOARD_OFFSET + 1;
 
         // Draw background
-        this.drawSingleSquareColor(i, j, startX, startY);
+        this.drawSingleSquareColor(i, j);
 
         // Draw letter
         this.gridContext.fillStyle = 'black';
