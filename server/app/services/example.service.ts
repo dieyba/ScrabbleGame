@@ -33,13 +33,6 @@ export class ExampleService {
             });
     }
 
-    // TODO : ceci est à titre d'exemple. À enlever pour la remise
-    storeMessage(message: Message): void {
-        // eslint-disable-next-line no-console
-        console.log(message);
-        this.clientMessages.push(message);
-    }
-
     getAllMessages(): Message[] {
         return this.clientMessages;
     }
