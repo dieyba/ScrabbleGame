@@ -1,11 +1,21 @@
 import { ScrabbleLetter } from './scrabble-letter';
+import { Vec2 } from './vec2';
 import { SquareColor } from './square';
 
 const PINK_FACTOR = 2;
 const RED_FACTOR = 3;
 
+export enum WordOrientation {
+    Horizontal = 0,
+    Vertical = 1,
+}
+
 export class ScrabbleWord {
     content: ScrabbleLetter[]; // Array of ScrabbleLetters continually growing to represent the word
+    value: number;
+    startPosition: Vec2;
+    orientation: WordOrientation;
+
     constructor() {
         this.content = [];
     }
@@ -41,7 +51,7 @@ export class ScrabbleWord {
             total += i.value;
         }
         // Word pink/red bonuses
-        // TODO : Export this into a new service.
+        // TODO : Export the following into a new service.
         total = total * PINK_FACTOR * pinkBonusCount;
         total = total * RED_FACTOR * redBonusCount;
         return total;

@@ -1,9 +1,8 @@
 <div>
     <mat-card class="card">
-        <div class="chat-display" #chatDisplayBox>
-            <div *ngFor="let entry of entries; let isLast = last">
-                <p [ngStyle]="{ color: entry.color }">{{ entry.message }}</p>
-                {{ isLast ? updateScroll(entry) : '' }}
+        <div class="chat-display" id="chat-display-box">
+            <div *ngFor="let entry of entries">
+                <p [ngStyle]="{ color: entry.color }">» {{ entry.message }}</p>
             </div>
         </div>
     </mat-card>

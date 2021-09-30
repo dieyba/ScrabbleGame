@@ -171,7 +171,7 @@ export class VirtualPlayerService {
     return Math.floor(Math.random()*(max-min+1)+min); 
   }
   findPosition(word : ScrabbleWord, axis : Axis) : Vec2{
-    let origin = new ScrabbleLetter; //Convert position
+    let origin = new ScrabbleLetter('', 0); //Convert position
     let index : number;
     for (index = 0; index < word.content.length; index++){
       if(word.content[index].tile.occupied){

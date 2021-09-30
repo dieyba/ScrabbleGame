@@ -43,7 +43,7 @@ export class WordBuilderService {
         }
         let nextLetter = firstLetter.nextLetters[directionOrigin];
         if (nextLetter) {
-            let temp = new ScrabbleLetter();
+            let temp = new ScrabbleLetter('', 0);
             while (nextLetter) {
                 temp = nextLetter;
                 nextLetter = temp.nextLetters[directionOrigin];
