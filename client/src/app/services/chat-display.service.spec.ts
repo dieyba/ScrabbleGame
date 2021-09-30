@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ChatDisplayService } from './chat-display.service';
 
-
 describe('ChatDisplayService', () => {
     let service: ChatDisplayService;
 
@@ -12,10 +11,6 @@ describe('ChatDisplayService', () => {
 
     it('should be created', () => {
         expect(service).toBeTruthy();
-    });
-
-    it('should ', () => {
-        
     });
 
     /*
@@ -31,8 +26,5 @@ describe('ChatDisplayService', () => {
         invertDebugState: is active inverted properly, proper activation message sent, properly call addSys?
 
 
-
     */
-    
-    
 });

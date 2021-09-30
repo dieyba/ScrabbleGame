@@ -14,9 +14,6 @@ export class ExchangeCmd extends Command {
     }
 }
 
-export const createExchangeCmd = function (params: { defaultParams: DefaultCommandParams; specificParams: ExchangeParams }):ExchangeCmd|undefined {
-    if (params) {
-        return new ExchangeCmd(params.defaultParams, params.specificParams);
-    }
-    return undefined;
+export const createExchangeCmd = (params: { defaultParams: DefaultCommandParams; specificParams: ExchangeParams }): ExchangeCmd => {
+    return new ExchangeCmd(params.defaultParams, params.specificParams);
 };

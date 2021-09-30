@@ -8,4 +8,3 @@ export enum ChatEntryColor {
     LocalPlayer = 'blue',
     RemotePlayer = 'red',
 }
-

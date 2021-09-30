@@ -6,8 +6,8 @@ import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { VirtualPlayer } from '@app/classes/virtual-player';
-import { ErrorType } from '../classes/errors';
-import { Vec2 } from '../classes/vec2';
+import { ErrorType } from '@app/classes/errors';
+import { Vec2 } from '@app/classes/vec2';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 
@@ -19,7 +19,6 @@ const MINUTE_IN_SEC = 60;
 @Injectable({
     providedIn: 'root',
 })
-
 export class SoloGameService {
     localPlayer: LocalPlayer;
     virtualPlayer: VirtualPlayer;
@@ -95,34 +94,33 @@ export class SoloGameService {
     }
 
     passTurn() {
-        if(this.localPlayer.isActive){
+        if (this.localPlayer.isActive) {
             this.timerMs = 0;
             this.secondsToMinutes();
             clearInterval(this.intervalValue);
             this.changeActivePlayer();
-                return ErrorType.NoError;
+            return ErrorType.NoError;
         }
         return ErrorType.ImpossibleCommand;
     }
 
-
-    place(position:Vec2, orientation:string, letters:string): ErrorType {
-        if(this.localPlayer.isActive){
-            console.log("Placing letters...");
+    place(position: Vec2, orientation: string, letters: string): ErrorType {
+        if (this.localPlayer.isActive) {
+            console.log('Placing ' + letters); // eslint-disable-line no-console
+            console.log('position:' + position); // eslint-disable-line no-console
+            console.log('orientation: ' + orientation); // eslint-disable-line no-console
             return ErrorType.NoError;
-        }return ErrorType.ImpossibleCommand
+        }
+        return ErrorType.ImpossibleCommand;
     }
 
     exchangeLetters(letters: string): ErrorType {
-        if(this.localPlayer.isActive){
-            console.log('Exchanging these letters:' + letters + " ...");
+        if (this.localPlayer.isActive) {
+            console.log('Exchanging these letters:' + letters + ' ...'); // eslint-disable-line no-console
             return ErrorType.NoError;
         }
         return ErrorType.ImpossibleCommand;
     }
-
-
-
 
     drawRackLetters(): void {
         for (let i = 0; i < DEFAULT_LETTER_COUNT; i++) {

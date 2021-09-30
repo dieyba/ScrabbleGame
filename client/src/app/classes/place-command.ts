@@ -1,6 +1,5 @@
 import { Command, DefaultCommandParams, PlaceParams } from './commands';
 import { ErrorType } from './errors';
-import { ExchangeCmd } from './exchange-command';
 import { Vec2 } from './vec2';
 
 export class PlaceCmd extends Command {
@@ -22,9 +21,6 @@ export class PlaceCmd extends Command {
     }
 }
 
-export const createPlaceCmd = function (params: { defaultParams: DefaultCommandParams; specificParams: PlaceParams }):PlaceCmd|undefined {
-    if (params) {
-        return new PlaceCmd(params.defaultParams, params.specificParams);
-    }
-    return undefined;
+export const createPlaceCmd = (params: { defaultParams: DefaultCommandParams; specificParams: PlaceParams }): PlaceCmd => {
+    return new PlaceCmd(params.defaultParams, params.specificParams);
 };

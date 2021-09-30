@@ -14,9 +14,6 @@ export class DebugCmd extends Command {
     }
 }
 
-export const createDebugCmd = function (params: { defaultParams: DefaultCommandParams; specificParams: DebugParams }):DebugCmd|undefined {
-    if (params) {
-        return new DebugCmd(params.defaultParams, params.specificParams);
-    }
-    return undefined;
+export const createDebugCmd = (params: { defaultParams: DefaultCommandParams; specificParams: DebugParams }): DebugCmd => {
+    return new DebugCmd(params.defaultParams, params.specificParams);
 };
