@@ -1,6 +1,6 @@
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { LetterStock } from '@app/services/letter-stock.service';
-// import SpyObj = jasmine.SpyObj;
+//import SpyObj = jasmine.SpyObj;
 
 export const NUMBER_OF_LETTERS = 102;
 // const VALUE_LETTER_0 = 0;
@@ -21,23 +21,20 @@ const OCCURENCE_NUMBER_5 = 5;
 // const OCCURENCE_NUMBER_15 = 15;
 
 describe('LetterStock', () => {
-  // CE TEST NE FONCTIONNE PAS ENCORE
-  // it('should call isEmpty and randomNumber when takeLettersFromStock is called', () => {
-  //   let spyStock: SpyObj<LetterStock> = jasmine.createSpyObj('LetterStock', ['takeLettersFromStock', 'randomNumber', 'isEmpty']);
-  //   //let stock: LetterStock = new LetterStock();
-
-  //   spyStock.takeLettersFromStock(4);
-
-  //   expect(spyStock.isEmpty).toHaveBeenCalled();
-  //   //expect(spyStock.randomNumber).toHaveBeenCalled();
-  // });
-
   it('should create an instance', () => {
     expect(new LetterStock()).toBeTruthy();
   });
 
   it('should create an instance with 102 letters', () => {
     expect(new LetterStock().letterStock.length).toEqual(NUMBER_OF_LETTERS);
+  });
+
+  it('should call isEmpty when takeLettersFromStock is called', () => {
+    let stock: LetterStock = new LetterStock();
+    const spy = spyOn(stock, 'isEmpty').and.stub();
+    stock.takeLettersFromStock(NUMBER_OF_LETTERS);
+
+    expect(spy).toHaveBeenCalled();
   });
 
   it('should remove the right number of letter in the stock', () => {
@@ -57,7 +54,6 @@ describe('LetterStock', () => {
     expect(stock.isEmpty()).toBeFalse();
 
     stock.takeLettersFromStock(NUMBER_OF_LETTERS);
-    // stock.letterStock = [];
     expect(stock.isEmpty()).toBeTrue();
   });
 
@@ -68,5 +64,25 @@ describe('LetterStock', () => {
     const remainingLetters: ScrabbleLetter[] = stock.takeLettersFromStock(OCCURENCE_NUMBER_5);
 
     expect(remainingLetters.length).toEqual(2);
+  });
+
+  it('should call takeLettersFromStock when exchangeLetters is called', () => {
+    let stock: LetterStock = new LetterStock();
+    let lettersToChange: ScrabbleLetter[] = [new ScrabbleLetter('a', 1), new ScrabbleLetter('j', 10)];
+
+    const spy = spyOn(stock, 'takeLettersFromStock').and.stub();
+    stock.exchangeLetters(lettersToChange);
+
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('', () => {
+    let stock: LetterStock = new LetterStock();
+    stock.letterStock = [];
+    let lettersToExchangeWithStock: ScrabbleLetter[] = [new ScrabbleLetter('a', 1)];
+    let lettersFromStock: ScrabbleLetter[] = [new ScrabbleLetter('z', 10)];
+    stock.addLettersToStock(lettersFromStock[0], 1);
+
+    expect(stock.exchangeLetters(lettersToExchangeWithStock)).toEqual(lettersFromStock);
   });
 });

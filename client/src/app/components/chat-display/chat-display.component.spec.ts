@@ -7,7 +7,7 @@ describe('ChatDisplayComponent', () => {
     let fixture: ComponentFixture<ChatDisplayComponent>;
 
     const systemEntry: ChatDisplayEntry = { authorType: AuthorType.System, color: ChatEntryColor.SystemColor, message: 'error message' };
-    const playerEntry: ChatDisplayEntry = { authorType: AuthorType.Player, color: ChatEntryColor.PlayerColor, message: 'player message' };
+    const playerEntry: ChatDisplayEntry = { authorType: AuthorType.LocalPlayer, color: ChatEntryColor.LocalPlayer, message: 'player message' };
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({

@@ -48,7 +48,7 @@ export class RackService {
     }
 
     drawLetter(scrabbleLetter: ScrabbleLetter): void {
-        
+
         for (let i = 0; i < MAX_LETTER_COUNT; i++) {
             if (!this.scrabbleRack.squares[i].occupied) {
                 this.scrabbleRack.squares[i].letter = scrabbleLetter;
@@ -69,4 +69,28 @@ export class RackService {
             }
         }
     }
+
+    // removeLetter(scrabbleLetter: ScrabbleLetter) {
+    //     for (let i = 0; i < MAX_LETTER_COUNT; i++) {
+    //         if (this.scrabbleRack.squares[i].letter.character === scrabbleLetter.character) {
+    //             this.scrabbleRack.squares[i] = new Square(i, 0);
+    //             break;
+    //         }
+    //     }
+    //     this.gridContext.clearRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
+    //     this.drawRack();
+    //     this.replaceLetters();
+    // }
+
+    // replaceLetters() {
+    //     for (let i = 0; i < MAX_LETTER_COUNT - 1; i++) {
+    //         if (this.scrabbleRack.squares[i].letter === undefined) {
+    //             this.scrabbleRack.squares[i].letter = this.scrabbleRack.squares[i + 1].letter;
+    //             this.scrabbleRack.squares[i + 1] = new Square(i + 1, 0);
+    //         }
+    //         this.scrabbleRack.squares[i].occupied = false;
+    //         this.drawLetter(this.scrabbleRack.squares[i].letter);
+    //     }
+    // }
+
 }
