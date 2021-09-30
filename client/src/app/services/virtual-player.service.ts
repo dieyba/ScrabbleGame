@@ -109,29 +109,35 @@ export class VirtualPlayerService {
           }
         }
       }
-
     }
     return list; //list contains movesFound elements
   }
-  makeMoves() : number{
+  makeMoves() : ScrabbleWord{
+    let startAxis = Axis.V;
+    if(this.getRandomIntInclusive(0,1) == 1){ //coinflip to determine starting axis
+      startAxis = Axis.H;
+    }
     let currentMove = this.getRandomIntInclusive(1, 100);
+    let movesList = [];
     if(currentMove <= 40){
       //40% chance to go for moves that earn 6 points or less
-      this.possibleMoves(6, Axis.V);
+      movesList = this.possibleMoves(6, startAxis);
     } else if(currentMove <= 70){
       //30% chance to go for moves that score 7-12 points
-      this.possibleMoves(12, Axis.V);
+      movesList = this.possibleMoves(12, startAxis);
     } else{
       //30% chance to go for moves that score 13-18 points
-      this.possibleMoves(18, Axis.V);
+      movesList = this.possibleMoves(18, startAxis);
     }
-    return 0;
+    return movesList[this.getRandomIntInclusive(0, movesList.length-1)]; //randomize move to make
   }
   //Displays a message based on an array of moves.
   displayMoves(moves : ScrabbleWord[]) : string{
     let message = "";
-    if (moves.length == 0){
-      message = "Le placement joué est le seul valide pour la plage de points sélectionnée par le joueur virtuel.";
+    if(moves.length == 0){
+      message = "Il n'y a aucun placement valide pour la plage de points et la longueur de mot sélectionnées par le joueur virtuel."
+    } else if (moves.length == 1){
+      message = "Le placement joué est le seul valide pour la plage de points et la lo sélectionnée par le joueur virtuel.";
     }
     else for(let i = 0; i < moves.length; i++){
       for(let j = 0; j < moves[i].content.length; j++){
