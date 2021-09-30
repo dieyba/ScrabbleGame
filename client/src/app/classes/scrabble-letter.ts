@@ -1,7 +1,7 @@
 import { SquareColor } from './square';
 
-export const DARK_BLUE_FACTOR = 2;
-export const PALE_BLUE_FACTOR = 3;
+export const DARK_BLUE_FACTOR = 3;
+export const PALE_BLUE_FACTOR = 2;
 
 export class ScrabbleLetter {
     character: string; // One word string, depending on which letter it is
@@ -10,7 +10,7 @@ export class ScrabbleLetter {
     color: SquareColor;
 
     constructor(letter: string, value: number) {
-        this.character = letter;
+        this.setLetter(letter);
         this.value = value;
         this.nextLetters = [];
         this.color = SquareColor.None;
@@ -20,5 +20,9 @@ export class ScrabbleLetter {
     }
     darkBlueBonus(): void {
         this.value = DARK_BLUE_FACTOR * this.value;
+    }
+    setLetter(character: string): void {
+        this.character = character;
+        this.character = this.character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 }
