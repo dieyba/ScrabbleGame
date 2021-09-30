@@ -1,9 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
 import { GridService } from '@app/services/grid.service';
 import { SoloGameService } from '@app/services/solo-game.service';
 
+/* eslint-disable  @typescript-eslint/no-unused-expressions */
+/* eslint-disable  no-unused-expressions */
 describe('PlayAreaComponent', () => {
     let component: PlayAreaComponent;
     let fixture: ComponentFixture<PlayAreaComponent>;
@@ -11,8 +14,14 @@ describe('PlayAreaComponent', () => {
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
 
     beforeEach(async () => {
-        gridServiceSpy = jasmine.createSpyObj('GridService', ['sizeUpLetters', 'sizeDownLetters', 'drawGrid', 'drawColors']);
-        soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['localPlayer', 'virtualPlayer']);
+        gridServiceSpy = jasmine.createSpyObj('GridService', ['sizeUpLetters', 'sizeDownLetters', 'drawGrid', 'drawColors', 'drawLetter']);
+        soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', [
+            'localPlayer',
+            'virtualPlayer',
+            'createNewGame',
+            'passTurn',
+            'changeActivePlayer',
+        ]);
         await TestBed.configureTestingModule({
             declarations: [PlayAreaComponent],
             providers: [
@@ -21,6 +30,7 @@ describe('PlayAreaComponent', () => {
             ],
         }).compileComponents();
 
+        gridServiceSpy.scrabbleBoard = new ScrabbleBoard();
         const letter: ScrabbleLetter = new ScrabbleLetter('a', 1);
         soloGameServiceSpy.localPlayer = {
             name: 'Ariane',

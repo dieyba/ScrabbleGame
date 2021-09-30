@@ -4,6 +4,7 @@ import { ScrabbleLetter } from './scrabble-letter';
 
 export const NUMBER_OF_LETTERS = 102;
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('LetterStock', () => {
     // CE TEST NE FONCTIONNE PAS ENCORE
     // it('should call isEmpty and randomNumber when takeLettersFromStock is called', () => {
@@ -26,7 +27,6 @@ describe('LetterStock', () => {
 
     it('should decrease the size of the tab', () => {
         const stock: LetterStock = new LetterStock();
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         stock.resize(4);
         expect(stock.letterStock.length).toBeLessThan(NUMBER_OF_LETTERS);
     });
@@ -47,9 +47,7 @@ describe('LetterStock', () => {
 
     it('should add the right number of letter in the stock', () => {
         const stock: LetterStock = new LetterStock();
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         stock.addLettersToStock(new ScrabbleLetter('z', 10), 4);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(stock.letterStock.length).toEqual(NUMBER_OF_LETTERS + 4);
     });
 
@@ -65,7 +63,6 @@ describe('LetterStock', () => {
     it('takeLettersFromStock should stop if there is no more letters', () => {
         const stock: LetterStock = new LetterStock();
         stock.takeLettersFromStock(NUMBER_OF_LETTERS - 2);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const remainingLetters: ScrabbleLetter[] = stock.takeLettersFromStock(5);
 
         expect(remainingLetters.length).toEqual(2);

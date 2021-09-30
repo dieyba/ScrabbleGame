@@ -6,6 +6,7 @@ import { SquareColor } from '@app/classes/square';
 import { BonusService } from './bonus.service';
 import { GridService } from './grid.service';
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('BonusService', () => {
     let service: BonusService;
     let gridServiceSpy: jasmine.SpyObj<GridService>;
@@ -35,7 +36,6 @@ describe('BonusService', () => {
         word.orientation = WordOrientation.Horizontal;
         word.content = [letter1, letter2, letter3, letter4];
         service.totalValue(word);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(word.value).toEqual(15);
     });
 
@@ -50,8 +50,7 @@ describe('BonusService', () => {
         word.startPosition = { x: 0, y: 0 };
         word.orientation = WordOrientation.Vertical;
         word.content = [letter1, letter2, letter3, letter4];
-        service.totalValue(word);        
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        service.totalValue(word);
         expect(word.value).toEqual(15);
     });
 
@@ -65,7 +64,6 @@ describe('BonusService', () => {
         word.orientation = WordOrientation.Vertical;
         word.content = [letter1, letter2, letter3];
         service.totalValue(word);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(word.value).toEqual(5);
     });
 
@@ -79,7 +77,6 @@ describe('BonusService', () => {
         word.orientation = WordOrientation.Horizontal;
         word.content = [letter1, letter2, letter3];
         service.totalValue(word);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(word.value).toEqual(5);
     });
 
@@ -93,7 +90,6 @@ describe('BonusService', () => {
         word.orientation = WordOrientation.Vertical;
         word.content = [letter1, letter2, letter3];
         service.totalValue(word);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(word.value).toEqual(6);
     });
 
@@ -107,7 +103,6 @@ describe('BonusService', () => {
         word.orientation = WordOrientation.Horizontal;
         word.content = [letter1, letter2, letter3];
         service.totalValue(word);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(word.value).toEqual(6);
     });
 
@@ -122,7 +117,6 @@ describe('BonusService', () => {
         word.content = [letter1, letter2, letter3];
         gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed = true;
         service.totalValue(word);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(word.value).toEqual(3);
     });
 
@@ -137,7 +131,6 @@ describe('BonusService', () => {
         word.content = [letter1, letter2, letter3];
         gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed = true;
         service.totalValue(word);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(word.value).toEqual(3);
     });
 });
