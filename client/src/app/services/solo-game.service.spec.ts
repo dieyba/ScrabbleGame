@@ -10,6 +10,8 @@ import { SoloGameService } from './solo-game.service';
 const DEFAULT_WIDTH = 600;
 const DEFAULT_HEIGHT = 600;
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('GameService', () => {
     let service: SoloGameService;
     let changeActivePlayerSpy: jasmine.Spy<any>;
@@ -43,25 +45,14 @@ describe('GameService', () => {
         const bonus = new FormControl(false);
         const dictionaryForm = new FormControl('0', [Validators.required]);
         const opponent = new FormControl('Sara');
-        const myForm = new FormGroup({
-            name: name,
-            timer: timer,
-            bonus: bonus,
-            dictionaryForm: dictionaryForm,
-            level: level,
-            opponent: opponent,
-        });
+        const myForm = new FormGroup({ name, timer, bonus, dictionaryForm, level, opponent });
         service.initializeGame(myForm);
         expect(service.localPlayer.name).toEqual('Ariane');
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(service.localPlayer.letters.length).toEqual(7);
         expect(service.localPlayer.isActive).toEqual(true);
         expect(service.virtualPlayer.name).toEqual('Sara');
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(service.virtualPlayer.letters.length).toEqual(7);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(service.totalCountDown).toEqual(60);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(service.timerMs).toEqual(60);
         expect(service.dictionary.title).toEqual('Mon dictionnaire');
         expect(service.randomBonus).toEqual(false);

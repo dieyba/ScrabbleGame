@@ -1,6 +1,9 @@
 {
     "root": true,
     "extends": ["../.eslintrc.json"],
+    "globals": {
+        "NodeJS": true
+    },
     "overrides": [
         {
             "files": ["*.ts"],
