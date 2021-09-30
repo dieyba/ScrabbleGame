@@ -135,17 +135,19 @@ export class SoloGameService {
 
                 for (let i: number = 0; i < letters.length; i++) {
                     lettersToRemove[i] = new ScrabbleLetter(letters[i], 1);
+                    // c est la que j ai ajouté la fonction remove
+                    this.rackService.removeLetter(lettersToRemove[i]);
                 }
 
                 let lettersToAdd: ScrabbleLetter[] = this.stock.exchangeLetters(lettersToRemove);
                 for (let i: number = 0; i < lettersToAdd.length; i++) {
                     this.localPlayer.addLetter(lettersToAdd[i]);
                     this.rackService.drawLetter(lettersToAdd[i]);
-                    console.log("letters to add :", lettersToAdd);
                 }
+                console.log("letters to add :", lettersToAdd);
+                console.log("LETTERS TO REMOVE : ", lettersToRemove);
                 return ErrorType.NoError;
             }
-            console.log("LETTERS TO REMOVE : ", lettersToRemove);
         }
         return ErrorType.ImpossibleCommand;
     }
