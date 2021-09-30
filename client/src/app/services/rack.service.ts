@@ -15,7 +15,7 @@ const DOUBLE_DIGIT = 10;
 export class RackService {
     scrabbleRack: ScrabbleRack;
     gridContext: CanvasRenderingContext2D;
-    squareWidth = RACK_WIDTH / 7;
+    squareWidth = RACK_WIDTH / MAX_LETTER_COUNT;
     squareHeight = RACK_WIDTH;
 
     constructor() {

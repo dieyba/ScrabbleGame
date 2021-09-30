@@ -53,11 +53,15 @@ describe('GameService', () => {
         });
         service.initializeGame(myForm);
         expect(service.localPlayer.name).toEqual('Ariane');
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(service.localPlayer.letters.length).toEqual(7);
         expect(service.localPlayer.isActive).toEqual(true);
         expect(service.virtualPlayer.name).toEqual('Sara');
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(service.virtualPlayer.letters.length).toEqual(7);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(service.totalCountDown).toEqual(60);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(service.timerMs).toEqual(60);
         expect(service.dictionary.title).toEqual('Mon dictionnaire');
         expect(service.randomBonus).toEqual(false);

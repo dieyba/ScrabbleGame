@@ -15,7 +15,10 @@ describe('PlayAreaComponent', () => {
         soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['localPlayer', 'virtualPlayer']);
         await TestBed.configureTestingModule({
             declarations: [PlayAreaComponent],
-            providers: [{ provide: GridService, useValue: gridServiceSpy }, { provide: SoloGameService, useValue: soloGameServiceSpy }]
+            providers: [
+                { provide: GridService, useValue: gridServiceSpy },
+                { provide: SoloGameService, useValue: soloGameServiceSpy },
+            ],
         }).compileComponents();
 
         const letter: ScrabbleLetter = new ScrabbleLetter('a', 1);
@@ -38,24 +41,24 @@ describe('PlayAreaComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it ('ngAfterViewInit should call drawGrid and drawColors', () => {
+    it('ngAfterViewInit should call drawGrid and drawColors', () => {
         component.ngAfterViewInit();
         expect(soloGameServiceSpy.createNewGame).toHaveBeenCalled;
         expect(gridServiceSpy.drawGrid).toHaveBeenCalled;
         expect(gridServiceSpy.drawColors).toHaveBeenCalled;
     });
 
-    it ('sizeUpLetters should call gridservices sizeUpLetters', () => {
+    it('sizeUpLetters should call gridservices sizeUpLetters', () => {
         component.sizeUpLetters();
         expect(gridServiceSpy.sizeUpLetters).toHaveBeenCalled;
     });
 
-    it ('sizeDownLetters should call gridservices sizeDownLetters', () => {
+    it('sizeDownLetters should call gridservices sizeDownLetters', () => {
         component.sizeDownLetters();
         expect(gridServiceSpy.sizeDownLetters).toHaveBeenCalled;
     });
 
-    it ('passTurn should call soloGameservices passTurn', () => {
+    it('passTurn should call soloGameservices passTurn', () => {
         component.passTurn();
         expect(soloGameServiceSpy.passTurn).toHaveBeenCalled;
     });

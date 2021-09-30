@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { SquareColor } from '@app/classes/square';
-import { Colors, GridService } from '@app/services/grid.service';
+import { GridService } from '@app/services/grid.service';
 
 describe('GridService', () => {
     let service: GridService;
@@ -31,6 +31,7 @@ describe('GridService', () => {
     });
 
     it(' drawGrid should call moveTo and lineTo 32 times', () => {
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const expectedCallTimes = 32;
         const moveToSpy = spyOn(service.gridContext, 'moveTo').and.callThrough();
         const lineToSpy = spyOn(service.gridContext, 'lineTo').and.callThrough();
@@ -52,21 +53,26 @@ describe('GridService', () => {
 
     it('drawLetter should call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        let letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        const letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         service.drawLetter(letter, 5, 6);
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
     it('drawLetter should handle double digits', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        let letter: ScrabbleLetter = new ScrabbleLetter('D', 11);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const letter: ScrabbleLetter = new ScrabbleLetter('D', 11);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         service.drawLetter(letter, 5, 6);
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
     it('drawLetters should handle double digits', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        let letter: ScrabbleLetter = new ScrabbleLetter('D', 11);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const letter: ScrabbleLetter = new ScrabbleLetter('D', 11);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         service.scrabbleBoard.squares[5][6].letter = letter;
         service.drawLetters();
         expect(fillTextSpy).toHaveBeenCalled();
@@ -74,7 +80,8 @@ describe('GridService', () => {
 
     it('drawLetters should call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        let letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        const letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         service.scrabbleBoard.squares[5][6].letter = letter;
         service.drawLetters();
         expect(fillTextSpy).toHaveBeenCalled();
@@ -93,33 +100,10 @@ describe('GridService', () => {
     });
 
     it('drawSingleSquareColor should change fillStyle to white', () => {
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         service.scrabbleBoard.squares[6][6].color = SquareColor.None;
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         service.drawSingleSquareColor(6, 6);
         expect(service.gridContext.fillStyle).toEqual('#ffffff');
-    });
-
-    it('removeSquare should change fillStyle to right color', () => {
-        service.scrabbleBoard.squares[0][3].color = SquareColor.Teal;
-        service.removeSquare(0, 3);
-        expect(service.gridContext.fillStyle).toEqual(Colors.Teal);
-    });
-
-    it('removeSquare should change fillStyle to right color', () => {
-        service.scrabbleBoard.squares[5][5].color = SquareColor.DarkBlue;
-        service.removeSquare(5, 5);
-        expect(service.gridContext.fillStyle).toEqual(Colors.DarkBlue);
-    });
-
-    it('removeSquare should change fillStyle to right color', () => {
-        service.scrabbleBoard.squares[0][3].color = SquareColor.Pink;
-        service.scrabbleBoard.squares[0][3].occupied = true;
-        service.removeSquare(0, 3);
-        expect(service.gridContext.fillStyle).toEqual(Colors.Pink);
-    });
-
-    it('removeSquare should change fillStyle to right color', () => {
-        service.scrabbleBoard.squares[0][3].color = SquareColor.Red;
-        service.removeSquare(0, 3);
-        expect(service.gridContext.fillStyle).toEqual(Colors.Red);
     });
 });

@@ -82,7 +82,7 @@ export class GridService {
     }
 
     removeSquare(i: number, j: number) {
-        let color = this.scrabbleBoard.squares[i][j].color;
+        const color = this.scrabbleBoard.squares[i][j].color;
         this.scrabbleBoard.squares[i][j] = new Square(i, j);
         this.scrabbleBoard.squares[i][j].color = color;
         this.drawSingleSquareColor(i, j);

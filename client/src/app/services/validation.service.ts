@@ -10,6 +10,7 @@ import { SoloGameService } from './solo-game.service';
 
 const BONUS_LETTER_COUNT = 7;
 const BONUS_POINTS = 50;
+const WAIT_TIME = 3000;
 
 @Injectable({
     providedIn: 'root',
@@ -18,37 +19,42 @@ export class ValidationService {
     dictionary: Dictionary;
     words: string[];
 
-    constructor(private readonly gridService: GridService, private bonusService: BonusService, private rackService: RackService, private soloGameService: SoloGameService) {
+    constructor(
+        private readonly gridService: GridService,
+        private bonusService: BonusService,
+        private rackService: RackService,
+        private soloGameService: SoloGameService,
+    ) {
         this.dictionary = new Dictionary(DictionaryType.Default);
         this.words = [];
     }
 
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
-        let wordsValue = this.validateWordsAndCalculateScore(newWords);
+        const wordsValue = this.validateWordsAndCalculateScore(newWords);
         player.score += wordsValue;
         // Retirer lettres du board
-        for (let i = 0; i < newWords.length; i++) {
-            for (let j = 0; j < newWords[i].content.length; j++) {
+        newWords.forEach((newWord) => {
+            for (let j = 0; j < newWord.content.length; j++) {
                 if (wordsValue === 0) {
                     setTimeout(() => {
-                        if (newWords[i].orientation === WordOrientation.Vertical) {
-                            this.gridService.removeSquare(newWords[i].startPosition.x, newWords[i].startPosition.y + j);
+                        if (newWord.orientation === WordOrientation.Vertical) {
+                            this.gridService.removeSquare(newWord.startPosition.x, newWord.startPosition.y + j);
                         }
-                        if (newWords[i].orientation === WordOrientation.Horizontal) {
-                            this.gridService.removeSquare(newWords[i].startPosition.x + j, newWords[i].startPosition.y);
+                        if (newWord.orientation === WordOrientation.Horizontal) {
+                            this.gridService.removeSquare(newWord.startPosition.x + j, newWord.startPosition.y);
                         }
-                        this.rackService.drawLetter(newWords[i].content[j]);
-                    }, 3000);
+                        this.rackService.drawLetter(newWord.content[j]);
+                    }, WAIT_TIME);
                 } else {
-                    if (newWords[i].orientation === WordOrientation.Vertical) {
-                        this.gridService.scrabbleBoard.squares[newWords[i].startPosition.x][newWords[i].startPosition.y + j].isValidated = true;
+                    if (newWord.orientation === WordOrientation.Vertical) {
+                        this.gridService.scrabbleBoard.squares[newWord.startPosition.x][newWord.startPosition.y + j].isValidated = true;
                     }
-                    if (newWords[i].orientation === WordOrientation.Horizontal) {
-                        this.gridService.scrabbleBoard.squares[newWords[i].startPosition.x + j][newWords[i].startPosition.y].isValidated = true;
+                    if (newWord.orientation === WordOrientation.Horizontal) {
+                        this.gridService.scrabbleBoard.squares[newWord.startPosition.x + j][newWord.startPosition.y].isValidated = true;
                     }
                 }
             }
-        }
+        });
         this.soloGameService.changeActivePlayer();
     }
 

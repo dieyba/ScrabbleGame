@@ -75,7 +75,7 @@ export class SoloGameService {
     }
 
     changeActivePlayer() {
-        let isLocalPlayerActive = this.localPlayer.isActive;
+        const isLocalPlayerActive = this.localPlayer.isActive;
         if (isLocalPlayerActive) {
             this.localPlayer.isActive = false;
             this.virtualPlayer.isActive = true;
@@ -99,7 +99,7 @@ export class SoloGameService {
     }
 
     drawRackLetters(): void {
-        for (let i: number = 0; i < DEFAULT_LETTER_COUNT; i++) {
+        for (let i = 0; i < DEFAULT_LETTER_COUNT; i++) {
             this.rackService.drawLetter(this.localPlayer.letters[i]);
         }
     }

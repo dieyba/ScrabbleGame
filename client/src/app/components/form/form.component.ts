@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -9,7 +9,7 @@ import { SoloGameService } from '@app/services/solo-game.service';
     templateUrl: './form.component.html',
     styleUrls: ['./form.component.scss'],
 })
-export class FormComponent {
+export class FormComponent implements OnInit {
     myForm: FormGroup;
     name: FormControl;
     timer: FormControl;
@@ -59,21 +59,22 @@ export class FormComponent {
     }
 
     randomNumber(minimum: number, maximum: number): number {
-        let randomFloat = Math.random() * (maximum - minimum);
+        const randomFloat = Math.random() * (maximum - minimum);
         return Math.floor(randomFloat) + minimum;
     }
 
     randomPlayer(list: string[]): void {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         document.getElementById('opponents')!.style.visibility = 'visible';
         this.random = this.randomNumber(0, list.length);
         this.selectedPlayer = list[this.random];
-        this.myForm.controls['opponent'].setValue(this.selectedPlayer);
+        this.myForm.controls.opponent.setValue(this.selectedPlayer);
     }
 
     changeName(list: string[]): void {
-        if (this.name.value == this.selectedPlayer) {
+        if (this.name.value === this.selectedPlayer) {
             this.randomPlayer(list);
-            this.myForm.controls['opponent'].setValue(this.selectedPlayer);
+            this.myForm.controls.opponent.setValue(this.selectedPlayer);
         }
     }
 
@@ -83,7 +84,7 @@ export class FormComponent {
             this.router.navigate(['/game']);
             this.soloGameService.initializeGame(this.myForm);
         } else {
-            //fait rien
+            // fait rien
         }
     }
 }

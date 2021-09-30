@@ -15,8 +15,8 @@ import { FormComponent } from './form.component';
 describe('FormComponent', () => {
     let component: FormComponent;
     let fixture: ComponentFixture<FormComponent>;
-    let list: string[] = ['dieyna', 'kevin', 'ariane'];
-    let dialog: jasmine.SpyObj<MatDialogRef<FormComponent>> = jasmine.createSpyObj('dialog', ['close']);
+    const list: string[] = ['dieyna', 'kevin', 'ariane'];
+    const dialog: jasmine.SpyObj<MatDialogRef<FormComponent>> = jasmine.createSpyObj('dialog', ['close']);
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [FormComponent],
@@ -49,7 +49,7 @@ describe('FormComponent', () => {
     });
     it('should call close() ', () => {
         component.closeDialog();
-        expect(dialog.close()).toHaveBeenCalled;
+        expect(dialog.close).toHaveBeenCalled;
     });
     it('should call randomPlayer() ', () => {
         component.selectedPlayer = 'dieyna';
@@ -86,10 +86,10 @@ describe('FormComponent', () => {
 
     it('form valid when submit', () => {
         const spy = spyOn(component, 'closeDialog');
-        component.myForm.controls['name'].setValue('dieyna');
-        component.myForm.controls['timer'].setValue('1:00');
-        component.myForm.controls['level'].setValue('easy');
-        component.myForm.controls['dictionnary1'].setValue('Francais');
+        component.myForm.controls.name.setValue('dieyna');
+        component.myForm.controls.timer.setValue('1:00');
+        component.myForm.controls.level.setValue('easy');
+        component.myForm.controls.dictionnary1.setValue('Francais');
         component.submit();
         expect(component.myForm.valid).toBeTrue();
         expect(spy).toHaveBeenCalled();

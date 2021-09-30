@@ -60,6 +60,7 @@ export class ScrabbleBoard {
                 this.generateRedSquares(i, j);
                 this.generateDarkBlueSquares(i, j);
                 this.generateTealSquares(i, j);
+                this.generateTealSquaresArrows(i, j);
             }
         }
     }
@@ -104,6 +105,9 @@ export class ScrabbleBoard {
         if ((j === Row.A || j === Row.O) && (i === Column.Four || i === Column.Twelve)) {
             this.squares[i][j].color = SquareColor.Teal;
         }
+    }
+
+    generateTealSquaresArrows(i: number, j: number) {
         if ((i === Column.Seven || i === Column.Nine) && (j === Row.C || j === Row.M)) {
             this.squares[i][j].color = SquareColor.Teal;
         }
