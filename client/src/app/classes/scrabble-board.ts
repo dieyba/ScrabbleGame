@@ -1,4 +1,5 @@
 import { Square, SquareColor } from './square';
+import { Vec2 } from './vec2';
 
 const BOARD_SIZE = 15;
 
@@ -120,23 +121,139 @@ export class ScrabbleBoard {
         }
     }
 
-    isWordInsideBoard(word: string, i: number, j: number, orientation: string): boolean {
-        // Verifying if coordinates are good
-        if (Column.One < i && i < Column.Fifteen) {
-            return false;
-        }
-        if (Row.A < j && j < Row.O) {
-            return false;
-        }
+    isCoordInsideBoard(coord: Vec2): boolean {
+        const isValidColumn = coord.x >= Column.One && coord.x <= Column.Fifteen;
+        const isValidRow = coord.y >= Row.A && coord.y <= Row.O;
+        return isValidColumn && isValidRow;
+    }
 
-        // Verifying if word is too long to stay inside board
-        if (orientation === 'h' && i + word.length > Row.Length) {
+    isWordInsideBoard(word: string, coord: Vec2, orientation: string): boolean {
+        // Verifying if coordinates are good
+        if (!this.isCoordInsideBoard(coord)) {
             return false;
         }
-        if (orientation === 'v' && j + word.length > Column.Length) {
+        // Verifying if word is too long to stay inside board
+        if (orientation === 'h' && coord.x + word.length > Row.Length) {
+            return false;
+        }
+        if (orientation === 'v' && coord.y + word.length > Column.Length) {
             return false;
         }
 
         return true;
+    }
+
+    isWordPassingInCenter(word: string, coord: Vec2, orientation: string): boolean {
+        // Checking if word passing middle vertically
+        const isWordInMiddleColumn = coord.x === Column.Eight && orientation === 'v';
+        const isVerticalWordOnCenter = coord.y < Row.I && coord.y + word.length - 1 >= Row.H;
+        if (isWordInMiddleColumn) {
+            if (isVerticalWordOnCenter) {
+                return true;
+            }
+        }
+
+        // Checking if word passing middle horizontally
+        const isWordInMiddleRow = coord.y === Row.H && orientation === 'h';
+        const isHorizontalWordOnCenter = coord.x < Column.Nine && coord.x + word.length - 1 >= Column.Eight;
+        if (isWordInMiddleRow) {
+            if (isHorizontalWordOnCenter) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // TODO add documentation?
+    isWordPartOfAnotherWord(word: string, coord: Vec2, orientation: string): boolean {
+        let result = false;
+        const isVertical = orientation === 'v';
+
+        // For each letter in "word", verifies if a Scrabble letter is already place and if it's the same letter
+        for (let i = 0; i < word.length; i++) {
+            const tempCoord = new Vec2();
+            tempCoord.x = coord.x;
+            tempCoord.y = coord.y;
+            if (isVertical) {
+                tempCoord.y += i;
+            } else {
+                tempCoord.x += i;
+            }
+
+            if (this.squares[tempCoord.x][tempCoord.y].occupied) {
+                // Checking if the letter corresponds with the string's character
+                if (this.squares[tempCoord.x][tempCoord.y].letter.character === word[i]) {
+                    result = true;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    isWordTouchingOtherWord(word: string, coord: Vec2, orientation: string): boolean {
+        // Checking if touching word before or after
+        const coordBeforeWord = new Vec2();
+        const coordAfterWord = new Vec2();
+
+        if (orientation === 'v') {
+            coordBeforeWord.x = coordAfterWord.x = coord.x;
+            coordBeforeWord.y = coord.y - 1;
+            coordAfterWord.y = coord.y + word.length;
+        } else {
+            coordBeforeWord.y = coordAfterWord.y = coord.y;
+            coordBeforeWord.x = coord.x - 1;
+            coordAfterWord.x = coord.y + word.length;
+        }
+
+        if (this.isCoordInsideBoard(coordBeforeWord)) {
+            if (this.squares[coordBeforeWord.x][coordBeforeWord.y].occupied) {
+                return true;
+            }
+        }
+        if (this.isCoordInsideBoard(coordBeforeWord)) {
+            if (this.squares[coordAfterWord.x][coordAfterWord.y].occupied) {
+                return true;
+            }
+        }
+
+        // TODO optimize checking word lengthwise
+        // Checking if touching word lengthwise (down if horizontal, right if vertical)
+        const tempCoord = new Vec2();
+        for (let i = 0; i < word.length; i++) {
+            if (orientation === 'v') {
+                tempCoord.x = coord.x + 1;
+                tempCoord.y = coord.y + i;
+            } else {
+                tempCoord.y = coord.y + 1;
+                tempCoord.x = coord.x + i;
+            }
+            if (this.squares[tempCoord.x][tempCoord.y] === undefined) {
+                continue;
+            } else if (this.squares[tempCoord.x][tempCoord.y].occupied) {
+                return true;
+            }
+        }
+
+        // Checking if touching word lengthwise (up if horizontal, left if vertical)
+        for (let i = 0; i < word.length; i++) {
+            if (orientation === 'v') {
+                tempCoord.x = coord.x - 1;
+                tempCoord.y = coord.y + i;
+            } else {
+                tempCoord.y = coord.y - 1;
+                tempCoord.x = coord.x + i;
+            }
+            if (this.squares[tempCoord.x][tempCoord.y] === undefined) {
+                continue;
+            } else if (this.squares[tempCoord.x][tempCoord.y].occupied) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
