@@ -23,7 +23,7 @@ export class Dictionary {
     }
 
     initializeDictionary(dict: Dictionary) {
-        let currentDictionary = dict;
+        const currentDictionary = dict;
         this.title = currentDictionary.title;
         this.description = currentDictionary.description;
         this.words = currentDictionary.words;

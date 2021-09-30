@@ -10,7 +10,7 @@ describe('ValidationService', () => {
     let convertScrabbleWordToStringSpy: jasmine.SpyObj<any>;
 
     beforeEach(() => {
-        TestBed.configureTestingModule({ });
+        TestBed.configureTestingModule({});
         service = TestBed.inject(ValidationService);
 
         isWordValidSpy = spyOn<any>(service, 'isWordValid').and.callThrough();
@@ -33,39 +33,41 @@ describe('ValidationService', () => {
     });
 
     it('convertScrabbleWordToString should return a string of the scrabble word', () => {
-        let letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
-        let letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
-        let letter3: ScrabbleLetter = new ScrabbleLetter('j', 4);
-        let letter4: ScrabbleLetter = new ScrabbleLetter('à', 3);
-        let word: ScrabbleLetter[] = [letter1, letter2, letter3, letter4];
+        const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        const letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const letter3: ScrabbleLetter = new ScrabbleLetter('j', 4);
+        const letter4: ScrabbleLetter = new ScrabbleLetter('à', 3);
+        const word: ScrabbleLetter[] = [letter1, letter2, letter3, letter4];
         expect(service.convertScrabbleWordToString(word)).toEqual('deja');
     });
 
     it('if words is not null, validateWordsAndCalculateScore should call convertScrabbleWordToString and isWordValid', () => {
-        let letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
-        let letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
-        let letter3: ScrabbleLetter = new ScrabbleLetter('j', 4);
-        let letter4: ScrabbleLetter = new ScrabbleLetter('à', 3);
-        let word1: ScrabbleWord = new ScrabbleWord();
+        const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        const letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const letter3: ScrabbleLetter = new ScrabbleLetter('j', 4);
+        const letter4: ScrabbleLetter = new ScrabbleLetter('à', 3);
+        const word1: ScrabbleWord = new ScrabbleWord();
         word1.content = [letter1, letter2, letter3, letter4];
-        let word2: ScrabbleWord = new ScrabbleWord();
+        const word2: ScrabbleWord = new ScrabbleWord();
         word2.content = [letter1, letter2, letter3, letter4];
-        let words: ScrabbleWord[] = [word1, word2];
+        const words: ScrabbleWord[] = [word1, word2];
         service.validateWordsAndCalculateScore(words);
         expect(convertScrabbleWordToStringSpy).toHaveBeenCalled();
         expect(isWordValidSpy).toHaveBeenCalled();
     });
 
     it('if one word is not valid, validateWordsAndCalculateScore should return 0', () => {
-        let firstLetter: ScrabbleLetter = new ScrabbleLetter('J', 1);
-        let secondLetter: ScrabbleLetter = new ScrabbleLetter("'", 1);
-        let thirdLetter: ScrabbleLetter = new ScrabbleLetter('a', 1);
-        let fourthLetter: ScrabbleLetter = new ScrabbleLetter('i', 1);
-        let word1: ScrabbleWord = new ScrabbleWord();
+        const firstLetter: ScrabbleLetter = new ScrabbleLetter('J', 1);
+        const secondLetter: ScrabbleLetter = new ScrabbleLetter("'", 1);
+        const thirdLetter: ScrabbleLetter = new ScrabbleLetter('a', 1);
+        const fourthLetter: ScrabbleLetter = new ScrabbleLetter('i', 1);
+        const word1: ScrabbleWord = new ScrabbleWord();
         word1.content = [firstLetter, secondLetter, thirdLetter, fourthLetter]; // J'ai - non valide
-        let word2: ScrabbleWord = new ScrabbleWord();
+        const word2: ScrabbleWord = new ScrabbleWord();
         word2.content = [firstLetter, thirdLetter, fourthLetter]; // Jai - valide
-        let words: ScrabbleWord[] = [word1, word2];
+        const words: ScrabbleWord[] = [word1, word2];
         expect(service.validateWordsAndCalculateScore(words)).toEqual(0);
     });
 

@@ -24,19 +24,21 @@ describe('RackService', () => {
 
     it('drawLetter should call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        let letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        const letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
         service.drawLetter(letter);
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
     it('drawLetter should handle double digit values', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        let letter: ScrabbleLetter = new ScrabbleLetter('D', 12);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const letter: ScrabbleLetter = new ScrabbleLetter('D', 12);
         service.drawLetter(letter);
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
     it('drawRack should call moveTo and lineTo 10 times', () => {
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const expectedCallTimes = 10;
         const moveToSpy = spyOn(service.gridContext, 'moveTo').and.callThrough();
         const lineToSpy = spyOn(service.gridContext, 'lineTo').and.callThrough();
@@ -54,6 +56,7 @@ describe('RackService', () => {
         square2.letter = letter;
         square2.occupied = true;
         const square3 = new Square(2, 0);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         square3.letter = new ScrabbleLetter('w', 10);
         square3.occupied = true;
         const square4 = new Square(0, 0);

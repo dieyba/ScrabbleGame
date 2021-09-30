@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { PlayerType } from '@app/classes/virtual-player';
 import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { SoloGameService } from '@app/services/solo-game.service';
-import { PlayerType } from '@app/classes/virtual-player';
 
 describe('SidebarComponent', () => {
     let component: SidebarComponent;
@@ -18,6 +18,7 @@ describe('SidebarComponent', () => {
 
         const firstLetter: ScrabbleLetter = new ScrabbleLetter('a', 1);
         const secondLetter: ScrabbleLetter = new ScrabbleLetter('p', 3);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const thirdLetter: ScrabbleLetter = new ScrabbleLetter('u', 4);
         const fourthLetter: ScrabbleLetter = new ScrabbleLetter('m', 3);
         soloGameServiceSpy.localPlayer = {
@@ -35,7 +36,7 @@ describe('SidebarComponent', () => {
             letters: [firstLetter, thirdLetter, firstLetter],
             isActive: true,
             type: PlayerType.Easy,
-            playTurn() {}
+            playTurn() {},
         };
     });
 
@@ -51,11 +52,13 @@ describe('SidebarComponent', () => {
 
     it('getPlayer1LetterCount should return the right count', () => {
         component.getPlayer1LetterCount();
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(component.getPlayer1LetterCount()).toEqual(4);
     });
 
     it('getPlayer1Score should return the right score', () => {
         component.getPlayer1Score();
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(component.getPlayer1Score()).toEqual(73);
     });
 });
