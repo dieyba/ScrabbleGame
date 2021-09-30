@@ -1,4 +1,4 @@
-import { SquareColor } from './square';
+import { Square, SquareColor } from './square';
 
 export const DARK_BLUE_FACTOR = 2;
 export const PALE_BLUE_FACTOR = 3;
@@ -25,12 +25,14 @@ export class ScrabbleLetter {
     value: number; // How many points the letter is worth before blue bonuses
     nextLetters: ScrabbleLetter[]; // Neighbouring letters (0: N, 1: E, 2: S, 3: W) of the letter. WATCH OUT : don't go over four
     color: SquareColor;
+    tile : Square;
 
     constructor() {
         this.character = 'VIDE';
         this.value = 0;
         this.nextLetters = [];
         this.color = SquareColor.None;
+        this.tile = new Square(-1,-1); //-1, -1 means it is not placed yet
     }
     tealBonus(): void {
         this.value = PALE_BLUE_FACTOR * this.value;
