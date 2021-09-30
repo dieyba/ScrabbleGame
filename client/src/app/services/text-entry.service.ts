@@ -183,11 +183,14 @@ export class TextEntryService {
      */
     extractExchangeParams(defaultParams:DefaultCommandParams,paramsInput:string[]): CommandParams{
         if(paramsInput.length === 1){
-            const letters = this.removeAccents(paramsInput[0]);
-            const isValidLetterAmount = (letters.length > 0) && (letters.length < 8);
-            if(isValidLetterAmount){
-                if(this.isValidExchangeWord(letters)){
-                    return {defaultParams:defaultParams,specificParams:letters};
+            const letters = paramsInput[0];
+            const hasAccents = (letters !== this.removeAccents(letters));
+            if(!hasAccents && this.isAllLowerLetters(letters)){
+                const isValidLetterAmount = (letters.length > 0) && (letters.length < 8);
+                if(isValidLetterAmount){
+                    if(this.isValidExchangeWord(letters)){
+                        return {defaultParams:defaultParams,specificParams:letters};
+                    }
                 }
             }
         }
@@ -230,7 +233,6 @@ export class TextEntryService {
     }
 
 
-    // TODO: there are duplicate methods (remove accents and isValidLetters))?
     removeAccents(letters:string):string{
         return letters.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
     }
