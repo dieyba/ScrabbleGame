@@ -45,14 +45,14 @@ export class SoloGameService {
         this.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.randomBonus = gameInfo.controls.bonus.value;
 
-        console.log('player letter : ', this.localPlayer.letters);
+        //console.log('player letter : ', this.localPlayer.letters);
     }
 
     createNewGame() {
         this.rackService.scrabbleRack = new ScrabbleRack();
         this.gridService.scrabbleBoard = new ScrabbleBoard();
         this.drawRackLetters();
-        console.log('local player letters :', this.localPlayer.letters);
+        //console.log('local player letters :', this.localPlayer.letters);
         this.startCountdown();
     }
 
@@ -127,25 +127,24 @@ export class SoloGameService {
     exchangeLetters(letters: string): ErrorType {
         //console.log('local player letters dans méthode :', this.localPlayer.letters);
         if (this.localPlayer.isActive && this.stock.letterStock.length > 7) {
-            console.log('Exchanging these letters:' + letters + " ...");
+            //console.log('Exchanging these letters:' + letters + " ...");
             let lettersToRemove: ScrabbleLetter[] = [];
             if (this.localPlayer.removeLetter(letters) == true) {
-                // Ajouter la fonction qui enleve les lettres de la vue
-                //this.rackService.removeLetter(this.localPlayer.letters[0]);
 
                 for (let i: number = 0; i < letters.length; i++) {
                     lettersToRemove[i] = new ScrabbleLetter(letters[i], 1);
                 }
 
                 let lettersToAdd: ScrabbleLetter[] = this.stock.exchangeLetters(lettersToRemove);
+                //console.log("letters to add :", lettersToAdd);
                 for (let i: number = 0; i < lettersToAdd.length; i++) {
                     this.localPlayer.addLetter(lettersToAdd[i]);
+                    this.rackService.removeLetter(lettersToRemove[i]);
                     this.rackService.drawLetter(lettersToAdd[i]);
-                    console.log("letters to add :", lettersToAdd);
                 }
+                //console.log("LETTERS TO REMOVE : ", lettersToRemove);
                 return ErrorType.NoError;
             }
-            console.log("LETTERS TO REMOVE : ", lettersToRemove);
         }
         return ErrorType.ImpossibleCommand;
     }

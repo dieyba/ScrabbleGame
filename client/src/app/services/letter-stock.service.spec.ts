@@ -76,7 +76,7 @@ describe('LetterStock', () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  it('', () => {
+  it('should exchange the given letters with the same number of letters in the letter stock', () => {
     let stock: LetterStock = new LetterStock();
     stock.letterStock = [];
     let lettersToExchangeWithStock: ScrabbleLetter[] = [new ScrabbleLetter('a', 1)];
@@ -84,5 +84,6 @@ describe('LetterStock', () => {
     stock.addLettersToStock(lettersFromStock[0], 1);
 
     expect(stock.exchangeLetters(lettersToExchangeWithStock)).toEqual(lettersFromStock);
+    expect(stock.letterStock[0]).toEqual(lettersToExchangeWithStock[0]);
   });
 });
