@@ -4,7 +4,8 @@ import { ErrorType, ERROR_MESSAGES } from '../classes/errors';
 
 const ACTIVE_DEBUG_MESSAGE = "Affichages de débogage activés"
 const INACTIVE_DEBUG_MESSAGE = "Affichages de débogage désactivés"
-const SYSTEM_NAME = "System";
+const SYSTEM_NAME = "Système";
+const DEBUG_PRE_MESSAGE = "[Debug] ";
 
 @Injectable({
     providedIn: 'root',
@@ -24,8 +25,8 @@ export class ChatDisplayService {
      * @param isAdversary Bool that indicates if the message comes from adversary
      * @param playerMessage Text or executed command
      */
-    addPlayerEntry(isLocalPlayer: boolean, playerName:string, playerMessage: string): void {
-        playerMessage = playerName.concat(" >> ").concat(playerMessage);
+    addPlayerEntry(isLocalPlayer: boolean, playerName:string, message: string): void {
+        const playerMessage = playerName.concat(" >> ").concat(message);
         this.entries.push({
             color: isLocalPlayer ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer,
             message: playerMessage,
@@ -33,17 +34,29 @@ export class ChatDisplayService {
     }
 
     addSystemEntry(message:string){
-        message = SYSTEM_NAME.concat(" >> ").concat(message);
+        const systemMessage = SYSTEM_NAME.concat(" >> ").concat(message);
         this.entries.push({
             color:ChatEntryColor.SystemColor,
-            message:message,
+            message:systemMessage,
         });
     }
 
     // TODO:change string for some fixed specific messages?
-    addVirtalPlayerEntry(playername:string,commandInput:string, debugMessage:string){
-        this.addPlayerEntry(false, playername,commandInput);
-        this.addSystemEntry(debugMessage);
+    addVirtalPlayerEntry(playername:string,commandInput:string, debugMessages:string[]){
+        this.addPlayerEntry(false, playername,commandInput); //display command entered
+        this.addDebugMessages(debugMessages);
+    }
+
+    private addDebugMessages(debugMessages:string[]){
+        if(this.isActiveDebug){
+            for(const i in debugMessages){
+                const debugMessage = DEBUG_PRE_MESSAGE.concat(debugMessages[i]);
+                this.entries.push({
+                    color:ChatEntryColor.SystemColor,
+                    message: debugMessage,
+                });
+            }
+        }
     }
 
     /**
@@ -53,14 +66,9 @@ export class ChatDisplayService {
      * @param errorMessage Error message to be sent by "system"
      */
     addErrorMessage(errorType: ErrorType, commandInput:string): void {
-        this.addSystemEntry(this.createErrorMessage(errorType, commandInput));
-    }
-
-
-    createErrorMessage(errorType: ErrorType, commandInput:string): string{
         const error = ERROR_MESSAGES.get(errorType) as string;
-        const inputAndError = commandInput.concat(" : ").concat(error);
-        return inputAndError;
+        const errorAndInput = error.concat(": ").concat(commandInput);
+        this.addSystemEntry(errorAndInput);
     }
 
     createExchangeMessage(isLocalPLayer:boolean, userInput:string): string{
@@ -82,7 +90,7 @@ export class ChatDisplayService {
 
     
     invertDebugState():ErrorType{
-        this.isActiveDebug != this.isActiveDebug;
+        this.isActiveDebug = !this.isActiveDebug;
         const activationMessage = this.isActiveDebug? ACTIVE_DEBUG_MESSAGE : INACTIVE_DEBUG_MESSAGE;
         this.addSystemEntry(activationMessage);
         return ErrorType.NoError;

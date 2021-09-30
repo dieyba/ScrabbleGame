@@ -6,7 +6,7 @@ import { TextEntryService } from '@app/services/text-entry.service';
     styleUrls: ['./text-entry.component.scss'],
 })
 export class TextEntryComponent {
-    inputText = 'Test';
+    inputText = '';
 
     constructor(private textEntryService: TextEntryService) {}
 
