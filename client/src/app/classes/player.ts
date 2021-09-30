@@ -12,17 +12,12 @@ export abstract class Player {
         this.letters = [];
         this.isActive = false;
     }
+
     addLetter(letterToAdd: ScrabbleLetter): void {
         this.letters.push(letterToAdd);
     }
 
-    // le même problème resize
     removeLetter(lettersToRemove: string): boolean {
-        // for (ScrabbleLetter letter : this.letters) {
-        //     if (letter)
-        // }
-
-        //let removedLetter: ScrabbleLetter[] = [];
         let oldRack: ScrabbleLetter[] = this.letters;
 
         for (let i = 0; i < lettersToRemove.length; i++) {
@@ -35,26 +30,5 @@ export abstract class Player {
             }
         }
         return true;
-
-        // for (let i: number = 0; i < lettersToRemove.length; i++) {
-        //     for (let j: number = 0; j < this.letters.length; j++) {
-        //         if (this.letters[j].character == lettersToRemove[i]) {
-        //             removedLetter[i] = this.letters[j];
-        //         }
-        //         else {
-        //             return false;
-        //         }
-        //     }
-        // }
-
-        // // for (let i: number = 0; i < this.letters.length; i++) {
-        // //     if (this.letters[i].character == letterToRemove) {
-        // //         removedLetter[i] = this.letters[i];
-
-        // //         return true;
-        // //     }
-        // // }
-
-        // return false;
     }
 }

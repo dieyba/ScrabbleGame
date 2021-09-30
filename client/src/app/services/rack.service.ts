@@ -34,6 +34,7 @@ export class RackService {
     }
 
     drawLetter(scrabbleLetter: ScrabbleLetter): void {
+        console.log('scrabble letter : ', scrabbleLetter);
 
         for (let i = 0; i < MAX_LETTER_COUNT; i++) {
             if (!this.scrabbleRack.squares[i].occupied) {
