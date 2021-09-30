@@ -1,4 +1,4 @@
-import { Command , DefaultCommandParams, PlaceParams } from "./commands";
+import { Command, DefaultCommandParams, PlaceParams } from "./commands";
 import { ErrorType } from "./errors";
 import { Vec2 } from "./vec2";
 

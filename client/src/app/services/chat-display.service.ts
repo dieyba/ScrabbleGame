@@ -1,12 +1,22 @@
 import { Injectable } from '@angular/core';
-import { AuthorType, ChatDisplayEntry, ChatEntryColor } from '../classes/chat-display-entry';
+import { ChatDisplayEntry, ChatEntryColor } from '../classes/chat-display-entry';
 import { ErrorType, ERROR_MESSAGES } from '../classes/errors';
+
+const ACTIVE_DEBUG_MESSAGE = "Affichages de débogage activés"
+const INACTIVE_DEBUG_MESSAGE = "Affichages de débogage désactivés"
+const SYSTEM_NAME = "System";
 
 @Injectable({
     providedIn: 'root',
 })
 export class ChatDisplayService {
     entries: ChatDisplayEntry[] = [];
+    isActiveDebug: boolean;
+
+    constructor(){
+        this.isActiveDebug = false;
+    }
+    
 
     /**
      * @description Add normal text and validated commands.
@@ -14,36 +24,44 @@ export class ChatDisplayService {
      * @param isAdversary Bool that indicates if the message comes from adversary
      * @param playerMessage Text or executed command
      */
-    addPlayerEntry(isLocalPlayer: boolean, username:string, playerMessage: string): void {
-        playerMessage = username.concat(" >> ").concat(playerMessage);
+    addPlayerEntry(isLocalPlayer: boolean, playerName:string, playerMessage: string): void {
+        playerMessage = playerName.concat(" >> ").concat(playerMessage);
         this.entries.push({
-            authorType: isLocalPlayer ? AuthorType.LocalPlayer : AuthorType.RemotePlayer,
             color: isLocalPlayer ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer,
             message: playerMessage,
         });
     }
 
+    addSystemEntry(message:string){
+        message = SYSTEM_NAME.concat(" >> ").concat(message);
+        this.entries.push({
+            color:ChatEntryColor.SystemColor,
+            message:message,
+        });
+    }
+
+    // TODO:change string for some fixed specific messages?
+    addVirtalPlayerEntry(playername:string,commandInput:string, debugMessage:string){
+        this.addPlayerEntry(false, playername,commandInput);
+        this.addSystemEntry(debugMessage);
+    }
+
     /**
      * @description Error message to be sent by "system". Follow this format:
-     * ERROR_TYPE: INVALID_COMMAND
-     * Example: Commande invalide: !placerr
+     * error_type: ErrorType, commandInput: !placerr
      *
      * @param errorMessage Error message to be sent by "system"
      */
     addErrorMessage(errorType: ErrorType, commandInput:string): void {
-        this.entries.push({
-            authorType: AuthorType.System,
-            color: ChatEntryColor.SystemColor,
-            message: this.createErrorMessage(errorType, commandInput),
-        });
+        this.addSystemEntry(this.createErrorMessage(errorType, commandInput));
     }
+
 
     createErrorMessage(errorType: ErrorType, commandInput:string): string{
         const error = ERROR_MESSAGES.get(errorType) as string;
         const inputAndError = commandInput.concat(" : ").concat(error);
         return inputAndError;
     }
-
 
     createExchangeMessage(isLocalPLayer:boolean, userInput:string): string{
         let exchangeMessage:string = "";
@@ -61,4 +79,13 @@ export class ChatDisplayService {
         }
         return exchangeMessage;
     }
+
+    
+    invertDebugState():ErrorType{
+        this.isActiveDebug != this.isActiveDebug;
+        const activationMessage = this.isActiveDebug? ACTIVE_DEBUG_MESSAGE : INACTIVE_DEBUG_MESSAGE;
+        this.addSystemEntry(activationMessage);
+        return ErrorType.NoError;
+    }
+
 }

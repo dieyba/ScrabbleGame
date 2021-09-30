@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { ErrorType } from '../classes/errors';
-import { Column, Row } from '../classes/scrabble-board';
-import { Command , CommandParams, DefaultCommandParams } from '../classes/commands';
-import { SoloGameService } from './solo-game.service';
+import { Command, CommandParams, DefaultCommandParams } from '../classes/commands';
 import { createDebugCmd } from '../classes/debugCommand';
+import { ErrorType } from '../classes/errors';
 import { createExchangeCmd, ExchangeCmd } from '../classes/exchangeCommand';
 import { createPassCmd } from '../classes/passCommand';
 import { createPlaceCmd } from '../classes/placeCommand';
+import { Column, Row } from '../classes/scrabble-board';
 import { Vec2 } from '../classes/vec2';
 import { ChatDisplayService } from './chat-display.service';
+import { SoloGameService } from './solo-game.service';
 
 
 const DEBUG_CMD = 'debug';
@@ -39,7 +39,7 @@ export class TextEntryService {
         this.commandsMap.set(PASS_CMD, createPassCmd);
         this.commandsMap.set(PLACE_CMD,createPlaceCmd);
 
-        this.paramsMap.set(DEBUG_CMD,this.isWithoutParams);
+        this.paramsMap.set(DEBUG_CMD,this.extractDebugParams);
         this.paramsMap.set(EXCHANGE_CMD, this.extractExchangeParams);
         this.paramsMap.set(PLACE_CMD, this.extractPlaceParams);
         this.paramsMap.set(PASS_CMD,this.isWithoutParams);
@@ -64,25 +64,29 @@ export class TextEntryService {
                 if(commandCreated){
                     const commandResult = commandCreated.execute();
                     if(commandResult === ErrorType.NoError){
+                        // send successful exchange command execution message
                         if(commandCreated instanceof ExchangeCmd){
                             const message= this.chatDisplayService.createExchangeMessage(isLocalPlayer, userInput);
                             this.chatDisplayService.addPlayerEntry(isLocalPlayer,playerName,message);
                         }
                         else {
+                            // send successful command execution message
                             this.chatDisplayService.addPlayerEntry(isLocalPlayer, playerName,userInput);
                         }
                     }else{
+                        // send unsuccesful command execution message
                         this.chatDisplayService.addErrorMessage(commandResult,userInput);
                     }
                 }
             } else {
+                // send normal chat message
                 this.chatDisplayService.addPlayerEntry(isLocalPlayer, playerName, userInput);
             }
         }
     }
     
     createCommand(commandInput:string,isLocalPlayer:boolean):Command|undefined{
-        const splitInput = this.splitInput(commandInput.substring(1));
+        const splitInput = this.splitCommandInput(commandInput);
         const commandName = splitInput.shift() as string;
         if(this.commandsMap.has(commandName)){
             const createCmdFunction:Function = this.commandsMap.get(commandName) as Function;
@@ -132,7 +136,13 @@ export class TextEntryService {
         return undefined;
     }
 
-
+    extractDebugParams(defaultParams:DefaultCommandParams,paramsInput:string[]):CommandParams{
+        const isdefaultParams = this.isWithoutParams(defaultParams,paramsInput);
+        if(isdefaultParams){
+            return {defaultParams:defaultParams,specificParams:this.chatDisplayService};
+        }
+        return isdefaultParams;
+    }
 
     /**
      * Returns the default command parameters, placing parameters and word to place if the syntax was valid.
@@ -146,7 +156,7 @@ export class TextEntryService {
             const word = this.removeAccents(paramsInput[1]);
             const positionOrientation = paramsInput[0];
 
-            if(this.isValidWord(word) && this.isAllLowerLetters(positionOrientation)){
+            if(this.isValidWordInput(word) && this.isAllLowerLetters(positionOrientation)){
                 const row = positionOrientation.slice(0,1);
                 const column = positionOrientation.slice(1,-1);
                 const coordinates = this.convertToCoordinates(row, column);
@@ -184,15 +194,11 @@ export class TextEntryService {
         return undefined;
     }
     
-    // TODO: there are duplicate methods (in validation service)?
-    removeAccents(letters:string):string{
-        return letters.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-    }
 
     /**
      * Checks if the word is not empty and only has valid letters
      */
-    isValidWord(word:string):boolean{
+    isValidWordInput(word:string):boolean{
         let isValid:boolean = false;
         if(!this.isEmpty(word)){
             for(const letter of word){
@@ -223,6 +229,11 @@ export class TextEntryService {
         return isValid;
     }
 
+
+    // TODO: there are duplicate methods (remove accents and isValidLetters))?
+    removeAccents(letters:string):string{
+        return letters.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+    }
 
     /**
      * Returns true if it is  a letter. False if it is not or has an accent or ç (replace accents and ç before using)
@@ -261,13 +272,13 @@ export class TextEntryService {
 
 
     /**
-     * Splits a string at the white spaces. 
+     * Takes the command input entered by player, removes the ! and splits the string at the white spaces. 
      * @param commandInput the string to split
      * @returns sintrg[]. Returns empty array if the input was empty or only had white spaces
      */
-    splitInput(commandInput:string):string[]{
-        if(!this.isEmpty(commandInput)){
-            return commandInput.split(' ');
+    splitCommandInput(commandInput:string):string[]{
+        if(commandInput.startsWith('!')){
+            return commandInput.substring(1).split(' ');
         }
         return [];
     }
@@ -299,7 +310,7 @@ export class TextEntryService {
         userInput = this.trimSpaces(userInput);
         return (userInput === '');
     }
-
+    
     isAllLowerLetters(letters:string):boolean{
         return (letters.toLowerCase() === letters);
     }

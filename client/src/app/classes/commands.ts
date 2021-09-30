@@ -1,6 +1,7 @@
-import { Vec2 } from './vec2';
-import {ErrorType} from './errors'
+import { ChatDisplayService } from '@app/services/chat-display.service';
 import { SoloGameService } from '../services/solo-game.service';
+import { ErrorType } from './errors';
+import { Vec2 } from './vec2';
 
 export interface DefaultCommandParams {
     gameService: SoloGameService;
@@ -15,9 +16,12 @@ export interface PlaceParams {
     word:string;
 }
 
+export type DebugParams = ChatDisplayService;
+
 export type CommandParams = 
     {defaultParams:DefaultCommandParams,specificParams:PlaceParams}|
     {defaultParams:DefaultCommandParams,specificParams:ExchangeParams}|
+    {defaultParams:DefaultCommandParams,specificParams:DebugParams}|
     DefaultCommandParams|
     undefined;
 
