@@ -4,7 +4,7 @@ export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;
 
 export class ScrabbleLetter {
-    private character: string; // One word string, depending on which letter it is
+    character: string; // One word string, depending on which letter it is
     value: number; // How many points the letter is worth before blue bonuses
     nextLetters: ScrabbleLetter[]; // Neighbouring letters (0: N, 1: E, 2: S, 3: W) of the letter. WATCH OUT : don't go over four
     color: SquareColor;
@@ -24,8 +24,5 @@ export class ScrabbleLetter {
     setLetter(character: string): void {
         this.character = character;
         this.character = this.character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    }
-    getLetter(): string {
-        return this.character;
     }
 }

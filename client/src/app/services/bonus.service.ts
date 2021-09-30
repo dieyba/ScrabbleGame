@@ -41,7 +41,7 @@ export class BonusService {
                     }
                 }
             }
-            if (scrabbleWord.orientation === WordOrientation.Vertical) {
+            else if (scrabbleWord.orientation === WordOrientation.Vertical) {
                 if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed) {
                     const color = scrabbleWord.content[i].color;
                     switch (color) {

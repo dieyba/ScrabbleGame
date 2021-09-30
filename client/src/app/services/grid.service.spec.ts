@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { SquareColor } from '@app/classes/square';
-import { GridService } from '@app/services/grid.service';
+import { Colors, GridService } from '@app/services/grid.service';
 
 describe('GridService', () => {
     let service: GridService;
@@ -95,6 +95,31 @@ describe('GridService', () => {
     it('drawSingleSquareColor should change fillStyle to white', () => {
         service.scrabbleBoard.squares[6][6].color = SquareColor.None;
         service.drawSingleSquareColor(6, 6);
-        expect(service.gridContext.fillStyle).toEqual('#000000');
+        expect(service.gridContext.fillStyle).toEqual('#ffffff');
+    });
+
+    it('removeSquare should change fillStyle to right color', () => {
+        service.scrabbleBoard.squares[0][3].color = SquareColor.Teal;
+        service.removeSquare(0, 3);
+        expect(service.gridContext.fillStyle).toEqual(Colors.Teal);
+    });
+
+    it('removeSquare should change fillStyle to right color', () => {
+        service.scrabbleBoard.squares[5][5].color = SquareColor.DarkBlue;
+        service.removeSquare(5, 5);
+        expect(service.gridContext.fillStyle).toEqual(Colors.DarkBlue);
+    });
+
+    it('removeSquare should change fillStyle to right color', () => {
+        service.scrabbleBoard.squares[0][3].color = SquareColor.Pink;
+        service.scrabbleBoard.squares[0][3].occupied = true;
+        service.removeSquare(0, 3);
+        expect(service.gridContext.fillStyle).toEqual(Colors.Pink);
+    });
+
+    it('removeSquare should change fillStyle to right color', () => {
+        service.scrabbleBoard.squares[0][3].color = SquareColor.Red;
+        service.removeSquare(0, 3);
+        expect(service.gridContext.fillStyle).toEqual(Colors.Red);
     });
 });

@@ -42,12 +42,12 @@ export class RackService {
 
     drawLetter(scrabbleLetter: ScrabbleLetter): void {
         for (let i = 0; i < MAX_LETTER_COUNT; i++) {
-            if (!this.scrabbleRack.squares[i].occupied) {
+            if (!this.scrabbleRack.squares[i].occupied && scrabbleLetter !== undefined) {
                 this.scrabbleRack.squares[i].letter = scrabbleLetter;
                 this.scrabbleRack.squares[i].occupied = true;
                 this.scrabbleRack.squares[i].position = { x: i, y: 0 };
                 const positionX = (RACK_WIDTH * i) / MAX_LETTER_COUNT;
-                const letter = scrabbleLetter.getLetter().toUpperCase();
+                const letter = scrabbleLetter.character.toUpperCase();
                 this.gridContext.beginPath();
                 this.gridContext.fillStyle = 'black';
                 this.gridContext.font = '60px system-ui';
@@ -65,9 +65,13 @@ export class RackService {
 
     removeLetter(scrabbleLetter: ScrabbleLetter) {
         for (let i = 0; i < this.scrabbleRack.squares.length; i++) {
-            if (this.scrabbleRack.squares[i].letter.getLetter() === scrabbleLetter.getLetter()) {
-                this.scrabbleRack.squares[i] = new Square(i, 0);
-                break;
+            if (this.scrabbleRack.squares[i].letter !== undefined) {
+                if (this.scrabbleRack.squares[i].letter.character === scrabbleLetter.character) {
+                    this.scrabbleRack.squares[i] = new Square(i, 0);
+                    break;
+                }
+            } else {
+                return;
             }
         }
         this.gridContext.clearRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
