@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Dictionary } from '@app/classes/dictionary';
+import { ErrorType } from '@app/classes/errors';
 import { LetterStock } from '@app/classes/letter-stock';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
@@ -124,14 +126,18 @@ export class SoloGameService {
     }
 
     passTurn() {
-        this.turnPassed = true;
-        if (this.isTurnsPassedLimit() && this.hasTurnsBeenPassed.length >= MAX_TURNS_PASSED) {
-            this.endGame();
+        if (this.localPlayer.isActive) {
+            this.turnPassed = true;
+            if (this.isTurnsPassedLimit() && this.hasTurnsBeenPassed.length >= MAX_TURNS_PASSED) {
+                this.endGame();
+            }
+            this.turnPassed = false;
+            this.timerMs = 0;
+            this.secondsToMinutes();
+            this.changeActivePlayer();
+            return ErrorType.NoError;
         }
-        this.timerMs = 0;
-        this.secondsToMinutes();
-        this.changeActivePlayer();
-        this.turnPassed = false;
+        return ErrorType.ImpossibleCommand;
     }
 
     // Check if last 5 turns have been passed (current turn is the 6th)
@@ -141,6 +147,24 @@ export class SoloGameService {
             isLimit = isLimit && this.hasTurnsBeenPassed[i];
         }
         return isLimit;
+    }
+
+    place(position: Vec2, orientation: string, letters: string): ErrorType {
+        if (this.localPlayer.isActive) {
+            console.log('Placing ' + letters); // eslint-disable-line no-console
+            console.log('position:' + position); // eslint-disable-line no-console
+            console.log('orientation: ' + orientation); // eslint-disable-line no-console
+            return ErrorType.NoError;
+        }
+        return ErrorType.ImpossibleCommand;
+    }
+
+    exchangeLetters(letters: string): ErrorType {
+        if (this.localPlayer.isActive) {
+            console.log('Exchanging these letters:' + letters + ' ...'); // eslint-disable-line no-console
+            return ErrorType.NoError;
+        }
+        return ErrorType.ImpossibleCommand;
     }
 
     addRackLetters(letters: ScrabbleLetter[]): void {

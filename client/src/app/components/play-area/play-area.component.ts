@@ -65,8 +65,10 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawLetter(letter5, 0, 2);
         const letter6: ScrabbleLetter = new ScrabbleLetter('m', 2);
         this.gridService.drawLetter(letter6, 0, 3);
-        // Uncomment for words to be valid
+        // Uncomment next two lines for words to be valid
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const letter7: ScrabbleLetter = new ScrabbleLetter('i', 4);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         this.gridService.drawLetter(letter7, 0, 4);
         const word1: ScrabbleWord = new ScrabbleWord();
         word1.content = [letter1, letter2, letter3, letter4];

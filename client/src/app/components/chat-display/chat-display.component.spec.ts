@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AuthorType, ChatDisplayEntry, ChatEntryColor } from 'src/app/classes/chat-display-entry';
+import { ChatDisplayEntry, ChatEntryColor } from 'src/app/classes/chat-display-entry';
 import { ChatDisplayComponent } from './chat-display.component';
 
 describe('ChatDisplayComponent', () => {
     let chatDisplay: ChatDisplayComponent;
     let fixture: ComponentFixture<ChatDisplayComponent>;
 
-    const systemEntry: ChatDisplayEntry = { authorType: AuthorType.System, color: ChatEntryColor.SystemColor, message: 'error message' };
-    const playerEntry: ChatDisplayEntry = { authorType: AuthorType.Player, color: ChatEntryColor.PlayerColor, message: 'player message' };
+    const systemEntry: ChatDisplayEntry = { color: ChatEntryColor.SystemColor, message: 'error message' };
+    const playerEntry: ChatDisplayEntry = { color: ChatEntryColor.LocalPlayer, message: 'player message' };
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
