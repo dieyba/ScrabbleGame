@@ -1,4 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { ValidationService } from '@app/services/validation.service';
 
@@ -6,15 +8,15 @@ import { ValidationService } from '@app/services/validation.service';
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('ValidationService', () => {
     let service: ValidationService;
-    // let isWordValidSpy: jasmine.SpyObj<any>;
-    // let convertScrabbleWordToStringSpy: jasmine.SpyObj<any>;
+    let isWordValidSpy: jasmine.SpyObj<any>;
+    let convertScrabbleWordToStringSpy: jasmine.SpyObj<any>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(ValidationService);
 
-        // isWordValidSpy = spyOn<any>(service, 'isWordValid').and.callThrough();
-        // convertScrabbleWordToStringSpy = spyOn<any>(service, 'convertScrabbleWordToString').and.callThrough();
+        isWordValidSpy = spyOn<any>(service, 'isWordValid').and.callThrough();
+        convertScrabbleWordToStringSpy = spyOn<any>(service, 'convertScrabbleWordToString').and.callThrough();
         service.dictionary = new Dictionary(DictionaryType.Default);
     });
 
