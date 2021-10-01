@@ -3,13 +3,15 @@ import { FormGroup } from '@angular/forms';
 import { Dictionary } from '@app/classes/dictionary';
 import { LetterStock } from '@app/classes/letter-stock';
 import { LocalPlayer } from '@app/classes/local-player';
+import {Player} from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { ErrorType } from '@app/classes/errors';
-import { Vec2 } from '@app/classes/vec2';
+// import { Vec2 } from '@app/classes/vec2';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
+import { ExchangeParams, PlaceParams } from '@app/classes/commands';
 
 const TIMER_INTERVAL = 1000;
 const DEFAULT_LETTER_COUNT = 7;
@@ -104,17 +106,17 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
-    place(position: Vec2, orientation: string, letters: string): ErrorType {
+    place(player: Player, params:PlaceParams): ErrorType {
         if (this.localPlayer.isActive) {
-            console.log('Placing ' + letters); // eslint-disable-line no-console
-            console.log('position:' + position); // eslint-disable-line no-console
-            console.log('orientation: ' + orientation); // eslint-disable-line no-console
+            console.log('Placing ' + params.word); // eslint-disable-line no-console
+            console.log('position:' + params.position); // eslint-disable-line no-console
+            console.log('orientation: ' + params.orientation); // eslint-disable-line no-console
             return ErrorType.NoError;
         }
         return ErrorType.ImpossibleCommand;
     }
 
-    exchangeLetters(letters: string): ErrorType {
+    exchangeLetters(player:Player,letters: ExchangeParams): ErrorType {
         if (this.localPlayer.isActive) {
             console.log('Exchanging these letters:' + letters + ' ...'); // eslint-disable-line no-console
             return ErrorType.NoError;
