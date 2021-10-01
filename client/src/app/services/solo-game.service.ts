@@ -3,7 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { Dictionary } from '@app/classes/dictionary';
 import { LetterStock } from '@app/classes/letter-stock';
 import { LocalPlayer } from '@app/classes/local-player';
-import {Player} from '@app/classes/player';
+import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { VirtualPlayer } from '@app/classes/virtual-player';
@@ -106,7 +106,7 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
-    place(player: Player, params:PlaceParams): ErrorType {
+    place(player: Player, params: PlaceParams): ErrorType {
         if (this.localPlayer.isActive) {
             console.log('Placing ' + params.word); // eslint-disable-line no-console
             console.log('position:' + params.position); // eslint-disable-line no-console
@@ -116,7 +116,7 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
-    exchangeLetters(player:Player,letters: ExchangeParams): ErrorType {
+    exchangeLetters(player: Player, letters: ExchangeParams): ErrorType {
         if (this.localPlayer.isActive) {
             console.log('Exchanging these letters:' + letters + ' ...'); // eslint-disable-line no-console
             return ErrorType.NoError;

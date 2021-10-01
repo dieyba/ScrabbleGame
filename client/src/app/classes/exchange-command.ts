@@ -13,7 +13,7 @@ export class ExchangeCmd extends Command {
     }
 
     execute(): ErrorType {
-        return this.gameService.exchangeLetters(this.player,this.letters);
+        return this.gameService.exchangeLetters(this.player, this.letters);
     }
 }
 

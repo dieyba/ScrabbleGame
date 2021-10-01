@@ -4,9 +4,9 @@ import { Player } from '@app/classes/player';
 import { ErrorType } from './errors';
 import { Vec2 } from './vec2';
 
-export interface DefaultCommandParams { 
-    player : Player;
-    serviceCalled : SoloGameService|ChatDisplayService;
+export interface DefaultCommandParams {
+    player: Player;
+    serviceCalled: SoloGameService | ChatDisplayService;
 }
 
 export type ExchangeParams = string;

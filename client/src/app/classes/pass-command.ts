@@ -5,7 +5,7 @@ import { ErrorType } from './errors';
 export class PassTurnCmd extends Command {
     private gameService: SoloGameService;
 
-    constructor(defaultParams: DefaultCommandParams){
+    constructor(defaultParams: DefaultCommandParams) {
         super(defaultParams.player);
         this.gameService = defaultParams.serviceCalled as SoloGameService;
     }

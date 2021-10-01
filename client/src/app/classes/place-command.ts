@@ -20,8 +20,8 @@ export class PlaceCmd extends Command {
     }
 
     execute(): ErrorType {
-        const placeParams = {position:this.position, orientation:this.orientation , word:this.word};
-        return this.gameService.place(this.player,placeParams);
+        const placeParams = { position: this.position, orientation: this.orientation, word: this.word };
+        return this.gameService.place(this.player, placeParams);
     }
 }
 

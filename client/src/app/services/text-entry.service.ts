@@ -25,7 +25,7 @@ const COLUMN_OFFSET = 1;
 const HORIZONTAL = 'h';
 const VERTICAL = 'v';
 
-type CommandCreationResult = Command | ErrorType.SyntaxError|ErrorType.InvalidCommand;
+type CommandCreationResult = Command | ErrorType.SyntaxError | ErrorType.InvalidCommand;
 
 @Injectable({
     providedIn: 'root',
@@ -58,10 +58,9 @@ export class TextEntryService {
      * @param text Text input from user
      */
     handleInput(userInput: string, isLocalPlayer: boolean) {
-        const player:Player = isLocalPlayer ? this.gameService.localPlayer : this.gameService.virtualPlayer;
+        const player: Player = isLocalPlayer ? this.gameService.localPlayer : this.gameService.virtualPlayer;
         userInput = this.trimSpaces(userInput);
         if (!this.isEmpty(userInput)) {
-            
             if (userInput.startsWith('!')) {
                 let commandCreationResult = this.createCommand(userInput, player);
                 const isCreated = commandCreationResult !== ErrorType.SyntaxError && commandCreationResult !== ErrorType.InvalidCommand;
@@ -78,9 +77,8 @@ export class TextEntryService {
                         this.chatDisplayService.addErrorMessage(commandExecutionResult, userInput);
                     }
                 } else {
-                    this.chatDisplayService.addErrorMessage(commandCreationResult as ErrorType,userInput);
+                    this.chatDisplayService.addErrorMessage(commandCreationResult as ErrorType, userInput);
                 }
-
             } else {
                 // Not a command input. Send normal chat message
                 this.chatDisplayService.addPlayerEntry(isLocalPlayer, player.name, userInput);
@@ -88,8 +86,7 @@ export class TextEntryService {
         }
     }
 
-
-    createCommand(commandInput: string, player:Player): CommandCreationResult {
+    createCommand(commandInput: string, player: Player): CommandCreationResult {
         const splitInput = this.splitCommandInput(commandInput);
         const commandName = splitInput.shift() as string;
         // Validate command name entered after the !
@@ -115,7 +112,7 @@ export class TextEntryService {
      * @param paramsInput string[] split at the spaces of the command input (without the command name)
      * @returns Default parameters and the command specific parameters if it has some
      */
-    extractCommandParams(player:Player, commandName: string, paramsInput: string[]): CommandParams | undefined {
+    extractCommandParams(player: Player, commandName: string, paramsInput: string[]): CommandParams | undefined {
         if (this.paramsMap.has(commandName)) {
             const createParamsFunction: Function = this.paramsMap.get(commandName) as Function; // eslint-disable-line @typescript-eslint/ban-types
             const params = createParamsFunction.call(this, player, paramsInput);
@@ -126,16 +123,16 @@ export class TextEntryService {
         return undefined;
     }
 
-    extractDebugParams(player:Player, paramsInput: string[]): CommandParams {
+    extractDebugParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
-            return { player:player, serviceCalled: this.chatDisplayService };
+            return { player, serviceCalled: this.chatDisplayService };
         }
         return undefined;
     }
 
-    extractPassParams(player:Player, paramsInput: string[]): CommandParams {
+    extractPassParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
-            return { player:player, serviceCalled: this.gameService };
+            return { player, serviceCalled: this.gameService };
         }
         return undefined;
     }
@@ -148,7 +145,7 @@ export class TextEntryService {
      * the placing parameters and the word to place.
      * @returns Default parameteres and place commands parameters. If invalid syntax, returns undefined
      */
-    extractPlaceParams(player:Player, paramsInput: string[]): CommandParams {
+    extractPlaceParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 2) {
             const word = this.removeAccents(paramsInput[1]);
             const positionOrientation = paramsInput[0];
@@ -161,8 +158,8 @@ export class TextEntryService {
                     const orientation = positionOrientation.slice(LAST_CHAR_INDEX).toLowerCase();
                     if (orientation === HORIZONTAL || orientation === VERTICAL) {
                         const placeParams = { position: coordinates, orientation, word };
-                        const defaultParams = {player:player, serviceCalled: this.gameService};
-                        const commandParams = { defaultParams:defaultParams, specificParams: placeParams };
+                        const defaultParams = { player, serviceCalled: this.gameService };
+                        const commandParams = { defaultParams, specificParams: placeParams };
                         return commandParams;
                     }
                 }
@@ -179,7 +176,7 @@ export class TextEntryService {
      * Should only have 1 element, the letters to exchange.
      * @returns Default parameteres and a string for the letters to exchange. If invalid syntax, returns undefined
      */
-    extractExchangeParams(player:Player, paramsInput: string[]): CommandParams {
+    extractExchangeParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 1) {
             const letters = paramsInput[0];
             const hasAccents = letters !== this.removeAccents(letters);
@@ -187,8 +184,8 @@ export class TextEntryService {
                 const isValidLetterAmount = letters.length >= MIN_EXCHANGE_LETTERS && letters.length <= MAX_EXCHANGE_LETTERS;
                 if (isValidLetterAmount) {
                     if (this.isValidExchangeWord(letters)) {
-                        const defaultParams = {player:player, serviceCalled: this.gameService};
-                        return { defaultParams:defaultParams, specificParams: letters };
+                        const defaultParams = { player, serviceCalled: this.gameService };
+                        return { defaultParams, specificParams: letters };
                     }
                 }
             }
