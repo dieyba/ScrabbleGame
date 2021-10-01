@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
+import { ErrorType } from '@app/classes/errors';
 import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
@@ -18,10 +19,9 @@ describe('GameService', () => {
     let drawRackLettersSpy: jasmine.Spy<any>;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
     let ctxStub: CanvasRenderingContext2D;
-
     beforeEach(() => {
         ctxStub = CanvasTestHelper.createCanvas(DEFAULT_WIDTH, DEFAULT_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
-        rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'drawLetter']);
+        rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'drawLetter', 'removeLetter']);
         TestBed.configureTestingModule({
             providers: [{ provide: RackService, useValue: rackServiceSpy }],
         });
@@ -117,5 +117,63 @@ describe('GameService', () => {
         expect(secondsToMinutesSpy).toHaveBeenCalled();
         expect(service.localPlayer.isActive).toEqual(false);
         expect(service.virtualPlayer.isActive).toEqual(true);
+    });
+
+    it('passTurn not possible when local player is not active', () => {
+        service.localPlayer = new LocalPlayer('Ariane');;
+        service.localPlayer.isActive = false;
+        let error = ErrorType.ImpossibleCommand;
+        expect(service.passTurn()).toEqual(error);
+    });
+
+    // Test pour la fonction exchangeLetters
+    it('exchangeLetter should call removeLetter of class Player if he is active and if there is at least 7 letters', () => {
+        let spyPlayer: LocalPlayer = new LocalPlayer('sara');
+        spyPlayer.letters = [new ScrabbleLetter('a', 1)];
+        service.localPlayer = spyPlayer;
+
+        const spy = spyOn(service.localPlayer, 'removeLetter').and.callThrough();
+        expect(spy).not.toHaveBeenCalled();
+
+        service.localPlayer.isActive = true;
+        service.exchangeLetters('a');
+
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('exchangeLetter should call addLetter, removeLetter(rack service) and drawLetter if the letters to exchange are removed with success', () => {
+        let spyPlayer: LocalPlayer = new LocalPlayer('sara');
+        spyPlayer.letters = [new ScrabbleLetter('a', 1)];
+        service.localPlayer = spyPlayer;
+        service.localPlayer.isActive = true;
+
+        const spy = spyOn(service.localPlayer, 'addLetter').and.callThrough();
+        service.exchangeLetters('b');
+        expect(spy).not.toHaveBeenCalled();
+        expect(rackServiceSpy.removeLetter).not.toHaveBeenCalled();
+        expect(rackServiceSpy.drawLetter).not.toHaveBeenCalled();
+
+        service.exchangeLetters('a');
+        expect(spy).toHaveBeenCalled();
+        expect(rackServiceSpy.removeLetter).toHaveBeenCalled();
+        expect(rackServiceSpy.drawLetter).toHaveBeenCalled();
+    });
+
+    it('exchange not possible when local player dont have the letters or stock barely empty', () => {
+        let spyPlayer: LocalPlayer = new LocalPlayer('sara');
+        spyPlayer.letters = [new ScrabbleLetter('o', 1)];
+        spyPlayer.isActive = true;
+        service.localPlayer = spyPlayer;
+        let error = ErrorType.ImpossibleCommand;
+        expect(service.exchangeLetters('a')).toEqual(error);
+    });
+
+    it('exchange not possible when local player not active', () => {
+        let spyPlayer: LocalPlayer = new LocalPlayer('sara');
+        spyPlayer.isActive = false;
+        service.localPlayer = spyPlayer;
+        let error = ErrorType.ImpossibleCommand;
+
+        expect(service.exchangeLetters('a')).toEqual(error);
     });
 });

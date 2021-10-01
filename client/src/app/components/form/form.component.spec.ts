@@ -9,14 +9,17 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Observable } from 'rxjs';
 import { FormComponent } from './form.component';
 
 describe('FormComponent', () => {
     let component: FormComponent;
     let fixture: ComponentFixture<FormComponent>;
     let list: string[] = ['dieyna', 'kevin', 'ariane'];
-    let dialog: jasmine.SpyObj<MatDialogRef<FormComponent>> = jasmine.createSpyObj('dialog', ['close']);
+    let dialogSpy: jasmine.Spy;
+    // let dialog: jasmine.SpyObj<MatDialogRef<FormComponent>> = jasmine.createSpyObj('dialog', ['close']);
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [FormComponent],
@@ -34,7 +37,9 @@ describe('FormComponent', () => {
                 MatDialogModule,
                 BrowserAnimationsModule,
             ],
-            providers: [{ provide: MatDialogRef, useValue: dialog }],
+            providers: [{ provide: MatDialogRef, useValue: { close: () => {} } },
+            { provide: Router, useValue: { navigate: () => new Observable() } },
+            ],
         }).compileComponents();
     });
 
@@ -47,10 +52,14 @@ describe('FormComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
     it('should call close() ', () => {
+        const dialogRefSpyObj = jasmine.createSpyObj({ close: true });
+        dialogSpy = spyOn(TestBed.get(MatDialogRef), 'close').and.returnValue(dialogRefSpyObj);
         component.closeDialog();
-        expect(dialog.close()).toHaveBeenCalled;
+        expect(dialogSpy).toHaveBeenCalled();
     });
+
     it('should call randomPlayer() ', () => {
         component.selectedPlayer = 'dieyna';
         const spy = spyOn(component, 'randomPlayer').and.stub();
@@ -58,12 +67,13 @@ describe('FormComponent', () => {
         component.changeName(list);
         expect(spy).toHaveBeenCalled();
     });
+
     it('should not call randomPlayer() ', () => {
         component.selectedPlayer = 'kevin';
         const spy = spyOn(component, 'randomPlayer').and.stub();
         component.name = new FormControl('dieyna');
         component.changeName(list);
-        expect(spy).not.toHaveBeenCalled;
+        expect(spy).not.toHaveBeenCalled();
     });
 
     it('should return a value between the minimum and the maxmimum', () => {
@@ -81,17 +91,20 @@ describe('FormComponent', () => {
     });
 
     it('form invalid when empty', () => {
+        component.submit();
         expect(component.myForm.valid).toBeFalsy();
     });
 
     it('form valid when submit', () => {
-        const spy = spyOn(component, 'closeDialog');
-        component.myForm.controls['name'].setValue('dieyna');
-        component.myForm.controls['timer'].setValue('1:00');
-        component.myForm.controls['level'].setValue('easy');
-        component.myForm.controls['dictionnary1'].setValue('Francais');
+        component.myForm.setValue({
+            name: 'dieyna',
+            timer: '1:00',
+            bonus: true,
+            level: 'easy',
+            dictionaryForm: 'Francais',
+            opponent: 'Sara',
+        });
         component.submit();
         expect(component.myForm.valid).toBeTrue();
-        expect(spy).toHaveBeenCalled();
     });
 });

@@ -87,8 +87,6 @@ export class FormComponent {
             this.closeDialog();
             this.router.navigate(['/game']);
             this.soloGameService.initializeGame(this.myForm);
-        } else {
-            //fait rien
         }
     }
 }

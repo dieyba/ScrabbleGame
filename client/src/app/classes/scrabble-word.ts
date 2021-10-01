@@ -1,8 +1,8 @@
 import { ScrabbleLetter } from './scrabble-letter';
 import { SquareColor } from './square';
 
-const PINK_FACTOR = 2;
-const RED_FACTOR = 3;
+export const PINK_FACTOR = 2;
+export const RED_FACTOR = 3;
 
 export class ScrabbleWord {
     content: ScrabbleLetter[]; // Array of ScrabbleLetters continually growing to represent the word
@@ -34,8 +34,8 @@ export class ScrabbleWord {
         }
         // Word pink/red bonuses
         // TODO : Export this into a new service.
-        total = total * PINK_FACTOR * pinkBonusCount;
-        total = total * RED_FACTOR * redBonusCount;
+        total += PINK_FACTOR * pinkBonusCount;
+        total += RED_FACTOR * redBonusCount;
         return total;
     }
 }

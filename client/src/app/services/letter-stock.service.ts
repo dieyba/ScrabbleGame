@@ -70,7 +70,7 @@ export class LetterStock {
     for (let i = 0; i < number; i++) {
       if (this.isEmpty()) {
         // Si la réserve est vide, qu'est ce qu'on fait ?
-        window.alert("Il n'y a plus assez de lettre dans la réserve.");
+        // window.alert("Il n'y a plus assez de lettre dans la réserve.");
       } else {
         const index = Math.floor(Math.random() * (this.letterStock.length - 1));
         lettersRemovedFromStock[i] = this.letterStock.splice(index, 1)[0];

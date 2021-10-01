@@ -125,7 +125,6 @@ export class SoloGameService {
     }
 
     exchangeLetters(letters: string): ErrorType {
-        //console.log('local player letters dans méthode :', this.localPlayer.letters);
         if (this.localPlayer.isActive && this.stock.letterStock.length > 7) {
             //console.log('Exchanging these letters:' + letters + " ...");
             let lettersToRemove: ScrabbleLetter[] = [];
@@ -136,13 +135,11 @@ export class SoloGameService {
                 }
 
                 let lettersToAdd: ScrabbleLetter[] = this.stock.exchangeLetters(lettersToRemove);
-                //console.log("letters to add :", lettersToAdd);
                 for (let i: number = 0; i < lettersToAdd.length; i++) {
                     this.localPlayer.addLetter(lettersToAdd[i]);
                     this.rackService.removeLetter(lettersToRemove[i]);
                     this.rackService.drawLetter(lettersToAdd[i]);
                 }
-                //console.log("LETTERS TO REMOVE : ", lettersToRemove);
                 return ErrorType.NoError;
             }
         }
