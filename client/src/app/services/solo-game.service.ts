@@ -43,6 +43,7 @@ export class SoloGameService {
         this.localPlayer = new LocalPlayer(gameInfo.controls.name.value);
         this.localPlayer.isActive = true;
         this.virtualPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
+        this.virtualPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.totalCountDown = +gameInfo.controls.timer.value;
         this.timerMs = +this.totalCountDown;
         this.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);

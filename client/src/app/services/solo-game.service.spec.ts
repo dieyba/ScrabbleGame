@@ -51,7 +51,7 @@ describe('GameService', () => {
         expect(service.localPlayer.letters.length).toEqual(0);
         expect(service.localPlayer.isActive).toEqual(true);
         expect(service.virtualPlayer.name).toEqual('Sara');
-        expect(service.virtualPlayer.letters.length).toEqual(0);
+        expect(service.virtualPlayer.letters.length).toEqual(7);
         expect(service.totalCountDown).toEqual(60);
         expect(service.timerMs).toEqual(60);
         expect(service.dictionary.title).toEqual('Mon dictionnaire');
