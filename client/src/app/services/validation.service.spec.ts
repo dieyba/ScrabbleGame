@@ -8,8 +8,8 @@ import { ScrabbleWord } from '@app/classes/scrabble-word';
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('ValidationService', () => {
     let service: ValidationService;
-    let isWordValidSpy: jasmine.SpyObj<any>;
-    let convertScrabbleWordToStringSpy: jasmine.SpyObj<any>;
+    //  let isWordValidSpy: jasmine.SpyObj<any>;
+    //   let convertScrabbleWordToStringSpy: jasmine.SpyObj<any>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
@@ -43,7 +43,7 @@ describe('ValidationService', () => {
         expect(service.convertScrabbleWordToString(word)).toEqual('deja');
     });
 
-    it('if words is not null, validateWordsAndCalculateScore should call convertScrabbleWordToString and isWordValid', () => {
+    /* it('if words is not null, validateWordsAndCalculateScore should call convertScrabbleWordToString and isWordValid', () => {
         const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
         const letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
         const letter3: ScrabbleLetter = new ScrabbleLetter('j', 4);
@@ -56,7 +56,7 @@ describe('ValidationService', () => {
         service.validateWordsAndCalculateScore(words);
         expect(convertScrabbleWordToStringSpy).toHaveBeenCalled();
         expect(isWordValidSpy).toHaveBeenCalled();
-    });
+    });*/
 
     it('if one word is not valid, validateWordsAndCalculateScore should return 0', () => {
         const firstLetter: ScrabbleLetter = new ScrabbleLetter('J', 1);
