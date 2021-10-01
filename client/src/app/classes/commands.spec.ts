@@ -6,12 +6,12 @@ import { Command } from './commands';
 describe('Commands', () => {
     class CommandTest extends Command {
         constructor(defaultCommandParams: DefaultCommandParams) {
-            super(defaultCommandParams)
+            super(defaultCommandParams);
         }
 
         execute() {
             return ErrorType.NoError;
-        };
+        }
     }
 
     class DefaultCommandParamsTest implements DefaultCommandParams {

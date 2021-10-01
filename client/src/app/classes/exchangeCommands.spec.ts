@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { DefaultCommandParams } from '@app/classes/commands';
-import { ExchangeCmd } from '@app/classes/exchangeCommand';
+import { ExchangeCmd } from '@app/classes/exchange-command';
 import { GridService } from '@app/services/grid.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';

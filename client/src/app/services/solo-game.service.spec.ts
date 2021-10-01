@@ -11,6 +11,8 @@ import { SoloGameService } from './solo-game.service';
 const DEFAULT_WIDTH = 600;
 const DEFAULT_HEIGHT = 600;
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('GameService', () => {
     let service: SoloGameService;
     let changeActivePlayerSpy: jasmine.Spy<any>;
@@ -43,14 +45,7 @@ describe('GameService', () => {
         const bonus = new FormControl(false);
         const dictionaryForm = new FormControl('0', [Validators.required]);
         const opponent = new FormControl('Sara');
-        const myForm = new FormGroup({
-            name: name,
-            timer: timer,
-            bonus: bonus,
-            dictionaryForm: dictionaryForm,
-            level: level,
-            opponent: opponent,
-        });
+        const myForm = new FormGroup({ name, timer, bonus, dictionaryForm, level, opponent });
         service.initializeGame(myForm);
         expect(service.localPlayer.name).toEqual('Ariane');
         expect(service.localPlayer.letters.length).toEqual(7);
@@ -63,7 +58,7 @@ describe('GameService', () => {
         expect(service.randomBonus).toEqual(false);
     });
 
-    it('createNewGame should clear scrabble board ans fill rack', () => {
+    it('createNewGame should clear scrabble board and fill rack', () => {
         service.localPlayer = new LocalPlayer('Ariane');
         const firstLetter: ScrabbleLetter = new ScrabbleLetter('D', 1);
         const secondLetter: ScrabbleLetter = new ScrabbleLetter('e', 2);

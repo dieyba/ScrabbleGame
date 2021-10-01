@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Dictionary } from '@app/classes/dictionary';
+import { ErrorType } from '@app/classes/errors';
 import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
+import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
-import { ErrorType } from '../classes/errors';
-import { Vec2 } from '../classes/vec2';
+import { LetterStock } from '@app/services/letter-stock.service';
 import { GridService } from './grid.service';
-import { LetterStock } from './letter-stock.service';
 import { RackService } from './rack.service';
 
 const TIMER_INTERVAL = 1000;
@@ -20,7 +20,6 @@ const MINUTE_IN_SEC = 60;
 @Injectable({
     providedIn: 'root',
 })
-
 export class SoloGameService {
     localPlayer: LocalPlayer;
     virtualPlayer: VirtualPlayer;
@@ -49,6 +48,7 @@ export class SoloGameService {
     }
 
     createNewGame() {
+        // Empty board and stack
         this.rackService.scrabbleRack = new ScrabbleRack();
         this.gridService.scrabbleBoard = new ScrabbleBoard();
         this.drawRackLetters();
@@ -81,7 +81,7 @@ export class SoloGameService {
     }
 
     changeActivePlayer() {
-        let isLocalPlayerActive = this.localPlayer.isActive;
+        const isLocalPlayerActive = this.localPlayer.isActive;
         if (isLocalPlayerActive) {
             this.localPlayer.isActive = false;
             this.virtualPlayer.isActive = true;
@@ -108,17 +108,11 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
-
     place(position: Vec2, orientation: string, letters: string): ErrorType {
         if (this.localPlayer.isActive) {
-            console.log("Placing letters...");
-            return ErrorType.NoError;
-        } return ErrorType.ImpossibleCommand
-    }
-
-    debug(): ErrorType {
-        if (this.localPlayer.isActive) {
-            console.log('Changing debug state...');
+            console.log('Placing ' + letters); // eslint-disable-line no-console
+            console.log('position:' + position); // eslint-disable-line no-console
+            console.log('orientation: ' + orientation); // eslint-disable-line no-console
             return ErrorType.NoError;
         }
         return ErrorType.ImpossibleCommand;
@@ -129,7 +123,6 @@ export class SoloGameService {
             //console.log('Exchanging these letters:' + letters + " ...");
             let lettersToRemove: ScrabbleLetter[] = [];
             if (this.localPlayer.removeLetter(letters) == true) {
-
                 for (let i: number = 0; i < letters.length; i++) {
                     lettersToRemove[i] = new ScrabbleLetter(letters[i], 1);
                 }
@@ -146,9 +139,8 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
-
     drawRackLetters(): void {
-        for (let i: number = 0; i < DEFAULT_LETTER_COUNT; i++) {
+        for (let i = 0; i < DEFAULT_LETTER_COUNT; i++) {
             this.rackService.drawLetter(this.localPlayer.letters[i]);
         }
     }

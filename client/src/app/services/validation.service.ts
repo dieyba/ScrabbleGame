@@ -1,10 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
+import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleWord } from '@app/classes/scrabble-word';
+import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
+import { BonusService } from './bonus.service';
+import { BOARD_SIZE, GridService } from './grid.service';
+import { RackService } from './rack.service';
+import { SoloGameService } from './solo-game.service';
 
 const BONUS_LETTER_COUNT = 7;
 const BONUS_POINTS = 50;
+const WAIT_TIME = 3000;
 
 @Injectable({
     providedIn: 'root',
@@ -13,40 +19,65 @@ export class ValidationService {
     dictionary: Dictionary;
     words: string[];
 
-    constructor() {
+    constructor(
+        private readonly gridService: GridService,
+        private bonusService: BonusService,
+        private rackService: RackService,
+        private soloGameService: SoloGameService,
+    ) {
         this.dictionary = new Dictionary(DictionaryType.Default);
-        let firstLetter: ScrabbleLetter = new ScrabbleLetter('D', 1);
-        let secondLetter: ScrabbleLetter = new ScrabbleLetter('é', 2);
-        let thirdLetter: ScrabbleLetter = new ScrabbleLetter('j', 4);
-        let fourthLetter: ScrabbleLetter = new ScrabbleLetter('à', 3);
-        let word1: ScrabbleWord = new ScrabbleWord();
-        word1.content = [firstLetter, secondLetter, thirdLetter, fourthLetter];
-        let word2: ScrabbleWord = new ScrabbleWord();
-        word2.content = [firstLetter, secondLetter, thirdLetter, fourthLetter];
-        let words: ScrabbleWord[] = [word1, word2];
-        this.validateWordsAndCalculateScore(words);
+        this.words = [];
+    }
+
+    updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
+        const wordsValue = this.validateWordsAndCalculateScore(newWords);
+        player.score += wordsValue;
+        // Retirer lettres du board
+        newWords.forEach((newWord) => {
+            for (let j = 0; j < newWord.content.length; j++) {
+                if (wordsValue === 0) {
+                    setTimeout(() => {
+                        if (newWord.orientation === WordOrientation.Vertical) {
+                            this.gridService.removeSquare(newWord.startPosition.x, newWord.startPosition.y + j);
+                        }
+                        if (newWord.orientation === WordOrientation.Horizontal) {
+                            this.gridService.removeSquare(newWord.startPosition.x + j, newWord.startPosition.y);
+                        }
+                        this.rackService.drawLetter(newWord.content[j]);
+                    }, WAIT_TIME);
+                } else {
+                    if (newWord.orientation === WordOrientation.Vertical) {
+                        this.gridService.scrabbleBoard.squares[newWord.startPosition.x][newWord.startPosition.y + j].isValidated = true;
+                    }
+                    if (newWord.orientation === WordOrientation.Horizontal) {
+                        this.gridService.scrabbleBoard.squares[newWord.startPosition.x + j][newWord.startPosition.y].isValidated = true;
+                    }
+                }
+            }
+        });
+        this.soloGameService.changeActivePlayer();
     }
 
     validateWordsAndCalculateScore(newWords: ScrabbleWord[]): number {
         let totalScore = 0;
-        let newLetters = 0;
 
         for (let i = 0; i < newWords.length; i++) {
             this.words[i] = this.convertScrabbleWordToString(newWords[i].content);
-            this.words[i] = this.words[i].normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            // Word not valid, validation fails
+            // Word not valid, validation fails3
             if (!this.isWordValid(this.words[i])) {
                 return 0;
             } else {
                 // Words are all valid
                 // Add word's value to player's score
-                totalScore += newWords[i].totalValue();
-                newLetters += this.newLettersCount(/* newWords[i].content*/);
+                newWords[i].value = this.bonusService.totalValue(newWords[i]);
+                totalScore += newWords[i].value;
             }
         }
-        if (newLetters === BONUS_LETTER_COUNT) {
+        if (this.newLettersCount() === BONUS_LETTER_COUNT) {
             // Add 50 points to player's score
             totalScore += BONUS_POINTS;
+        } else if (this.newLettersCount() > BONUS_LETTER_COUNT) {
+            return 0;
         }
         return totalScore;
     }
@@ -63,8 +94,18 @@ export class ValidationService {
         return this.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
     }
 
-    newLettersCount(/* scrabbleLetters: ScrabbleLetter[]*/): number {
-        // TODO
-        return 1;
+    newLettersCount(): number {
+        let newLetters = 0;
+        for (let i = 0; i < BOARD_SIZE; i++) {
+            for (let j = 0; j < BOARD_SIZE; j++) {
+                if (
+                    this.gridService.scrabbleBoard.squares[i][j].occupied === true &&
+                    this.gridService.scrabbleBoard.squares[i][j].isValidated === false
+                ) {
+                    newLetters++;
+                }
+            }
+        }
+        return newLetters;
     }
 }

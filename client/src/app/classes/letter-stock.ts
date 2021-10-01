@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleLetter } from './scrabble-letter';
 
 enum LetterQuantity {
     A = 9,
@@ -61,11 +60,17 @@ enum LetterValue {
     Star = 0,
 }
 
-@Injectable({
-    providedIn: 'root',
-})
 export class LetterStock {
+    // getInstance(): LetterStock {
+    //     if (this.instance == null) {
+    //         this.instance = new LetterStock()
+    //     }
+    //     return this.instance;
+    // }
+
     letterStock: ScrabbleLetter[];
+    sizeStock: number = 0;
+    // private instance: LetterStock;
 
     constructor() {
         this.letterStock = [];
@@ -98,36 +103,46 @@ export class LetterStock {
         this.addLettersToStock(new ScrabbleLetter('*', LetterValue.Star), LetterQuantity.Star); // *
     }
 
-    isEmpty(): boolean {
-        return this.letterStock.length == 0;
-    }
-
     addLettersToStock(letter: ScrabbleLetter, number: number): void {
         for (let i = 0; i < number; i++) {
             this.letterStock.push(letter);
+            this.sizeStock++;
         }
     }
 
     takeLettersFromStock(number: number): ScrabbleLetter[] {
-        let lettersRemovedFromStock: ScrabbleLetter[] = [];
+        const lettersRemovedFromStock: ScrabbleLetter[] = [];
+
         for (let i = 0; i < number; i++) {
+            // Si la réserve est vide, qu'est ce qu'on fait ?
             if (this.isEmpty()) {
-                // Si la réserve est vide, qu'est ce qu'on fait ?
-                // window.alert("Il n'y a plus assez de lettre dans la réserve.");
+                window.alert("Il n'y a plus de lettre dans la réserve.");
+                break;
             } else {
-                const index = Math.floor(Math.random() * (this.letterStock.length - 1));
-                lettersRemovedFromStock[i] = this.letterStock.splice(index, 1)[0];
+                const index = this.randomNumber(0, this.sizeStock);
+                lettersRemovedFromStock[i] = this.letterStock[index];
+                this.resize(i);
             }
         }
+
         return lettersRemovedFromStock;
     }
 
-    exchangeLetters(playerLetters: ScrabbleLetter[]): ScrabbleLetter[] {
-        let randomLetters = this.takeLettersFromStock(playerLetters.length);
-        for (let i = 0; i < playerLetters.length; i++) {
-            this.letterStock.push(playerLetters[i]);
+    resize(index: number): void {
+        for (let i = 0; i < this.sizeStock; i++) {
+            this.letterStock[index] = this.letterStock[index + 1];
         }
+        this.letterStock.pop();
+        this.sizeStock--;
+    }
 
-        return randomLetters;
+    // duplication de code, cette fonction existe dans forms.ts
+    randomNumber(minimum: number, maximum: number): number {
+        const randomFloat = Math.random() * (maximum - minimum);
+        return Math.floor(randomFloat) + minimum;
+    }
+
+    isEmpty(): boolean {
+        return this.sizeStock === 0;
     }
 }

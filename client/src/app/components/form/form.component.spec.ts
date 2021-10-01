@@ -37,8 +37,9 @@ describe('FormComponent', () => {
                 MatDialogModule,
                 BrowserAnimationsModule,
             ],
-            providers: [{ provide: MatDialogRef, useValue: { close: () => {} } },
-            { provide: Router, useValue: { navigate: () => new Observable() } },
+            providers: [
+                { provide: MatDialogRef, useValue: { close: () => {} } },
+                { provide: Router, useValue: { navigate: () => new Observable() } },
             ],
         }).compileComponents();
     });
@@ -77,8 +78,8 @@ describe('FormComponent', () => {
     });
 
     it('should return a value between the minimum and the maxmimum', () => {
-        const minimum: number = 3;
-        const maximum: number = 10;
+        const minimum = 3;
+        const maximum = 10;
 
         expect(component.randomNumber(minimum, maximum)).toBeLessThan(maximum);
         expect(component.randomNumber(minimum, maximum)).toBeGreaterThanOrEqual(minimum);

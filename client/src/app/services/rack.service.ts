@@ -15,6 +15,8 @@ const DOUBLE_DIGIT = 10;
 export class RackService {
     scrabbleRack: ScrabbleRack;
     gridContext: CanvasRenderingContext2D;
+    squareWidth = RACK_WIDTH / MAX_LETTER_COUNT;
+    squareHeight = RACK_WIDTH;
 
     constructor() {
         this.scrabbleRack = new ScrabbleRack();
@@ -25,21 +27,25 @@ export class RackService {
         this.gridContext.strokeStyle = 'black';
         this.gridContext.lineWidth = 1;
 
-        for (let i = 1; i < MAX_LETTER_COUNT - 1; i++) {
+        for (let i = 0; i < MAX_LETTER_COUNT + 1; i++) {
             this.gridContext.moveTo((RACK_WIDTH * i) / MAX_LETTER_COUNT, 0);
             this.gridContext.lineTo((RACK_WIDTH * i) / MAX_LETTER_COUNT, RACK_HEIGHT);
         }
+
+        this.gridContext.moveTo(0, 0);
+        this.gridContext.lineTo(RACK_WIDTH, 0);
+        this.gridContext.moveTo(0, RACK_HEIGHT);
+        this.gridContext.lineTo(RACK_WIDTH, RACK_HEIGHT);
 
         this.gridContext.stroke();
     }
 
     drawLetter(scrabbleLetter: ScrabbleLetter): void {
-        console.log('scrabble letter : ', scrabbleLetter);
-
         for (let i = 0; i < MAX_LETTER_COUNT; i++) {
-            if (!this.scrabbleRack.squares[i].occupied) {
+            if (!this.scrabbleRack.squares[i].occupied && scrabbleLetter !== undefined) {
                 this.scrabbleRack.squares[i].letter = scrabbleLetter;
                 this.scrabbleRack.squares[i].occupied = true;
+                this.scrabbleRack.squares[i].position = { x: i, y: 0 };
                 const positionX = (RACK_WIDTH * i) / MAX_LETTER_COUNT;
                 const letter = scrabbleLetter.character.toUpperCase();
                 this.gridContext.beginPath();
@@ -58,10 +64,14 @@ export class RackService {
     }
 
     removeLetter(scrabbleLetter: ScrabbleLetter) {
-        for (let i = 0; i < MAX_LETTER_COUNT; i++) {
-            if (this.scrabbleRack.squares[i].letter.character === scrabbleLetter.character) {
-                this.scrabbleRack.squares[i] = new Square(i, 0);
-                break;
+        for (let i = 0; i < this.scrabbleRack.squares.length; i++) {
+            if (this.scrabbleRack.squares[i].letter !== undefined) {
+                if (this.scrabbleRack.squares[i].letter.character === scrabbleLetter.character) {
+                    this.scrabbleRack.squares[i] = new Square(i, 0);
+                    break;
+                }
+            } else {
+                return;
             }
         }
         this.gridContext.clearRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
@@ -70,7 +80,7 @@ export class RackService {
     }
 
     replaceLetters() {
-        for (let i = 0; i < MAX_LETTER_COUNT - 1; i++) {
+        for (let i = 0; i < this.scrabbleRack.squares.length - 1; i++) {
             if (this.scrabbleRack.squares[i].letter === undefined) {
                 this.scrabbleRack.squares[i].letter = this.scrabbleRack.squares[i + 1].letter;
                 this.scrabbleRack.squares[i + 1] = new Square(i + 1, 0);
