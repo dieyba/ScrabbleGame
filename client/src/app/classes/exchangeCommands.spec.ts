@@ -1,37 +1,38 @@
 import { TestBed } from '@angular/core/testing';
 import { DefaultCommandParams } from '@app/classes/commands';
 import { ExchangeCmd } from '@app/classes/exchangeCommand';
+import { GridService } from '@app/services/grid.service';
+import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
+import { LocalPlayer } from './local-player';
 //import SpyObj = jasmine.SpyObj;
 class DefaultCommandParamsTest implements DefaultCommandParams {
     gameService: SoloGameService;
     isFromLocalPlayer: boolean;
 }
 describe('ExchangeCmd', () => {
-    //let service= new SoloGameService();
-
+    let rack = new RackService();
+    let grid = new GridService();
+    let service = new SoloGameService(grid, rack);
     const defaultCommandParams: DefaultCommandParamsTest = new DefaultCommandParamsTest();
-    let soloGameSpy: jasmine.SpyObj<SoloGameService>;
     let exchange = new ExchangeCmd(defaultCommandParams, 'amd');
-    //soloGameSpy = jasmine.createSpyObj('SoloGameService', ['exchangeLetters']);
     beforeEach(() => {
         TestBed.configureTestingModule({
-            providers: [{ provide: ExchangeCmd, useValue: exchange }, { provide: SoloGameService, useValue: soloGameSpy }],
+            providers: [{ provide: ExchangeCmd, useValue: exchange }],
         });
-        exchange = TestBed.inject(ExchangeCmd);
-        // soloGameSpy = TestBed.inject(SoloGameService) as jasmine.SpyObj<SoloGameService>;
     });
 
     it('should create an instance', () => {
         expect(exchange).toBeTruthy();
     });
 
-    // it('should call exchange letters from soloGameService', () => {
-    //     // spyOn('soloGameSpy', 'exchangeLetters');
-    //     // soloGameSpy = spyOn<any>(exchange, 'exchangeLetters');
-    //     //spyOn(soloGameSpy, 'exchangeLetters').and.callThrough();
-    //     // exchange.gameService = spy;
-    //     exchange.execute();
-    //     expect(exchange.gameService.exchangeLetters).toHaveBeenCalled();
-    // });
+    it('should call exchange letters from soloGameService', () => {
+        let player = new LocalPlayer('dieyna');
+        player.isActive = true;
+        service.localPlayer = player;
+        exchange.gameService = service;
+        const spy = spyOn(service, 'exchangeLetters').and.callThrough();
+        exchange.execute();
+        expect(spy).toHaveBeenCalled();
+    });
 });
