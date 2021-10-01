@@ -21,6 +21,7 @@ describe('PlayAreaComponent', () => {
             'createNewGame',
             'passTurn',
             'changeActivePlayer',
+            'removeLetter',
         ]);
         await TestBed.configureTestingModule({
             declarations: [PlayAreaComponent],
@@ -38,6 +39,7 @@ describe('PlayAreaComponent', () => {
             score: 73,
             letters: [letter],
             isActive: false,
+            isWinner: false,
         };
     });
 
