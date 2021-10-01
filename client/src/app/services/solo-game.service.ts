@@ -7,7 +7,9 @@ import { LetterStock } from '@app/classes/letter-stock';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
+import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
@@ -139,14 +141,68 @@ export class SoloGameService {
             return ErrorType.SyntaxError;
         }
 
-        // TODO Check if player has the necessary letters on the rack (also if played didn't place any letters)
-        // const testLetter = this.localPlayer.letters.pop() as ScrabbleLetter;
+        // Removing all the letters from my "word" that are already on the board
+        const wordCopy = placeParams.word.toLowerCase();
+        const letterOnBoard = this.gridService.scrabbleBoard.getStringFromCoord(
+            placeParams.position,
+            placeParams.word.length,
+            placeParams.orientation,
+        );
+        for (const letter of letterOnBoard) {
+            wordCopy.replace(letter, '');
+        }
 
-        // TODO Place letters
+        // All letter are already placed
+        if (wordCopy === '') {
+            return ErrorType.SyntaxError;
+        }
+
+        // Checking if the rest of the letters are on the rack
+        for (const letter of player.letters) {
+            wordCopy.replace(letter.character, '');
+        }
+
+        // There should be no letters left, else there is not enough letter on the rack to place de "word"
+        if (wordCopy !== '') {
+            return ErrorType.SyntaxError;
+        }
+
+        // Placing letters
+        const tempCoord = new Vec2(placeParams.position.x, placeParams.position.y);
+        for (const letter of placeParams.word) {
+            if (!this.gridService.scrabbleBoard.squares[tempCoord.x][tempCoord.y].occupied) {
+                // Taking letter from player and placing it
+                this.placeLetter(player.letters, letter, tempCoord);
+            }
+            if (placeParams.orientation === 'h') {
+                tempCoord.x++;
+            } else {
+                tempCoord.y++;
+            }
+        }
+
+        // TODO Generate all words created
 
         // TODO Call validation method and end turn
+        // Take letters??
 
         // TODO Optional : update la vue de ScrabbleLetter automatically
         return ErrorType.NoError; // TODO change to "no error"
+    }
+
+    placeLetter(playerLetters: ScrabbleLetter[], letter: string, position: Vec2) {
+        // Position already occupied
+        if (this.gridService.scrabbleBoard.squares[position.x][position.y].occupied) {
+            return;
+        }
+
+        for (let i = 0; i < playerLetters.length; i++) {
+            if (playerLetters[i].character === letter) {
+                this.gridService.drawLetter(playerLetters[i], position.x, position.y);
+                this.rackService.removeLetter(playerLetters[i]);
+                playerLetters.splice(i, 1);
+                return;
+            }
+        }
     }
 }

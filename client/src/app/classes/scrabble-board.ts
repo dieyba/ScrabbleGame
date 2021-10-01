@@ -260,4 +260,19 @@ export class ScrabbleBoard {
 
         return false;
     }
+
+    getStringFromCoord(coord: Vec2, length: number, orientation: string): string {
+        let tempString = '';
+        for (let i = 0; i < length; i++) {
+            if (this.squares[coord.x][coord.y].occupied) {
+                tempString += this.squares[coord.x][coord.y].letter;
+            }
+            if (orientation === 'h') {
+                coord.x++;
+            } else {
+                coord.y++;
+            }
+        }
+        return tempString;
+    }
 }
