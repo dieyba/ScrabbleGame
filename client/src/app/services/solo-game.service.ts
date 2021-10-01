@@ -125,25 +125,9 @@ export class SoloGameService {
         const tempCoord = new Vec2();
 
         // Checking if its player's turn
-        if (!player.isActive) {
+        if (!this.canPlaceWord(player, placeParams)) {
             return ErrorType.SyntaxError;
         }
-
-        // Checking if the whole word is inside the board
-        tempCoord.clone(placeParams.position);
-        if (!this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, tempCoord, placeParams.orientation)) {
-            return ErrorType.SyntaxError;
-        }
-
-        // Checking if the word is touching another word or passing through the middle
-        if (
-            !this.gridService.scrabbleBoard.isWordPassingInCenter(placeParams.word, placeParams.position, placeParams.orientation) &&
-            !this.gridService.scrabbleBoard.isWordPartOfAnotherWord(placeParams.word, placeParams.position, placeParams.orientation) &&
-            !this.gridService.scrabbleBoard.isWordTouchingOtherWord(placeParams.word, placeParams.position, placeParams.orientation)
-        ) {
-            return ErrorType.SyntaxError;
-        }
-
         // Removing all the letters from my "word" that are already on the board
         let wordCopy = placeParams.word.toLowerCase();
         const letterOnBoard = this.gridService.scrabbleBoard.getStringFromCoord(
@@ -151,6 +135,7 @@ export class SoloGameService {
             placeParams.word.length,
             placeParams.orientation,
         );
+
         for (const letter of letterOnBoard) {
             wordCopy = wordCopy.replace(letter, '');
         }
@@ -220,7 +205,17 @@ export class SoloGameService {
             }
         }
     }
-    // canPlaceWord(): boolean {
-    //     if(!this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, tempCoord, placeParams.orientation)))
-    // }
+
+    canPlaceWord(player: Player, placeParams: PlaceParams): boolean {
+        if (
+            !this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, placeParams.position, placeParams.orientation) ||
+            (!this.gridService.scrabbleBoard.isWordPassingInCenter(placeParams.word, placeParams.position, placeParams.orientation) &&
+                !this.gridService.scrabbleBoard.isWordPartOfAnotherWord(placeParams.word, placeParams.position, placeParams.orientation) &&
+                !this.gridService.scrabbleBoard.isWordTouchingOtherWord(placeParams.word, placeParams.position, placeParams.orientation)) ||
+            !player.isActive
+        ) {
+            return false;
+        }
+        return true;
+    }
 }
