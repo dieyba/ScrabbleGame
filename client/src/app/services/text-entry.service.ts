@@ -25,6 +25,8 @@ const COLUMN_OFFSET = 1;
 const HORIZONTAL = 'h';
 const VERTICAL = 'v';
 
+type CommandCreationResult = Command | ErrorType.SyntaxError|ErrorType.InvalidCommand;
+
 @Injectable({
     providedIn: 'root',
 })
@@ -59,22 +61,26 @@ export class TextEntryService {
         const player:Player = isLocalPlayer ? this.gameService.localPlayer : this.gameService.virtualPlayer;
         userInput = this.trimSpaces(userInput);
         if (!this.isEmpty(userInput)) {
+            
             if (userInput.startsWith('!')) {
-                const commandCreated = this.createCommand(userInput, player);
-                if (commandCreated) {
-                    const commandResult = commandCreated.execute();
-                    if (commandResult === ErrorType.NoError) {
-                        if (commandCreated instanceof ExchangeCmd) {
-                            // Only exchange success message depends on who called the command
+                let commandCreationResult = this.createCommand(userInput, player);
+                const isCreated = commandCreationResult !== ErrorType.SyntaxError && commandCreationResult !== ErrorType.InvalidCommand;
+                if (isCreated) {
+                    commandCreationResult = commandCreationResult as Command;
+                    const commandExecutionResult = commandCreationResult.execute();
+                    if (commandExecutionResult === ErrorType.NoError) {
+                        // In this sprint, only exchange command success message depends on who called the command
+                        if (commandCreationResult instanceof ExchangeCmd) {
                             userInput = this.chatDisplayService.createExchangeMessage(isLocalPlayer, userInput);
                         }
-                        // Command executed successfully
                         this.chatDisplayService.addPlayerEntry(isLocalPlayer, player.name, userInput);
                     } else {
-                        // Command not executed successfully
-                        this.chatDisplayService.addErrorMessage(commandResult, userInput);
+                        this.chatDisplayService.addErrorMessage(commandExecutionResult, userInput);
                     }
+                } else {
+                    this.chatDisplayService.addErrorMessage(commandCreationResult as ErrorType,userInput);
                 }
+
             } else {
                 // Not a command input. Send normal chat message
                 this.chatDisplayService.addPlayerEntry(isLocalPlayer, player.name, userInput);
@@ -82,7 +88,8 @@ export class TextEntryService {
         }
     }
 
-    private createCommand(commandInput: string, player:Player): Command | undefined {
+
+    private createCommand(commandInput: string, player:Player): CommandCreationResult {
         const splitInput = this.splitCommandInput(commandInput);
         const commandName = splitInput.shift() as string;
         // Validate command name entered after the !
@@ -94,13 +101,13 @@ export class TextEntryService {
             if (commandParams) {
                 return createCmdFunction.call(this, commandParams);
             } else {
-                this.chatDisplayService.addErrorMessage(ErrorType.SyntaxError, commandInput);
+                return ErrorType.SyntaxError;
             }
         } else {
-            this.chatDisplayService.addErrorMessage(ErrorType.InvalidCommand, commandInput);
+            return ErrorType.InvalidCommand;
         }
-        return undefined;
     }
+
     /**
      * Returns the parameters specific to the command entered if its syntax was valid
      *
