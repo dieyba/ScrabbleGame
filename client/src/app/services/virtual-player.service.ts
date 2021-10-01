@@ -17,13 +17,12 @@ const POINTS_INTERVAL = 5;
 @Injectable({
   providedIn: 'root'
 })
+
 export class VirtualPlayerService {
   board : ScrabbleBoard;
   rack : ScrabbleRack; //Replace this for implementation
 
   constructor(private validationService : ValidationService) {    //TODO Implement timer (3s and 20s limit)
-    this.board = new ScrabbleBoard;
-    this.rack = new ScrabbleRack;
     let currentMove = this.getRandomIntInclusive(1, 100);
     if(currentMove <= Probability.EndTurn){
       //10% chance to end turn
