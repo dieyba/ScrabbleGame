@@ -1,12 +1,12 @@
 export enum ErrorType {
+    NoError,
     SyntaxError,
     InvalidCommand,
     ImpossibleCommand,
 }
 
-// TODO: Voir si inclure commande erronée dans le msg
 export const ERROR_MESSAGES = new Map([
-    [ErrorType.SyntaxError, 'Syntax error'],
-    [ErrorType.InvalidCommand, 'Invalid command'],
-    [ErrorType.ImpossibleCommand, 'Impossible command'],
+    [ErrorType.SyntaxError, 'Erreur de syntaxe, vérifiez les paramètres de commande entrés'],
+    [ErrorType.InvalidCommand, 'Entrée invalide, vérifiez le nom de la commande entrée'],
+    [ErrorType.ImpossibleCommand, 'Commande impossible à réaliser, exécution illégale'],
 ]);

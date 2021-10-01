@@ -15,7 +15,7 @@ const DOUBLE_DIGIT = 10;
 export class RackService {
     scrabbleRack: ScrabbleRack;
     gridContext: CanvasRenderingContext2D;
-    squareWidth = RACK_WIDTH / 7;
+    squareWidth = RACK_WIDTH / MAX_LETTER_COUNT;
     squareHeight = RACK_WIDTH;
 
     constructor() {
@@ -42,7 +42,7 @@ export class RackService {
 
     drawLetter(scrabbleLetter: ScrabbleLetter): void {
         for (let i = 0; i < MAX_LETTER_COUNT; i++) {
-            if (!this.scrabbleRack.squares[i].occupied) {
+            if (!this.scrabbleRack.squares[i].occupied && scrabbleLetter !== undefined) {
                 this.scrabbleRack.squares[i].letter = scrabbleLetter;
                 this.scrabbleRack.squares[i].occupied = true;
                 this.scrabbleRack.squares[i].position = { x: i, y: 0 };
@@ -65,9 +65,13 @@ export class RackService {
 
     removeLetter(scrabbleLetter: ScrabbleLetter) {
         for (let i = 0; i < this.scrabbleRack.squares.length; i++) {
-            if (this.scrabbleRack.squares[i].letter.character === scrabbleLetter.character) {
-                this.scrabbleRack.squares[i] = new Square(i, 0);
-                break;
+            if (this.scrabbleRack.squares[i].letter !== undefined) {
+                if (this.scrabbleRack.squares[i].letter.character === scrabbleLetter.character) {
+                    this.scrabbleRack.squares[i] = new Square(i, 0);
+                    break;
+                }
+            } else {
+                return;
             }
         }
         this.gridContext.clearRect(0, 0, RACK_WIDTH, RACK_HEIGHT);

@@ -7,6 +7,7 @@ import { RackService } from './rack.service';
 export const RACK_WIDTH = 500;
 export const RACK_HEIGHT = 60;
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('RackService', () => {
     let service: RackService;
     let ctxStub: CanvasRenderingContext2D;
@@ -24,14 +25,14 @@ describe('RackService', () => {
 
     it('drawLetter should call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        let letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        const letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
         service.drawLetter(letter);
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
     it('drawLetter should handle double digit values', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
-        let letter: ScrabbleLetter = new ScrabbleLetter('D', 12);
+        const letter: ScrabbleLetter = new ScrabbleLetter('D', 12);
         service.drawLetter(letter);
         expect(fillTextSpy).toHaveBeenCalled();
     });
