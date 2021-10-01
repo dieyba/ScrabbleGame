@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { Square } from '@app/classes/square';
+import { Vec2 } from '@app/classes/vec2';
 
 export const RACK_WIDTH = 500;
 export const RACK_HEIGHT = 60;
@@ -45,7 +46,7 @@ export class RackService {
             if (!this.scrabbleRack.squares[i].occupied && scrabbleLetter !== undefined) {
                 this.scrabbleRack.squares[i].letter = scrabbleLetter;
                 this.scrabbleRack.squares[i].occupied = true;
-                this.scrabbleRack.squares[i].position = { x: i, y: 0 };
+                this.scrabbleRack.squares[i].position = new Vec2(i, 0);
                 const positionX = (RACK_WIDTH * i) / MAX_LETTER_COUNT;
                 const letter = scrabbleLetter.character.toUpperCase();
                 this.gridContext.beginPath();

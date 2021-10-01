@@ -37,7 +37,7 @@ export class GridService {
     valueFonts: string[] = ['9px system-ui', '11px system-ui', '13px system-ui', '15px system-ui'];
     currentLetterFont: string;
     currentValueFont: string;
-    private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
+    private canvasSize: Vec2 = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
     constructor() {
         this.scrabbleBoard = new ScrabbleBoard();

@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Command, CommandParams } from '@app/classes/commands';
-import { Player } from '@app/classes/player';
 import { createDebugCmd } from '@app/classes/debug-command';
 import { ErrorType } from '@app/classes/errors';
 import { createExchangeCmd, ExchangeCmd } from '@app/classes/exchange-command';
 import { createPassCmd } from '@app/classes/pass-command';
 import { createPlaceCmd } from '@app/classes/place-command';
+import { Player } from '@app/classes/player';
 import { Column, Row } from '@app/classes/scrabble-board';
 import { Vec2 } from '@app/classes/vec2';
 import { ChatDisplayService } from './chat-display.service';
@@ -56,7 +56,7 @@ export class TextEntryService {
      * @param text Text input from user
      */
     handleInput(userInput: string, isLocalPlayer: boolean) {
-        const player:Player = isLocalPlayer ? this.gameService.localPlayer : this.gameService.virtualPlayer;
+        const player: Player = isLocalPlayer ? this.gameService.localPlayer : this.gameService.virtualPlayer;
         userInput = this.trimSpaces(userInput);
         if (!this.isEmpty(userInput)) {
             if (userInput.startsWith('!')) {
@@ -82,7 +82,7 @@ export class TextEntryService {
         }
     }
 
-    private createCommand(commandInput: string, player:Player): Command | undefined {
+    private createCommand(commandInput: string, player: Player): Command | undefined {
         const splitInput = this.splitCommandInput(commandInput);
         const commandName = splitInput.shift() as string;
         // Validate command name entered after the !
@@ -108,7 +108,7 @@ export class TextEntryService {
      * @param paramsInput string[] split at the spaces of the command input (without the command name)
      * @returns Default parameters and the command specific parameters if it has some
      */
-    private extractCommandParams(player:Player, commandName: string, paramsInput: string[]): CommandParams | undefined {
+    private extractCommandParams(player: Player, commandName: string, paramsInput: string[]): CommandParams | undefined {
         if (this.paramsMap.has(commandName)) {
             const createParamsFunction: Function = this.paramsMap.get(commandName) as Function; // eslint-disable-line @typescript-eslint/ban-types
             const params = createParamsFunction.call(this, player, paramsInput);
@@ -119,16 +119,16 @@ export class TextEntryService {
         return undefined;
     }
 
-    private extractDebugParams(player:Player, paramsInput: string[]): CommandParams {
+    private extractDebugParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
-            return { player:player, serviceCalled: this.chatDisplayService };
+            return { player, serviceCalled: this.chatDisplayService };
         }
         return undefined;
     }
 
-    private extractPassParams(player:Player, paramsInput: string[]): CommandParams {
+    private extractPassParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
-            return { player:player, serviceCalled: this.gameService };
+            return { player, serviceCalled: this.gameService };
         }
         return undefined;
     }
@@ -141,7 +141,7 @@ export class TextEntryService {
      * the placing parameters and the word to place.
      * @returns Default parameteres and place commands parameters. If invalid syntax, returns undefined
      */
-    private extractPlaceParams(player:Player, paramsInput: string[]): CommandParams {
+    private extractPlaceParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 2) {
             const word = this.removeAccents(paramsInput[1]);
             const positionOrientation = paramsInput[0];
@@ -154,8 +154,8 @@ export class TextEntryService {
                     const orientation = positionOrientation.slice(LAST_CHAR_INDEX).toLowerCase();
                     if (orientation === HORIZONTAL || orientation === VERTICAL) {
                         const placeParams = { position: coordinates, orientation, word };
-                        const defaultParams = {player:player, serviceCalled: this.gameService};
-                        const commandParams = { defaultParams:defaultParams, specificParams: placeParams };
+                        const defaultParams = { player, serviceCalled: this.gameService };
+                        const commandParams = { defaultParams, specificParams: placeParams };
                         return commandParams;
                     }
                 }
@@ -172,7 +172,7 @@ export class TextEntryService {
      * Should only have 1 element, the letters to exchange.
      * @returns Default parameteres and a string for the letters to exchange. If invalid syntax, returns undefined
      */
-    private extractExchangeParams(player:Player, paramsInput: string[]): CommandParams {
+    private extractExchangeParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 1) {
             const letters = paramsInput[0];
             const hasAccents = letters !== this.removeAccents(letters);
@@ -180,8 +180,8 @@ export class TextEntryService {
                 const isValidLetterAmount = letters.length >= MIN_EXCHANGE_LETTERS && letters.length <= MAX_EXCHANGE_LETTERS;
                 if (isValidLetterAmount) {
                     if (this.isValidExchangeWord(letters)) {
-                        const defaultParams = {player:player, serviceCalled: this.gameService};
-                        return { defaultParams:defaultParams, specificParams: letters };
+                        const defaultParams = { player, serviceCalled: this.gameService };
+                        return { defaultParams, specificParams: letters };
                     }
                 }
             }
@@ -254,7 +254,7 @@ export class TextEntryService {
             const isValidRow = rowNumber >= Row.A && rowNumber <= Row.O;
             const isValidColumn = columnNumber >= Column.One && columnNumber <= Column.Fifteen;
             if (isValidRow && isValidColumn) {
-                return { x: rowNumber, y: columnNumber };
+                return new Vec2(columnNumber, rowNumber);
             }
         }
         return undefined;
