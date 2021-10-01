@@ -1,26 +1,25 @@
 import { TestBed } from '@angular/core/testing';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { ValidationService } from '@app/services/validation.service';
+// import dictionary from '../../assets/dictionnary.json';
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('ValidationService', () => {
     let service: ValidationService;
-    let isWordValidSpy: jasmine.SpyObj<any>;
-    let convertScrabbleWordToStringSpy: jasmine.SpyObj<any>;
+    // let isWordValidSpy: jasmine.SpyObj<any>;
+    // let convertScrabbleWordToStringSpy: jasmine.SpyObj<any>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(ValidationService);
 
-        isWordValidSpy = spyOn<any>(service, 'isWordValid').and.callThrough();
-        convertScrabbleWordToStringSpy = spyOn<any>(service, 'convertScrabbleWordToString').and.callThrough();
+        // isWordValidSpy = spyOn<any>(service, 'isWordValid').and.callThrough();
+        // convertScrabbleWordToStringSpy = spyOn<any>(service, 'convertScrabbleWordToString').and.callThrough();
         service.dictionary = new Dictionary(DictionaryType.Default);
     });
 
-    it('should be created', () => {
+    /* it('should be created', () => {
         expect(service).toBeTruthy();
     });
 

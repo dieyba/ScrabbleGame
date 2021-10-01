@@ -19,7 +19,6 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { StartingPageComponent } from '@app/pages/starting-page/starting-page.component';
-import { ChatBoxComponent } from './components/chat-box/chat-box.component';
 import { ChatDisplayComponent } from './components/chat-display/chat-display.component';
 import { FormComponent } from './components/form/form.component';
 import { TextEntryComponent } from './components/text-entry/text-entry.component';
@@ -39,7 +38,6 @@ import { AutofocusDirective } from './directives/autofocus.directive';
         MaterialPageComponent,
         PlayAreaComponent,
         SidebarComponent,
-        ChatBoxComponent,
         ChatDisplayComponent,
         TextEntryComponent,
         AutofocusDirective,

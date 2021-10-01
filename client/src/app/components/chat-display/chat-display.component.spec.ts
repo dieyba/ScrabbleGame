@@ -1,15 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AuthorType, ChatDisplayEntry, ChatEntryColor } from 'src/app/classes/chat-display-entry';
 import { ChatDisplayComponent } from './chat-display.component';
 
 describe('ChatDisplayComponent', () => {
     let chatDisplay: ChatDisplayComponent;
     let fixture: ComponentFixture<ChatDisplayComponent>;
 
-    // TODO update tests!!
-    // let systemEntry: ChatEntry = { authorType:AuthorType.System, color:ChatEntryColor.SystemColor, message:"error message"};
-    // let playerEntry: ChatEntry = { authorType: AuthorType.Player, color:ChatEntryColor.PlayerColor, message:"player message"};
-    // let adversaryEntry: ChatEntry = { authorType:AuthorType.Adversary, color:ChatEntryColor.AdversaryColor, message:"adversary message"};
-    // const isAdversary = true;
+    const systemEntry: ChatDisplayEntry = { authorType: AuthorType.System, color: ChatEntryColor.SystemColor, message: 'error message' };
+    const playerEntry: ChatDisplayEntry = { authorType: AuthorType.Player, color: ChatEntryColor.PlayerColor, message: 'player message' };
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -27,32 +25,63 @@ describe('ChatDisplayComponent', () => {
         expect(chatDisplay).toBeTruthy();
     });
 
-    // TODO update test!!
+    it("method 'isNewEntry' should return true if 'lastEntry' is undefined", () => {
+        const result = chatDisplay.isNewEntry(playerEntry);
 
-    // it('should add entries to entry array', () => {
-    //     expect(chatDisplay.entries.length).toBe(0);
-    //     chatDisplay.addErrorMessage( systemEntry.message);
-    //     expect(chatDisplay.entries.length).toBe(1);
-    //     chatDisplay.addPlayerEntry(!isAdversary, playerEntry.message);
-    //     expect(chatDisplay.entries.length).toBe(2);
-    //     chatDisplay.addPlayerEntry(isAdversary, playerEntry.message);
-    //     expect(chatDisplay.entries.length).toBe(3);
-    // });
+        expect(result).toEqual(true);
+    });
 
-    // it('should add entries in the array with the right values', () => {
-    //     chatDisplay.addErrorMessage(systemEntry.message);
-    //     expect(chatDisplay.entries[chatDisplay.entries.length-1].authorType).toBe(AuthorType.System);
-    //     expect(chatDisplay.entries[chatDisplay.entries.length-1].color).toBe(ChatEntryColor.SystemColor);
-    //     expect(chatDisplay.entries[chatDisplay.entries.length-1].message).toBe(systemEntry.message);
+    it("method 'isNewEntry' should return true if 'lastEntry' is not equal to 'entry'", () => {
+        chatDisplay.lastEntry = systemEntry;
 
-    //     chatDisplay.addPlayerEntry(!isAdversary, playerEntry.message);
-    //     expect(chatDisplay.entries[chatDisplay.entries.length-1].authorType).toBe(AuthorType.Player);
-    //     expect(chatDisplay.entries[chatDisplay.entries.length-1].color).toBe(ChatEntryColor.PlayerColor);
-    //     expect(chatDisplay.entries[chatDisplay.entries.length-1].message).toBe(playerEntry.message);
+        const result = chatDisplay.isNewEntry(playerEntry);
 
-    //     chatDisplay.addPlayerEntry(isAdversary, adversaryEntry.message);
-    //     expect(chatDisplay.entries[chatDisplay.entries.length-1].authorType).toBe(AuthorType.Adversary);
-    //     expect(chatDisplay.entries[chatDisplay.entries.length-1].color).toBe(ChatEntryColor.AdversaryColor);
-    //     expect(chatDisplay.entries[chatDisplay.entries.length-1].message).toBe(adversaryEntry.message);
+        expect(result).toEqual(true);
+    });
+
+    it("method 'isNewEntry' should return false if 'lastEntry' is equal to 'entry'", () => {
+        chatDisplay.lastEntry = systemEntry;
+
+        const result = chatDisplay.isNewEntry(systemEntry);
+
+        expect(result).toEqual(false);
+    });
+
+    it("method 'updateScroll' should call 'scrollDown' AND 'this.lastEntry' should be equal to 'entry' if 'isNewEntry()' is true", () => {
+        const isNewEntrySpy = spyOn(chatDisplay, 'isNewEntry').and.returnValue(true);
+        const scrollDownSpy = spyOn(chatDisplay, 'scrollDown').and.stub();
+
+        chatDisplay.updateScroll(playerEntry);
+
+        expect(isNewEntrySpy).toHaveBeenCalled();
+        expect(chatDisplay.lastEntry).toEqual(playerEntry);
+        expect(scrollDownSpy).toHaveBeenCalled();
+    });
+
+    it("method 'updateScroll' should not call 'scrollDown' if 'isNewEntry()' is false", () => {
+        const isNewEntrySpy = spyOn(chatDisplay, 'isNewEntry').and.returnValue(false);
+        const scrollDownSpy = spyOn(chatDisplay, 'scrollDown').and.stub();
+
+        chatDisplay.updateScroll(playerEntry);
+
+        expect(isNewEntrySpy).toHaveBeenCalled();
+        expect(scrollDownSpy).not.toHaveBeenCalled();
+    });
+
+    // TODO : Demander dans le forum commment tester des functions qui utilise seulement des elements html
+    // it("'scrollDown' should scroll to the bottom of 'input' element", () => {
+    //     const SCROLL_HEIGHT = 100;
+    //     const SCROLL_VALUE_FROM_TOP = 50;
+
+    //     chatDisplay.chatDisplayBox.nativeElement.scrollHeight = SCROLL_HEIGHT;
+    //     chatDisplay.chatDisplayBox.nativeElement.scrollTop = SCROLL_VALUE_FROM_TOP;
+    //     // const bannerDe: DebugElement = fixture.debugElement;
+    //     // const bannerEl: HTMLElement = bannerDe.nativeElement;
+    //     // const input = bannerEl.querySelector('input');
+    //     // input?.scrollHeight = SCROLL_HEIGHT;
+    //     // input?.scrollTop = SCROLL_VALUE_FROM_TOP;
+
+    //     chatDisplay.scrollDown();
+    //     expect(chatDisplay.chatDisplayBox.nativeElement.scrollTop).toEqual(SCROLL_HEIGHT);
     // });
 });

@@ -9,7 +9,7 @@ describe('GamePageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [GamePageComponent, SidebarComponent, PlayAreaComponent],
+            declarations: [GamePageComponent, SidebarComponent, PlayAreaComponent, ChatDisplayComponent],
         }).compileComponents();
     });
 
