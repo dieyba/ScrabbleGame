@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { PlaceParams } from '@app/classes/commands';
+import { ExchangeParams, PlaceParams } from '@app/classes/commands';
 import { Dictionary } from '@app/classes/dictionary';
 import { ErrorType } from '@app/classes/errors';
 import { LetterStock } from '@app/classes/letter-stock';
@@ -107,7 +107,7 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
-    exchangeLetters(letters: string): ErrorType {
+    exchangeLetters(player: Player, letters: ExchangeParams): ErrorType {
         if (this.localPlayer.isActive) {
             console.log('Exchanging these letters:' + letters + ' ...'); // eslint-disable-line no-console
             return ErrorType.NoError;
@@ -122,13 +122,16 @@ export class SoloGameService {
     }
 
     place(player: Player, placeParams: PlaceParams): ErrorType {
+        const tempCoord = new Vec2();
+
         // Checking if its player's turn
         if (!player.isActive) {
             return ErrorType.SyntaxError;
         }
 
         // Checking if the whole word is inside the board
-        if (!this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, placeParams.position, placeParams.orientation)) {
+        tempCoord.clone(placeParams.position);
+        if (!this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, tempCoord, placeParams.orientation)) {
             return ErrorType.SyntaxError;
         }
 
@@ -142,14 +145,14 @@ export class SoloGameService {
         }
 
         // Removing all the letters from my "word" that are already on the board
-        const wordCopy = placeParams.word.toLowerCase();
+        let wordCopy = placeParams.word.toLowerCase();
         const letterOnBoard = this.gridService.scrabbleBoard.getStringFromCoord(
             placeParams.position,
             placeParams.word.length,
             placeParams.orientation,
         );
         for (const letter of letterOnBoard) {
-            wordCopy.replace(letter, '');
+            wordCopy = wordCopy.replace(letter, '');
         }
 
         // All letter are already placed
@@ -159,7 +162,7 @@ export class SoloGameService {
 
         // Checking if the rest of the letters are on the rack
         for (const letter of player.letters) {
-            wordCopy.replace(letter.character, '');
+            wordCopy = wordCopy.replace(letter.character, '');
         }
 
         // There should be no letters left, else there is not enough letter on the rack to place de "word"
@@ -168,7 +171,7 @@ export class SoloGameService {
         }
 
         // Placing letters
-        const tempCoord = new Vec2(placeParams.position.x, placeParams.position.y);
+        tempCoord.clone(placeParams.position);
         for (const letter of placeParams.word) {
             if (!this.gridService.scrabbleBoard.squares[tempCoord.x][tempCoord.y].occupied) {
                 // Taking letter from player and placing it
@@ -184,8 +187,20 @@ export class SoloGameService {
         // TODO Generate all words created
 
         // TODO Call validation method and end turn
-        // Take letters??
 
+        // Taking letters
+
+        const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+        for (const letter of newLetters) {
+            this.rackService.drawLetter(letter);
+        }
+        player.letters.concat(newLetters);
+
+        // End game if no more letter
+
+        // Pass turn
+        this.passTurn();
+        this.passTurn();
         // TODO Optional : update la vue de ScrabbleLetter automatically
         return ErrorType.NoError; // TODO change to "no error"
     }
@@ -205,4 +220,7 @@ export class SoloGameService {
             }
         }
     }
+    // canPlaceWord(): boolean {
+    //     if(!this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, tempCoord, placeParams.orientation)))
+    // }
 }

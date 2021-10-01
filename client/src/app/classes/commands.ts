@@ -1,11 +1,12 @@
 import { ChatDisplayService } from '@app/services/chat-display.service';
 import { SoloGameService } from '@app/services/solo-game.service';
+import { Player } from '@app/classes/player';
 import { ErrorType } from './errors';
 import { Vec2 } from './vec2';
 
-export interface DefaultCommandParams {
-    gameService: SoloGameService;
-    isFromLocalPlayer: boolean;
+export interface DefaultCommandParams { 
+    player : Player;
+    serviceCalled : SoloGameService|ChatDisplayService;
 }
 
 export type ExchangeParams = string;
@@ -16,22 +17,17 @@ export interface PlaceParams {
     word: string;
 }
 
-export type DebugParams = ChatDisplayService;
-
 export type CommandParams =
     | { defaultParams: DefaultCommandParams; specificParams: PlaceParams }
     | { defaultParams: DefaultCommandParams; specificParams: ExchangeParams }
-    | { defaultParams: DefaultCommandParams; specificParams: DebugParams }
     | DefaultCommandParams
     | undefined;
 
 export abstract class Command {
-    gameService: SoloGameService;
-    isFromLocalPlayer: boolean;
+    player: Player;
 
-    constructor(defaultCommandParams: DefaultCommandParams) {
-        this.gameService = defaultCommandParams.gameService;
-        this.isFromLocalPlayer = defaultCommandParams.isFromLocalPlayer;
+    constructor(player: Player) {
+        this.player = player;
     }
 
     abstract execute(): ErrorType;
