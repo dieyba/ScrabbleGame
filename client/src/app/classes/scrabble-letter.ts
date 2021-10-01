@@ -15,10 +15,16 @@ export class ScrabbleLetter {
         this.nextLetters = [];
         this.color = SquareColor.None;
     }
-    tealBonus(): void {
+    getTealBonus(): number {
+        return PALE_BLUE_FACTOR * this.value;
+    }
+    setTealBonus(): void {
         this.value = PALE_BLUE_FACTOR * this.value;
     }
-    darkBlueBonus(): void {
+    getDarkBlueBonus(): number {
+        return DARK_BLUE_FACTOR * this.value;
+    }
+    setDarkBlueBonus(): void {
         this.value = DARK_BLUE_FACTOR * this.value;
     }
     setLetter(character: string): void {

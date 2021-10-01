@@ -42,5 +42,9 @@
             <label class="values">{{ getTimer() }}</label>
         </mat-card-content>
     </mat-card>
+    <mat-card *ngIf="isEndGame() && hasWinner()">
+        <mat-card-title *ngIf="!isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br>tu as gagné!</mat-card-title>
+        <mat-card-title *ngIf="isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br>vous avez gagné!</mat-card-title>
+    </mat-card>
     <button class="return" routerLink="/start">Quitter la partie</button>
 </div>

@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Square } from '@app/classes/square';
 import { RackService } from './rack.service';
 
 export const RACK_WIDTH = 500;
@@ -26,14 +25,14 @@ describe('RackService', () => {
     it('drawLetter should call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
         const letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
-        service.drawLetter(letter);
+        service.addLetter(letter);
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
     it('drawLetter should handle double digit values', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
         const letter: ScrabbleLetter = new ScrabbleLetter('D', 12);
-        service.drawLetter(letter);
+        service.addLetter(letter);
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
@@ -47,21 +46,12 @@ describe('RackService', () => {
     });
 
     it('removeLetter should decrease rack length by 1', () => {
-        const square1 = new Square(0, 0);
-        square1.letter = new ScrabbleLetter('a', 1);
-        square1.occupied = true;
-        const square2 = new Square(1, 0);
-        const letter = new ScrabbleLetter('o', 1);
-        square2.letter = letter;
-        square2.occupied = true;
-        const square3 = new Square(2, 0);
-        square3.letter = new ScrabbleLetter('w', 10);
-        square3.occupied = true;
-        const square4 = new Square(0, 0);
-        square4.letter = new ScrabbleLetter('k', 2);
-        square4.occupied = true;
-        service.scrabbleRack.squares = [square1, square2, square3, square4];
-        service.removeLetter(letter);
-        expect(service.scrabbleRack.squares[3].occupied).toEqual(false);
+        const letter1 = new ScrabbleLetter('a', 1);
+        const letter2 = new ScrabbleLetter('o', 1);
+        const letter3 = new ScrabbleLetter('w', 10);
+        const letter4 = new ScrabbleLetter('k', 2);
+        service.rackLetters = [letter1, letter2, letter3, letter4];
+        service.removeLetter(letter1);
+        expect(service.rackLetters.length).toEqual(3);
     });
 });
