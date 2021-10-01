@@ -1,14 +1,9 @@
-import { Square } from './square';
-
-const RACK_SIZE = 7;
+import { ScrabbleLetter } from './scrabble-letter';
 
 export class ScrabbleRack {
-    squares: Square[];
+    letters: ScrabbleLetter[];
 
     constructor() {
-        this.squares = [];
-        for (let i = 0; i < RACK_SIZE; i++) {
-            this.squares[i] = new Square(i, 0);
-        }
+        this.letters = [];
     }
 }

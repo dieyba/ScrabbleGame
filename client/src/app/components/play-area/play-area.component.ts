@@ -65,6 +65,7 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawLetter(letter5, 0, 2);
         const letter6: ScrabbleLetter = new ScrabbleLetter('m', 2);
         this.gridService.drawLetter(letter6, 0, 3);
+        // Uncomment next two lines for words to be valid
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const letter7: ScrabbleLetter = new ScrabbleLetter('i', 4);
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -78,13 +79,13 @@ export class PlayAreaComponent implements AfterViewInit {
         word2.startPosition = { x: 0, y: 2 };
         word2.orientation = WordOrientation.Vertical;
         const words: ScrabbleWord[] = [word1, word2];
-        this.rackService.removeLetter(this.soloGameService.localPlayer.letters[6]);
-        this.rackService.removeLetter(this.soloGameService.localPlayer.letters[5]);
-        this.rackService.removeLetter(this.soloGameService.localPlayer.letters[4]);
-        this.rackService.removeLetter(this.soloGameService.localPlayer.letters[3]);
-        this.rackService.removeLetter(this.soloGameService.localPlayer.letters[2]);
-        this.rackService.removeLetter(this.soloGameService.localPlayer.letters[1]);
-        this.rackService.removeLetter(this.soloGameService.localPlayer.letters[0]);
+        this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
+        this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
+        this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
+        this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
+        this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
+        this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
+        this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
         this.validationService.updatePlayerScore(words, this.soloGameService.localPlayer);
         this.gridCanvas.nativeElement.focus();
     }
@@ -95,6 +96,10 @@ export class PlayAreaComponent implements AfterViewInit {
 
     isLocalPlayerActive(): boolean {
         return this.soloGameService.localPlayer.isActive;
+    }
+
+    isEndGame(): boolean {
+        return this.soloGameService.isEndGame;
     }
 
     get width(): number {
