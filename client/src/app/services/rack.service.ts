@@ -1,8 +1,5 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleRack } from '@app/classes/scrabble-rack';
-import { Square } from '@app/classes/square';
-import { Vec2 } from '@app/classes/vec2';
 
 export const RACK_WIDTH = 500;
 export const RACK_HEIGHT = 60;
@@ -14,13 +11,13 @@ const DOUBLE_DIGIT = 10;
     providedIn: 'root',
 })
 export class RackService {
-    scrabbleRack: ScrabbleRack;
+    rackLetters: ScrabbleLetter[];
     gridContext: CanvasRenderingContext2D;
     squareWidth = RACK_WIDTH / MAX_LETTER_COUNT;
     squareHeight = RACK_WIDTH;
 
     constructor() {
-        this.scrabbleRack = new ScrabbleRack();
+        this.rackLetters = [];
     }
 
     drawRack() {
@@ -41,53 +38,47 @@ export class RackService {
         this.gridContext.stroke();
     }
 
-    drawLetter(scrabbleLetter: ScrabbleLetter): void {
-        for (let i = 0; i < MAX_LETTER_COUNT; i++) {
-            if (!this.scrabbleRack.squares[i].occupied && scrabbleLetter !== undefined) {
-                this.scrabbleRack.squares[i].letter = scrabbleLetter;
-                this.scrabbleRack.squares[i].occupied = true;
-                this.scrabbleRack.squares[i].position = new Vec2(i, 0);
-                const positionX = (RACK_WIDTH * i) / MAX_LETTER_COUNT;
-                const letter = scrabbleLetter.character.toUpperCase();
-                this.gridContext.beginPath();
-                this.gridContext.fillStyle = 'black';
-                this.gridContext.font = '60px system-ui';
-                this.gridContext.fillText(letter, positionX + OFFSET, 0 + RACK_HEIGHT - OFFSET);
-                this.gridContext.font = '18px system-ui';
-                if (scrabbleLetter.value >= DOUBLE_DIGIT) {
-                    this.gridContext.fillText(String(scrabbleLetter.value), positionX + RACK_HEIGHT - OFFSET * 2, 0 + RACK_HEIGHT - OFFSET);
-                } else {
-                    this.gridContext.fillText(String(scrabbleLetter.value), positionX + RACK_HEIGHT - OFFSET, 0 + RACK_HEIGHT - OFFSET);
-                }
-                return;
-            }
+    // Draws letter and returns the letter position in the rack
+    addLetter(scrabbleLetter: ScrabbleLetter): void {
+        if (scrabbleLetter !== undefined && this.rackLetters.length !== MAX_LETTER_COUNT) {
+            this.rackLetters[this.rackLetters.length] = scrabbleLetter;
+            this.drawLetter(this.rackLetters.length - 1);
         }
     }
 
-    removeLetter(scrabbleLetter: ScrabbleLetter) {
-        for (let i = 0; i < this.scrabbleRack.squares.length; i++) {
-            if (this.scrabbleRack.squares[i].letter !== undefined) {
-                if (this.scrabbleRack.squares[i].letter.character === scrabbleLetter.character) {
-                    this.scrabbleRack.squares[i] = new Square(i, 0);
-                    break;
-                }
-            } else {
-                return;
+    removeLetter(scrabbleLetter: ScrabbleLetter): number {
+        let pos = -1;
+        for (let i = 0; i < this.rackLetters.length; i++) {
+            if (this.rackLetters[i].character === scrabbleLetter.character) {
+                this.rackLetters.splice(i, 1);
+                pos = i;
+                break;
             }
         }
         this.gridContext.clearRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
         this.drawRack();
-        this.replaceLetters();
+        this.drawExistingLetters();
+        return pos;
     }
 
-    replaceLetters() {
-        for (let i = 0; i < this.scrabbleRack.squares.length - 1; i++) {
-            if (this.scrabbleRack.squares[i].letter === undefined) {
-                this.scrabbleRack.squares[i].letter = this.scrabbleRack.squares[i + 1].letter;
-                this.scrabbleRack.squares[i + 1] = new Square(i + 1, 0);
-            }
-            this.scrabbleRack.squares[i].occupied = false;
-            this.drawLetter(this.scrabbleRack.squares[i].letter);
+    drawExistingLetters() {
+        for (let i = 0; i < this.rackLetters.length; i++) {
+            this.drawLetter(i);
+        }
+    }
+
+    drawLetter(position: number) {
+        const positionX = (RACK_WIDTH * position) / MAX_LETTER_COUNT;
+        const letter = this.rackLetters[position].character.toUpperCase();
+        this.gridContext.beginPath();
+        this.gridContext.fillStyle = 'black';
+        this.gridContext.font = '60px system-ui';
+        this.gridContext.fillText(letter, positionX + OFFSET, 0 + RACK_HEIGHT - OFFSET);
+        this.gridContext.font = '18px system-ui';
+        if (this.rackLetters[position].value >= DOUBLE_DIGIT) {
+            this.gridContext.fillText(String(this.rackLetters[position].value), positionX + RACK_HEIGHT - OFFSET * 2, 0 + RACK_HEIGHT - OFFSET);
+        } else {
+            this.gridContext.fillText(String(this.rackLetters[position].value), positionX + RACK_HEIGHT - OFFSET, 0 + RACK_HEIGHT - OFFSET);
         }
     }
 }

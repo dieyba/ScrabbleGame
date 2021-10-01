@@ -26,6 +26,7 @@ describe('SidebarComponent', () => {
             score: 73,
             letters: [firstLetter, secondLetter, thirdLetter, fourthLetter],
             isActive: false,
+            isWinner: false,
         };
 
         soloGameServiceSpy.virtualPlayer = {
@@ -33,6 +34,7 @@ describe('SidebarComponent', () => {
             score: 70,
             letters: [firstLetter, thirdLetter, firstLetter],
             isActive: true,
+            isWinner: false,
             type: PlayerType.Easy,
             // eslint-disable-next-line no-empty-function
             // eslint-disable-next-line prefer-arrow/prefer-arrow-functions

@@ -118,7 +118,7 @@ describe('BonusService', () => {
         word.content = [letter1, letter2, letter3];
         gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed = true;
         service.totalValue(word);
-        expect(word.value).toEqual(3);
+        expect(word.value).toEqual(6);
     });
 
     it('totalValue should apply the right bonuses when bonus is already taken (pink)', () => {
@@ -132,6 +132,6 @@ describe('BonusService', () => {
         word.content = [letter1, letter2, letter3];
         gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed = true;
         service.totalValue(word);
-        expect(word.value).toEqual(3);
+        expect(word.value).toEqual(6);
     });
 });
