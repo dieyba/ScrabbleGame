@@ -30,8 +30,8 @@ export class PlayAreaComponent implements AfterViewInit {
 
     mousePosition: Vec2 = new Vec2(0, 0);
     buttonPressed = '';
-    private canvasSize = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
-    private rackSize = { x: RACK_WIDTH, y: RACK_HEIGHT };
+    private canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    private rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
 
     constructor(
         private readonly gridService: GridService,
@@ -67,11 +67,11 @@ export class PlayAreaComponent implements AfterViewInit {
         // this.gridService.drawLetter(letter7, 0, 4);
         // const word1: ScrabbleWord = new ScrabbleWord();
         // word1.content = [letter1, letter2, letter3, letter4];
-        // word1.startPosition = { x: 0, y: 0 };
+        // word1.startPosition = new Vec2(0, 0);
         // word1.orientation = WordOrientation.Horizontal;
         // const word2: ScrabbleWord = new ScrabbleWord();
         // word2.content = [letter5, letter6, letter7];
-        // word2.startPosition = { x: 0, y: 2 };
+        // word2.startPosition = new Vec2(0, 2);
         // word2.orientation = WordOrientation.Vertical;
         // const words: ScrabbleWord[] = [word1, word2];
         // this.rackService.removeLetter(this.soloGameService.localPlayer.letters[6]);

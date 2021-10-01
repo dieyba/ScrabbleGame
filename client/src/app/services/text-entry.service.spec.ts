@@ -89,7 +89,7 @@ describe('TextEntryService', () => {
             if empty return undef
             if column isnt a number (ex:letter or random char), undef
             if row isnt a min letter (ex:maj letter, accent,random char) undef
-            if valid, return valid coord vec2
+            if valid, return valid coord Vec2
         
         splitCommandInput:
             if its empty return []
