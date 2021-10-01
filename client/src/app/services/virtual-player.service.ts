@@ -28,21 +28,21 @@ const PERCENTAGE = 100;
 })
 export class VirtualPlayerService {
     board: ScrabbleBoard;
-    rack: ScrabbleRack; // Replace this for implementation
+    rack: ScrabbleRack;
 
     constructor(private validationService: ValidationService) {
         // TODO Implement timer (3s and 20s limit)
         this.board = new ScrabbleBoard();
         this.rack = new ScrabbleRack();
-        const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
-        if (currentMove <= Probability.EndTurn) {
-            // 10% chance to end turn
-        } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
-            this.chooseTilesFromRack(); // 10% chance to exchange tiles
-        } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
-            // =100
-            this.makeMoves(); // 80% chance to make a move
-        }
+        // const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
+        // if (currentMove <= Probability.EndTurn) {
+        //     // 10% chance to end turn
+        // } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
+        //     this.chooseTilesFromRack(); // 10% chance to exchange tiles
+        // } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
+        //     // =100
+        //     this.makeMoves(); // 80% chance to make a move
+        // }
     }
     permutationsOfLetters(letters: ScrabbleLetter[]): ScrabbleLetter[][] {
         // Adapted from medium.com/weekly-webtips/step-by-step-guide-to-array-permutation-using-recursion-in-javascript-4e76188b88ff
@@ -66,7 +66,7 @@ export class VirtualPlayerService {
         const lettersAvailable = [];
         lettersAvailable[0] = letter;
         const lettersInArray = [];
-        for (let i = 1; i < this.getRandomIntInclusive(2, this.rack.squares.length + 1); i++) {
+        for (let i = 1; i < this.getRandomIntInclusive(2, this.rack.squares.length); i++) {
             // Randomize length of word
             let index = this.getRandomIntInclusive(0, this.rack.squares.length - 1);
             while (lettersInArray[index] === 1) {
@@ -95,6 +95,9 @@ export class VirtualPlayerService {
     }
 
     possibleMoves(points: number, axis: Axis): ScrabbleWord[] {
+        if(points === 0){
+            return [];
+        }
         const listLength = 4; // How many words we should aim for
         let list = [];
         for (let i = 0; i < listLength; i++) {
@@ -104,7 +107,7 @@ export class VirtualPlayerService {
         let movesFound = 0;
         while (movesFound < listLength) {
             for (let j = 0; j <= this.board.actualBoardSize; j++) {
-                // TODO : randomize this
+                // TODO : randomize order in which board is iterated over
                 for (let k = 0; k <= this.board.actualBoardSize; k++) {
                     if (this.board.squares[j][k].occupied) {
                         list = this.movesWithGivenLetter(this.board.squares[j][k].letter);
@@ -115,7 +118,7 @@ export class VirtualPlayerService {
                             // TODO : Verify if move is valid on the board and simulate placement to calculate points
                             if (this.validationService.isPlacable(list[l], this.findPosition(list[l], axis), axis))
                                 if (list[l].totalValue() > points || list[l].totalValue() < points - POINTS_INTERVAL) {
-                                    // Verify if points are respected
+                                    // Verify if points are respected (TODO)
                                     list.splice(l);
                                 }
                             movesFound += list.length;
@@ -152,7 +155,7 @@ export class VirtualPlayerService {
         if (moves.length === 0) {
             message = "Il n'y a aucun placement valide pour la plage de points et la longueur de mot sélectionnées par le joueur virtuel.";
         } else if (moves.length === 1) {
-            message = 'Le placement joué est le seul valide pour la plage de points et la lo sélectionnée par le joueur virtuel.';
+            message = 'Le placement joué est le seul valide pour la plage de points et la longueur sélectionnée par le joueur virtuel.';
         } else
             for (const i of moves) {
                 for (let j = 0; j < i.content.length; j++) {
@@ -165,17 +168,22 @@ export class VirtualPlayerService {
                         message += ' '; // If it's the last letter
                     } else message += '  '; // If it's not
                 }
-                message += i.totalValue + '\n'; // Add score for each move
+                message += i.totalValue() + '\n'; // Add score for each move
             }
         return message;
     }
     displayMoveChat(move: ScrabbleWord, position: Vec2, axis: Axis): string {
-        const message = '!placer ' + position.y /* convert this to letters*/ + position.x + axis + ' ' + move.stringify();
-        return message;
+        if(move.content.length > 0 && position.x !== -1 && position.y !== -1){
+            const message = '!placer ' + position.y /* convert this to letters*/ + position.x + axis + ' ' + move.stringify();
+            return message;
+        }
+        else return "Erreur de placement";
     }
     wordify(letters: ScrabbleLetter[]): ScrabbleWord {
         const word = new ScrabbleWord();
-        word.content = letters;
+        for(let i = 0; i < letters.length; i++){
+            word.content[i] = letters[i];
+        }
         return word;
     }
     // found on developer.mozilla.org under Math.random()
@@ -186,11 +194,19 @@ export class VirtualPlayerService {
     }
     findPosition(word: ScrabbleWord, axis: Axis): Vec2 {
         let origin = new ScrabbleLetter('', 0); // Convert position
-        let index: number;
+        let index: number = -1;
         for (index = 0; index < word.content.length; index++) {
             if (word.content[index].tile.occupied) {
                 origin = word.content[index];
+                break;
             }
+        }
+        if(index === word.content.length){
+            //ERROR
+            let errorVec = new Vec2;
+            errorVec.x = -1;
+            errorVec.y = -1;
+            return errorVec;
         }
         const position = new Vec2();
         if (axis === Axis.V) {
@@ -204,19 +220,20 @@ export class VirtualPlayerService {
     }
     chooseTilesFromRack(): Square[] {
         const numberOfTiles = this.getRandomIntInclusive(1, this.rack.squares.length);
-        const tileReplaced = 0;
+        let  tileReplaced = 0;
         const listOfTiles = [];
-        for (let i = 0; i < this.rack.squares.length; i++) {
-            listOfTiles[i] = new Square(i, 0);
+        for (let i = 0; i < numberOfTiles; i++) {
+            listOfTiles[i] = new Square(0, 0);
         }
         let currentLetter = 0;
         while (tileReplaced < numberOfTiles) {
-            const replaced = this.getRandomIntInclusive(0, 1);
-            if (replaced === 1) {
-                listOfTiles[tileReplaced] = this.rack.squares[currentLetter];
-                currentLetter++;
-                if (currentLetter === this.rack.squares.length) currentLetter = 0;
+            let replaced = this.getRandomIntInclusive(0, 1);
+            if (replaced === 1 && !listOfTiles.includes(this.rack.squares[currentLetter])) {
+                listOfTiles[tileReplaced] = this.rack.squares[currentLetter];;
+                tileReplaced++;
             }
+            currentLetter++;
+            if (currentLetter === this.rack.squares.length) currentLetter = 0
         }
         return listOfTiles;
     }
