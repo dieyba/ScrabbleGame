@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ExchangeParams } from '@app/classes/commands';
+import { ExchangeParams, PlaceParams } from '@app/classes/commands';
 import { Dictionary } from '@app/classes/dictionary';
 import { ErrorType } from '@app/classes/errors';
 import { LetterStock } from '@app/classes/letter-stock';
@@ -8,7 +8,7 @@ import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Vec2 } from '@app/classes/vec2';
+// import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
@@ -150,7 +150,7 @@ export class SoloGameService {
         return isLimit;
     }
 
-    place(position: Vec2, orientation: string, letters: string): ErrorType {
+    place(player: Player, params: PlaceParams): ErrorType {
         if (this.localPlayer.isActive) {
             console.log('Placing ' + params.word); // eslint-disable-line no-console
             console.log('position:' + params.position); // eslint-disable-line no-console
