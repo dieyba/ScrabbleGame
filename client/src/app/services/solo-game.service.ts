@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { PlaceParams } from '@app/classes/commands';
 import { Dictionary } from '@app/classes/dictionary';
+import { ErrorType } from '@app/classes/errors';
 import { LetterStock } from '@app/classes/letter-stock';
 import { LocalPlayer } from '@app/classes/local-player';
+import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { VirtualPlayer } from '@app/classes/virtual-player';
-import { ErrorType } from '@app/classes/errors';
-import { Vec2 } from '@app/classes/vec2';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 
@@ -104,16 +105,6 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
-    place(position: Vec2, orientation: string, letters: string): ErrorType {
-        if (this.localPlayer.isActive) {
-            console.log('Placing ' + letters); // eslint-disable-line no-console
-            console.log('position:' + position); // eslint-disable-line no-console
-            console.log('orientation: ' + orientation); // eslint-disable-line no-console
-            return ErrorType.NoError;
-        }
-        return ErrorType.ImpossibleCommand;
-    }
-
     exchangeLetters(letters: string): ErrorType {
         if (this.localPlayer.isActive) {
             console.log('Exchanging these letters:' + letters + ' ...'); // eslint-disable-line no-console
@@ -126,5 +117,36 @@ export class SoloGameService {
         for (let i = 0; i < DEFAULT_LETTER_COUNT; i++) {
             this.rackService.drawLetter(this.localPlayer.letters[i]);
         }
+    }
+
+    place(player: Player, placeParams: PlaceParams): ErrorType {
+        // Checking if its player's turn
+        if (!player.isActive) {
+            return ErrorType.SyntaxError;
+        }
+
+        // Checking if the whole word is inside the board
+        if (!this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, placeParams.position, placeParams.orientation)) {
+            return ErrorType.SyntaxError;
+        }
+
+        // Checking if the word is touching another word or passing through the middle
+        if (
+            !this.gridService.scrabbleBoard.isWordPassingInCenter(placeParams.word, placeParams.position, placeParams.orientation) &&
+            !this.gridService.scrabbleBoard.isWordPartOfAnotherWord(placeParams.word, placeParams.position, placeParams.orientation) &&
+            !this.gridService.scrabbleBoard.isWordTouchingOtherWord(placeParams.word, placeParams.position, placeParams.orientation)
+        ) {
+            return ErrorType.SyntaxError;
+        }
+
+        // TODO Check if player has the necessary letters on the rack (also if played didn't place any letters)
+        // const testLetter = this.localPlayer.letters.pop() as ScrabbleLetter;
+
+        // TODO Place letters
+
+        // TODO Call validation method and end turn
+
+        // TODO Optional : update la vue de ScrabbleLetter automatically
+        return ErrorType.NoError; // TODO change to "no error"
     }
 }
