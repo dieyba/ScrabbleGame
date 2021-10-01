@@ -19,11 +19,11 @@ export class ScrabbleWord {
     constructor() {
         this.content = [];
     }
-    stringify() : string{
-        let string = "";
-        for(let i = 0; i < this.content.length; i++){
-            string += this.content[i].character;
-            //TODO: Modify for blank pieces
+    stringify(): string {
+        let string = '';
+        for (const i of this.content) {
+            string += i.character;
+            // TODO: Modify for blank pieces
         }
         return string;
     }

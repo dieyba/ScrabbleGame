@@ -17,9 +17,6 @@ const WAIT_TIME = 3000;
     providedIn: 'root',
 })
 export class ValidationService {
-    isPlacable(arg0: ScrabbleWord, arg1: Vec2, axis: Axis) : boolean{
-      throw new Error('Method not implemented.');
-    }
     dictionary: Dictionary;
     words: string[];
 
@@ -32,6 +29,11 @@ export class ValidationService {
         this.dictionary = new Dictionary(DictionaryType.Default);
         this.words = [];
     }
+    /* eslint-disable no-unused-vars */
+    isPlacable(arg0: ScrabbleWord, arg1: Vec2, axis: Axis): boolean {
+        throw new Error('Method not implemented.');
+    }
+    /* eslint-enable no-unused-vars */
 
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
         const wordsValue = this.validateWordsAndCalculateScore(newWords);

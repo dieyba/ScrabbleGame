@@ -25,14 +25,15 @@ export class ScrabbleLetter {
     value: number; // How many points the letter is worth before blue bonuses
     nextLetters: ScrabbleLetter[]; // Neighbouring letters (0: N, 1: E, 2: S, 3: W) of the letter. WATCH OUT : don't go over four
     color: SquareColor;
-    tile : Square;
+    tile: Square;
 
     constructor(letter: string, value: number) {
+        const unplaced = -1;
         this.setLetter(letter);
         this.value = value;
         this.nextLetters = [];
         this.color = SquareColor.None;
-        this.tile = new Square(-1,-1); //-1, -1 means it is not placed yet
+        this.tile = new Square(unplaced, unplaced); // -1, -1 means it is not placed yet
     }
     tealBonus(): void {
         this.value = PALE_BLUE_FACTOR * this.value;

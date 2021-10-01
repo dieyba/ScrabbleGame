@@ -6,7 +6,7 @@ import { ScrabbleWord } from '@app/classes/scrabble-word';
     providedIn: 'root',
 })
 export class WordBuilderService {
-    //All words created from the letters placed on the board
+    // All words created from the letters placed on the board
     allWordsCreated(newLetters: ScrabbleLetter[], axis: Axis): ScrabbleWord[] {
         const wordList: ScrabbleWord[] = [];
         let i = 0;
