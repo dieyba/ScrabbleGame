@@ -1,0 +1,85 @@
+.container {
+    display: block;
+    width: 600px;
+    height: 600px;
+}
+
+.papy {
+    width: 100%;
+}
+
+.btn hr.solid {
+    position: relative;
+    left: -30px;
+    top: -15px;
+    width: 238%;
+}
+
+.error {
+    font-size: 10px;
+}
+mat-radio-group {
+    top: 10px;
+    position: relative;
+}
+mat-radio-button {
+    position: relative;
+    margin: 10px;
+    margin-left: 100px;
+    display: inline-block;
+}
+
+#opponents {
+    visibility: hidden;
+}
+
+.check-input {
+    margin: 0 12px;
+}
+
+.jouer {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 60px;
+    border-radius: 10px;
+    padding: 5px 5px;
+    font-size: x-large;
+    background-color: #dcecff;
+    border-width: 10px;
+    border-style: double;
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 1;
+    transition: 0.3s;
+}
+.annuler {
+    position: relative;
+    margin-top: 20px;
+    padding: 5px 5px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10px;
+    font-size: x-large;
+    background-color: #dcecff;
+    border-width: 10px;
+    border-style: double;
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 1;
+    transition: 0.3s;
+}
+
+p {
+    top: 25px;
+    font-size: large;
+    display: block;
+    text-align: center;
+    margin-top: 25px;
+}
