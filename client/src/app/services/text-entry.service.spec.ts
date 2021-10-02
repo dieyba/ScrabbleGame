@@ -3,11 +3,14 @@ import { ErrorType } from '@app/classes/errors';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Vec2 } from '@app/classes/vec2';
 import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
+import { BonusService } from './bonus.service';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 import { SoloGameService } from './solo-game.service';
 import { TextEntryService } from './text-entry.service';
+import { ValidationService } from './validation.service';
+import { WordBuilderService } from './word-builder.service';
 
 const LOCAL_PLAYER_NAME = 'Local Player';
 const VIRTUAL_PLAYER_NAME = 'Virtual Player';
@@ -17,7 +20,10 @@ describe('TextEntryService', () => {
     let service: TextEntryService;
     const rack = new RackService();
     const grid = new GridService();
-    const soloGameService = new SoloGameService(grid, rack);
+    const bonus = new BonusService(grid);
+    const validation = new ValidationService(grid, bonus);
+    const wordBuilder = new WordBuilderService();
+    const soloGameService = new SoloGameService(grid, rack, validation, wordBuilder);
     const chatDisplayService = new ChatDisplayService();
     const IS_FROM_LOCAL_PLAYER = true;
 
