@@ -169,8 +169,6 @@ export class ScrabbleBoard {
 
         return false;
     }
-
-    // TODO add documentation?
     isWordPartOfAnotherWord(word: string, coord: Vec2, orientation: string): boolean {
         let result = false;
         const isVertical = orientation === 'v';
@@ -209,7 +207,7 @@ export class ScrabbleBoard {
         } else {
             coordBeforeWord.y = coordAfterWord.y = coord.y;
             coordBeforeWord.x = coord.x - 1;
-            coordAfterWord.x = coord.y + word.length;
+            coordAfterWord.x = coord.x + word.length;
         }
 
         if (this.isCoordInsideBoard(coordBeforeWord)) {
@@ -222,8 +220,6 @@ export class ScrabbleBoard {
                 return true;
             }
         }
-
-        // TODO optimize checking word lengthwise
         // Checking if touching word lengthwise (down if horizontal, right if vertical)
         const tempCoord = new Vec2();
         for (let i = 0; i < word.length; i++) {

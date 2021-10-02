@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
+import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
@@ -14,6 +16,9 @@ describe('PlayAreaComponent', () => {
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
 
     beforeEach(async () => {
+        TestBed.configureTestingModule({
+            imports: [MatCardModule],
+        });
         gridServiceSpy = jasmine.createSpyObj('GridService', ['sizeUpLetters', 'sizeDownLetters', 'drawGrid', 'drawColors', 'drawLetter']);
         soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', [
             'localPlayer',
@@ -33,14 +38,9 @@ describe('PlayAreaComponent', () => {
 
         gridServiceSpy.scrabbleBoard = new ScrabbleBoard();
         const letter: ScrabbleLetter = new ScrabbleLetter('a', 1);
-        soloGameServiceSpy.localPlayer = {
-            name: 'Ariane',
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            score: 73,
-            letters: [letter],
-            isActive: false,
-            isWinner: false,
-        };
+        soloGameServiceSpy.localPlayer = new LocalPlayer('Arianne');
+        soloGameServiceSpy.localPlayer.score = 73;
+        soloGameServiceSpy.localPlayer.letters = [letter];
     });
 
     beforeEach(() => {
@@ -55,23 +55,23 @@ describe('PlayAreaComponent', () => {
 
     it('ngAfterViewInit should call drawGrid and drawColors', () => {
         component.ngAfterViewInit();
-        expect(soloGameServiceSpy.createNewGame).toHaveBeenCalled;
-        expect(gridServiceSpy.drawGrid).toHaveBeenCalled;
-        expect(gridServiceSpy.drawColors).toHaveBeenCalled;
+        expect(soloGameServiceSpy.createNewGame).toHaveBeenCalled();
+        expect(gridServiceSpy.drawGrid).toHaveBeenCalled();
+        expect(gridServiceSpy.drawColors).toHaveBeenCalled();
     });
 
     it('sizeUpLetters should call gridservices sizeUpLetters', () => {
         component.sizeUpLetters();
-        expect(gridServiceSpy.sizeUpLetters).toHaveBeenCalled;
+        expect(gridServiceSpy.sizeUpLetters).toHaveBeenCalled();
     });
 
     it('sizeDownLetters should call gridservices sizeDownLetters', () => {
         component.sizeDownLetters();
-        expect(gridServiceSpy.sizeDownLetters).toHaveBeenCalled;
+        expect(gridServiceSpy.sizeDownLetters).toHaveBeenCalled();
     });
 
     it('passTurn should call soloGameservices passTurn', () => {
         component.passTurn();
-        expect(soloGameServiceSpy.passTurn).toHaveBeenCalled;
+        expect(soloGameServiceSpy.passTurn).toHaveBeenCalled();
     });
 });
