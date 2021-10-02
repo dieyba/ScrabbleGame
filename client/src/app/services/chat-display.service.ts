@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ChatDisplayEntry, ChatEntryColor } from '@app/classes/chat-display-entry';
 import { ErrorType, ERROR_MESSAGES } from '@app/classes/errors';
+import { Player } from '@app/classes/player';
+import { ScrabbleLetter } from '../classes/scrabble-letter';
 
 const ACTIVE_DEBUG_MESSAGE = 'Affichages de débogage activés';
 const INACTIVE_DEBUG_MESSAGE = 'Affichages de débogage désactivés';
@@ -57,6 +59,27 @@ export class ChatDisplayService {
         this.addSystemEntry(errorAndInput);
     }
 
+    addEndGameMessage(remainingLetters:ScrabbleLetter[], firstPlayer:Player, secondPlayer:Player) {
+        const remainingLettersMessage = "Fin de partie - " + this.scrabbleLetterstoString(remainingLetters);
+        const firstPlayerMessage = firstPlayer.name + " : " + this.scrabbleLetterstoString(remainingLetters);
+        const secondPlayerMessage = secondPlayer.name + " : "+ this.scrabbleLetterstoString(remainingLetters);
+
+        this.entries.push({
+            color: ChatEntryColor.SystemColor,
+            message: remainingLettersMessage,
+        });
+        this.entries.push({
+            color: ChatEntryColor.SystemColor,
+            message: firstPlayerMessage,
+        });
+        this.entries.push({
+            color: ChatEntryColor.SystemColor,
+            message: secondPlayerMessage,
+        });
+        
+    }
+
+
     createExchangeMessage(isFromLocalPLayer: boolean, userInput: string): string {
         let exchangeMessage = '';
         if (isFromLocalPLayer) {
@@ -90,5 +113,14 @@ export class ChatDisplayService {
                 });
             }
         }
+    }
+
+
+    scrabbleLetterstoString(letters: ScrabbleLetter[]):string{
+        let stringLetters:string = '';
+        for(let letter of letters){
+            stringLetters += letter.character;
+        }
+        return stringLetters;
     }
 }

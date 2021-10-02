@@ -11,6 +11,7 @@ import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
+import { ChatDisplayService } from './chat-display.service';
 
 const TIMER_INTERVAL = 1000;
 const DEFAULT_LETTER_COUNT = 7;
@@ -35,13 +36,14 @@ export class SoloGameService {
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
 
-    constructor(private gridService: GridService, private rackService: RackService) {
+    constructor(private gridService: GridService, private rackService: RackService, private chatDisplayService:ChatDisplayService) {
         this.hasTurnsBeenPassed = [];
         this.turnPassed = false;
         this.isEndGame = false;
     }
 
     initializeGame(gameInfo: FormGroup) {
+        this.chatDisplayService.entries = [];
         this.localPlayer = new LocalPlayer(gameInfo.controls.name.value);
         this.localPlayer.isActive = true;
         this.virtualPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
@@ -184,6 +186,8 @@ export class SoloGameService {
     }
 
     endGame() {
+        this.chatDisplayService.addEndGameMessage(this.stock.letterStock,this.localPlayer,this.virtualPlayer);
+        
         clearInterval(this.intervalValue);
         this.timerMs = 0;
         this.secondsToMinutes();
