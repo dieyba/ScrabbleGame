@@ -112,5 +112,5 @@ export class WordBuilderService {
           }
         }
         return this.wordify(letters);        
-    }
+    }*/
 }

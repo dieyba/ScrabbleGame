@@ -1,13 +1,13 @@
-import { Square, SquareColor } from './square';
+import { SquareColor } from './square';
 
 export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;
 
-export enum Direction{
+export enum Direction {
     North = 0,
     East = 1,
     South = 2,
-    West = 3
+    West = 3,
 }
 
 export class ScrabbleLetter {

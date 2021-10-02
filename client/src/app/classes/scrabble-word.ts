@@ -3,8 +3,7 @@ import { Vec2 } from './vec2';
 
 export enum WordOrientation {
     Horizontal = 0,
-    Vertical = ~Horizontal,
-
+    Vertical = 1,
 }
 
 export class ScrabbleWord {
@@ -16,6 +15,6 @@ export class ScrabbleWord {
     constructor() {
         this.content = [];
         this.value = 0;
-        this.startPosition = new Vec2;
+        this.startPosition = new Vec2();
     }
 }
