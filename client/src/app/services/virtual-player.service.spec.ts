@@ -176,25 +176,27 @@ describe('VirtualPlayerService', () => {
         expect(true).toBeTruthy();
     });
     //movesWithGivenLetter
-    // it('movesWithGivenLetter should return permutations of the rack AND the letter on the board', ()=>{
-    //     let letterOnBoard = new ScrabbleLetter('z', 6);
-    //     letterOnBoard.tile.occupied = true;
-    //     let expectedPermutation = service.wordify([new ScrabbleLetter('a', 0), new ScrabbleLetter('b', 0), new ScrabbleLetter('z', 6), new ScrabbleLetter('c', 0)]);
-    //     //Expected permutation : [A B Z C]
-    //     spyOn(Math, "random").and.returnValue(0.2) //Want to return 4-length permutation
-    //     let resultPermutations = service.movesWithGivenLetter(letterOnBoard);
-    //     expect(resultPermutations.includes(expectedPermutation)).toBeTruthy();
-    //     console.log(resultPermutations);
-    //     console.log(expectedPermutation); //WIP
-    // });
+    it('movesWithGivenLetter should return permutations of the rack AND the letter on the board', ()=>{
+        let letterOnBoard = new ScrabbleLetter('z', 6);
+        letterOnBoard.tile.occupied = true;
+        let expectedPermutation = service.wordify([new ScrabbleLetter('a', 0), new ScrabbleLetter('b', 0), new ScrabbleLetter('z', 6), new ScrabbleLetter('c', 0)]);
+        //Expected permutation : [A B Z C]
+        spyOn(Math, "random").and.returnValue(0.2) //Want to return 4-length permutation
+        let resultPermutations = service.movesWithGivenLetter(letterOnBoard);
+        expect(resultPermutations.includes(expectedPermutation)).toBeTruthy();
+        console.log(resultPermutations);
+        console.log(expectedPermutation); //WIP
+    });
     // //permutationOfLetters
-    // it('movesWithGivenLetter should return permutations of the the array of letters in parameter', ()=>{
-    //     let initialArray = [new ScrabbleLetter('a', 0), new ScrabbleLetter('b', 0), new ScrabbleLetter('c', 0), new ScrabbleLetter('z', 6)];
-    //     //Expected permutation : [A B Z C]
-    //     let expectedPermutation = [new ScrabbleLetter('a', 0), new ScrabbleLetter('b', 0), new ScrabbleLetter('z', 6), new ScrabbleLetter('c', 0)];
-    //     let resultPermutations = service.permutationsOfLetters(initialArray)
-    //     expect(resultPermutations.includes(expectedPermutation)).toBeTruthy();
-    //     console.log(resultPermutations);
-    //     console.log(expectedPermutation);
-    // });
+    it('movesWithGivenLetter should return permutations of the the array of letters in parameter', ()=>{
+        const letterA = new ScrabbleLetter('a', 0);
+        const letterB = new ScrabbleLetter('b', 0);
+        const letterC = new ScrabbleLetter('c', 0);
+        const letterZ = new ScrabbleLetter('z', 6)
+        let initialArray = [letterA, letterB, letterC, letterZ];
+        //Expected permutation : [A B Z C]
+        let expectedPermutation = [letterA, letterB, letterZ, letterC];
+        let resultPermutations = service.permutationsOfLetters(initialArray)
+        expect(resultPermutations.some(row => row.toString() === expectedPermutation.toString())).toBeTruthy(); //not very elegant, but cannot use includes() to check if [] is in [][]
+    });
   });

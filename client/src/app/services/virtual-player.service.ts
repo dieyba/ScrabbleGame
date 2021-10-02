@@ -62,27 +62,28 @@ export class VirtualPlayerService {
         }
         return result;
     }
+    //Returns all valid combinations of the letter + the letters currently in the rack
     movesWithGivenLetter(letter: ScrabbleLetter): ScrabbleWord[] {
-        const lettersAvailable = [];
+        let lettersAvailable : ScrabbleLetter[] = [];
         lettersAvailable[0] = letter;
-        const lettersInArray = [];
+        let lettersInArray : boolean[] = [];
         for (let i = 1; i < this.getRandomIntInclusive(2, this.rack.squares.length); i++) {
             // Randomize length of word
             let index = this.getRandomIntInclusive(0, this.rack.squares.length - 1);
-            while (lettersInArray[index] === 1) {
+            while (lettersInArray[index] === true) {
                 // If we've already generated this number before
                 if (index !== lettersInArray.length - 1) {
                     index++;
                 } else index = 0;
             }
             lettersAvailable[i] = this.rack.squares[index].letter;
-            lettersInArray[index] = 1;
+            lettersInArray[index] = true;
         }
         // check all possible permutations. Maximum of O(8!)
         const permutations = this.permutationsOfLetters(lettersAvailable);
         const possibleMoves = [];
         for (let i = 0; i < permutations.length; i++) {
-            possibleMoves[i] = this.wordify([]);
+            possibleMoves[i] = new ScrabbleWord;
         }
         let movesFound = 0;
         for (const j of permutations) {
