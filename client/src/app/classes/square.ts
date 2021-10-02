@@ -10,7 +10,7 @@ export enum SquareColor {
 }
 
 export class Square {
-    position: Vec2 = { x: 0, y: 0 }; // Where the square is on the board
+    position: Vec2 = new Vec2(0, 0); // Where the square is on the board
     color: SquareColor;
     occupied: boolean; // 0 if not occupied, 1 if it is
     isValidated: boolean;

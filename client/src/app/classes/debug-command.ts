@@ -1,12 +1,13 @@
 import { ChatDisplayService } from '@app/services/chat-display.service';
-import { Command, DebugParams, DefaultCommandParams } from './commands';
+import { Command, DefaultCommandParams } from './commands';
 import { ErrorType } from './errors';
 
 export class DebugCmd extends Command {
     chatDisplayService: ChatDisplayService;
-    constructor(defaultParams: DefaultCommandParams, chatDisplayService: ChatDisplayService) {
-        super(defaultParams);
-        this.chatDisplayService = chatDisplayService;
+
+    constructor(defaultParams: DefaultCommandParams) {
+        super(defaultParams.player);
+        this.chatDisplayService = defaultParams.serviceCalled as ChatDisplayService;
     }
 
     execute(): ErrorType {
@@ -14,6 +15,6 @@ export class DebugCmd extends Command {
     }
 }
 
-export const createDebugCmd = (params: { defaultParams: DefaultCommandParams; specificParams: DebugParams }): DebugCmd => {
-    return new DebugCmd(params.defaultParams, params.specificParams);
+export const createDebugCmd = (defaultParams: DefaultCommandParams): DebugCmd => {
+    return new DebugCmd(defaultParams);
 };

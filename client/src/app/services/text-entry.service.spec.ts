@@ -1,151 +1,199 @@
-// import { TestBed } from '@angular/core/testing';
-// import { TextEntryService } from './text-entry.service';
+import { TestBed } from '@angular/core/testing';
+import { ErrorType } from '@app/classes/errors';
+import { LocalPlayer } from '@app/classes/local-player';
+import { Vec2 } from '@app/classes/vec2';
+import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
+import { ChatDisplayService } from './chat-display.service';
+import { GridService } from './grid.service';
+import { RackService } from './rack.service';
+import { SoloGameService } from './solo-game.service';
+import { TextEntryService } from './text-entry.service';
 
-// describe('TextEntryService', () => {
-//     let service: TextEntryService;
+const LOCAL_PLAYER_NAME = 'Local Player';
+const VIRTUAL_PLAYER_NAME = 'Virtual Player';
 
-//     beforeEach(() => {
-//         TestBed.configureTestingModule({});
-//         service = TestBed.inject(TextEntryService);
-//     });
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+describe('TextEntryService', () => {
+    let service: TextEntryService;
+    const rack = new RackService();
+    const grid = new GridService();
+    const soloGameService = new SoloGameService(grid, rack);
+    const chatDisplayService = new ChatDisplayService();
+    const IS_FROM_LOCAL_PLAYER = true;
 
-/*
-    handleInput:
-        if ! should call create command not send add player entry
-        if not, should send player entry
-        if command create valid (not tested here), should execute
-        Return error type should send error message
-        return noerror, should add player entry
-        if command is exchange, should call createExchangeMessage then addPlayerEntry
-    */
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            providers: [
+                { provide: SoloGameService, useValue: soloGameService },
+                { provide: ChatDisplayService, useValue: chatDisplayService },
+            ],
+        });
 
-// it('should be created', () => {
-//     expect(service).toBeTruthy();
-// });
+        service = TestBed.inject(TextEntryService);
+        soloGameService.localPlayer = new LocalPlayer(LOCAL_PLAYER_NAME);
+        soloGameService.virtualPlayer = new VirtualPlayer(VIRTUAL_PLAYER_NAME, PlayerType.Easy);
+    });
 
-// it('should send input to createCommand', () => {
-//     // Only check if ! calls the command creation function
-//     const spy = spyOn(service, 'createCommand').and.stub();
-//     const FAKE_COMMAND = '!not a command';
-//     const IS_FROM_LOCAL_PLAYER = true;
-//     service.handleInput(FAKE_COMMAND,IS_FROM_LOCAL_PLAYER);
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
 
-//     expect(spy).toHaveBeenCalled();
-// });
+    it('should send ! starting input to createCommand', () => {
+        const spy = spyOn<any>(service, 'createCommand').and.callThrough();
+        const fakeCommand = '!fake command name';
 
-// it('should ', () => {
+        service.handleInput(fakeCommand, IS_FROM_LOCAL_PLAYER);
+        expect(spy).toHaveBeenCalledWith(fakeCommand, soloGameService.localPlayer);
+    });
 
-// });
+    it('should send input as normal chat message', () => {
+        const spy = spyOn<any>(chatDisplayService, 'addPlayerEntry').and.callThrough();
+        const chatMessage = 'not a command';
 
-/*  
-        create command
-            splitCommandInput
-            commandsMap.has(commandName) or spy addError(invalidCommand)
-            extractCommandParams returns the right params type|undefined or spy addError(syntax)
-            createCmdFunction.call() should always return a valid command
+        service.handleInput(chatMessage, IS_FROM_LOCAL_PLAYER);
+        expect(spy).toHaveBeenCalledWith(IS_FROM_LOCAL_PLAYER, LOCAL_PLAYER_NAME, chatMessage);
+    });
 
-        extract command
-            paramsMap.has(commandName) or func returns undefined
-            createCmdFunction.call returns the right params (no undef)
-     
-        isWithoutParams: returns defaultparams or undef
+    it('should call display success message method(s)', () => {
+        const successMessageSpy = spyOn<any>(chatDisplayService, 'addPlayerEntry').and.callThrough();
+        const exchangeMessageSpy = spyOn<any>(chatDisplayService, 'createExchangeMessage').and.callThrough();
 
-        extractDebugParams:
-            isWithoutParams() not tested here
-            returns default and chat or undef (isdefaultParams should be undef)
-        
-        extractPlaceParams:
-            removeAccents not tested here
-            isvalidword and allLower not tested here ->
-                just check this method returns undef if position/orientation not valid 
-            convertToCoordinates not tested here, juste see if not valid row/col return undef
-            if orientation not 'h' or 'v' orientation return undef
-            return the right place params when valid
-        
-        extract exchange params:
-            if exchange has more than one param, return undef
-            if its maj or has accent return undef
-            if 0 or more than 7 letters return undef
-            if valid word return command params properly
-        
-        isValidWordInput:
-            empty word returns false
-            if has invalid letters (num and other random char) returns false
-            min and maj letters return true
-            accents returns false
-        
-        isValidExchangeWord:
-            if accent or maj return false
-            random char returns false
-            empty returns false
-        
-        
-        isValidLetter:
-            if empty or more than one letter false
-            if random char or accent false
-            if letter true
+        spyOn<any>(chatDisplayService, 'invertDebugState').and.returnValue(ErrorType.NoError);
+        spyOn<any>(soloGameService, 'exchangeLetters').and.returnValue(ErrorType.NoError);
 
-        convertToCoordinates:
-            if empty return undef
-            if column isnt a number (ex:letter or random char), undef
-            if row isnt a min letter (ex:maj letter, accent,random char) undef
-            if valid, return valid coord vec2
-        
-        splitCommandInput:
-            if its empty return []
-            if its not a command input return [];
-            else should return the right split array
-        
-        trimspaces:
-            if empty or only white spaces return ""
-            otherwise return with only edge white spaces trimmed
-        
-        isEmpty:
-            if empty/white space: return true (not much here either)
-        
-        isAllLowerLetters and remove accents:
-            not much in there its only for lisibility
+        const validCmd = '!debug';
+        const validExchangeCmd = '!échanger lettres';
 
-    */
+        service.handleInput(validCmd, IS_FROM_LOCAL_PLAYER);
+        expect(successMessageSpy).toHaveBeenCalledWith(IS_FROM_LOCAL_PLAYER, LOCAL_PLAYER_NAME, validCmd);
 
-// it('should send to chat display as an invalid command', () => {
-//     const spy = spyOn(service, 'createCommand').and.returnValue(false);
-//     // TODO Add spy for command handler!
-//     // In this test we don't care about the command validity
-//     const FAKE_COMMAND = '!not a command';
+        service.handleInput(validExchangeCmd, IS_FROM_LOCAL_PLAYER);
+        expect(exchangeMessageSpy).toHaveBeenCalledWith(IS_FROM_LOCAL_PLAYER, validExchangeCmd);
+        expect(successMessageSpy).toHaveBeenCalled();
 
-//     service.handleInput(FAKE_COMMAND);
+        service.handleInput(validExchangeCmd, !IS_FROM_LOCAL_PLAYER);
+        expect(exchangeMessageSpy).toHaveBeenCalledWith(!IS_FROM_LOCAL_PLAYER, validExchangeCmd);
+        expect(successMessageSpy).toHaveBeenCalledWith(!IS_FROM_LOCAL_PLAYER, VIRTUAL_PLAYER_NAME, '!échanger 7 lettre(s)');
+    });
 
-//     expect(spy).toHaveBeenCalled();
-//     // TODO Verify if command handler isn't called
-// });
+    it('should send invalid command error message when needed', () => {
+        const successMessageSpy = spyOn<any>(chatDisplayService, 'addPlayerEntry').and.callThrough();
+        const errorSpy = spyOn<any>(chatDisplayService, 'addErrorMessage').and.callThrough();
 
-// it('should send to chat display as normal text', () => {
-//     const spy = spyOn(service, 'isValidCommand').and.returnValue(false);
-//     // TODO spy on chat display service
-//     const USER_MESSAGE = 'Some normal message';
+        spyOn<any>(chatDisplayService, 'invertDebugState').and.returnValue(ErrorType.NoError);
+        spyOn<any>(soloGameService, 'exchangeLetters').and.returnValue(ErrorType.NoError);
+        spyOn<any>(soloGameService, 'place').and.returnValue(ErrorType.NoError);
+        spyOn<any>(soloGameService, 'passTurn').and.returnValue(ErrorType.NoError);
 
-//     service.handleInput(USER_MESSAGE);
+        // Having spaces before the ! or after the command input should not be an error of any type
+        const validNameCmds = [' !debug ', '!debug', '!passer', '!échanger z', '!placer b5v mot'];
+        // empty string is already prevented by checking if the string is empty beforehand
+        const invalidCmds = ['!', '! debug', '!random name', '!echanger', '!123'];
 
-//     expect(spy).not.toHaveBeenCalled();
-//     // TODO verify is text sent to chat display service with good arguments
-// });
+        for (const input of validNameCmds) {
+            service.handleInput(input, IS_FROM_LOCAL_PLAYER);
+            expect(successMessageSpy).toHaveBeenCalled();
+        }
 
-// it('should recognize as command', () => {
-//     // In this test we don't care about arguments
-//     const VALID_COMMAND = '!placer someArguments';
+        for (const input of invalidCmds) {
+            service.handleInput(input, IS_FROM_LOCAL_PLAYER);
+            expect(errorSpy).toHaveBeenCalledWith(ErrorType.InvalidCommand, input);
+        }
+    });
 
-//     const IS_VALID_COMMAND = service.isValidCommand(VALID_COMMAND);
+    it('should send invalid syntax error message when needed', () => {
+        const successMessageSpy = spyOn<any>(chatDisplayService, 'addPlayerEntry').and.callThrough();
+        const errorSpy = spyOn<any>(chatDisplayService, 'addErrorMessage').and.callThrough();
 
-//     expect(IS_VALID_COMMAND).toEqual(true);
-// });
+        spyOn<any>(chatDisplayService, 'invertDebugState').and.returnValue(ErrorType.NoError);
+        spyOn<any>(soloGameService, 'exchangeLetters').and.returnValue(ErrorType.NoError);
+        spyOn<any>(soloGameService, 'place').and.returnValue(ErrorType.NoError);
+        spyOn<any>(soloGameService, 'passTurn').and.returnValue(ErrorType.NoError);
 
-// it('should recognize as an invalid command', () => {
-//     // In this test we don't care about arguments
-//     const VALID_COMMAND = '!jeNeSuisPasUneCommand someArguments';
+        // '!debug' and '!passer' already checked
+        const validSyntaxCmds = ['!échanger abcde*g', '!placer a1h garçon', '!placer o15v ÉLÉPHANT'];
+        const syntaxErrorCmds = [
+            '!debug bugs',
+            '!passer tour',
+            '!échanger',
+            '!échanger abcdefgh',
+            '!échanger ééé',
+            '!échanger A',
+            '!échanger 1',
+            '!échanger ^',
+            '!placer p5h mot',
+            '!placer aah mot',
+            '!placer à1h',
+            '!placer A1h',
+            '!placer a1H',
+            '!placer a5a mot',
+            '!placer a5h',
+            '!placer a10v *',
+            '!placer d5v mot mot',
+            '!placer i10h 123',
+            '!placer a31416h something',
+            '!placer a5V nothing',
+        ];
 
-//     const IS_VALID_COMMAND = service.isValidCommand(VALID_COMMAND);
+        for (const input of validSyntaxCmds) {
+            service.handleInput(input, IS_FROM_LOCAL_PLAYER);
+            expect(successMessageSpy).toHaveBeenCalled();
+        }
 
-//     expect(IS_VALID_COMMAND).toEqual(false);
-// });
-// });
+        for (const input of syntaxErrorCmds) {
+            service.handleInput(input, IS_FROM_LOCAL_PLAYER);
+            expect(errorSpy).toHaveBeenCalledWith(ErrorType.SyntaxError, input);
+        }
+    });
+
+    it('should send impossible command error message when execution returns it', () => {
+        spyOn<any>(soloGameService, 'exchangeLetters').and.returnValue(ErrorType.ImpossibleCommand);
+        const errorSpy = spyOn<any>(chatDisplayService, 'addErrorMessage').and.callThrough();
+        const cmd = '!échanger aaa';
+
+        service.handleInput(cmd, IS_FROM_LOCAL_PLAYER);
+        expect(errorSpy).toHaveBeenCalledWith(ErrorType.ImpossibleCommand, cmd);
+    });
+
+    it('should return false when it is not a valid letter', () => {
+        // this method isValidLetter does not return true for accents or asterisks
+        const validLetters = ['A', 'a', 'Z', 'z'];
+        const invalidLetters = ['       ', '', 'é', 'あ', 'ç', 'œ'];
+        for (const input of validLetters) {
+            const isValid = service.isValidWordInput(input);
+            expect(isValid).toEqual(true);
+        }
+        for (const input of invalidLetters) {
+            const isValid = service.isValidWordInput(input);
+            expect(isValid).toEqual(false);
+        }
+        const isValidLetter = service.isValidLetter('');
+        expect(isValidLetter).toEqual(false);
+    });
+
+    // the rest of the this method is tested when being called in createCommand method
+    it('should split an input only if it starts with !', () => {
+        const emptyString = service.splitCommandInput('');
+        expect(emptyString).toEqual([]);
+        const notACommand = service.splitCommandInput('not a command');
+        expect(notACommand).toEqual([]);
+    });
+
+    it('should return coordinates from 0 to 14 for valid row and column', () => {
+        const invalidRows = ['A', 'P', '', '01', '0000001'];
+        const invalidCols = ['0', '16', '0x01']; // columns on the board from 1 to 15
+        const validRow = 'a';
+        const validCol = '1';
+        for (const invalidRow of invalidRows) {
+            const coordinates = service.convertToCoordinates(invalidRow, validCol);
+            expect(coordinates).toEqual(undefined);
+        }
+        for (const invalidCol of invalidCols) {
+            const coordinates = service.convertToCoordinates(validRow, invalidCol);
+            expect(coordinates).toEqual(undefined);
+        }
+        const validCoordinates = service.convertToCoordinates(validRow, validCol) as Vec2;
+        expect(validCoordinates.x).toEqual(0);
+        expect(validCoordinates.y).toEqual(0);
+    });
+});

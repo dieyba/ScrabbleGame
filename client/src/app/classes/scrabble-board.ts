@@ -148,9 +148,10 @@ export class ScrabbleBoard {
     }
 
     isWordPassingInCenter(word: string, coord: Vec2, orientation: string): boolean {
+        const tempCoord = new Vec2(coord.x, coord.y);
         // Checking if word passing middle vertically
-        const isWordInMiddleColumn = coord.x === Column.Eight && orientation === 'v';
-        const isVerticalWordOnCenter = coord.y < Row.I && coord.y + word.length - 1 >= Row.H;
+        const isWordInMiddleColumn = tempCoord.x === Column.Eight && orientation === 'v';
+        const isVerticalWordOnCenter = tempCoord.y < Row.I && tempCoord.y + word.length - 1 >= Row.H;
         if (isWordInMiddleColumn) {
             if (isVerticalWordOnCenter) {
                 return true;
@@ -158,8 +159,8 @@ export class ScrabbleBoard {
         }
 
         // Checking if word passing middle horizontally
-        const isWordInMiddleRow = coord.y === Row.H && orientation === 'h';
-        const isHorizontalWordOnCenter = coord.x < Column.Nine && coord.x + word.length - 1 >= Column.Eight;
+        const isWordInMiddleRow = tempCoord.y === Row.H && orientation === 'h';
+        const isHorizontalWordOnCenter = tempCoord.x < Column.Nine && tempCoord.x + word.length - 1 >= Column.Eight;
         if (isWordInMiddleRow) {
             if (isHorizontalWordOnCenter) {
                 return true;
@@ -176,9 +177,7 @@ export class ScrabbleBoard {
 
         // For each letter in "word", verifies if a Scrabble letter is already place and if it's the same letter
         for (let i = 0; i < word.length; i++) {
-            const tempCoord = new Vec2();
-            tempCoord.x = coord.x;
-            tempCoord.y = coord.y;
+            const tempCoord = new Vec2(coord.x, coord.y);
             if (isVertical) {
                 tempCoord.y += i;
             } else {
@@ -259,5 +258,21 @@ export class ScrabbleBoard {
         }
 
         return false;
+    }
+
+    getStringFromCoord(coord: Vec2, length: number, orientation: string): string {
+        const tempCoord = new Vec2(coord.x, coord.y);
+        let tempString = '';
+        for (let i = 0; i < length; i++) {
+            if (this.squares[tempCoord.x][tempCoord.y].occupied) {
+                tempString += this.squares[tempCoord.x][tempCoord.y].letter;
+            }
+            if (orientation === 'h') {
+                tempCoord.x++;
+            } else {
+                tempCoord.y++;
+            }
+        }
+        return tempString;
     }
 }

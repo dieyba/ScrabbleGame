@@ -3,14 +3,14 @@ import { createExchangeCmd, ExchangeCmd } from '@app/classes/exchange-command';
 import { GridService } from '@app/services/grid.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
-import { LocalPlayer } from '@app/classes/local-player';
+import { LocalPlayer } from './local-player';
 
 describe('ExchangeCmd', () => {
+    let playerchoice = new LocalPlayer('dieyna');
     let rack = new RackService();
     let grid = new GridService();
     let service = new SoloGameService(grid, rack);
-    let localPlayer = new LocalPlayer('Sara');
-    const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: service };
+    let defaultParams: DefaultCommandParams = { player: playerchoice, serviceCalled: service };
     const specificParams: ExchangeParams = 'test';
     let exchange = new ExchangeCmd(defaultParams, 'amd');
 

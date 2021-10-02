@@ -31,10 +31,10 @@ export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
     @ViewChild('rackCanvas', { static: false }) private rackCanvas!: ElementRef<HTMLCanvasElement>;
 
-    mousePosition: Vec2 = { x: 0, y: 0 };
+    mousePosition: Vec2 = new Vec2(0, 0);
     buttonPressed = '';
-    private canvasSize = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
-    private rackSize = { x: RACK_WIDTH, y: RACK_HEIGHT };
+    private canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    private rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
 
     constructor(
         private readonly gridService: GridService,
@@ -65,17 +65,18 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawLetter(letter5, 0, 2);
         const letter6: ScrabbleLetter = new ScrabbleLetter('m', 2);
         this.gridService.drawLetter(letter6, 0, 3);
+        // Uncomment next two lines for words to be valid
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const letter7: ScrabbleLetter = new ScrabbleLetter('i', 4);
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         this.gridService.drawLetter(letter7, 0, 4);
         const word1: ScrabbleWord = new ScrabbleWord();
         word1.content = [letter1, letter2, letter3, letter4];
-        word1.startPosition = { x: 0, y: 0 };
+        word1.startPosition = new Vec2(0, 0);
         word1.orientation = WordOrientation.Horizontal;
         const word2: ScrabbleWord = new ScrabbleWord();
         word2.content = [letter5, letter6, letter7];
-        word2.startPosition = { x: 0, y: 2 };
+        word2.startPosition = new Vec2(0, 2);
         word2.orientation = WordOrientation.Vertical;
         const words: ScrabbleWord[] = [word1, word2];
         // this.rackService.removeLetter(this.soloGameService.localPlayer.letters[6]);
@@ -95,6 +96,10 @@ export class PlayAreaComponent implements AfterViewInit {
 
     isLocalPlayerActive(): boolean {
         return this.soloGameService.localPlayer.isActive;
+    }
+
+    isEndGame(): boolean {
+        return this.soloGameService.isEndGame;
     }
 
     get width(): number {

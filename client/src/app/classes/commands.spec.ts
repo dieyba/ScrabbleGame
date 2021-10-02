@@ -1,12 +1,12 @@
-import { DefaultCommandParams } from '@app/classes/commands';
 import { ErrorType } from '@app/classes/errors';
-import { SoloGameService } from '@app/services/solo-game.service';
+import { LocalPlayer } from '@app/classes/local-player';
 import { Command } from './commands';
+import { Player } from './player';
 
 describe('Commands', () => {
     class CommandTest extends Command {
-        constructor(defaultCommandParams: DefaultCommandParams) {
-            super(defaultCommandParams);
+        constructor(player: Player) {
+            super(player);
         }
 
         execute() {
@@ -14,14 +14,15 @@ describe('Commands', () => {
         }
     }
 
-    class DefaultCommandParamsTest implements DefaultCommandParams {
-        gameService: SoloGameService;
-        isFromLocalPlayer: boolean;
-    }
+    // class DefaultCommandParamsTest implements DefaultCommandParams {
+    //     gameService: SoloGameService;
+    //     isFromLocalPlayer: boolean;
+    // }
 
-    const defaultCommandParams: DefaultCommandParamsTest = new DefaultCommandParamsTest();
+    // const defaultCommandParams: DefaultCommandParamsTest = new DefaultCommandParamsTest();
+    const player = new LocalPlayer('Erika');
 
     it('should ', () => {
-        expect(new CommandTest(defaultCommandParams)).toBeTruthy();
+        expect(new CommandTest(player)).toBeTruthy();
     });
 });

@@ -2,14 +2,16 @@ import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
 import { GridService } from '@app/services/grid.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
+import { LocalPlayer } from './local-player';
 import { createPlaceCmd, PlaceCmd } from './place-command';
 import { Vec2 } from './vec2';
 
 describe('PlaceCmd', () => {
+    let playerchoice = new LocalPlayer('dieyna');
     let rack = new RackService();
     let grid = new GridService();
     let service = new SoloGameService(grid, rack);
-    let defaultParams: DefaultCommandParams = { gameService: service, isFromLocalPlayer: true };
+    let defaultParams: DefaultCommandParams = { player: playerchoice, serviceCalled: service };
     const specificParams: PlaceParams = { position: new Vec2(), orientation: 'est', word: 'testword' };
     let place = new PlaceCmd(defaultParams, specificParams);
 

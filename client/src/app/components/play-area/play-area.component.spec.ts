@@ -22,6 +22,7 @@ describe('PlayAreaComponent', () => {
             'createNewGame',
             'passTurn',
             'changeActivePlayer',
+            'removeLetter',
         ]);
         await TestBed.configureTestingModule({
             declarations: [PlayAreaComponent],
@@ -36,13 +37,6 @@ describe('PlayAreaComponent', () => {
         soloGameServiceSpy.localPlayer = new LocalPlayer('Arianne');
         soloGameServiceSpy.localPlayer.score = 73;
         soloGameServiceSpy.localPlayer.letters = [letter];
-        // {
-        //     name: 'Ariane',
-        //     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        //     score: 73,
-        //     letters: [letter],
-        //     isActive: false,
-        // };
     });
 
     beforeEach(() => {
