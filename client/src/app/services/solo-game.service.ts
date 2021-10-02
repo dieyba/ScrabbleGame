@@ -165,6 +165,7 @@ export class SoloGameService {
                     this.rackService.removeLetter(lettersToRemove[i]);
                     this.addRackLetter(lettersToAdd[i]);
                 }
+                this.passTurn();
                 return ErrorType.NoError;
             }
         }
