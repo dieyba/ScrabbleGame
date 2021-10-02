@@ -7,13 +7,13 @@ import { createPlaceCmd, PlaceCmd } from './place-command';
 import { Vec2 } from './vec2';
 
 describe('PlaceCmd', () => {
-    let playerchoice = new LocalPlayer('dieyna');
-    let rack = new RackService();
-    let grid = new GridService();
-    let service = new SoloGameService(grid, rack);
-    let defaultParams: DefaultCommandParams = { player: playerchoice, serviceCalled: service };
+    const playerchoice = new LocalPlayer('dieyna');
+    const rack = new RackService();
+    const grid = new GridService();
+    const service = new SoloGameService(grid, rack);
+    const defaultParams: DefaultCommandParams = { player: playerchoice, serviceCalled: service };
     const specificParams: PlaceParams = { position: new Vec2(), orientation: 'est', word: 'testword' };
-    let place = new PlaceCmd(defaultParams, specificParams);
+    const place = new PlaceCmd(defaultParams, specificParams);
 
     it('should create an instance', () => {
         expect(place).toBeTruthy();

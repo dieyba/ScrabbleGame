@@ -88,7 +88,7 @@ describe('ScrabbleBoard', () => {
     });
 
     it('isWordTouchingOtherWord should return true if the word touch another word on the board on the left or the right (word horizontale)', () => {
-        let letterAlreadyPlaced = new ScrabbleLetter('a', 1);
+        const letterAlreadyPlaced = new ScrabbleLetter('a', 1);
         board.squares[0][0].letter = letterAlreadyPlaced;
         board.squares[0][0].occupied = true;
         position.x = 1;
@@ -104,7 +104,7 @@ describe('ScrabbleBoard', () => {
 
     it('isWordTouchingOtherWord should return true if the word touch another word on the board on the top or the bottom (word verticale)', () => {
         expect(board.isWordTouchingOtherWord(motAPlacer, position, orientation)).toBeFalse();
-        let letterAlreadyPlaced = new ScrabbleLetter('a', 1);
+        const letterAlreadyPlaced = new ScrabbleLetter('a', 1);
         board.squares[0][0].letter = letterAlreadyPlaced;
         board.squares[0][0].occupied = true;
         orientation = 'v';
@@ -119,7 +119,7 @@ describe('ScrabbleBoard', () => {
     });
 
     it('isWordTouchingOtherWord should return true if the word touch another word on the board above it (word horizontal)', () => {
-        let letterAlreadyPlaced = new ScrabbleLetter('a', 1);
+        const letterAlreadyPlaced = new ScrabbleLetter('a', 1);
         board.squares[5][0].letter = letterAlreadyPlaced;
         board.squares[5][0].occupied = true;
         position.y = 1;
@@ -130,7 +130,7 @@ describe('ScrabbleBoard', () => {
     });
 
     it('isWordTouchingOtherWord should return true if the word touch another word on the board below it (word horizontal)', () => {
-        let letterAlreadyPlaced = new ScrabbleLetter('a', 1);
+        const letterAlreadyPlaced = new ScrabbleLetter('a', 1);
         board.squares[5][2].letter = letterAlreadyPlaced;
         board.squares[5][2].occupied = true;
         position.y = 1;
@@ -141,7 +141,7 @@ describe('ScrabbleBoard', () => {
     });
 
     it('isWordTouchingOtherWord should return true if the word touch another word on the board on the left (word vertical)', () => {
-        let letterAlreadyPlaced = new ScrabbleLetter('a', 1);
+        const letterAlreadyPlaced = new ScrabbleLetter('a', 1);
         board.squares[0][5].letter = letterAlreadyPlaced;
         board.squares[0][5].occupied = true;
         orientation = 'v';
@@ -153,7 +153,7 @@ describe('ScrabbleBoard', () => {
     });
 
     it('isWordTouchingOtherWord should return true if the word touch another word on the board on the right (word vertical)', () => {
-        let letterAlreadyPlaced = new ScrabbleLetter('a', 1);
+        const letterAlreadyPlaced = new ScrabbleLetter('a', 1);
         board.squares[2][5].letter = letterAlreadyPlaced;
         board.squares[2][5].occupied = true;
         orientation = 'v';

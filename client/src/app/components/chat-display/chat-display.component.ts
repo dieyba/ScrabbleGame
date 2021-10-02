@@ -8,7 +8,7 @@ import { ChatDisplayService } from '@app/services/chat-display.service';
     styleUrls: ['./chat-display.component.scss'],
 })
 export class ChatDisplayComponent {
-    @ViewChild('chatDisplayBox') chatDisplayBox!: ElementRef; // TODO Make it private?
+    @ViewChild('chatDisplayBox') chatDisplayBox!: ElementRef;
     entries: ChatDisplayEntry[] = [];
     lastEntry: ChatDisplayEntry;
 

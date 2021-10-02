@@ -20,10 +20,14 @@ export abstract class Player {
     }
 
     removeLetter(lettersToRemove: string): boolean {
-        let oldRack: ScrabbleLetter[] = this.letters;
+        const oldRack: ScrabbleLetter[] = this.letters;
 
-        for (let i = 0; i < lettersToRemove.length; i++) {
-            let indexLetter = this.letters.findIndex((letter) => letter.character === lettersToRemove[i]);
+        // for (let i = 0; i < lettersToRemove.length; i++) {
+        //     const indexLetter = this.letters.findIndex((letter) => letter.character === lettersToRemove[i]);
+        // }
+
+        for (const singleLetter of lettersToRemove) {
+            const indexLetter = this.letters.findIndex((letter) => letter.character === singleLetter);
             if (indexLetter > -1) {
                 this.letters.splice(indexLetter, 1);
             } else {

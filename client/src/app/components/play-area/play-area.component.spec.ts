@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
 import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
@@ -15,6 +16,9 @@ describe('PlayAreaComponent', () => {
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
 
     beforeEach(async () => {
+        TestBed.configureTestingModule({
+            imports: [MatCardModule],
+        });
         gridServiceSpy = jasmine.createSpyObj('GridService', ['sizeUpLetters', 'sizeDownLetters', 'drawGrid', 'drawColors', 'drawLetter']);
         soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', [
             'localPlayer',

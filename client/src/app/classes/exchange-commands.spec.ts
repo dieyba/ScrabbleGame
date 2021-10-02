@@ -6,13 +6,13 @@ import { SoloGameService } from '@app/services/solo-game.service';
 import { LocalPlayer } from './local-player';
 
 describe('ExchangeCmd', () => {
-    let playerchoice = new LocalPlayer('dieyna');
-    let rack = new RackService();
-    let grid = new GridService();
-    let service = new SoloGameService(grid, rack);
-    let defaultParams: DefaultCommandParams = { player: playerchoice, serviceCalled: service };
+    const playerchoice = new LocalPlayer('dieyna');
+    const rack = new RackService();
+    const grid = new GridService();
+    const service = new SoloGameService(grid, rack);
+    const defaultParams: DefaultCommandParams = { player: playerchoice, serviceCalled: service };
     const specificParams: ExchangeParams = 'test';
-    let exchange = new ExchangeCmd(defaultParams, 'amd');
+    const exchange = new ExchangeCmd(defaultParams, 'amd');
 
     it('should create an instance', () => {
         expect(exchange).toBeTruthy();

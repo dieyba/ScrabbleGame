@@ -99,7 +99,7 @@ export class LetterStock {
     }
 
     isEmpty(): boolean {
-        return this.letterStock.length == 0;
+        return this.letterStock.length === 0;
     }
 
     addLettersToStock(letter: ScrabbleLetter, number: number): void {
@@ -109,7 +109,7 @@ export class LetterStock {
     }
 
     takeLettersFromStock(number: number): ScrabbleLetter[] {
-        let lettersRemovedFromStock: ScrabbleLetter[] = [];
+        const lettersRemovedFromStock: ScrabbleLetter[] = [];
         for (let i = 0; i < number; i++) {
             if (this.isEmpty()) {
                 // Si la réserve est vide, qu'est ce qu'on fait ?
@@ -123,9 +123,10 @@ export class LetterStock {
     }
 
     exchangeLetters(playerLetters: ScrabbleLetter[]): ScrabbleLetter[] {
-        let randomLetters = this.takeLettersFromStock(playerLetters.length);
-        for (let i = 0; i < playerLetters.length; i++) {
-            this.letterStock.push(playerLetters[i]);
+        const randomLetters = this.takeLettersFromStock(playerLetters.length);
+
+        for (let letters of playerLetters) {
+            this.letterStock.push(letters);
         }
 
         return randomLetters;

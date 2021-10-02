@@ -55,7 +55,7 @@ describe('LetterStock', () => {
     });
 
     it('should call takeLettersFromStock when exchangeLetters is called', () => {
-        let lettersToChange: ScrabbleLetter[] = [new ScrabbleLetter('a', 1), new ScrabbleLetter('j', 10)];
+        const lettersToChange: ScrabbleLetter[] = [new ScrabbleLetter('a', 1), new ScrabbleLetter('j', VALUE_LETTER_10)];
 
         const spy = spyOn(stock, 'takeLettersFromStock').and.stub();
         stock.exchangeLetters(lettersToChange);
@@ -65,8 +65,8 @@ describe('LetterStock', () => {
 
     it('should exchange the given letters with the same number of letters in the letter stock', () => {
         stock.letterStock = [];
-        let lettersToExchangeWithStock: ScrabbleLetter[] = [new ScrabbleLetter('a', 1)];
-        let lettersFromStock: ScrabbleLetter[] = [new ScrabbleLetter('z', 10)];
+        const lettersToExchangeWithStock: ScrabbleLetter[] = [new ScrabbleLetter('a', 1)];
+        const lettersFromStock: ScrabbleLetter[] = [new ScrabbleLetter('z', VALUE_LETTER_10)];
         stock.addLettersToStock(lettersFromStock[0], 1);
 
         expect(stock.exchangeLetters(lettersToExchangeWithStock)).toEqual(lettersFromStock);

@@ -4,10 +4,10 @@ import { ChatDisplayService } from '@app/services/chat-display.service';
 import { DefaultCommandParams } from './commands';
 
 describe('DebugCmd', () => {
-    let chat = new ChatDisplayService();
-    let localPlayer = new LocalPlayer('Sara');
+    const chat = new ChatDisplayService();
+    const localPlayer = new LocalPlayer('Sara');
     const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: chat };
-    let debug = new DebugCmd(defaultParams);
+    const debug = new DebugCmd(defaultParams);
 
     it('should create an instance', () => {
         expect(debug).toBeTruthy();

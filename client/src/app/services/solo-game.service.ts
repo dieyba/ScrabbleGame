@@ -45,7 +45,6 @@ export class SoloGameService {
     initializeGame(gameInfo: FormGroup) {
         this.localPlayer = new LocalPlayer(gameInfo.controls.name.value);
         this.localPlayer.isActive = true;
-        //this.chooseFirstPlayer();
         this.virtualPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
         this.virtualPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.totalCountDown = +gameInfo.controls.timer.value;
@@ -152,16 +151,16 @@ export class SoloGameService {
     }
 
     exchangeLetters(player: Player, letters: string): ErrorType {
-        if (player.isActive && this.stock.letterStock.length > 7) {
-            //console.log('Exchanging these letters:' + letters + " ...");
-            let lettersToRemove: ScrabbleLetter[] = [];
-            if (player.removeLetter(letters) == true) {
-                for (let i: number = 0; i < letters.length; i++) {
+        if (player.isActive && this.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
+            // console.log('Exchanging these letters:' + letters + " ...");
+            const lettersToRemove: ScrabbleLetter[] = [];
+            if (player.removeLetter(letters) === true) {
+                for (let i = 0; i < letters.length; i++) {
                     lettersToRemove[i] = new ScrabbleLetter(letters[i], 1);
                 }
 
-                let lettersToAdd: ScrabbleLetter[] = this.stock.exchangeLetters(lettersToRemove);
-                for (let i: number = 0; i < lettersToAdd.length; i++) {
+                const lettersToAdd: ScrabbleLetter[] = this.stock.exchangeLetters(lettersToRemove);
+                for (let i = 0; i < lettersToAdd.length; i++) {
                     player.addLetter(lettersToAdd[i]);
                     this.rackService.removeLetter(lettersToRemove[i]);
                     this.addRackLetter(lettersToAdd[i]);
@@ -316,13 +315,4 @@ export class SoloGameService {
         }
         return true;
     }
-
-    // chooseFirstPlayer(): void {
-    //     const choice: number = Math.random();
-    //     if (choice < 0.5) {
-    //         this.localPlayer.isActive = true;
-    //     } else {
-    //         this.virtualPlayer.isActive = true;
-    //     }
-    // }
 }

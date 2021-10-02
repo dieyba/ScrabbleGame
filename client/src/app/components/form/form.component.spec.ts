@@ -17,7 +17,7 @@ import { FormComponent } from './form.component';
 describe('FormComponent', () => {
     let component: FormComponent;
     let fixture: ComponentFixture<FormComponent>;
-    let list: string[] = ['dieyna', 'kevin', 'ariane'];
+    const list: string[] = ['dieyna', 'kevin', 'ariane'];
     let dialogSpy: jasmine.Spy;
     // let dialog: jasmine.SpyObj<MatDialogRef<FormComponent>> = jasmine.createSpyObj('dialog', ['close']);
     beforeEach(async () => {
@@ -38,7 +38,7 @@ describe('FormComponent', () => {
                 BrowserAnimationsModule,
             ],
             providers: [
-                { provide: MatDialogRef, useValue: { close: () => {} } },
+                { provide: MatDialogRef, useValue: { close: () => {} } }, // eslint-disable-line @typescript-eslint/no-empty-function
                 { provide: Router, useValue: { navigate: () => new Observable() } },
             ],
         }).compileComponents();
@@ -56,7 +56,7 @@ describe('FormComponent', () => {
 
     it('should call close() ', () => {
         const dialogRefSpyObj = jasmine.createSpyObj({ close: true });
-        dialogSpy = spyOn(TestBed.get(MatDialogRef), 'close').and.returnValue(dialogRefSpyObj);
+        dialogSpy = spyOn(TestBed.get(MatDialogRef), 'close').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
         component.closeDialog();
         expect(dialogSpy).toHaveBeenCalled();
     });

@@ -67,21 +67,4 @@ describe('ChatDisplayComponent', () => {
         expect(isNewEntrySpy).toHaveBeenCalled();
         expect(scrollDownSpy).not.toHaveBeenCalled();
     });
-
-    // TODO : Demander dans le forum commment tester des functions qui utilise seulement des elements html
-    // it("'scrollDown' should scroll to the bottom of 'input' element", () => {
-    //     const SCROLL_HEIGHT = 100;
-    //     const SCROLL_VALUE_FROM_TOP = 50;
-
-    //     chatDisplay.chatDisplayBox.nativeElement.scrollHeight = SCROLL_HEIGHT;
-    //     chatDisplay.chatDisplayBox.nativeElement.scrollTop = SCROLL_VALUE_FROM_TOP;
-    //     // const bannerDe: DebugElement = fixture.debugElement;
-    //     // const bannerEl: HTMLElement = bannerDe.nativeElement;
-    //     // const input = bannerEl.querySelector('input');
-    //     // input?.scrollHeight = SCROLL_HEIGHT;
-    //     // input?.scrollTop = SCROLL_VALUE_FROM_TOP;
-
-    //     chatDisplay.scrollDown();
-    //     expect(chatDisplay.chatDisplayBox.nativeElement.scrollTop).toEqual(SCROLL_HEIGHT);
-    // });
 });

@@ -15,7 +15,7 @@ const DEFAULT_HEIGHT = 600;
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('GameService', () => {
     let service: SoloGameService;
-    let spyPlayer: LocalPlayer = new LocalPlayer('sara');
+    const spyPlayer: LocalPlayer = new LocalPlayer('sara');
     let changeActivePlayerSpy: jasmine.Spy<any>;
     let secondsToMinutesSpy: jasmine.Spy<any>;
     let startCountdownSpy: jasmine.Spy<any>;
@@ -121,7 +121,7 @@ describe('GameService', () => {
     it('passTurn not possible when local player is not active', () => {
         service.localPlayer = new LocalPlayer('Ariane');
         service.localPlayer.isActive = false;
-        let error = ErrorType.ImpossibleCommand;
+        const error = ErrorType.ImpossibleCommand;
         expect(service.passTurn()).toEqual(error);
     });
 
@@ -160,14 +160,14 @@ describe('GameService', () => {
         spyPlayer.letters = [new ScrabbleLetter('o', 1)];
         spyPlayer.isActive = true;
         service.localPlayer = spyPlayer;
-        let error = ErrorType.ImpossibleCommand;
+        const error = ErrorType.ImpossibleCommand;
         expect(service.exchangeLetters(spyPlayer, 'a')).toEqual(error);
     });
 
     it('exchange not possible when local player not active', () => {
         spyPlayer.isActive = false;
         service.localPlayer = spyPlayer;
-        let error = ErrorType.ImpossibleCommand;
+        const error = ErrorType.ImpossibleCommand;
 
         expect(service.exchangeLetters(spyPlayer, 'a')).toEqual(error);
     });

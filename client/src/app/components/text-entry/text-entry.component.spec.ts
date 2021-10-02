@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
 import { TextEntryService } from '@app/services/text-entry.service';
 import { TextEntryComponent } from './text-entry.component';
 import SpyObj = jasmine.SpyObj;
@@ -13,6 +14,8 @@ describe('TextEntryComponent', () => {
         textEntryServiceSpy = jasmine.createSpyObj('TextEntryService', ['handleInput']);
         TestBed.configureTestingModule({
             declarations: [TextEntryComponent],
+            imports: [MatCardModule],
+
             providers: [{ provide: TextEntryService, useValue: textEntryServiceSpy }],
         }).compileComponents();
     });
@@ -32,7 +35,4 @@ describe('TextEntryComponent', () => {
 
         expect(textEntryServiceSpy.handleInput).toHaveBeenCalled();
     });
-
-    // TODO Test number of characters entered by user. User most not be able to enter
-    //      more than 512 characters
 });

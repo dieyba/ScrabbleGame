@@ -108,8 +108,8 @@ export class ChatDisplayService {
     }
 
     scrabbleLetterstoString(letters: ScrabbleLetter[]): string {
-        let stringLetters: string = '';
-        for (let letter of letters) {
+        let stringLetters = '';
+        for (const letter of letters) {
             stringLetters += letter.character;
         }
         return stringLetters;

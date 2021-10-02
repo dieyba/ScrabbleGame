@@ -6,12 +6,12 @@ import { SoloGameService } from '@app/services/solo-game.service';
 import { LocalPlayer } from './local-player';
 
 describe('PassTurnCmd', () => {
-    let playerChoice = new LocalPlayer('dieyna');
-    let rack = new RackService();
-    let grid = new GridService();
-    let service = new SoloGameService(grid, rack);
-    let defaultParams: DefaultCommandParams = { player: playerChoice, serviceCalled: service };
-    let passTurn = new PassTurnCmd(defaultParams);
+    const playerChoice = new LocalPlayer('dieyna');
+    const rack = new RackService();
+    const grid = new GridService();
+    const service = new SoloGameService(grid, rack);
+    const defaultParams: DefaultCommandParams = { player: playerChoice, serviceCalled: service };
+    const passTurn = new PassTurnCmd(defaultParams);
 
     it('should create an instance', () => {
         expect(passTurn).toBeTruthy();

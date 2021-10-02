@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
 import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
@@ -15,6 +16,7 @@ describe('SidebarComponent', () => {
         soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['localPlayer', 'virtualPlayer']);
         await TestBed.configureTestingModule({
             declarations: [SidebarComponent],
+            imports: [MatCardModule],
             providers: [{ provide: SoloGameService, useValue: soloGameServiceSpy }],
         }).compileComponents();
 
