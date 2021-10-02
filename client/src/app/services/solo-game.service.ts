@@ -267,7 +267,6 @@ export class SoloGameService {
         } else {
             tempScrabbleWords = this.wordBuilder.buildWordOnBoard(placeParams.word, placeParams.position, WordOrientation.Vertical);
         }
-        console.log(tempScrabbleWords);
 
         // Call validation method and end turn
         if (this.validationService.validateWordsAndCalculateScore(tempScrabbleWords) === 0) {

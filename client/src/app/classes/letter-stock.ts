@@ -30,7 +30,7 @@ enum LetterQuantity {
     Star = 2,
 }
 
-enum LetterValue {
+export enum LetterValue {
     A = 1,
     B = 3,
     C = 3,
