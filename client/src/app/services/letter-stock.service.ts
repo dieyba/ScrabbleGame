@@ -125,7 +125,7 @@ export class LetterStock {
     exchangeLetters(playerLetters: ScrabbleLetter[]): ScrabbleLetter[] {
         const randomLetters = this.takeLettersFromStock(playerLetters.length);
 
-        for (let letters of playerLetters) {
+        for (const letters of playerLetters) {
             this.letterStock.push(letters);
         }
 
