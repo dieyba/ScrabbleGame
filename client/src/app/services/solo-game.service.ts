@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ExchangeParams, PlaceParams } from '@app/classes/commands';
+import { PlaceParams } from '@app/classes/commands';
 import { Dictionary } from '@app/classes/dictionary';
 import { ErrorType } from '@app/classes/errors';
-import { LetterStock } from '@app/classes/letter-stock';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
@@ -11,12 +10,14 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
 import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
+import { LetterStock } from '@app/services/letter-stock.service';
+import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 import { ValidationService, WAIT_TIME } from './validation.service';
-import { ChatDisplayService } from './chat-display.service';
 
-const TIMER_INTERVAL = 1000;
+export const TIMER_INTERVAL = 1000;
+
 const DEFAULT_LETTER_COUNT = 7;
 const DOUBLE_DIGIT = 10;
 const MINUTE_IN_SEC = 60;
@@ -39,7 +40,12 @@ export class SoloGameService {
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
 
-    constructor(private gridService: GridService, private rackService: RackService, private chatDisplayService: ChatDisplayService, private validationService: ValidationService) {
+    constructor(
+        private gridService: GridService,
+        private rackService: RackService,
+        private chatDisplayService: ChatDisplayService,
+        private validationService: ValidationService,
+    ) {
         this.hasTurnsBeenPassed = [];
         this.turnPassed = false;
         this.isEndGame = false;
@@ -172,10 +178,23 @@ export class SoloGameService {
         });
     }
 
-    exchangeLetters(player: Player, letters: ExchangeParams): ErrorType {
-        if (this.localPlayer.isActive) {
-            console.log('Exchanging these letters:' + letters + ' ...'); // eslint-disable-line no-console
-            return ErrorType.NoError;
+    exchangeLetters(player: Player, letters: string): ErrorType {
+        if (player.isActive && this.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
+            // console.log('Exchanging these letters:' + letters + " ...");
+            const lettersToRemove: ScrabbleLetter[] = [];
+            if (player.removeLetter(letters) === true) {
+                for (let i = 0; i < letters.length; i++) {
+                    lettersToRemove[i] = new ScrabbleLetter(letters[i], 1);
+                }
+
+                const lettersToAdd: ScrabbleLetter[] = this.stock.exchangeLetters(lettersToRemove);
+                for (let i = 0; i < lettersToAdd.length; i++) {
+                    player.addLetter(lettersToAdd[i]);
+                    this.rackService.removeLetter(lettersToRemove[i]);
+                    this.addRackLetter(lettersToAdd[i]);
+                }
+                return ErrorType.NoError;
+            }
         }
         return ErrorType.ImpossibleCommand;
     }
@@ -197,8 +216,8 @@ export class SoloGameService {
     }
 
     endGame() {
-        this.chatDisplayService.addEndGameMessage(this.stock.letterStock,this.localPlayer,this.virtualPlayer);
-        
+        this.chatDisplayService.addEndGameMessage(this.stock.letterStock, this.localPlayer, this.virtualPlayer);
+
         clearInterval(this.intervalValue);
         this.timerMs = 0;
         this.secondsToMinutes();

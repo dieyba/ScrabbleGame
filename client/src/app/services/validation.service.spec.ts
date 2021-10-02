@@ -85,37 +85,4 @@ describe('ValidationService', () => {
         const words: ScrabbleWord[] = [word1, word2];
         expect(service.validateWordsAndCalculateScore(words)).toEqual(0);
     });
-
-    /* it('newLettersCount adds a bonus if equals 7', () => {
-        const letter1: ScrabbleLetter = new ScrabbleLetter('p', 1);
-        gridServiceSpy.scrabbleBoard.squares[0][0].occupied = true;
-        gridServiceSpy.scrabbleBoard.squares[0][0].isValidated = false;
-        const letter2: ScrabbleLetter = new ScrabbleLetter('o', 1);
-        gridServiceSpy.scrabbleBoard.squares[0][1].occupied = true;
-        gridServiceSpy.scrabbleBoard.squares[0][1].isValidated = false;
-        const letter3: ScrabbleLetter = new ScrabbleLetter('u', 1);
-        gridServiceSpy.scrabbleBoard.squares[0][2].occupied = true;
-        gridServiceSpy.scrabbleBoard.squares[0][2].isValidated = false;
-        const letter4: ScrabbleLetter = new ScrabbleLetter('t', 1);
-        gridServiceSpy.scrabbleBoard.squares[0][3].occupied = true;
-        gridServiceSpy.scrabbleBoard.squares[0][3].isValidated = false;
-        const letter5: ScrabbleLetter = new ScrabbleLetter('i', 1);
-        gridServiceSpy.scrabbleBoard.squares[0][4].occupied = true;
-        gridServiceSpy.scrabbleBoard.squares[0][4].isValidated = false;
-        const letter6: ScrabbleLetter = new ScrabbleLetter('n', 1);
-        gridServiceSpy.scrabbleBoard.squares[0][5].occupied = true;
-        gridServiceSpy.scrabbleBoard.squares[0][5].isValidated = false;
-        const letter7: ScrabbleLetter = new ScrabbleLetter('e', 1);
-        gridServiceSpy.scrabbleBoard.squares[0][6].occupied = true;
-        gridServiceSpy.scrabbleBoard.squares[0][6].isValidated = false;
-        const letters: ScrabbleLetter[] = [letter1, letter2, letter3, letter4, letter5, letter6, letter7];
-        const word: ScrabbleWord = new ScrabbleWord();
-        word.content = letters;
-        word.startPosition = { x: 0, y: 0 };
-        word.orientation = WordOrientation.Vertical;
-        expect(service.newLettersCount()).toEqual(7);
-        expect(service.validateWordsAndCalculateScore([word])).toEqual(7);
-    });*/
-
-    it('updatePlayerScore should ');
 });

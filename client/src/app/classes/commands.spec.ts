@@ -1,7 +1,16 @@
-// import { Command } from './commands';
+import { ErrorType } from '@app/classes/errors';
+import { LocalPlayer } from '@app/classes/local-player';
+import { Command } from './commands';
 
-// describe('Commands', () => {
-//     it('should create an instance', () => {
-//         expect(new Command()).toBeUndefined();
-//     });
-//     });
+describe('Commands', () => {
+    class CommandTest extends Command {
+        execute() {
+            return ErrorType.NoError;
+        }
+    }
+    const player = new LocalPlayer('Erika');
+
+    it('should ', () => {
+        expect(new CommandTest(player)).toBeTruthy();
+    });
+});

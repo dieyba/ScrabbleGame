@@ -98,4 +98,10 @@ describe('GridService', () => {
         service.drawSingleSquareColor(6, 6);
         expect(service.gridContext.fillStyle).toEqual('#ffffff');
     });
+
+    it('removeSquare should call drawSingleSquareColor', () => {
+        const spy = spyOn(service, 'drawSingleSquareColor');
+        service.removeSquare(5, 7);
+        expect(spy).toHaveBeenCalled();
+    });
 });

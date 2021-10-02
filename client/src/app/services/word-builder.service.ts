@@ -1,49 +1,60 @@
 import { Injectable } from '@angular/core';
+import { Axis, invertAxis, Direction, ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleWord } from '@app/classes/scrabble-word';
 
 @Injectable({
     providedIn: 'root',
 })
 export class WordBuilderService {
-    /*
-  buildWordOnBoard(direction : number) : void{ //direction is either h or v inputed by the user through the communication window
-    if(this.validation.isWordValid){ //bug here?
-      for(let i = 0; i < this.board.boardSize; i++){
-        for(let j = 0; j < this.board.boardSize; j++){ //iterate through the board
-          //WORK IN PROGRESS
-        }
-      }
-    }
-  }
-  */
-    /* This function builds a word, given a direction and the very first letter
-from the north, east, south or west position. Written to be used in conjunction
-with a function that would find all new edges of the scrabble board*/
-    /*
-    scoreWordInADirection(firstLetter: ScrabbleLetter, direction: number): ScrabbleWord {
-        if (direction === 0 || direction === 3) {
-            // If the direction is illegal
-            // throw exception (TODO)
-        }
-        const wordInConstruction = new ScrabbleWord();
-        wordInConstruction.content[0] = firstLetter;
-
+    // All words created from the letters placed on the board
+    allWordsCreated(newLetters: ScrabbleLetter[], axis: Axis): ScrabbleWord[] {
+        const wordList: ScrabbleWord[] = [];
         let i = 0;
-        while (!wordInConstruction.content[i].nextLetters[direction].square.occupied) {
-            wordInConstruction.content[i + 1] = wordInConstruction.content[i].nextLetters[direction];
+        const horizontalResult = this.completeWordInADirection(newLetters[0], axis);
+        if (horizontalResult.content !== []) {
+            wordList[i] = horizontalResult;
             i++;
         }
+        for (const index of newLetters) {
+            const verticalResult = this.completeWordInADirection(index, invertAxis[axis]);
+            if (verticalResult.content !== []) {
+                wordList[i] = verticalResult;
+                i++;
+            }
+        }
+        return wordList;
+    }
 
+    // THIS FUNCTION WILL BREAK WHEN CODE STRUCTURE CHANGES. BEWARE.
+    completeWordInADirection(firstLetter: ScrabbleLetter, direction: Axis): ScrabbleWord {
+        const wordInConstruction = new ScrabbleWord();
+        let directionOrigin: Direction;
+        let directionLast: Direction;
+        if (direction === 'h') {
+            directionOrigin = Direction.West;
+            directionLast = Direction.East;
+        } else if (direction === 'v') {
+            directionOrigin = Direction.North;
+            directionLast = Direction.South;
+        } else {
+            return new ScrabbleWord();
+            // TEMPORARY
+            // TODO : Throw exception
+        }
+        let nextLetter = firstLetter.nextLetters[directionOrigin];
+        if (nextLetter) {
+            let temp = new ScrabbleLetter('', 0);
+            while (nextLetter) {
+                temp = nextLetter;
+                nextLetter = temp.nextLetters[directionOrigin];
+            } // When we get out of the loop, temp is the letter furthest left and leftwardsLetter is invalid
+            let i = 0;
+            wordInConstruction.content[i] = temp; // first letter of the horizontal word
+            while (wordInConstruction.content[i].nextLetters[directionLast]) {
+                i++;
+                wordInConstruction.content[i] = wordInConstruction.content[i - 1].nextLetters[directionLast];
+            }
+        }
         return wordInConstruction;
-    }*/
-    /* scoreWordFromEdge(firstLetter : ScrabbleLetter) : ScrabbleWord[]{
-    let wordsFormed = new ScrabbleWord[];
-    let j = 0
-    for(let i = 0; i < firstLetter.nextLetters.length; i++){
-      wordsFormed[j] = this.buildWordInADirection(firstLetter, i);
-      j++;
     }
-    return wordsFormed;
-    }
-  } // Ne fonctionne pas, je ne sais pas pourquoi. Mais c'est l'implémentation
-    // que je comptais faire pour la classe un peu plus haut.*/
 }

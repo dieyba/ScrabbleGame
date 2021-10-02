@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { Player } from '@app/classes/player';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { Axis, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
+import { Vec2 } from '@app/classes/vec2';
 import { BonusService } from './bonus.service';
 import { BOARD_SIZE, GridService } from './grid.service';
 
@@ -23,6 +24,11 @@ export class ValidationService {
         this.words = [];
         this.isTimerElapsed = false;
     }
+    /* eslint-disable no-unused-vars */
+    isPlacable(arg0: ScrabbleWord, arg1: Vec2, axis: Axis): boolean {
+        throw new Error('Method not implemented.');
+    }
+    /* eslint-enable no-unused-vars */
 
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
         const wordsValue = this.validateWordsAndCalculateScore(newWords);

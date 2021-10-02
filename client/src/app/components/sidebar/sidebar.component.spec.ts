@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
+import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { PlayerType } from '@app/classes/virtual-player';
+import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
 import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { SoloGameService } from '@app/services/solo-game.service';
 
@@ -14,6 +16,7 @@ describe('SidebarComponent', () => {
         soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['localPlayer', 'virtualPlayer']);
         await TestBed.configureTestingModule({
             declarations: [SidebarComponent],
+            imports: [MatCardModule],
             providers: [{ provide: SoloGameService, useValue: soloGameServiceSpy }],
         }).compileComponents();
 
@@ -21,27 +24,14 @@ describe('SidebarComponent', () => {
         const secondLetter: ScrabbleLetter = new ScrabbleLetter('p', 3);
         const thirdLetter: ScrabbleLetter = new ScrabbleLetter('u', 4);
         const fourthLetter: ScrabbleLetter = new ScrabbleLetter('m', 3);
-        soloGameServiceSpy.localPlayer = {
-            name: 'Ariane',
-            score: 73,
-            letters: [firstLetter, secondLetter, thirdLetter, fourthLetter],
-            isActive: false,
-            isWinner: false,
-        };
 
-        soloGameServiceSpy.virtualPlayer = {
-            name: 'Sara',
-            score: 70,
-            letters: [firstLetter, thirdLetter, firstLetter],
-            isActive: true,
-            isWinner: false,
-            type: PlayerType.Easy,
-            // eslint-disable-next-line no-empty-function
-            // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
-            playTurn() {
-                /* Nothing */
-            },
-        };
+        soloGameServiceSpy.localPlayer = new LocalPlayer('Arianne');
+        soloGameServiceSpy.localPlayer.score = 73;
+        soloGameServiceSpy.localPlayer.letters = [firstLetter, secondLetter, thirdLetter, fourthLetter];
+
+        soloGameServiceSpy.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
+        soloGameServiceSpy.virtualPlayer.score = 70;
+        soloGameServiceSpy.virtualPlayer.letters = [firstLetter, thirdLetter, firstLetter];
     });
 
     beforeEach(() => {

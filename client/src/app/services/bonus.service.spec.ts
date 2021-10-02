@@ -4,8 +4,8 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
 import { SquareColor } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
-import { BonusService } from './bonus.service';
-import { GridService } from './grid.service';
+import { BonusService } from '@app/services/bonus.service';
+import { GridService } from '@app/services/grid.service';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
