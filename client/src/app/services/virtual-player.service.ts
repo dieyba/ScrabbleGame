@@ -5,6 +5,7 @@ import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { ValidationService } from './validation.service';
 import { Vec2 } from '@app/classes/vec2';
+import { GridService } from './grid.service';
 
 export enum Probability {
     EndTurn = 10,
@@ -30,9 +31,8 @@ export class VirtualPlayerService {
     board: ScrabbleBoard;
     rack: ScrabbleRack;
 
-    constructor(private validationService: ValidationService) {
+    constructor(private validationService: ValidationService, private gridService: GridService) {
         // TODO Implement timer (3s and 20s limit)
-        this.board = new ScrabbleBoard();
         this.rack = new ScrabbleRack();
         // const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
         // if (currentMove <= Probability.EndTurn) {
@@ -107,11 +107,11 @@ export class VirtualPlayerService {
         // Board analysis
         let movesFound = 0;
         while (movesFound < listLength) {
-            for (let j = 0; j <= this.board.actualBoardSize; j++) {
+            for (let j = 0; j <= this.gridService.scrabbleBoard.actualBoardSize; j++) {
                 // TODO : randomize order in which board is iterated over
-                for (let k = 0; k <= this.board.actualBoardSize; k++) {
-                    if (this.board.squares[j][k].occupied) {
-                        list = this.movesWithGivenLetter(this.board.squares[j][k].letter);
+                for (let k = 0; k <= this.gridService.scrabbleBoard.actualBoardSize; k++) {
+                    if (this.gridService.scrabbleBoard.squares[j][k].occupied) {
+                        list = this.movesWithGivenLetter(this.gridService.scrabbleBoard.squares[j][k].letter);
                         for (let l = 0; l < list.length; l++) {
                             if (!this.validationService.isWordValid(list[l].stringify())) {
                                 list.splice(l);
