@@ -14,4 +14,27 @@ export abstract class Player {
         this.isActive = false;
         this.isWinner = false;
     }
+
+    addLetter(letterToAdd: ScrabbleLetter): void {
+        this.letters.push(letterToAdd);
+    }
+
+    removeLetter(lettersToRemove: string): boolean {
+        const oldRack: ScrabbleLetter[] = this.letters;
+
+        // for (let i = 0; i < lettersToRemove.length; i++) {
+        //     const indexLetter = this.letters.findIndex((letter) => letter.character === lettersToRemove[i]);
+        // }
+
+        for (const singleLetter of lettersToRemove) {
+            const indexLetter = this.letters.findIndex((letter) => letter.character === singleLetter);
+            if (indexLetter > -1) {
+                this.letters.splice(indexLetter, 1);
+            } else {
+                this.letters = oldRack;
+                return false;
+            }
+        }
+        return true;
+    }
 }

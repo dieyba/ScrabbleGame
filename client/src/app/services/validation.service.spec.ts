@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
+import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { ValidationService } from '@app/services/validation.service';
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
@@ -70,18 +70,4 @@ describe('ValidationService', () => {
         const words: ScrabbleWord[] = [word1, word2];
         expect(service.validateWordsAndCalculateScore(words)).toEqual(0);
     });
-
-    /* it('newLettersCount adds a bonus if equals 7', () => {
-        let letter1: ScrabbleLetter = new ScrabbleLetter('a', 1);
-        let letter2: ScrabbleLetter = new ScrabbleLetter('b', 1);
-        let letter3: ScrabbleLetter = new ScrabbleLetter('a', 1);
-        let letter4: ScrabbleLetter = new ScrabbleLetter('j', 1);
-        let letter5: ScrabbleLetter = new ScrabbleLetter('o', 1);
-        let letter6: ScrabbleLetter = new ScrabbleLetter('u', 1);
-        let letter7: ScrabbleLetter = new ScrabbleLetter('e', 1);
-        let letters: ScrabbleLetter[] = [letter1, letter2, letter3, letter4, letter5, letter6, letter7];
-        let word: ScrabbleWord = new ScrabbleWord();
-        word.content = letters;
-        expect(service.validateWordsAndCalculateScore([word])).toEqual(7);
-    }); */
 });
