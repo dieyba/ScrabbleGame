@@ -8,10 +8,13 @@ import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
 import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
+import { ValidationService } from './validation.service';
+import { WordBuilderService } from './word-builder.service';
 const TIMER_INTERVAL = 1000;
 const DEFAULT_LETTER_COUNT = 7;
 const DOUBLE_DIGIT = 10;
@@ -35,7 +38,12 @@ export class SoloGameService {
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
 
-    constructor(private gridService: GridService, private rackService: RackService) {
+    constructor(
+        private gridService: GridService,
+        private rackService: RackService,
+        private validationService: ValidationService,
+        private wordBuilder: WordBuilderService,
+    ) {
         this.hasTurnsBeenPassed = [];
         this.turnPassed = false;
         this.isEndGame = false;
@@ -126,7 +134,7 @@ export class SoloGameService {
     }
 
     passTurn() {
-        if (this.localPlayer.isActive) {
+        if (/* this.localPlayer.isActive*/ true) {
             this.turnPassed = true;
             if (this.isTurnsPassedLimit() && this.hasTurnsBeenPassed.length >= MAX_TURNS_PASSED) {
                 this.endGame();
@@ -252,23 +260,32 @@ export class SoloGameService {
             }
         }
 
-        // TODO Generate all words created
-
-        // TODO Call validation method and end turn
-
-        // Taking letters
-
-        const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-        for (const letter of newLetters) {
-            this.rackService.addLetter(letter);
+        // Generate all words created
+        let tempScrabbleWords: ScrabbleWord[];
+        if (placeParams.orientation === 'h') {
+            tempScrabbleWords = this.wordBuilder.buildWordOnBoard(placeParams.word, placeParams.position, WordOrientation.Horizontal);
+        } else {
+            tempScrabbleWords = this.wordBuilder.buildWordOnBoard(placeParams.word, placeParams.position, WordOrientation.Vertical);
         }
-        player.letters.concat(newLetters);
+        console.log(tempScrabbleWords);
 
-        // End game if no more letter
+        // Call validation method and end turn
+        if (this.validationService.validateWordsAndCalculateScore(tempScrabbleWords) === 0) {
+            // Retake lettres
+        } else {
+            // Score
+            this.validationService.updatePlayerScore(tempScrabbleWords, player);
+            // Take new letters
+            const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+            for (const letter of newLetters) {
+                this.rackService.addLetter(letter);
+                player.letters.push(letter);
+            }
+        }
 
-        // Pass turn
         this.passTurn();
         this.passTurn();
+
         // TODO Optional : update la vue de ScrabbleLetter automatically
         return ErrorType.NoError; // TODO change to "no error"
     }
