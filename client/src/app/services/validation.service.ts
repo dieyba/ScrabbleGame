@@ -5,7 +5,6 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
 import { BonusService } from './bonus.service';
 import { BOARD_SIZE, GridService } from './grid.service';
-import { SoloGameService } from './solo-game.service';
 
 const BONUS_LETTER_COUNT = 7;
 const BONUS_POINTS = 50;
@@ -17,10 +16,12 @@ const WAIT_TIME = 3000;
 export class ValidationService {
     dictionary: Dictionary;
     words: string[];
+    isTimerElapsed: boolean;
 
-    constructor(private readonly gridService: GridService, private bonusService: BonusService, private soloGameService: SoloGameService) {
+    constructor(private readonly gridService: GridService, private bonusService: BonusService) {
         this.dictionary = new Dictionary(DictionaryType.Default);
         this.words = [];
+        this.isTimerElapsed = false;
     }
 
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
@@ -37,8 +38,6 @@ export class ValidationService {
                         if (newWord.orientation === WordOrientation.Horizontal) {
                             this.gridService.removeSquare(newWord.startPosition.x + j, newWord.startPosition.y);
                         }
-                        this.soloGameService.addRackLetter(newWord.content[j]);
-                        this.bonusService.useBonus(newWord);
                     } else {
                         if (newWord.orientation === WordOrientation.Vertical) {
                             this.gridService.scrabbleBoard.squares[newWord.startPosition.x][newWord.startPosition.y + j].isValidated = true;
@@ -50,8 +49,7 @@ export class ValidationService {
                     }
                 }
             });
-
-            this.soloGameService.changeActivePlayer();
+            this.isTimerElapsed = true;
         }, WAIT_TIME);
     }
 

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
+import { ErrorType } from '@app/classes/errors';
 import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
@@ -12,6 +13,8 @@ const DEFAULT_HEIGHT = 600;
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable  @typescript-eslint/no-unused-expressions */
+/* eslint-disable  no-unused-expressions */
 describe('GameService', () => {
     let service: SoloGameService;
     let changeActivePlayerSpy: jasmine.Spy<any>;
@@ -23,7 +26,7 @@ describe('GameService', () => {
 
     beforeEach(() => {
         ctxStub = CanvasTestHelper.createCanvas(DEFAULT_WIDTH, DEFAULT_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
-        rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'addLetter']);
+        rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'addLetter', 'removeLetter']);
         TestBed.configureTestingModule({
             providers: [{ provide: RackService, useValue: rackServiceSpy }],
         });
@@ -110,10 +113,55 @@ describe('GameService', () => {
         service.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
         service.localPlayer.letters = [new ScrabbleLetter('D', 1)];
         service.localPlayer.isActive = true;
-        service.passTurn();
+        service.passTurn(service.localPlayer);
         expect(changeActivePlayerSpy).toHaveBeenCalled();
         expect(secondsToMinutesSpy).toHaveBeenCalled();
         expect(service.localPlayer.isActive).toEqual(false);
         expect(service.virtualPlayer.isActive).toEqual(true);
+    });
+
+    it('when local player rack is empty, game should be ended', () => {
+        service.localPlayer = new LocalPlayer('Ariane');
+        service.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
+        service.localPlayer.letters = [];
+        service.localPlayer.isActive = true;
+        service.changeActivePlayer();
+        expect(service.endGame()).toHaveBeenCalled;
+    });
+
+    it('when virtual player rack is empty, game should be ended', () => {
+        service.localPlayer = new LocalPlayer('Ariane');
+        service.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
+        service.localPlayer.letters = [];
+        service.virtualPlayer.isActive = true;
+        service.changeActivePlayer();
+        expect(service.endGame()).toHaveBeenCalled;
+    });
+
+    it('when players pass turn 6 times in a row, the game should end', () => {
+        service.localPlayer = new LocalPlayer('Ariane');
+        service.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
+        service.localPlayer.letters = [new ScrabbleLetter('D', 1)];
+        service.virtualPlayer.letters = [new ScrabbleLetter('D', 1)];
+        service.localPlayer.isActive = true;
+        service.hasTurnsBeenPassed = [true, true, true, true, true, true];
+        service.passTurn(service.localPlayer);
+        expect(service.endGame()).toHaveBeenCalled;
+    });
+
+    it('when unactive player pass turn, error should be returned', () => {
+        service.localPlayer = new LocalPlayer('Ariane');
+        service.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
+        service.localPlayer.letters = [new ScrabbleLetter('D', 1)];
+        service.virtualPlayer.letters = [new ScrabbleLetter('D', 1)];
+        expect(service.passTurn(service.localPlayer)).toEqual(ErrorType.ImpossibleCommand);
+    });
+
+    it('removeLetter should call grid service and decrease player letters length', () => {
+        service.localPlayer = new LocalPlayer('Ariane');
+        const letter = new ScrabbleLetter('D', 1);
+        service.localPlayer.letters = [letter];
+        service.removeLetter(letter);
+        expect(rackServiceSpy.removeLetter(letter)).toHaveBeenCalled;
     });
 });
