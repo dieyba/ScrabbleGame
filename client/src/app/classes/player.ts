@@ -28,6 +28,7 @@ export abstract class Player {
 
         for (const singleLetter of lettersToRemove) {
             const indexLetter = this.letters.findIndex((letter) => letter.character === singleLetter);
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             if (indexLetter > -1) {
                 this.letters.splice(indexLetter, 1);
             } else {
