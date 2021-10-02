@@ -22,6 +22,7 @@ export enum Points {
 }
 const POINTS_INTERVAL = 5;
 const PERCENTAGE = 100;
+const POSITION_ERROR = -1;
 
 @Injectable({
     providedIn: 'root',
@@ -62,11 +63,11 @@ export class VirtualPlayerService {
         }
         return result;
     }
-    //Returns all valid combinations of the letter + the letters currently in the rack
+    // Returns all valid combinations of the letter + the letters currently in the rack
     movesWithGivenLetter(letter: ScrabbleLetter): ScrabbleWord[] {
-        let lettersAvailable : ScrabbleLetter[] = [];
+        const lettersAvailable: ScrabbleLetter[] = [];
         lettersAvailable[0] = letter;
-        let lettersInArray : boolean[] = [];
+        const lettersInArray: boolean[] = [];
         for (let i = 1; i < this.getRandomIntInclusive(2, this.rack.squares.length); i++) {
             // Randomize length of word
             let index = this.getRandomIntInclusive(0, this.rack.squares.length - 1);
@@ -83,7 +84,7 @@ export class VirtualPlayerService {
         const permutations = this.permutationsOfLetters(lettersAvailable);
         const possibleMoves = [];
         for (let i = 0; i < permutations.length; i++) {
-            possibleMoves[i] = new ScrabbleWord;
+            possibleMoves[i] = new ScrabbleWord();
         }
         let movesFound = 0;
         for (const j of permutations) {
@@ -96,7 +97,7 @@ export class VirtualPlayerService {
     }
 
     possibleMoves(points: number, axis: Axis): ScrabbleWord[] {
-        if(points === 0){
+        if (points === 0) {
             return [];
         }
         const listLength = 4; // How many words we should aim for
@@ -174,15 +175,14 @@ export class VirtualPlayerService {
         return message;
     }
     displayMoveChat(move: ScrabbleWord, position: Vec2, axis: Axis): string {
-        if(move.content.length > 0 && position.x !== -1 && position.y !== -1){
+        if (move.content.length > 0 && position.x !== POSITION_ERROR && position.y !== POSITION_ERROR) {
             const message = '!placer ' + position.y /* convert this to letters*/ + position.x + axis + ' ' + move.stringify();
             return message;
-        }
-        else return "Erreur de placement";
+        } else return 'Erreur de placement';
     }
     wordify(letters: ScrabbleLetter[]): ScrabbleWord {
         const word = new ScrabbleWord();
-        for(let i = 0; i < letters.length; i++){
+        for (let i = 0; i < letters.length; i++) {
             word.content[i] = letters[i];
         }
         return word;
@@ -195,16 +195,16 @@ export class VirtualPlayerService {
     }
     findPosition(word: ScrabbleWord, axis: Axis): Vec2 {
         let origin = new ScrabbleLetter('', 0); // Convert position
-        let index: number = -1;
+        let index = -1;
         for (index = 0; index < word.content.length; index++) {
             if (word.content[index].tile.occupied) {
                 origin = word.content[index];
                 break;
             }
         }
-        if(index === word.content.length){
-            //ERROR
-            let errorVec = new Vec2;
+        if (index === word.content.length) {
+            // ERROR
+            const errorVec = new Vec2();
             errorVec.x = -1;
             errorVec.y = -1;
             return errorVec;
@@ -221,20 +221,20 @@ export class VirtualPlayerService {
     }
     chooseTilesFromRack(): Square[] {
         const numberOfTiles = this.getRandomIntInclusive(1, this.rack.squares.length);
-        let  tileReplaced = 0;
+        let tileReplaced = 0;
         const listOfTiles = [];
         for (let i = 0; i < numberOfTiles; i++) {
             listOfTiles[i] = new Square(0, 0);
         }
         let currentLetter = 0;
         while (tileReplaced < numberOfTiles) {
-            let replaced = this.getRandomIntInclusive(0, 1);
+            const replaced = this.getRandomIntInclusive(0, 1);
             if (replaced === 1 && !listOfTiles.includes(this.rack.squares[currentLetter])) {
-                listOfTiles[tileReplaced] = this.rack.squares[currentLetter];;
+                listOfTiles[tileReplaced] = this.rack.squares[currentLetter];
                 tileReplaced++;
             }
             currentLetter++;
-            if (currentLetter === this.rack.squares.length) currentLetter = 0
+            if (currentLetter === this.rack.squares.length) currentLetter = 0;
         }
         return listOfTiles;
     }
