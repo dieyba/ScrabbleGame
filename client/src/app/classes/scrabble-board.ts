@@ -166,7 +166,6 @@ export class ScrabbleBoard {
                 return true;
             }
         }
-
         return false;
     }
 
