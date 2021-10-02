@@ -166,7 +166,6 @@ export class ScrabbleBoard {
                 return true;
             }
         }
-
         return false;
     }
     isWordPartOfAnotherWord(word: string, coord: Vec2, orientation: string): boolean {
