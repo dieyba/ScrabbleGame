@@ -3,7 +3,6 @@ import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
-import { Square } from '@app/classes/square';
 import { ValidationService } from './validation.service';
 import { Vec2 } from '@app/classes/vec2';
 
