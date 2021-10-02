@@ -183,11 +183,11 @@ describe('VirtualPlayerService', () => {
         //Expected permutation : [A B Z C]
         spyOn(Math, "random").and.returnValue(0.2) //Want to return 4-length permutation
         let resultPermutations = service.movesWithGivenLetter(letterOnBoard);
-        expect(resultPermutations.includes(expectedPermutation)).toBeTruthy();
+        expect(resultPermutations.some(row => row.toString() === expectedPermutation.toString())).toBeTruthy();
         console.log(resultPermutations);
         console.log(expectedPermutation); //WIP
     });
-    // //permutationOfLetters
+    //permutationOfLetters
     it('movesWithGivenLetter should return permutations of the the array of letters in parameter', ()=>{
         const letterA = new ScrabbleLetter('a', 0);
         const letterB = new ScrabbleLetter('b', 0);
