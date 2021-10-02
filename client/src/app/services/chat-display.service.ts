@@ -69,8 +69,8 @@ export class ChatDisplayService {
 
     addEndGameMessage(remainingLetters: ScrabbleLetter[], firstPlayer: Player, secondPlayer: Player) {
         const remainingLettersMessage = 'Fin de partie - ' + this.scrabbleLetterstoString(remainingLetters);
-        const firstPlayerMessage = firstPlayer.name + ' : ' + this.scrabbleLetterstoString(remainingLetters);
-        const secondPlayerMessage = secondPlayer.name + ' : ' + this.scrabbleLetterstoString(remainingLetters);
+        const firstPlayerMessage = firstPlayer.name + ' : ' + this.scrabbleLetterstoString(firstPlayer.letters);
+        const secondPlayerMessage = secondPlayer.name + ' : ' + this.scrabbleLetterstoString(secondPlayer.letters);
 
         this.entries.push({
             color: ChatEntryColor.SystemColor,
@@ -95,9 +95,7 @@ export class ChatDisplayService {
             const commandName = splitCommand[0];
             const letters = splitCommand[1];
             const lettersNum = letters.length.toString();
-            exchangeMessage = commandName + ' ';
-            exchangeMessage = exchangeMessage + lettersNum;
-            exchangeMessage = exchangeMessage + ' lettre(s)';
+            exchangeMessage = commandName + ' ' + lettersNum + ' lettre(s)';
         }
         return exchangeMessage;
     }
