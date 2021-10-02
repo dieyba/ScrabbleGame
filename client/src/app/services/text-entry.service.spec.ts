@@ -21,8 +21,8 @@ describe('TextEntryService', () => {
     const grid = new GridService();
     const bonus = new BonusService(grid);
     const validation = new ValidationService(grid, bonus);
-    const soloGameService = new SoloGameService(grid, rack, validation);
     const chatDisplayService = new ChatDisplayService();
+    const soloGameService = new SoloGameService(grid, rack, chatDisplayService, validation);
     const IS_FROM_LOCAL_PLAYER = true;
 
     beforeEach(() => {

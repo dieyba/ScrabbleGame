@@ -8,7 +8,7 @@ import { BOARD_SIZE, GridService } from './grid.service';
 
 const BONUS_LETTER_COUNT = 7;
 const BONUS_POINTS = 50;
-const WAIT_TIME = 3000;
+export const WAIT_TIME = 3000;
 
 @Injectable({
     providedIn: 'root',

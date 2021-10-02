@@ -61,7 +61,8 @@ export class TextEntryService {
         const player: Player = isLocalPlayer ? this.gameService.localPlayer : this.gameService.virtualPlayer;
         userInput = this.trimSpaces(userInput);
         if (!this.isEmpty(userInput)) {
-            if (userInput.startsWith('!')) {
+            // After the end game, messages starting with ! can't call commands and are considered normal chat messages
+            if (userInput.startsWith('!') && !this.gameService.isEndGame) {
                 let commandCreationResult = this.createCommand(userInput, player);
                 const isCreated = commandCreationResult !== ErrorType.SyntaxError && commandCreationResult !== ErrorType.InvalidCommand;
                 if (isCreated) {
