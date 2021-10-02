@@ -1,49 +1,101 @@
 import { Injectable } from '@angular/core';
+import { LetterValue } from '@app/classes/letter-stock';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
+import { Square } from '@app/classes/square';
+import { Vec2 } from '@app/classes/vec2';
+import { GridService } from './grid.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class WordBuilderService {
-    /*
-  buildWordOnBoard(direction : number) : void{ //direction is either h or v inputed by the user through the communication window
-    if(this.validation.isWordValid){ //bug here?
-      for(let i = 0; i < this.board.boardSize; i++){
-        for(let j = 0; j < this.board.boardSize; j++){ //iterate through the board
-          //WORK IN PROGRESS
+    // All words created from the letters placed on the board
+
+    constructor(private gridService: GridService) {
+
+    }
+
+    // this.gridService.scrabbleBoard.square[][]
+    allWordsCreated(word: string, coord : Vec2, axis: WordOrientation): ScrabbleWord[] {
+        let newLetters : ScrabbleLetter[] = [];
+        for(let i = 0; i < word.length; i++){
+          let letterfromString = word[i]
+          newLetters[i] = new ScrabbleLetter(letterfromString, LetterValue[letterfromString as keyof typeof LetterValue])
         }
+        let wordList: ScrabbleWord[] = [];
+        wordList[0] = this.wordify(newLetters);
+        let currentTile : Square = this.gridService.scrabbleBoard.squares[coord.x][coord.y];
+        let newWord = new ScrabbleWord;
+        for(let i = 0; i < word.length; i++){
+          if(axis = WordOrientation.Horizontal){
+            currentTile = this.gridService.scrabbleBoard.squares[coord.x+i][coord.y];
+            newWord = this.completeWordInADirection(currentTile, WordOrientation.Horizontal);
+          }
+          else{
+            currentTile = this.gridService.scrabbleBoard.squares[coord.x][coord.y+i];
+            newWord = this.completeWordInADirection(currentTile, WordOrientation.Vertical);
+          }
+          if(newWord.content.length > 0)
+            wordList[i+1] = newWord;
+        }
+        return wordList;
+    }
+    
+    wordify(letters: ScrabbleLetter[]): ScrabbleWord {
+      const word = new ScrabbleWord();
+      for(let i = 0; i < letters.length; i++){
+          word.content[i] = letters[i];
       }
+      return word;
     }
-  }
-  */
-    /* This function builds a word, given a direction and the very first letter
-from the north, east, south or west position. Written to be used in conjunction
-with a function that would find all new edges of the scrabble board*/
-    /*
-    scoreWordInADirection(firstLetter: ScrabbleLetter, direction: number): ScrabbleWord {
-        if (direction === 0 || direction === 3) {
-            // If the direction is illegal
-            // throw exception (TODO)
-        }
-        const wordInConstruction = new ScrabbleWord();
-        wordInConstruction.content[0] = firstLetter;
 
-        let i = 0;
-        while (!wordInConstruction.content[i].nextLetters[direction].square.occupied) {
-            wordInConstruction.content[i + 1] = wordInConstruction.content[i].nextLetters[direction];
-            i++;
+    // THIS FUNCTION WILL BREAK WHEN CODE STRUCTURE CHANGES. BEWARE.
+    completeWordInADirection(firstTile: Square, direction: WordOrientation): ScrabbleWord {
+        let found : boolean = false;
+        let steps = 0;
+        if (direction === WordOrientation.Horizontal) {
+            while(!found){
+              let previoustile = this.gridService.scrabbleBoard.squares[firstTile.position.x-1-steps][firstTile.position.y];
+              if(!previoustile.occupied){
+                found = true;
+              }
+              else steps++;
+            }
+        } else if (direction === WordOrientation.Vertical) {
+          while(!found){
+            let previoustile = this.gridService.scrabbleBoard.squares[firstTile.position.x][firstTile.position.y-1-steps];
+            if(!previoustile.occupied){
+              found = true;
+            }
+            else steps++;
+          }
         }
-
-        return wordInConstruction;
-    }*/
-    /* scoreWordFromEdge(firstLetter : ScrabbleLetter) : ScrabbleWord[]{
-    let wordsFormed = new ScrabbleWord[];
-    let j = 0
-    for(let i = 0; i < firstLetter.nextLetters.length; i++){
-      wordsFormed[j] = this.buildWordInADirection(firstLetter, i);
-      j++;
+        found = false;
+        let currentSquare : Square = this.gridService.scrabbleBoard.squares[firstTile.position.x][firstTile.position.y];
+        while(!found){
+          if(direction === WordOrientation.Horizontal)
+            currentSquare = this.gridService.scrabbleBoard.squares[firstTile.position.x - steps][firstTile.position.y];
+          else currentSquare = this.gridService.scrabbleBoard.squares[firstTile.position.x][firstTile.position.y - steps];
+            if(!currentSquare.occupied) {
+            found = true;
+          }
+        }
+        let end : boolean = false;
+        let sizeOfWord = 0;
+        let currentSquareLast : Square;
+        let letters : ScrabbleLetter[] = [];
+        while(!end){
+          if(direction = WordOrientation.Horizontal)
+            currentSquareLast = this.gridService.scrabbleBoard.squares[currentSquare.position.x+sizeOfWord][currentSquare.position.y];
+          else  currentSquareLast = this.gridService.scrabbleBoard.squares[currentSquare.position.x][currentSquare.position.y+sizeOfWord];
+          if(!currentSquareLast.occupied)
+            end = true
+          else {
+            letters[sizeOfWord] = currentSquareLast.letter;
+            sizeOfWord++;
+          }
+        }
+        return this.wordify(letters);        
     }
-    return wordsFormed;
-    }
-  } // Ne fonctionne pas, je ne sais pas pourquoi. Mais c'est l'implémentation
-    // que je comptais faire pour la classe un peu plus haut.*/
 }
