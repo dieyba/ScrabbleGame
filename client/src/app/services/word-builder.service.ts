@@ -1,9 +1,24 @@
 import { Injectable } from '@angular/core';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
+import { Vec2 } from '@app/classes/vec2';
 
 @Injectable({
     providedIn: 'root',
 })
 export class WordBuilderService {
+    buildWordOnBoard(word: string, coord: Vec2, axis: WordOrientation): ScrabbleWord[] {
+        const result: ScrabbleWord[] = [];
+        const scrabbleWord = new ScrabbleWord();
+        scrabbleWord.startPosition = new Vec2(coord.x, coord.y);
+        scrabbleWord.orientation = axis;
+        for (const letter of word) {
+            scrabbleWord.content.push(new ScrabbleLetter(letter, 1));
+            scrabbleWord.value++;
+        }
+        result.push(scrabbleWord);
+        return result;
+    }
     /*
   buildWordOnBoard(direction : number) : void{ //direction is either h or v inputed by the user through the communication window
     if(this.validation.isWordValid){ //bug here?
