@@ -36,10 +36,8 @@ export class ScrabbleWord {
             const color = i.color;
             switch (color) {
                 case SquareColor.Teal:
-                    i.tealBonus();
                     break;
                 case SquareColor.DarkBlue:
-                    i.darkBlueBonus();
                     break;
                 case SquareColor.Pink:
                     pinkBonusCount++;

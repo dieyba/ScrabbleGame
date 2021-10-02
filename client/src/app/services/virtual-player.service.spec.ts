@@ -33,11 +33,11 @@ describe('VirtualPlayerService', () => {
         service = TestBed.inject(VirtualPlayerService);
         const lettersInRack: ScrabbleLetter[] = [];
         const letterAlphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
-        for (let i = 0; i < service.rack.squares.length; i++) {
+        for (let i = 0; i < service.rack.letters.length; i++) {
             lettersInRack[i] = new ScrabbleLetter(letterAlphabet[i], 1);
         }
-        for (let j = 0; j < service.rack.squares.length; j++) {
-            service.rack.squares[j].letter = lettersInRack[j];
+        for (let j = 0; j < service.rack.letters.length; j++) {
+            service.rack.letters[j] = lettersInRack[j];
         }
         testWord = new ScrabbleWord();
         testWord2 = new ScrabbleWord();
@@ -79,12 +79,12 @@ describe('VirtualPlayerService', () => {
     });
     // chooseTilesFromRack
     it('chooseTilesFromRack should select a random number of tiles to exchange from the rack', () => {
-        expect(service.chooseTilesFromRack().length).toBeLessThanOrEqual(service.rack.squares.length);
+        expect(service.chooseTilesFromRack().length).toBeLessThanOrEqual(service.rack.letters.length);
         expect(service.chooseTilesFromRack().length).toBeGreaterThanOrEqual(1);
     });
     it('chooseTilesFromRack should select tiles to exchange from the rack ', () => {
         const testArray = service.chooseTilesFromRack();
-        const found = testArray.every((elem) => service.rack.squares.includes(elem));
+        const found = testArray.every((elem) => service.rack.letters.includes(elem));
         expect(found).toBeTruthy();
     });
     // findPosition

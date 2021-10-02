@@ -68,16 +68,16 @@ export class VirtualPlayerService {
         const lettersAvailable: ScrabbleLetter[] = [];
         lettersAvailable[0] = letter;
         const lettersInArray: boolean[] = [];
-        for (let i = 1; i < this.getRandomIntInclusive(2, this.rack.squares.length); i++) {
+        for (let i = 1; i < this.getRandomIntInclusive(2, this.rack.letters.length); i++) {
             // Randomize length of word
-            let index = this.getRandomIntInclusive(0, this.rack.squares.length - 1);
+            let index = this.getRandomIntInclusive(0, this.rack.letters.length - 1);
             while (lettersInArray[index] === true) {
                 // If we've already generated this number before
                 if (index !== lettersInArray.length - 1) {
                     index++;
                 } else index = 0;
             }
-            lettersAvailable[i] = this.rack.squares[index].letter;
+            lettersAvailable[i] = this.rack.letters[index];
             lettersInArray[index] = true;
         }
         // check all possible permutations. Maximum of O(8!)
@@ -219,22 +219,22 @@ export class VirtualPlayerService {
         }
         return position;
     }
-    chooseTilesFromRack(): Square[] {
-        const numberOfTiles = this.getRandomIntInclusive(1, this.rack.squares.length);
+    chooseTilesFromRack(): ScrabbleLetter[] {
+        const numberOfTiles = this.getRandomIntInclusive(1, this.rack.letters.length);
         let tileReplaced = 0;
         const listOfTiles = [];
         for (let i = 0; i < numberOfTiles; i++) {
-            listOfTiles[i] = new Square(0, 0);
+            listOfTiles[i] = new ScrabbleLetter('', 0);
         }
         let currentLetter = 0;
         while (tileReplaced < numberOfTiles) {
             const replaced = this.getRandomIntInclusive(0, 1);
-            if (replaced === 1 && !listOfTiles.includes(this.rack.squares[currentLetter])) {
-                listOfTiles[tileReplaced] = this.rack.squares[currentLetter];
+            if (replaced === 1 && !listOfTiles.includes(this.rack.letters[currentLetter])) {
+                listOfTiles[tileReplaced] = this.rack.letters[currentLetter];
                 tileReplaced++;
             }
             currentLetter++;
-            if (currentLetter === this.rack.squares.length) currentLetter = 0;
+            if (currentLetter === this.rack.letters.length) currentLetter = 0;
         }
         return listOfTiles;
     }
