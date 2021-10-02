@@ -115,7 +115,7 @@ describe('GameService', () => {
     });
 
     it('passTurn not possible when local player is not active', () => {
-        service.localPlayer = new LocalPlayer('Ariane');;
+        service.localPlayer = new LocalPlayer('Ariane');
         service.localPlayer.isActive = false;
         let error = ErrorType.ImpossibleCommand;
         expect(service.passTurn()).toEqual(error);

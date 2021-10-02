@@ -57,23 +57,23 @@ describe('PlayAreaComponent', () => {
 
     it('ngAfterViewInit should call drawGrid and drawColors', () => {
         component.ngAfterViewInit();
-        expect(soloGameServiceSpy.createNewGame).toHaveBeenCalled;
-        expect(gridServiceSpy.drawGrid).toHaveBeenCalled;
-        expect(gridServiceSpy.drawColors).toHaveBeenCalled;
+        expect(soloGameServiceSpy.createNewGame).toHaveBeenCalled();
+        expect(gridServiceSpy.drawGrid).toHaveBeenCalled();
+        expect(gridServiceSpy.drawColors).toHaveBeenCalled();
     });
 
     it('sizeUpLetters should call gridservices sizeUpLetters', () => {
         component.sizeUpLetters();
-        expect(gridServiceSpy.sizeUpLetters).toHaveBeenCalled;
+        expect(gridServiceSpy.sizeUpLetters).toHaveBeenCalled();
     });
 
     it('sizeDownLetters should call gridservices sizeDownLetters', () => {
         component.sizeDownLetters();
-        expect(gridServiceSpy.sizeDownLetters).toHaveBeenCalled;
+        expect(gridServiceSpy.sizeDownLetters).toHaveBeenCalled();
     });
 
     it('passTurn should call soloGameservices passTurn', () => {
         component.passTurn();
-        expect(soloGameServiceSpy.passTurn).toHaveBeenCalled;
+        expect(soloGameServiceSpy.passTurn).toHaveBeenCalled();
     });
 });

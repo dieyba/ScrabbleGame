@@ -210,7 +210,7 @@ export class ScrabbleBoard {
         } else {
             coordBeforeWord.y = coordAfterWord.y = coord.y;
             coordBeforeWord.x = coord.x - 1;
-            coordAfterWord.x = coord.y + word.length;
+            coordAfterWord.x = coord.x + word.length;
         }
 
         if (this.isCoordInsideBoard(coordBeforeWord)) {

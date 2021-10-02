@@ -12,7 +12,7 @@ import { LetterStock } from '@app/services/letter-stock.service';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 
-const TIMER_INTERVAL = 1000;
+export const TIMER_INTERVAL = 1000;
 const DEFAULT_LETTER_COUNT = 7;
 const DOUBLE_DIGIT = 10;
 const MINUTE_IN_SEC = 60;
@@ -37,14 +37,13 @@ export class SoloGameService {
         this.localPlayer = new LocalPlayer(gameInfo.controls.name.value);
         this.localPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.localPlayer.isActive = true;
+        //this.chooseFirstPlayer();
         this.virtualPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
         this.virtualPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.totalCountDown = +gameInfo.controls.timer.value;
         this.timerMs = +this.totalCountDown;
         this.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.randomBonus = gameInfo.controls.bonus.value;
-
-        //console.log('player letter : ', this.localPlayer.letters);
     }
 
     createNewGame() {
@@ -144,4 +143,13 @@ export class SoloGameService {
             this.rackService.drawLetter(this.localPlayer.letters[i]);
         }
     }
+
+    // chooseFirstPlayer(): void {
+    //     const choice: number = Math.random();
+    //     if (choice < 0.5) {
+    //         this.localPlayer.isActive = true;
+    //     } else {
+    //         this.virtualPlayer.isActive = true;
+    //     }
+    // }
 }
