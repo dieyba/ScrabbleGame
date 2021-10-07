@@ -10,6 +10,7 @@ import { RackService } from './rack.service';
 import { SoloGameService } from './solo-game.service';
 import { TextEntryService } from './text-entry.service';
 import { ValidationService } from './validation.service';
+import { WordBuilderService } from './word-builder.service';
 
 const LOCAL_PLAYER_NAME = 'Local Player';
 const VIRTUAL_PLAYER_NAME = 'Virtual Player';
@@ -21,8 +22,9 @@ describe('TextEntryService', () => {
     const grid = new GridService();
     const bonus = new BonusService(grid);
     const validation = new ValidationService(grid, bonus);
+    const wordBuilder = new WordBuilderService();
     const chatDisplayService = new ChatDisplayService();
-    const soloGameService = new SoloGameService(grid, rack, chatDisplayService, validation);
+    const soloGameService = new SoloGameService(grid, rack, chatDisplayService, validation, wordBuilder);
     const IS_FROM_LOCAL_PLAYER = true;
 
     beforeEach(() => {

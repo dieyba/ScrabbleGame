@@ -14,10 +14,9 @@ import { LetterStock } from '@app/services/letter-stock.service';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
-import { ValidationService, WAIT_TIME } from './validation.service';
-
+import { ValidationService } from './validation.service';
+import { WordBuilderService } from './word-builder.service';
 export const TIMER_INTERVAL = 1000;
-
 const DEFAULT_LETTER_COUNT = 7;
 const DOUBLE_DIGIT = 10;
 const MINUTE_IN_SEC = 60;
@@ -45,6 +44,7 @@ export class SoloGameService {
         private rackService: RackService,
         private chatDisplayService: ChatDisplayService,
         private validationService: ValidationService,
+        private wordBuilder: WordBuilderService,
     ) {
         this.hasTurnsBeenPassed = [];
         this.turnPassed = false;
@@ -193,6 +193,7 @@ export class SoloGameService {
                     this.rackService.removeLetter(lettersToRemove[i]);
                     this.addRackLetter(lettersToAdd[i]);
                 }
+                this.passTurn(this.localPlayer);
                 return ErrorType.NoError;
             }
         }
@@ -296,23 +297,27 @@ export class SoloGameService {
             }
         }
 
-        // TODO Generate all words created
-
-        setTimeout(() => {
-            if (this.validationService.isTimerElapsed === true) {
-                this.changeActivePlayer();
-                // this.drawRack(words);
-            }
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        }, WAIT_TIME);
-
-        const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-        for (const letter of newLetters) {
-            this.rackService.addLetter(letter);
+        // Generate all words created
+        let tempScrabbleWords: ScrabbleWord[];
+        if (placeParams.orientation === 'h') {
+            tempScrabbleWords = this.wordBuilder.buildWordOnBoard(placeParams.word, placeParams.position, WordOrientation.Horizontal);
+        } else {
+            tempScrabbleWords = this.wordBuilder.buildWordOnBoard(placeParams.word, placeParams.position, WordOrientation.Vertical);
         }
-        player.letters.concat(newLetters);
 
-        // End game if no more letter
+        // Call validation method and end turn
+        if (this.validationService.validateWordsAndCalculateScore(tempScrabbleWords) === 0) {
+            // Retake lettres
+        } else {
+            // Score
+            this.validationService.updatePlayerScore(tempScrabbleWords, player);
+            // Take new letters
+            const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+            for (const letter of newLetters) {
+                this.rackService.addLetter(letter);
+                player.letters.push(letter);
+            }
+        }
 
         // Pass turn
         this.passTurn(this.localPlayer);

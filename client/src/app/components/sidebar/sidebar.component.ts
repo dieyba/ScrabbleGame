@@ -17,6 +17,7 @@ export class SidebarComponent {
         this.player1Name = this.sologameService.localPlayer.name;
         this.player2Name = this.sologameService.virtualPlayer.name;
         this.winnerName = '';
+        this.lettersLeftCount = this.sologameService.stock.letterStock.length;
     }
 
     getPlayer1LetterCount(): number {

@@ -18,6 +18,8 @@ export class ScrabbleWord {
 
     constructor() {
         this.content = [];
+        this.value = 0;
+        this.startPosition = new Vec2();
     }
     stringify(): string {
         let string = '';

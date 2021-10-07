@@ -31,7 +31,7 @@ enum LetterQuantity {
     Star = 2,
 }
 
-enum LetterValue {
+export enum LetterValue {
     A = 1,
     B = 3,
     C = 3,
@@ -125,7 +125,7 @@ export class LetterStock {
     exchangeLetters(playerLetters: ScrabbleLetter[]): ScrabbleLetter[] {
         const randomLetters = this.takeLettersFromStock(playerLetters.length);
 
-        for (let letters of playerLetters) {
+        for (const letters of playerLetters) {
             this.letterStock.push(letters);
         }
 

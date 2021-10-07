@@ -260,7 +260,7 @@ export class ScrabbleBoard {
         let tempString = '';
         for (let i = 0; i < length; i++) {
             if (this.squares[tempCoord.x][tempCoord.y].occupied) {
-                tempString += this.squares[tempCoord.x][tempCoord.y].letter;
+                tempString += this.squares[tempCoord.x][tempCoord.y].letter.character;
             }
             if (orientation === 'h') {
                 tempCoord.x++;
