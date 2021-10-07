@@ -33,13 +33,7 @@ describe('GameService', () => {
         secondsToMinutesSpy = spyOn<any>(service, 'secondsToMinutes').and.callThrough();
         startCountdownSpy = spyOn<any>(service, 'startCountdown').and.callThrough();
         addRackLettersSpy = spyOn<any>(service, 'addRackLetters').and.callThrough();
-    });
 
-    it('should be created', () => {
-        expect(service).toBeTruthy();
-    });
-
-    it('initializeGame should set variables to right value', () => {
         const level = new FormControl('easy', [Validators.required]);
         const name = new FormControl('Ariane', [Validators.required, Validators.pattern('[a-zA-Z]*')]);
         const timer = new FormControl('60', [Validators.required]);
@@ -48,6 +42,13 @@ describe('GameService', () => {
         const opponent = new FormControl('Sara');
         const myForm = new FormGroup({ name, timer, bonus, dictionaryForm, level, opponent });
         service.initializeGame(myForm);
+    });
+
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
+
+    it('initializeGame should set variables to right value', () => {
         expect(service.localPlayer.name).toEqual('Ariane');
         expect(service.localPlayer.letters.length).toEqual(0);
         expect(service.localPlayer.isActive).toEqual(true);
@@ -134,7 +135,7 @@ describe('GameService', () => {
         expect(spy).not.toHaveBeenCalled();
 
         service.localPlayer.isActive = true;
-        service.exchangeLetters(spyPlayer, 'a');
+        service.exchangeLetters(service.localPlayer, 'a');
 
         expect(spy).toHaveBeenCalled();
     });

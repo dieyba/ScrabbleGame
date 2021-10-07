@@ -134,7 +134,7 @@ export class SoloGameService {
     }
 
     passTurn() {
-        if (/* this.localPlayer.isActive*/ true) {
+        if (this.localPlayer.isActive) {
             this.turnPassed = true;
             if (this.isTurnsPassedLimit() && this.hasTurnsBeenPassed.length >= MAX_TURNS_PASSED) {
                 this.endGame();

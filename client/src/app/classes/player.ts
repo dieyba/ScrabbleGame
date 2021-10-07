@@ -22,10 +22,6 @@ export abstract class Player {
     removeLetter(lettersToRemove: string): boolean {
         const oldRack: ScrabbleLetter[] = this.letters;
 
-        // for (let i = 0; i < lettersToRemove.length; i++) {
-        //     const indexLetter = this.letters.findIndex((letter) => letter.character === lettersToRemove[i]);
-        // }
-
         for (const singleLetter of lettersToRemove) {
             const indexLetter = this.letters.findIndex((letter) => letter.character === singleLetter);
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
