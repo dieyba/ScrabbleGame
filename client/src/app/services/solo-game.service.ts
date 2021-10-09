@@ -159,7 +159,6 @@ export class SoloGameService {
 
     exchangeLetters(player: Player, letters: string): ErrorType {
         if (player.isActive && this.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
-            // console.log('Exchanging these letters:' + letters + " ...");
             const lettersToRemove: ScrabbleLetter[] = [];
             if (player.removeLetter(letters) === true) {
                 for (let i = 0; i < letters.length; i++) {
@@ -300,7 +299,7 @@ export class SoloGameService {
         this.passTurn();
 
         // TODO Optional : update la vue de ScrabbleLetter automatically
-        return ErrorType.NoError; // TODO change to "no error"
+gi        return ErrorType.NoError; // TODO change to "no error"
     }
 
     placeLetter(playerLetters: ScrabbleLetter[], letter: string, position: Vec2) {

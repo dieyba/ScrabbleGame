@@ -4,7 +4,7 @@ import { ChatEntryColor } from '@app/classes/chat-display-entry';
 import { ErrorType } from '@app/classes/errors';
 import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
+import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { ChatDisplayService } from './chat-display.service';
 
 describe('ChatDisplayService', () => {
@@ -88,7 +88,7 @@ describe('ChatDisplayService', () => {
         const secondPlayerLetters: ScrabbleLetter[] = [new ScrabbleLetter('e', 1), new ScrabbleLetter('f', 1)];
 
         const firstPlayer = new LocalPlayer('Local player');
-        const secondPlayer = new VirtualPlayer('Virtual Player', PlayerType.Easy);
+        const secondPlayer = new VirtualPlayer('Virtual Player', Difficulty.Easy);
         firstPlayer.letters = firstPlayerLetters;
         secondPlayer.letters = secondPlayerLetters;
 

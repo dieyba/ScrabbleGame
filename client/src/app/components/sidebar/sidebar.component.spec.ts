@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
+import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { SoloGameService } from '@app/services/solo-game.service';
 
@@ -29,7 +29,7 @@ describe('SidebarComponent', () => {
         soloGameServiceSpy.localPlayer.score = 73;
         soloGameServiceSpy.localPlayer.letters = [firstLetter, secondLetter, thirdLetter, fourthLetter];
 
-        soloGameServiceSpy.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
+        soloGameServiceSpy.virtualPlayer = new VirtualPlayer('Sara', Difficulty.Easy);
         soloGameServiceSpy.virtualPlayer.score = 70;
         soloGameServiceSpy.virtualPlayer.letters = [firstLetter, thirdLetter, firstLetter];
     });

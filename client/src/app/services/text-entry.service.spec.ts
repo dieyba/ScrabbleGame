@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { ErrorType } from '@app/classes/errors';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Vec2 } from '@app/classes/vec2';
-import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
+import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { BonusService } from './bonus.service';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
@@ -37,7 +37,7 @@ describe('TextEntryService', () => {
 
         service = TestBed.inject(TextEntryService);
         soloGameService.localPlayer = new LocalPlayer(LOCAL_PLAYER_NAME);
-        soloGameService.virtualPlayer = new VirtualPlayer(VIRTUAL_PLAYER_NAME, PlayerType.Easy);
+        soloGameService.virtualPlayer = new VirtualPlayer(VIRTUAL_PLAYER_NAME, Difficulty.Easy);
     });
 
     it('should be created', () => {

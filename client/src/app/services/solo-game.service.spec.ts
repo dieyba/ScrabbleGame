@@ -4,7 +4,7 @@ import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ErrorType } from '@app/classes/errors';
 import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
+import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { RackService } from './rack.service';
 import { SoloGameService } from './solo-game.service';
 
@@ -86,7 +86,7 @@ describe('GameService', () => {
 
     it('when localPlayer is active, changeActivePlayer should set virtualPlayer to active', () => {
         service.localPlayer = new LocalPlayer('Ariane');
-        service.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
+        service.virtualPlayer = new VirtualPlayer('Sara', Difficulty.Easy);
         service.localPlayer.letters = [new ScrabbleLetter('D', 1)];
         service.localPlayer.isActive = true;
         service.changeActivePlayer();
@@ -98,7 +98,7 @@ describe('GameService', () => {
 
     it('when virtualPlayer is active, changeActivePlayer should set localPlayer to active', () => {
         service.localPlayer = new LocalPlayer('Ariane');
-        service.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
+        service.virtualPlayer = new VirtualPlayer('Sara', Difficulty.Easy);
         service.virtualPlayer.letters = [new ScrabbleLetter('D', 1)];
         service.virtualPlayer.isActive = true;
         service.changeActivePlayer();
@@ -108,7 +108,7 @@ describe('GameService', () => {
 
     it('passTurn should make virtualPlayer active and clear interval', () => {
         service.localPlayer = new LocalPlayer('Ariane');
-        service.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
+        service.virtualPlayer = new VirtualPlayer('Sara', Difficulty.Easy);
         service.localPlayer.letters = [new ScrabbleLetter('D', 1)];
         service.localPlayer.isActive = true;
         service.passTurn();
