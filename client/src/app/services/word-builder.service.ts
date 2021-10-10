@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { Axis, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
 import { Vec2 } from '@app/classes/vec2';
 
@@ -19,6 +19,17 @@ export class WordBuilderService {
         result.push(scrabbleWord);
         return result;
     }
+    allWordsCreated(word: string, coord: Vec2, axis: Axis): ScrabbleWord[] {
+        // DUMMY FUNCTION TO MAKE VIRTUAL PLAYER COMPILE, PLEASE IGNORE.
+        const words: ScrabbleWord[] = [];
+        const newWord = new ScrabbleWord();
+        newWord.content[0].character = word[0];
+        newWord.content[0].tile.position = coord;
+        if (axis) {
+            return [];
+        }
+        return words;
+    }
     /*
   buildWordOnBoard(direction : number) : void{ //direction is either h or v inputed by the user through the communication window
     if(this.validation.isWordValid){ //bug here?
@@ -30,7 +41,6 @@ export class WordBuilderService {
     constructor(private gridService: GridService) {
 
     }
-
     // this.gridService.scrabbleBoard.square[][]
     allWordsCreated(word: string, coord : Vec2, axis: WordOrientation): ScrabbleWord[] {
         let newLetters : ScrabbleLetter[] = [];
