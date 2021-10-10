@@ -96,7 +96,6 @@ export class VirtualPlayerService {
     }
 
     possibleMoves(points: number, axis: Axis): ScrabbleWord[] {
-        // TODO : Reduce complexity from 16 to 15.
         const listLength = 4; // How many words we should aim for
         const list: ScrabbleWord[] = [];
         // Board analysis
@@ -142,9 +141,9 @@ export class VirtualPlayerService {
                                 list.splice(l);
                                 const currentWord = list[l].stringify();
                                 const position = this.findPosition(list[l], axis);
-                                const otherWords : ScrabbleWord[] = wordBuilderService.allWordsCreated(currentWord, position, axis);
+                                const otherWords: ScrabbleWord[] = wordBuilderService.allWordsCreated(currentWord, position, axis);
                                 let sum = 0;
-                                for (let word of otherWords) {
+                                for (const word of otherWords) {
                                     sum += word.value;
                                 }
                                 if (sum > points) list.splice(l);
