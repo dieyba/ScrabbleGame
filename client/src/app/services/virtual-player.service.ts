@@ -96,12 +96,9 @@ export class VirtualPlayerService {
     }
 
     possibleMoves(points: number, axis: Axis): ScrabbleWord[] {
-        // TODO : Reduce complexity from 17 to 15.
-        if (points === 0) {
-            return [];
-        }
+        // TODO : Reduce complexity from 16 to 15.
         const listLength = 4; // How many words we should aim for
-        let list: ScrabbleWord[] = [];
+        const list: ScrabbleWord[] = [];
         // Board analysis
         let movesFound = 0;
         let loopsDone = 0;
@@ -109,7 +106,7 @@ export class VirtualPlayerService {
             // Arbitrarily do a maximum of [loopsDone] checks for words. We don't want an infinite loop.
             let j = this.getRandomIntInclusive(0, 1);
             let k = this.getRandomIntInclusive(0, 1);
-            let increment = this.getRandomIntInclusive(0, 1);
+            let increment;
             let iteratorMax;
             if (j === 0) {
                 iteratorMax = this.gridService.scrabbleBoard.actualBoardSize;
@@ -134,32 +131,30 @@ export class VirtualPlayerService {
                 for (k; k !== iteratorMax - increment; k = k + increment) {
                     if (this.gridService.scrabbleBoard.squares[j][k].occupied) {
                         const newWords = this.movesWithGivenLetter(this.gridService.scrabbleBoard.squares[j][k].letter);
-                        if (list.length === 0) list = newWords;
-                        else {
-                            for (let newWordsIndex = 0; newWordsIndex < newWords.length; newWordsIndex++) {
-                                list[list.length + newWordsIndex] = newWords[newWordsIndex];
-                            }
+                        for (let newWordsIndex = 0; newWordsIndex < newWords.length; newWordsIndex++) {
+                            list[list.length + newWordsIndex] = newWords[newWordsIndex];
                         }
-                        for (let l = 0; l < newWords.length; l++) {
-                            // Remove elements of the list which aren't valid with the points constraint
-                            if (this.validationService.isPlacable(list[l], this.findPosition(list[l], axis), axis)) {
-                                if (newWords[l].totalValue() > points || newWords[l].totalValue() < points - POINTS_INTERVAL) {
-                                    list.splice(l);
-                                    // const currentWord = newWords[l].stringify();
-                                    // const position = this.findPosition(newWords[l]);
-                                    // const otherWords : ScrabbleWord[] = wordBuilderService.allWordsCreated(currentWord, position, axis);
-                                    // let sum = 0;
-                                    // for(let index = 0; index < otherWords.length; index++){
-                                    //     sum += otherWords[index].value;
-                                    // }
-                                    // if(sum > points) list.splice(l);
+                    }
+                    for (let l = 0; l < list.length; l++) {
+                        // Remove elements of the list which aren't valid with the points constraint
+                        if (this.validationService.isPlacable(list[l], this.findPosition(list[l], axis), axis)) {
+                            if (list[l].totalValue() > points || list[l].totalValue() < points - POINTS_INTERVAL) {
+                                list.splice(l);
+                                const currentWord = list[l].stringify();
+                                const position = this.findPosition(list[l], axis);
+                                const otherWords : ScrabbleWord[] = wordBuilderService.allWordsCreated(currentWord, position, axis);
+                                let sum = 0;
+                                for (let word of otherWords) {
+                                    sum += word.value;
                                 }
+                                if (sum > points) list.splice(l);
                             }
-                            movesFound += list.length;
                         }
+                        movesFound += list.length;
                     }
                 }
             }
+
             loopsDone++;
         }
         return list; // list contains movesFound elements
