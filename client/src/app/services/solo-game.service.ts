@@ -134,18 +134,19 @@ export class SoloGameService {
     }
 
     passTurn() {
-        if (this.localPlayer.isActive) {
-            this.turnPassed = true;
-            if (this.isTurnsPassedLimit() && this.hasTurnsBeenPassed.length >= MAX_TURNS_PASSED) {
-                this.endGame();
-            }
-            this.turnPassed = false;
-            this.timerMs = 0;
-            this.secondsToMinutes();
-            this.changeActivePlayer();
-            return ErrorType.NoError;
+        // TODO: temporarily deactivate to be able to !passer virtual player too
+        // if (this.localPlayer.isActive) {
+        this.turnPassed = true;
+        if (this.isTurnsPassedLimit() && this.hasTurnsBeenPassed.length >= MAX_TURNS_PASSED) {
+            this.endGame();
         }
-        return ErrorType.ImpossibleCommand;
+        this.turnPassed = false;
+        this.timerMs = 0;
+        this.secondsToMinutes();
+        this.changeActivePlayer();
+        return ErrorType.NoError;
+        // }
+        // return ErrorType.ImpossibleCommand;
     }
 
     // Check if last 5 turns have been passed (current turn is the 6th)

@@ -1,16 +1,16 @@
-import { TestBed } from '@angular/core/testing';
+// import { TestBed } from '@angular/core/testing';
 
-import { WordBuilderService } from './word-builder.service';
+// import { WordBuilderService } from './word-builder.service';
 
-describe('WordBuilderService', () => {
-    let service: WordBuilderService;
+// describe('WordBuilderService', () => {
+//     let service: WordBuilderService;
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({});
-        service = TestBed.inject(WordBuilderService);
-    });
+//     beforeEach(() => {
+//         TestBed.configureTestingModule({});
+//         service = TestBed.inject(WordBuilderService);
+//     });
 
-    it('should be created', () => {
-        expect(service).toBeTruthy();
-    });
-});
+//     it('should be created', () => {
+//         expect(service).toBeTruthy();
+//     });
+// });
