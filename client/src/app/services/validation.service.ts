@@ -43,6 +43,7 @@ export class ValidationService {
                             this.gridService.removeSquare(newWord.startPosition.x + j, newWord.startPosition.y);
                         }
                     } else {
+                        // TODO: are all the right squares set to isvalidated? 
                         if (newWord.orientation === WordOrientation.Vertical) {
                             this.gridService.scrabbleBoard.squares[newWord.startPosition.x][newWord.startPosition.y + j].isValidated = true;
                         }
@@ -69,6 +70,12 @@ export class ValidationService {
                 // Add word's value to player's score
                 newWords[i].value = this.bonusService.totalValue(newWords[i]);
                 totalScore += newWords[i].value;
+
+                // TODO: is it fine to put this here? if put in updatePlayerScore, because of how the methods are called in placer, it wouldnt work properly
+                newWords[i].content.forEach((letter) => {
+                    letter.tile.isValidated = true;
+                });
+
             }
         }
         if (this.newLettersCount() === BONUS_LETTER_COUNT) {
@@ -81,7 +88,7 @@ export class ValidationService {
     }
 
     // Total value ne consume pas les bonus
-
+    // TODO: duplicate method with stringify in ScrabbleWord. Which one is to remove?
     convertScrabbleWordToString(scrabbleLetter: ScrabbleLetter[]): string {
         let word = '';
         scrabbleLetter.forEach((letter) => {

@@ -313,6 +313,7 @@ export class SoloGameService {
         for (let i = 0; i < playerLetters.length; i++) {
             if (playerLetters[i].character === letter) {
                 this.gridService.drawLetter(playerLetters[i], position.x, position.y);
+                playerLetters[i].tile = this.gridService.scrabbleBoard.squares[position.x][position.y];
                 this.rackService.removeLetter(playerLetters[i]);
                 playerLetters.splice(i, 1);
                 return;

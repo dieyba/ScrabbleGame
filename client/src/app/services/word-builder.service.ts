@@ -5,42 +5,52 @@ import { Vec2 } from '@app/classes/vec2';
 
 const TOWARD_START = true;
 const TOWARD_END = false;
+const BACKWARD_STEP = -1;
+const FORWARD_STEP = 1;
 
 @Injectable({
     providedIn: 'root',
 })
 export class WordBuilderService {
-    // TODO: initialisation grid service, pass game service's scrabble board instead?
     constructor(private gridService: GridService) {}
 
     buildWordOnBoard(word: string, coord: Vec2, axis: WordOrientation): ScrabbleWord[] {
         const result: ScrabbleWord[] = [];
-        const currentCoord = coord;
-        // adding the full word that could be read on the same axis as the word placed
-        let wordBuilt = this.buildScrabbleWord(currentCoord, axis);
+
+        // adding the full word that can be read on the placed word's row/column
+        let wordBuilt = this.buildScrabbleWord(coord, axis);
         if (wordBuilt.content.length !== 0) {
             result.push(wordBuilt);
+            // TODO: to remove console log after testing
+            console.log('placed word: ' + wordBuilt.stringify());
         }
 
-        // adding the opposite axis words that could be created from the word placed
-        for (let i = 0; i < word.length; i++) {
+        // adding all the opposite axis words that could be created from the word placed
+        const placedWord = result[0].content;
+
+        for (const letter of placedWord) {
+            const currentCoord = letter.tile.position;
+            // if the current letter is not a newly placed letter, there is no need to validate it again
+            if (this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y].isValidated) {
+                    console.log('current placed letter ' + letter.character + " at position (" + currentCoord.x+ "," + currentCoord.y + ") was already validated");
+                continue;
+            }
+            console.log('current placed letter ' + letter.character + " at position (" + currentCoord.x+ "," + currentCoord.y + ")");
+
+
             const oppositeAxis = axis === WordOrientation.Horizontal ? WordOrientation.Vertical : WordOrientation.Horizontal;
             wordBuilt = this.buildScrabbleWord(currentCoord, oppositeAxis);
             if (wordBuilt.content.length !== 0) {
                 result.push(wordBuilt);
-            }
-
-            if (axis === WordOrientation.Horizontal) {
-                currentCoord.x += 1;
-            } else {
-                currentCoord.y += 1;
+                // TODO: to remove console log after testing
+                console.log('added the word ' + wordBuilt.stringify() + ' based on the placed letter ' + letter.character);
             }
         }
         return result;
     }
 
     findWordEdge(coord: Vec2, axis: WordOrientation, isTowardStart: boolean): Vec2 {
-        const step = isTowardStart ? -1 : 1;
+        const step = isTowardStart ? BACKWARD_STEP : FORWARD_STEP;
         const currentCoord = new Vec2(coord.x, coord.y);
         const nextCoord = new Vec2(coord.x, coord.y);
 
