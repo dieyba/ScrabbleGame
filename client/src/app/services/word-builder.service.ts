@@ -23,6 +23,9 @@ export class WordBuilderService {
         // DUMMY FUNCTION TO MAKE VIRTUAL PLAYER COMPILE, PLEASE IGNORE.
         const words: ScrabbleWord[] = [];
         const newWord = new ScrabbleWord();
+        for (let index = 0; index < word.length; index++) {
+            newWord.content[index] = new ScrabbleLetter('', 0);
+        }
         newWord.content[0].character = word[0];
         newWord.content[0].tile.position = coord;
         if (axis) {
