@@ -50,6 +50,7 @@ export class ScrabbleWord {
             }
             total += i.value;
         }
+        if (pinkBonusCount === 0 && redBonusCount === 0) return total;
         // Word pink/red bonuses
         // TODO : Export the following into a new service.
         total = total * PINK_FACTOR * pinkBonusCount;

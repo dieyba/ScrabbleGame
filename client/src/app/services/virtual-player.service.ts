@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis, ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { ValidationService } from './validation.service';
 import { Vec2 } from '@app/classes/vec2';
@@ -29,7 +28,6 @@ const POSITION_ERROR = -1;
     providedIn: 'root',
 })
 export class VirtualPlayerService {
-    board: ScrabbleBoard;
     rack: ScrabbleRack;
 
     constructor(private validationService: ValidationService, private gridService: GridService, private wordBuilderService: WordBuilderService) {
@@ -67,7 +65,7 @@ export class VirtualPlayerService {
     movesWithGivenLetter(letter: ScrabbleLetter): ScrabbleWord[] {
         const lettersAvailable: ScrabbleLetter[] = [];
         lettersAvailable[0] = letter;
-        const lettersInArray: boolean[] = [];
+        const lettersInArray: boolean[] = [false, false, false, false, false, false, false];
         for (let i = 1; i < this.getRandomIntInclusive(2, this.rack.letters.length); i++) {
             // Randomize length of word
             let index = this.getRandomIntInclusive(0, this.rack.letters.length - 1);
@@ -75,7 +73,7 @@ export class VirtualPlayerService {
                 // If we've already generated this number before
                 if (index !== lettersInArray.length - 1) {
                     index++;
-                } else index = 0;
+                } else index = 0; // Code coverage on this line
             }
             lettersAvailable[i] = this.rack.letters[index];
             lettersInArray[index] = true;
@@ -83,19 +81,23 @@ export class VirtualPlayerService {
         // check all possible permutations. Maximum of O(8!)
         const permutations = this.permutationsOfLetters(lettersAvailable);
         const possibleMoves = [];
-        for (let i = 0; i < permutations.length; i++) {
-            possibleMoves[i] = new ScrabbleWord();
-        }
         let movesFound = 0;
+        const charArray = [];
         for (const j of permutations) {
-            if (this.validationService.isWordValid(j.toString())) {
+            let index = 0;
+            for (const char of j) {
+                charArray[index] = char.character;
+                index++;
+            }
+            if (this.validationService.isWordValid(charArray.join(''))) {
                 possibleMoves[movesFound] = this.wordify(j);
                 movesFound++;
             }
         }
         return possibleMoves;
     }
-
+    // I have to do this, sorry everyone. If it wasn't for the randomizing we wouldn't have to go this far.
+    // eslint-disable-next-line complexity
     possibleMoves(points: number, axis: Axis): ScrabbleWord[] {
         const listLength = 4; // How many words we should aim for
         const list: ScrabbleWord[] = [];
@@ -106,33 +108,35 @@ export class VirtualPlayerService {
             // Arbitrarily do a maximum of [loopsDone] checks for words. We don't want an infinite loop.
             let j = this.getRandomIntInclusive(0, 1);
             let k = this.getRandomIntInclusive(0, 1);
-            let increment;
-            let iteratorMax;
+            let incrementJ;
+            let incrementK;
+            let iteratorMaxJ;
+            let iteratorMaxK;
             if (j === 0) {
-                iteratorMax = this.gridService.scrabbleBoard.actualBoardSize;
-                increment = 1;
+                iteratorMaxJ = this.gridService.scrabbleBoard.actualBoardSize;
+                incrementJ = 1;
             } else {
-                iteratorMax = 0;
+                iteratorMaxJ = 0;
                 j = this.gridService.scrabbleBoard.actualBoardSize;
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                increment = -1;
+                incrementJ = -1;
             }
-            for (j; j !== iteratorMax - increment; j = j + increment) {
+            for (j; j !== iteratorMaxJ + incrementJ; j = j + incrementJ) {
                 // Iterate through board in a random order
                 if (k === 0) {
-                    iteratorMax = this.gridService.scrabbleBoard.actualBoardSize;
-                    increment = 1;
+                    iteratorMaxK = this.gridService.scrabbleBoard.actualBoardSize;
+                    incrementK = 1;
                 } else {
-                    iteratorMax = 0;
+                    iteratorMaxK = 0;
                     k = this.gridService.scrabbleBoard.actualBoardSize;
                     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                    increment = -1;
+                    incrementK = -1;
                 }
-                for (k; k !== iteratorMax - increment; k = k + increment) {
+                for (k; k !== iteratorMaxK + incrementK; k = k + incrementK) {
                     if (this.gridService.scrabbleBoard.squares[j][k].occupied) {
                         const newWords = this.movesWithGivenLetter(this.gridService.scrabbleBoard.squares[j][k].letter);
-                        for (let newWordsIndex = 0; newWordsIndex < newWords.length; newWordsIndex++) {
-                            list[list.length + newWordsIndex] = newWords[newWordsIndex];
+                        for (const newWord of newWords) {
+                            if (!list.includes(newWord)) list.push(newWord);
                         }
                     }
                     for (let l = 0; l < list.length; l++) {
@@ -140,6 +144,7 @@ export class VirtualPlayerService {
                         if (this.validationService.isPlacable(list[l], this.findPosition(list[l], axis), axis)) {
                             if (list[l].totalValue() > points || list[l].totalValue() < points - POINTS_INTERVAL) {
                                 list.splice(l);
+                            } else {
                                 const currentWord = list[l].stringify();
                                 const position = this.findPosition(list[l], axis);
                                 const otherWords: ScrabbleWord[] = this.wordBuilderService.allWordsCreated(currentWord, position, axis);
@@ -149,8 +154,8 @@ export class VirtualPlayerService {
                                 }
                                 if (sum > points) list.splice(l);
                             }
+                            movesFound = list.length;
                         }
-                        movesFound += list.length;
                     }
                 }
             }
@@ -223,7 +228,7 @@ export class VirtualPlayerService {
     }
     findPosition(word: ScrabbleWord, axis: Axis): Vec2 {
         let origin = new ScrabbleLetter('', 0); // Convert position
-        let index = -1;
+        let index;
         for (index = 0; index < word.content.length; index++) {
             if (word.content[index].tile.occupied) {
                 origin = word.content[index];
