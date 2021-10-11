@@ -100,12 +100,10 @@ export class SoloGameService {
         clearInterval(this.intervalValue);
         // Check if last turn was passed by player
         if (this.turnPassed) {
-            this.hasTurnsBeenPassed[this.hasTurnsBeenPassed.length] = false;
             // Set last turn to hasBeenPassed = true
             this.hasTurnsBeenPassed[this.hasTurnsBeenPassed.length - 1] = true;
-        } else {
-            this.hasTurnsBeenPassed[this.hasTurnsBeenPassed.length] = false;
         }
+        this.hasTurnsBeenPassed[this.hasTurnsBeenPassed.length] = false;
 
         // Change active player and reset timer for new turn
         const isLocalPlayerActive = this.localPlayer.isActive;
@@ -142,6 +140,7 @@ export class SoloGameService {
             this.turnPassed = true;
             if (this.isTurnsPassedLimit() && this.hasTurnsBeenPassed.length >= MAX_TURNS_PASSED) {
                 this.endGame();
+                return ErrorType.NoError;
             }
             this.timerMs = 0;
             this.secondsToMinutes();
@@ -211,7 +210,7 @@ export class SoloGameService {
         this.localPlayer.letters[this.localPlayer.letters.length] = letter;
     }
 
-    removeLetter(scrabbleLetter: ScrabbleLetter): void {
+    removeRackLetter(scrabbleLetter: ScrabbleLetter): void {
         const i = this.rackService.removeLetter(scrabbleLetter);
         this.localPlayer.letters.splice(i, 1);
     }
@@ -219,9 +218,6 @@ export class SoloGameService {
     endGame() {
         this.chatDisplayService.addEndGameMessage(this.stock.letterStock, this.localPlayer, this.virtualPlayer);
 
-        clearInterval(this.intervalValue);
-        this.timerMs = 0;
-        this.secondsToMinutes();
         const localPlayerPoints = this.calculateRackPoints(this.localPlayer);
         const virtualPlayerPoints = this.calculateRackPoints(this.virtualPlayer);
 
@@ -229,16 +225,18 @@ export class SoloGameService {
             this.localPlayer.score += virtualPlayerPoints;
             this.virtualPlayer.score -= virtualPlayerPoints;
         } else if (this.virtualPlayer.isWinner === true) {
-            this.virtualPlayer.isWinner = true;
             this.virtualPlayer.score += localPlayerPoints;
             this.localPlayer.score -= localPlayerPoints;
         } else {
             this.localPlayer.score -= localPlayerPoints;
             this.virtualPlayer.score -= virtualPlayerPoints;
         }
-        this.isEndGame = true;
+        clearInterval(this.intervalValue);
+        this.timerMs = 0;
+        this.secondsToMinutes();
         // Show message in sidebar
         // Show end of game info in communication box
+        this.isEndGame = true;
     }
 
     calculateRackPoints(player: Player): number {
@@ -324,19 +322,13 @@ export class SoloGameService {
     }
 
     placeLetter(playerLetters: ScrabbleLetter[], letter: string, position: Vec2) {
-        // Position already occupied
-        if (this.gridService.scrabbleBoard.squares[position.x][position.y].occupied) {
-            return;
-        }
-
-        for (let i = 0; i < playerLetters.length; i++) {
-            if (playerLetters[i].character === letter) {
-                this.gridService.drawLetter(playerLetters[i], position.x, position.y);
-                this.rackService.removeLetter(playerLetters[i]);
-                playerLetters.splice(i, 1);
+        playerLetters.forEach((playerLetter) => {
+            if (playerLetter.character === letter) {
+                this.gridService.drawLetter(playerLetter, position.x, position.y);
+                this.removeRackLetter(playerLetter);
                 return;
             }
-        }
+        });
     }
 
     canPlaceWord(player: Player, placeParams: PlaceParams): boolean {

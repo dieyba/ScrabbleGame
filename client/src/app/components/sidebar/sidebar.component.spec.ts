@@ -4,6 +4,7 @@ import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
 import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
+import { LetterStock } from '@app/services/letter-stock.service';
 import { SoloGameService } from '@app/services/solo-game.service';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
@@ -32,6 +33,7 @@ describe('SidebarComponent', () => {
         soloGameServiceSpy.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
         soloGameServiceSpy.virtualPlayer.score = 70;
         soloGameServiceSpy.virtualPlayer.letters = [firstLetter, thirdLetter, firstLetter];
+        soloGameServiceSpy.stock = new LetterStock();
     });
 
     beforeEach(() => {

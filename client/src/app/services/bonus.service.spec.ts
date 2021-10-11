@@ -62,7 +62,7 @@ describe('BonusService', () => {
         const letter2 = new ScrabbleLetter('b', 1);
         const letter3 = new ScrabbleLetter('c', 1);
         const word = new ScrabbleWord();
-        word.startPosition = new Vec2(5, 5);
+        word.startPosition = new Vec2(1, 1);
         word.orientation = WordOrientation.Horizontal;
         word.content = [letter1, letter2, letter3];
         service.totalValue(word);
@@ -103,41 +103,122 @@ describe('BonusService', () => {
         const letter2 = new ScrabbleLetter('b', 1);
         const letter3 = new ScrabbleLetter('c', 1);
         const word = new ScrabbleWord();
-        word.startPosition = new Vec2(2, 2);
+        word.startPosition = new Vec2(5, 5);
         word.orientation = WordOrientation.Horizontal;
         word.content = [letter1, letter2, letter3];
         service.useBonus(word);
-        expect(gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed).toEqual(true);
-        expect(gridServiceSpy.scrabbleBoard.squares[3][2].isBonusUsed).toEqual(true);
-        expect(gridServiceSpy.scrabbleBoard.squares[4][2].isBonusUsed).toEqual(true);
-        expect(gridServiceSpy.scrabbleBoard.squares[5][2].isBonusUsed).toEqual(true);
+        expect(gridServiceSpy.scrabbleBoard.squares[5][5].isBonusUsed).toEqual(true);
+        // No color, no bonus to use
+        expect(gridServiceSpy.scrabbleBoard.squares[6][5].isBonusUsed).toEqual(false);
+        expect(gridServiceSpy.scrabbleBoard.squares[7][5].isBonusUsed).toEqual(false);
     });
 
-    it('useVerticalWordBonus should set the square isBonusUsed to true', () => {
+    it('useVerticalWordBonus should set the square isBonusUsed to true (dark blue)', () => {
         const letter1 = new ScrabbleLetter('a', 1);
         letter1.color = SquareColor.DarkBlue;
         const letter2 = new ScrabbleLetter('b', 1);
-        letter2.color = SquareColor.Pink;
         const letter3 = new ScrabbleLetter('c', 1);
-        letter3.color = SquareColor.Red;
         const letter4 = new ScrabbleLetter('d', 1);
-        letter4.color = SquareColor.Teal;
         const word = new ScrabbleWord();
-        word.startPosition = new Vec2(2, 2);
+        word.startPosition = new Vec2(5, 5);
         word.orientation = WordOrientation.Vertical;
         word.content = [letter1, letter2, letter3, letter4];
         service.useBonus(word);
-        expect(gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed).toEqual(true);
-        expect(gridServiceSpy.scrabbleBoard.squares[2][3].isBonusUsed).toEqual(true);
-        expect(gridServiceSpy.scrabbleBoard.squares[2][4].isBonusUsed).toEqual(true);
-        expect(gridServiceSpy.scrabbleBoard.squares[2][5].isBonusUsed).toEqual(true);
+        expect(gridServiceSpy.scrabbleBoard.squares[5][5].isBonusUsed).toEqual(true);
+        // No color, no bonus to use
+        expect(gridServiceSpy.scrabbleBoard.squares[5][6].isBonusUsed).toEqual(false);
+        expect(gridServiceSpy.scrabbleBoard.squares[5][7].isBonusUsed).toEqual(false);
+        expect(gridServiceSpy.scrabbleBoard.squares[5][8].isBonusUsed).toEqual(false);
+    });
+
+    it('useVerticalWordBonus should set the square isBonusUsed to true (teal)', () => {
+        const letter1 = new ScrabbleLetter('a', 1);
+        letter1.color = SquareColor.Teal;
+        const letter2 = new ScrabbleLetter('b', 1);
+        const word = new ScrabbleWord();
+        word.startPosition = new Vec2(6, 6);
+        word.orientation = WordOrientation.Vertical;
+        word.content = [letter1, letter2];
+        service.useBonus(word);
+        expect(gridServiceSpy.scrabbleBoard.squares[6][6].isBonusUsed).toEqual(true);
+        // No color, no bonus to use
+        expect(gridServiceSpy.scrabbleBoard.squares[6][7].isBonusUsed).toEqual(false);
+    });
+
+    it('useVerticalWordBonus should set the square isBonusUsed to true (pink)', () => {
+        const letter1 = new ScrabbleLetter('a', 1);
+        letter1.color = SquareColor.Pink;
+        const letter2 = new ScrabbleLetter('b', 1);
+        const word = new ScrabbleWord();
+        word.startPosition = new Vec2(1, 1);
+        word.orientation = WordOrientation.Vertical;
+        word.content = [letter1, letter2];
+        service.useBonus(word);
+        expect(gridServiceSpy.scrabbleBoard.squares[1][1].isBonusUsed).toEqual(true);
+        // No color, no bonus to use
+        expect(gridServiceSpy.scrabbleBoard.squares[1][2].isBonusUsed).toEqual(false);
+    });
+
+    it('useVerticalWordBonus should set the square isBonusUsed to true (red)', () => {
+        const letter1 = new ScrabbleLetter('a', 1);
+        letter1.color = SquareColor.Red;
+        const letter2 = new ScrabbleLetter('b', 1);
+        const word = new ScrabbleWord();
+        word.startPosition = new Vec2(0, 0);
+        word.orientation = WordOrientation.Vertical;
+        word.content = [letter1, letter2];
+        service.useBonus(word);
+        expect(gridServiceSpy.scrabbleBoard.squares[0][0].isBonusUsed).toEqual(true);
+        // No color, no bonus to use
+        expect(gridServiceSpy.scrabbleBoard.squares[0][1].isBonusUsed).toEqual(false);
+    });
+
+    it('useHorizontalWordBonus should set the square isBonusUsed to true (teal)', () => {
+        const letter1 = new ScrabbleLetter('a', 1);
+        letter1.color = SquareColor.Teal;
+        const letter2 = new ScrabbleLetter('b', 1);
+        const word = new ScrabbleWord();
+        word.startPosition = new Vec2(6, 6);
+        word.orientation = WordOrientation.Horizontal;
+        word.content = [letter1, letter2];
+        service.useBonus(word);
+        expect(gridServiceSpy.scrabbleBoard.squares[6][6].isBonusUsed).toEqual(true);
+        // No color, no bonus to use
+        expect(gridServiceSpy.scrabbleBoard.squares[7][6].isBonusUsed).toEqual(false);
+    });
+
+    it('useHorizontalWordBonus should set the square isBonusUsed to true (pink)', () => {
+        const letter1 = new ScrabbleLetter('a', 1);
+        letter1.color = SquareColor.Pink;
+        const letter2 = new ScrabbleLetter('b', 1);
+        const word = new ScrabbleWord();
+        word.startPosition = new Vec2(1, 1);
+        word.orientation = WordOrientation.Horizontal;
+        word.content = [letter1, letter2];
+        service.useBonus(word);
+        expect(gridServiceSpy.scrabbleBoard.squares[1][1].isBonusUsed).toEqual(true);
+        // No color, no bonus to use
+        expect(gridServiceSpy.scrabbleBoard.squares[2][1].isBonusUsed).toEqual(false);
+    });
+
+    it('useHorizontalWordBonus should set the square isBonusUsed to true (red)', () => {
+        const letter1 = new ScrabbleLetter('a', 1);
+        letter1.color = SquareColor.Red;
+        const letter2 = new ScrabbleLetter('b', 1);
+        const word = new ScrabbleWord();
+        word.startPosition = new Vec2(0, 0);
+        word.orientation = WordOrientation.Horizontal;
+        word.content = [letter1, letter2];
+        service.useBonus(word);
+        expect(gridServiceSpy.scrabbleBoard.squares[0][0].isBonusUsed).toEqual(true);
+        // No color, no bonus to use
+        expect(gridServiceSpy.scrabbleBoard.squares[1][0].isBonusUsed).toEqual(false);
     });
 
     it('useVerticalWordBonus should keep the square isBonusUsed to true when already true', () => {
         const letter1 = new ScrabbleLetter('a', 1);
-        letter1.color = SquareColor.DarkBlue;
+        letter1.color = SquareColor.Pink;
         const letter2 = new ScrabbleLetter('b', 1);
-        letter2.color = SquareColor.Pink;
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(2, 2);
         word.orientation = WordOrientation.Vertical;
@@ -145,21 +226,32 @@ describe('BonusService', () => {
         gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed = true;
         service.useBonus(word);
         expect(gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed).toEqual(true);
-        expect(gridServiceSpy.scrabbleBoard.squares[2][3].isBonusUsed).toEqual(true);
+        expect(gridServiceSpy.scrabbleBoard.squares[2][3].isBonusUsed).toEqual(false);
     });
 
     it('useHorizontalBonus should keep the square isBonusUsed to true when is already true', () => {
         const letter1 = new ScrabbleLetter('a', 1);
-        letter1.color = SquareColor.DarkBlue;
+        letter1.color = SquareColor.Teal;
         const letter2 = new ScrabbleLetter('b', 1);
-        letter2.color = SquareColor.Pink;
         const word = new ScrabbleWord();
-        word.startPosition = new Vec2(2, 2);
+        word.startPosition = new Vec2(6, 6);
         word.orientation = WordOrientation.Horizontal;
         word.content = [letter1, letter2];
-        gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed = true;
+        gridServiceSpy.scrabbleBoard.squares[6][6].isBonusUsed = true;
         service.useBonus(word);
-        expect(gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed).toEqual(true);
-        expect(gridServiceSpy.scrabbleBoard.squares[3][2].isBonusUsed).toEqual(true);
+        expect(gridServiceSpy.scrabbleBoard.squares[6][6].isBonusUsed).toEqual(true);
+        expect(gridServiceSpy.scrabbleBoard.squares[7][6].isBonusUsed).toEqual(false);
+    });
+
+    it('useBonus should not set the square isBonusUsed to true when no orientation is set', () => {
+        const letter1 = new ScrabbleLetter('a', 1);
+        letter1.color = SquareColor.Teal;
+        const letter2 = new ScrabbleLetter('b', 1);
+        const word = new ScrabbleWord();
+        word.startPosition = new Vec2(6, 6);
+        word.content = [letter1, letter2];
+        service.useBonus(word);
+        expect(gridServiceSpy.scrabbleBoard.squares[6][6].isBonusUsed).toEqual(false);
+        expect(gridServiceSpy.scrabbleBoard.squares[7][6].isBonusUsed).toEqual(false);
     });
 });

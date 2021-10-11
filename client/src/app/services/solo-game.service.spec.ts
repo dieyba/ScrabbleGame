@@ -4,6 +4,7 @@ import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ErrorType } from '@app/classes/errors';
 import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
 import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
 import { RackService } from './rack.service';
 import { SoloGameService } from './solo-game.service';
@@ -26,7 +27,7 @@ describe('GameService', () => {
     let ctxStub: CanvasRenderingContext2D;
     beforeEach(() => {
         ctxStub = CanvasTestHelper.createCanvas(DEFAULT_WIDTH, DEFAULT_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
-        rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'drawLetter', 'removeLetter', 'addLetter']);
+        rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'drawLetter', 'removeLetter', 'addLetter', 'rackLetters']);
         TestBed.configureTestingModule({
             providers: [{ provide: RackService, useValue: rackServiceSpy }],
         });
@@ -131,6 +132,8 @@ describe('GameService', () => {
     it('exchangeLetter should call removeLetter of class Player if he is active and if there is at least 7 letters', () => {
         spyPlayer.letters = [new ScrabbleLetter('a', 1)];
         service.localPlayer = spyPlayer;
+        service.virtualPlayer = new VirtualPlayer('Ariane', PlayerType.Easy);
+        service.virtualPlayer.isActive = false;
 
         const spy = spyOn(service.localPlayer, 'removeLetter').and.callThrough();
         expect(spy).not.toHaveBeenCalled();
@@ -145,6 +148,8 @@ describe('GameService', () => {
         spyPlayer.letters = [new ScrabbleLetter('a', 1)];
         service.localPlayer = spyPlayer;
         service.localPlayer.isActive = true;
+        service.virtualPlayer = new VirtualPlayer('Ariane', PlayerType.Easy);
+        service.virtualPlayer.isActive = false;
 
         const spy = spyOn(service.localPlayer, 'addLetter').and.callThrough();
         service.exchangeLetters(spyPlayer, 'b');
@@ -172,5 +177,85 @@ describe('GameService', () => {
         const error = ErrorType.ImpossibleCommand;
 
         expect(service.exchangeLetters(spyPlayer, 'a')).toEqual(error);
+    });
+
+    it('endGame should be called when changing players and rack + letterStock is empty (localPlayer)', () => {
+        const endGameSpy = spyOn<any>(service, 'endGame').and.callThrough();
+        spyPlayer.letters = [new ScrabbleLetter('a', 1)];
+        service.localPlayer = spyPlayer;
+        service.localPlayer.isActive = true;
+        service.localPlayer.letters = [];
+        service.stock.letterStock.length = 0;
+        service.virtualPlayer = new VirtualPlayer('Ariane', PlayerType.Easy);
+        service.virtualPlayer.isActive = false;
+        service.changeActivePlayer();
+        expect(endGameSpy).toHaveBeenCalled();
+        expect(service.isEndGame).toEqual(true);
+    });
+
+    it('endGame should be called when changing players and rack + letterStock is empty (virtualPlayer)', () => {
+        const endGameSpy = spyOn<any>(service, 'endGame').and.callThrough();
+        spyPlayer.letters = [new ScrabbleLetter('a', 1)];
+        service.virtualPlayer = new VirtualPlayer('Ariane', PlayerType.Easy);
+        service.virtualPlayer.isActive = true;
+        service.virtualPlayer.letters = [];
+        service.stock.letterStock.length = 0;
+        service.localPlayer = spyPlayer;
+        service.localPlayer.isActive = false;
+        service.changeActivePlayer();
+        expect(endGameSpy).toHaveBeenCalled();
+        expect(service.isEndGame).toEqual(true);
+    });
+
+    it('isTurnsPassedLimit should return true if turn has been passed 6 times', () => {
+        service.hasTurnsBeenPassed = [false, true, true, true, true, true, true];
+        service.turnPassed = true;
+        expect(service.isTurnsPassedLimit()).toEqual(true);
+    });
+
+    it('when passTurn is called 6 times in a row, endGame should be called', () => {
+        const endGameSpy = spyOn<any>(service, 'endGame').and.callThrough();
+        spyPlayer.letters = [new ScrabbleLetter('a', 1)];
+        service.localPlayer = spyPlayer;
+        service.localPlayer.isActive = true;
+        service.stock.letterStock.length = 0;
+        service.virtualPlayer = new VirtualPlayer('Ariane', PlayerType.Easy);
+        service.virtualPlayer.letters = [new ScrabbleLetter('a', 1)];
+        service.virtualPlayer.isActive = false;
+        service.hasTurnsBeenPassed = [false, true, true, true, true, true];
+        service.turnPassed = true;
+        service.passTurn(service.localPlayer);
+        expect(endGameSpy).toHaveBeenCalled();
+        expect(service.isEndGame).toEqual(true);
+    });
+
+    it('drawRack should call addRackLetter', () => {
+        const addRackLetterSpy = spyOn<any>(service, 'addRackLetter').and.callThrough();
+        const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        const letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
+        const letter3: ScrabbleLetter = new ScrabbleLetter('j', 4);
+        const word1: ScrabbleWord = new ScrabbleWord();
+        word1.content = [letter1, letter2, letter3];
+        word1.orientation = WordOrientation.Horizontal;
+        const word2: ScrabbleWord = new ScrabbleWord();
+        word2.orientation = WordOrientation.Vertical;
+        word2.content = [letter1, letter2, letter3];
+        const words: ScrabbleWord[] = [word1, word2];
+        service.localPlayer = new LocalPlayer('Ariane');
+        service.localPlayer.letters = [letter1];
+        rackServiceSpy.rackLetters = [letter1];
+        service.drawRack(words);
+        expect(addRackLetterSpy).toHaveBeenCalled;
+    });
+
+    it('removeLetter should call rackService', () => {
+        const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        const letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
+        rackServiceSpy.rackLetters = [letter1, letter2];
+        service.localPlayer = new LocalPlayer('Ariane');
+        service.localPlayer.letters = [letter1, letter2];
+        service.removeRackLetter(letter2);
+        expect(rackServiceSpy.removeLetter).toHaveBeenCalled;
+        expect(service.localPlayer.letters.length).toEqual(1);
     });
 });

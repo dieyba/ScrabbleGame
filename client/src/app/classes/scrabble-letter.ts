@@ -48,7 +48,6 @@ export class ScrabbleLetter {
         this.value = DARK_BLUE_FACTOR * this.value;
     }
     setLetter(character: string): void {
-        this.character = character;
-        this.character = this.character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        this.character = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 }
