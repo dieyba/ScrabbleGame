@@ -5,6 +5,8 @@ import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { ValidationService } from './validation.service';
 import { Vec2 } from '@app/classes/vec2';
+import { GridService } from './grid.service';
+import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
     EndTurn = 10,
@@ -30,9 +32,8 @@ export class VirtualPlayerService {
     board: ScrabbleBoard;
     rack: ScrabbleRack;
 
-    constructor(private validationService: ValidationService) {
+    constructor(private validationService: ValidationService, private gridService: GridService, private wordBuilderService: WordBuilderService) {
         // TODO Implement timer (3s and 20s limit)
-        this.board = new ScrabbleBoard();
         this.rack = new ScrabbleRack();
         // const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
         // if (currentMove <= Probability.EndTurn) {
@@ -96,52 +97,80 @@ export class VirtualPlayerService {
     }
 
     possibleMoves(points: number, axis: Axis): ScrabbleWord[] {
-        if (points === 0) {
-            return [];
-        }
         const listLength = 4; // How many words we should aim for
-        let list = [];
-        for (let i = 0; i < listLength; i++) {
-            list[i] = new ScrabbleWord();
-        }
+        const list: ScrabbleWord[] = [];
         // Board analysis
         let movesFound = 0;
-        while (movesFound < listLength) {
-            for (let j = 0; j <= this.board.actualBoardSize; j++) {
-                // TODO : randomize order in which board is iterated over
-                for (let k = 0; k <= this.board.actualBoardSize; k++) {
-                    if (this.board.squares[j][k].occupied) {
-                        list = this.movesWithGivenLetter(this.board.squares[j][k].letter);
-                        for (let l = 0; l < list.length; l++) {
-                            if (!this.validationService.isWordValid(list[l].stringify())) {
-                                list.splice(l);
-                            }
-                            // TODO : Verify if move is valid on the board and simulate placement to calculate points
-                            if (this.validationService.isPlacable(list[l], this.findPosition(list[l], axis), axis))
-                                if (list[l].totalValue() > points || list[l].totalValue() < points - POINTS_INTERVAL) {
-                                    // Verify if points are respected (TODO)
-                                    list.splice(l);
-                                }
-                            movesFound += list.length;
+        let loopsDone = 0;
+        while (movesFound < listLength && loopsDone < listLength) {
+            // Arbitrarily do a maximum of [loopsDone] checks for words. We don't want an infinite loop.
+            let j = this.getRandomIntInclusive(0, 1);
+            let k = this.getRandomIntInclusive(0, 1);
+            let increment;
+            let iteratorMax;
+            if (j === 0) {
+                iteratorMax = this.gridService.scrabbleBoard.actualBoardSize;
+                increment = 1;
+            } else {
+                iteratorMax = 0;
+                j = this.gridService.scrabbleBoard.actualBoardSize;
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                increment = -1;
+            }
+            for (j; j !== iteratorMax - increment; j = j + increment) {
+                // Iterate through board in a random order
+                if (k === 0) {
+                    iteratorMax = this.gridService.scrabbleBoard.actualBoardSize;
+                    increment = 1;
+                } else {
+                    iteratorMax = 0;
+                    k = this.gridService.scrabbleBoard.actualBoardSize;
+                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                    increment = -1;
+                }
+                for (k; k !== iteratorMax - increment; k = k + increment) {
+                    if (this.gridService.scrabbleBoard.squares[j][k].occupied) {
+                        const newWords = this.movesWithGivenLetter(this.gridService.scrabbleBoard.squares[j][k].letter);
+                        for (let newWordsIndex = 0; newWordsIndex < newWords.length; newWordsIndex++) {
+                            list[list.length + newWordsIndex] = newWords[newWordsIndex];
                         }
+                    }
+                    for (let l = 0; l < list.length; l++) {
+                        // Remove elements of the list which aren't valid with the points constraint
+                        if (this.validationService.isPlacable(list[l], this.findPosition(list[l], axis), axis)) {
+                            if (list[l].totalValue() > points || list[l].totalValue() < points - POINTS_INTERVAL) {
+                                list.splice(l);
+                                const currentWord = list[l].stringify();
+                                const position = this.findPosition(list[l], axis);
+                                const otherWords: ScrabbleWord[] = this.wordBuilderService.allWordsCreated(currentWord, position, axis);
+                                let sum = 0;
+                                for (const word of otherWords) {
+                                    sum += word.value;
+                                }
+                                if (sum > points) list.splice(l);
+                            }
+                        }
+                        movesFound += list.length;
                     }
                 }
             }
+
+            loopsDone++;
         }
         return list; // list contains movesFound elements
     }
     makeMoves(): ScrabbleWord {
         let startAxis = Axis.V;
         if (this.getRandomIntInclusive(0, 1) === 1) {
-            // coinflip to determine starting axis
+            // coin flip to determine starting axis
             startAxis = Axis.H;
         }
-        const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
+        const pointTarget = this.getRandomIntInclusive(1, PERCENTAGE);
         let movesList = [];
-        if (currentMove <= Probability.MaxValue1) {
+        if (pointTarget <= Probability.MaxValue1) {
             // 40% chance to go for moves that earn 6 points or less
             movesList = this.possibleMoves(Points.MaxValue1, startAxis);
-        } else if (currentMove <= Probability.MaxValue1 + Probability.MaxValue2) {
+        } else if (pointTarget <= Probability.MaxValue1 + Probability.MaxValue2) {
             // 30% chance to go for moves that score 7-12 points
             movesList = this.possibleMoves(Points.MaxValue2, startAxis);
         } else {

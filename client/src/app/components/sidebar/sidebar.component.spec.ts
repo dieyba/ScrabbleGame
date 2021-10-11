@@ -14,7 +14,7 @@ describe('SidebarComponent', () => {
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
 
     beforeEach(async () => {
-        soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['localPlayer', 'virtualPlayer']);
+        soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['localPlayer', 'virtualPlayer', 'stock']);
         await TestBed.configureTestingModule({
             declarations: [SidebarComponent],
             imports: [MatCardModule],

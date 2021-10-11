@@ -100,10 +100,12 @@ export class SoloGameService {
         clearInterval(this.intervalValue);
         // Check if last turn was passed by player
         if (this.turnPassed) {
+            this.hasTurnsBeenPassed[this.hasTurnsBeenPassed.length] = false;
             // Set last turn to hasBeenPassed = true
             this.hasTurnsBeenPassed[this.hasTurnsBeenPassed.length - 1] = true;
+        } else {
+            this.hasTurnsBeenPassed[this.hasTurnsBeenPassed.length] = false;
         }
-        this.hasTurnsBeenPassed[this.hasTurnsBeenPassed.length] = false;
 
         // Change active player and reset timer for new turn
         const isLocalPlayerActive = this.localPlayer.isActive;
@@ -119,6 +121,7 @@ export class SoloGameService {
             this.timerMs = +this.totalCountDown;
             this.secondsToMinutes();
             this.startCountdown();
+            this.passTurn(this.virtualPlayer);
         } else {
             // If the rack is empty, end game + player won
             if (this.virtualPlayer.letters.length === 0 && this.stock.isEmpty()) {

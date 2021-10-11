@@ -17,16 +17,6 @@ describe('VirtualPlayerService', () => {
     let testWord2: ScrabbleWord;
     let testMoves: ScrabbleWord[];
     let nonsenseWord: ScrabbleWord;
-    /*  let permutationsOfLettersSpy : jasmine.SpyObj<any>;
-  let movesWithGivenLetterSpy : jasmine.SpyObj<any>;
-  let possibleMovesSpy : jasmine.SpyObj<any>;
-  let makeMovesSpy : jasmine.SpyObj<any>;
-  let displayMovesSpy : jasmine.SpyObj<any>;
-  let displayMoveChatSpy : jasmine.SpyObj<any>;
-  let wordifySpy : jasmine.SpyObj<any>;
-  let getRandomIntInclusiveSpy : jasmine.SpyObj<any>;
-  let findPositionSpy : jasmine.SpyObj<any>;
-  let chooseTilesFromRackSpy : jasmine.SpyObj<any>;*/
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(VirtualPlayerService);
