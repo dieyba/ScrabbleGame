@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { Player } from '@app/classes/player';
 import { Axis, ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
+import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Vec2 } from '@app/classes/vec2';
 import { BonusService } from './bonus.service';
 import { BOARD_SIZE, GridService } from './grid.service';
@@ -34,29 +34,44 @@ export class ValidationService {
         // Retirer lettres du board
         setTimeout(() => {
             newWords.forEach((newWord) => {
-                for (let j = 0; j < newWord.content.length; j++) {
-                    if (wordsValue === 0) {
-                        if (newWord.orientation === WordOrientation.Vertical) {
-                            this.gridService.removeSquare(newWord.startPosition.x, newWord.startPosition.y + j);
-                        }
-                        if (newWord.orientation === WordOrientation.Horizontal) {
-                            this.gridService.removeSquare(newWord.startPosition.x + j, newWord.startPosition.y);
-                        }
-                    } else {
-                        // TODO: are all the right squares set to isvalidated? 
-                        if (newWord.orientation === WordOrientation.Vertical) {
-                            this.gridService.scrabbleBoard.squares[newWord.startPosition.x][newWord.startPosition.y + j].isValidated = true;
-                        }
-                        if (newWord.orientation === WordOrientation.Horizontal) {
-                            this.gridService.scrabbleBoard.squares[newWord.startPosition.x + j][newWord.startPosition.y].isValidated = true;
-                        }
-                        this.bonusService.useBonus(newWord);
+                // for (let j = 0; j < newWord.content.length; j++) {
+                //     if (wordsValue === 0) {
+                //         if (newWord.orientation === WordOrientation.Vertical) {
+                //             this.gridService.removeSquare(newWord.startPosition.x, newWord.startPosition.y + j);
+                //         }
+                //         if (newWord.orientation === WordOrientation.Horizontal) {
+                //             this.gridService.removeSquare(newWord.startPosition.x + j, newWord.startPosition.y);
+                //         }
+                //     } else {
+                //         // TODO: are all the right squares set to isvalidated? 
+                //         if (newWord.orientation === WordOrientation.Vertical) {
+                //             this.gridService.scrabbleBoard.squares[newWord.startPosition.x][newWord.startPosition.y + j].isValidated = true;
+                //         }
+                //         if (newWord.orientation === WordOrientation.Horizontal) {
+                //             this.gridService.scrabbleBoard.squares[newWord.startPosition.x + j][newWord.startPosition.y].isValidated = true;
+                //         }
+                //         this.bonusService.useBonus(newWord);
+                //     }
+                // }
+                for(let letter of newWord.content){
+                    // TODO: technically if we only put white letters the value would be 0 but it should be valid.
+                    // if we separate validateWords and CalculateScore, we could juste use validateWords' return (true/false)
+                    // the place method calls validateWordsAndCalculateScore and then calls updatePlayerScore
+                    // instead it could just call validate words and then this methods calls calculateScore and yatti yatta
+                    if(wordsValue === 0){
+                        this.gridService.removeSquare(letter.tile.position.x,letter.tile.position.y);
+                    }else{
+                        // TODO: seems to have a problem in how usebonus iterates? did the same in previous for loop's version that is commented
+                        // where it also put bonus used and isValided true to empty squares after the placed word
+                        this.bonusService.useBonus(newWord); 
                     }
                 }
+
             });
         }, WAIT_TIME);
     }
 
+    // TODO: separate validate words and calculate score in 2 methods?
     validateWordsAndCalculateScore(newWords: ScrabbleWord[]): number {
         let totalScore = 0;
 
