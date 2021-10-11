@@ -1,6 +1,7 @@
 import { DefaultCommandParams, ExchangeParams } from '@app/classes/commands';
 import { createExchangeCmd, ExchangeCmd } from '@app/classes/exchange-command';
 import { BonusService } from '@app/services/bonus.service';
+import { ChatDisplayService } from '@app/services/chat-display.service';
 import { GridService } from '@app/services/grid.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
@@ -14,8 +15,9 @@ describe('ExchangeCmd', () => {
     const grid = new GridService();
     const bonus = new BonusService(grid);
     const validation = new ValidationService(grid, bonus);
-    const wordBuilder = new WordBuilderService();
-    const service = new SoloGameService(grid, rack, validation, wordBuilder);
+    const wordBuilder = new WordBuilderService();    
+    const chatDisplay =  new ChatDisplayService();
+    const service = new SoloGameService(grid, rack, chatDisplay, validation, wordBuilder);
     const defaultParams: DefaultCommandParams = { player: playerchoice, serviceCalled: service };
     const specificParams: ExchangeParams = 'test';
     const exchange = new ExchangeCmd(defaultParams, 'amd');

@@ -14,7 +14,7 @@ import { LetterStock } from '@app/services/letter-stock.service';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
-import { ValidationService } from './validation.service';
+import { ValidationService, WAIT_TIME } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 export const TIMER_INTERVAL = 1000;
 const DEFAULT_LETTER_COUNT = 7;
@@ -306,22 +306,19 @@ export class SoloGameService {
         }
 
         // Call validation method and end turn
-        if (this.validationService.validateWordsAndCalculateScore(tempScrabbleWords) === 0) {
-            // Retake lettres
-        } else {
-            // Score
-            this.validationService.updatePlayerScore(tempScrabbleWords, player);
-            // Take new letters
-            const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-            for (const letter of newLetters) {
-                this.rackService.addLetter(letter);
-                player.letters.push(letter);
+        this.validationService.updatePlayerScore(tempScrabbleWords, this.localPlayer);
+        setTimeout(() => {
+            if (this.validationService.isTimerElapsed === true) {
+                this.changeActivePlayer();
+                this.drawRack(tempScrabbleWords);
+                const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+                for (const letter of newLetters) {
+                    this.rackService.addLetter(letter);
+                    player.letters.push(letter);
+                }
             }
-        }
+        }, WAIT_TIME);
 
-        // Pass turn
-        this.passTurn(this.localPlayer);
-        this.passTurn(this.localPlayer);
         // TODO Optional : update la vue de ScrabbleLetter automatically
         return ErrorType.NoError; // TODO change to "no error"
     }
