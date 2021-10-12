@@ -69,6 +69,7 @@ describe('GridService', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
         const letter: ScrabbleLetter = new ScrabbleLetter('D', 11);
         service.scrabbleBoard.squares[5][6].letter = letter;
+        service.scrabbleBoard.squares[5][6].occupied = true;
         service.drawLetters();
         expect(fillTextSpy).toHaveBeenCalled();
     });
@@ -77,6 +78,7 @@ describe('GridService', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
         const letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
         service.scrabbleBoard.squares[5][6].letter = letter;
+        service.scrabbleBoard.squares[5][6].occupied = true;
         service.drawLetters();
         expect(fillTextSpy).toHaveBeenCalled();
     });

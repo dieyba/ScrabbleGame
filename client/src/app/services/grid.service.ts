@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleLetter, UNPLACED } from '@app/classes/scrabble-letter';
 import { Square, SquareColor } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
 
@@ -168,7 +168,7 @@ export class GridService {
     drawLetters(): void {
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
-                if (this.scrabbleBoard.squares[i][j].letter != null) {
+                if (this.scrabbleBoard.squares[i][j].occupied === true) {
                     const positionX = (this.width * i) / BOARD_SIZE + BOARD_OFFSET;
                     const positionY = (this.height * j) / BOARD_SIZE + BOARD_OFFSET;
 
@@ -234,5 +234,30 @@ export class GridService {
         this.drawGrid();
         this.drawColors();
         this.drawLetters();
+    }
+
+    removeInvalidLetters(coord: Vec2, length: number, orientation: string): ScrabbleLetter[] {
+        const removedScrabbleLetters: ScrabbleLetter[] = [];
+        for (let i = 0; i < length; i++) {
+            if (orientation === 'v') {
+                if (this.scrabbleBoard.squares[coord.x][coord.y + i].isValidated === false) {
+                    removedScrabbleLetters.push(this.scrabbleBoard.squares[coord.x][coord.y + i].letter);
+                    this.scrabbleBoard.squares[coord.x][coord.y + i].letter.tile = new Square(UNPLACED, UNPLACED);
+                    this.scrabbleBoard.squares[coord.x][coord.y + i].occupied = false;
+                    this.scrabbleBoard.squares[coord.x][coord.y + i].letter = new ScrabbleLetter('', 0);
+                    this.removeSquare(coord.x, coord.y + i);
+                }
+            }
+            if (orientation === 'h') {
+                if (this.scrabbleBoard.squares[coord.x + i][coord.y].isValidated === false) {
+                    removedScrabbleLetters.push(this.scrabbleBoard.squares[coord.x + i][coord.y].letter);
+                    this.scrabbleBoard.squares[coord.x + i][coord.y].letter.tile = new Square(UNPLACED, UNPLACED);
+                    this.scrabbleBoard.squares[coord.x + i][coord.y].occupied = false;
+                    this.scrabbleBoard.squares[coord.x + i][coord.y].letter = new ScrabbleLetter('', 0);
+                    this.removeSquare(coord.x + i, coord.y);
+                }
+            }
+        }
+        return removedScrabbleLetters;
     }
 }
