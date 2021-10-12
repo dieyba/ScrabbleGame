@@ -3,8 +3,11 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ErrorType } from '@app/classes/errors';
 import { LocalPlayer } from '@app/classes/local-player';
+import { Column, Row, ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { Vec2 } from '@app/classes/vec2';
 import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
+import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 import { SoloGameService } from './solo-game.service';
 
@@ -15,24 +18,32 @@ const DEFAULT_HEIGHT = 600;
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('GameService', () => {
     let service: SoloGameService;
-    const spyPlayer: LocalPlayer = new LocalPlayer('sara');
+    let spyPlayer: LocalPlayer;
     let changeActivePlayerSpy: jasmine.Spy<any>;
     let secondsToMinutesSpy: jasmine.Spy<any>;
     let startCountdownSpy: jasmine.Spy<any>;
+    let gridServiceSpy: jasmine.SpyObj<GridService>;
     let addRackLettersSpy: jasmine.Spy<any>;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
     let ctxStub: CanvasRenderingContext2D;
     beforeEach(() => {
         ctxStub = CanvasTestHelper.createCanvas(DEFAULT_WIDTH, DEFAULT_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
-        rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'drawLetter', 'removeLetter', 'addLetter']);
+        gridServiceSpy = jasmine.createSpyObj('GridService', ['drawLetter', 'drawLetters'], { scrabbleBoard: new ScrabbleBoard() });
+        rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'drawLetter', 'removeLetter', 'addLetter'], {
+            rackLetters: [] as ScrabbleLetter[],
+        });
         TestBed.configureTestingModule({
-            providers: [{ provide: RackService, useValue: rackServiceSpy }],
+            providers: [
+                { provide: GridService, useValue: gridServiceSpy },
+                { provide: RackService, useValue: rackServiceSpy },
+            ],
         });
         service = TestBed.inject(SoloGameService);
         changeActivePlayerSpy = spyOn<any>(service, 'changeActivePlayer').and.callThrough();
         secondsToMinutesSpy = spyOn<any>(service, 'secondsToMinutes').and.callThrough();
         startCountdownSpy = spyOn<any>(service, 'startCountdown').and.callThrough();
         addRackLettersSpy = spyOn<any>(service, 'addRackLetters').and.callThrough();
+        spyPlayer = new LocalPlayer('sara');
 
         const level = new FormControl('easy', [Validators.required]);
         const name = new FormControl('Ariane', [Validators.required, Validators.pattern('[a-zA-Z]*')]);
@@ -171,5 +182,135 @@ describe('GameService', () => {
         const error = ErrorType.ImpossibleCommand;
 
         expect(service.exchangeLetters(spyPlayer, 'a')).toEqual(error);
+    });
+
+    it('canPlaceWord should be false when word is outside of scrabble board', () => {
+        spyPlayer.isActive = true;
+        const placeParams = { position: new Vec2(Column.Fifteen, 0), orientation: 'h', word: 'myWord' };
+
+        expect(service.canPlaceWord(spyPlayer, placeParams)).toEqual(false);
+    });
+
+    it("'canPlaceWord' should be false if first the word is not in the middle or touching another word", () => {
+        spyPlayer.isActive = true;
+        const placeParams = { position: new Vec2(Column.Seven, Row.G), orientation: 'h', word: 'myWord' };
+        expect(service.canPlaceWord(spyPlayer, placeParams)).toEqual(false);
+    });
+
+    it("'canPlaceWord' should be true if first the word is in the middle", () => {
+        spyPlayer.isActive = true;
+        const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'myWord' };
+
+        expect(service.canPlaceWord(spyPlayer, placeParams)).toEqual(true);
+    });
+
+    it("'canPlaceWord' should be true if the word is touching another word", () => {
+        // Placing first word
+        const firstWord = 'maison';
+        for (let i = 0; i < firstWord.length; i++) {
+            // eslint-disable-next-line dot-notation
+            service['gridService'].scrabbleBoard.squares[Column.Eight][Row.H + i].letter = new ScrabbleLetter(firstWord[i], 1);
+            // eslint-disable-next-line dot-notation
+            service['gridService'].scrabbleBoard.squares[Column.Eight][Row.H + i].occupied = true;
+        }
+
+        spyPlayer.isActive = true;
+        const placeParams = { position: new Vec2(Column.Nine, Row.G), orientation: 'v', word: 'maison' };
+
+        expect(service.canPlaceWord(spyPlayer, placeParams)).toEqual(true);
+    });
+
+    it("'canPlaceWord' should be false if it's not the player's turn", () => {
+        spyPlayer.isActive = false;
+        const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'myWord' };
+
+        expect(service.canPlaceWord(spyPlayer, placeParams)).toEqual(false);
+    });
+
+    it('"placeLetter" should remove letter from the rack and place it to the board', () => {
+        const playerLetters: ScrabbleLetter[] = [];
+        const letterA = new ScrabbleLetter('a', 1);
+        const letterStar = new ScrabbleLetter('*', 0);
+        playerLetters.push(letterA);
+        playerLetters.push(letterStar);
+        const letterToPlace = 'a';
+        const coord = new Vec2(Column.Eight, Row.H);
+
+        service.placeLetter(playerLetters, letterToPlace, coord);
+
+        // Searching letter in playerLetter
+        let playerLetter: ScrabbleLetter | undefined;
+        for (const letter of playerLetters) {
+            if (letter.character === letterToPlace) {
+                playerLetter = letter;
+            }
+        }
+        expect(gridServiceSpy.drawLetter).toHaveBeenCalled();
+        expect(rackServiceSpy.removeLetter).toHaveBeenCalled();
+        expect(playerLetter).toEqual(undefined);
+        // eslint-disable-next-line dot-notation
+        expect(letterA.tile).toEqual(service['gridService'].scrabbleBoard.squares[coord.x][coord.y]);
+    });
+
+    it('"placeLetter" should remove letter from the rack and place it to the board', () => {
+        const playerLetters: ScrabbleLetter[] = [];
+        const letterA = new ScrabbleLetter('a', 1);
+        const letterStar = new ScrabbleLetter('*', 0);
+        playerLetters.push(letterA);
+        playerLetters.push(letterStar);
+        const letterToPlace = 'A';
+        const coord = new Vec2(Column.Eight, Row.H);
+
+        service.placeLetter(playerLetters, letterToPlace, coord);
+
+        // Searching letter in playerLetter
+        let playerLetter: ScrabbleLetter | undefined;
+        for (const letter of playerLetters) {
+            if (letter.character === letterToPlace) {
+                playerLetter = letter;
+            }
+        }
+        expect(gridServiceSpy.drawLetter).toHaveBeenCalled();
+        expect(rackServiceSpy.removeLetter).toHaveBeenCalled();
+        expect(playerLetter).toEqual(undefined);
+        // eslint-disable-next-line dot-notation
+        expect(letterStar.tile).toEqual(service['gridService'].scrabbleBoard.squares[coord.x][coord.y]);
+    });
+
+    it('"placeLetter" should not place letter if the is already a letter', () => {
+        const playerLetters: ScrabbleLetter[] = [];
+        const letterA = new ScrabbleLetter('a', 1);
+        const letterStar = new ScrabbleLetter('*', 0);
+        playerLetters.push(letterA);
+        playerLetters.push(letterStar);
+        const letterToPlace = 'a';
+        const coord = new Vec2(Column.Eight, Row.H);
+
+        // eslint-disable-next-line dot-notation
+        service['gridService'].scrabbleBoard.squares[coord.x][coord.y].occupied = true; // No need to place a real letter
+        service.placeLetter(playerLetters, letterToPlace, coord);
+
+        // Searching letter in playerLetter
+        let playerLetter: ScrabbleLetter | undefined;
+        for (const letter of playerLetters) {
+            if (letter.character === letterToPlace) {
+                playerLetter = letter;
+            }
+        }
+        expect(gridServiceSpy.drawLetter).not.toHaveBeenCalled();
+        expect(rackServiceSpy.removeLetter).not.toHaveBeenCalled();
+        expect(playerLetter).toEqual(letterA);
+        // When coord are negative, it means that the letter is not placed
+        expect(letterA.tile.position.x).toEqual(-1);
+        expect(letterA.tile.position.y).toEqual(-1);
+    });
+
+    it('"place" should return a syntax error if it\'s not possible to place the word', () => {
+        spyOn(service, 'canPlaceWord').and.returnValue(false);
+
+        spyPlayer.isActive = true;
+        const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'myWord' };
+
+        expect(service.place(spyPlayer, placeParams)).toEqual(ErrorType.SyntaxError);
     });
 });
