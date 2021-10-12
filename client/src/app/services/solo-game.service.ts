@@ -180,8 +180,8 @@ export class SoloGameService {
     }
 
     addRackLetters(letters: ScrabbleLetter[]): void {
-        for (let i = 0; i < DEFAULT_LETTER_COUNT; i++) {
-            this.addRackLetter(letters[i]);
+        for (const letter of letters) {
+            this.addRackLetter(letter);
         }
     }
 
@@ -234,7 +234,7 @@ export class SoloGameService {
             return ErrorType.SyntaxError;
         }
         // Removing all the letters from my "word" that are already on the board
-        let wordCopy = placeParams.word.toLowerCase();
+        let wordCopy = placeParams.word;
         const letterOnBoard = this.gridService.scrabbleBoard.getStringFromCoord(
             placeParams.position,
             placeParams.word.length,
@@ -242,7 +242,7 @@ export class SoloGameService {
         );
 
         for (const letter of letterOnBoard) {
-            wordCopy = wordCopy.replace(letter, '');
+            wordCopy = wordCopy.replace(letter.toLowerCase(), '');
         }
 
         // All letter are already placed
@@ -252,14 +252,23 @@ export class SoloGameService {
 
         // Checking if the rest of the letters are on the rack
         for (const letter of player.letters) {
-            wordCopy = wordCopy.replace(letter.character, '');
+            // If there is an star, removing a upper letter from "word" string
+            if (letter.character === '*') {
+                let upperLetter = '';
+                for (const wordLetter of wordCopy) {
+                    if (wordLetter === wordLetter.toUpperCase()) {
+                        upperLetter = wordLetter;
+                    }
+                }
+                wordCopy = wordCopy.replace(upperLetter, '');
+            } else {
+                wordCopy = wordCopy.replace(letter.character, '');
+            }
         }
-
         // There should be no letters left, else there is not enough letter on the rack to place de "word"
         if (wordCopy !== '') {
             return ErrorType.SyntaxError;
         }
-
         // Placing letters
         tempCoord.clone(placeParams.position);
         for (const letter of placeParams.word) {
@@ -273,7 +282,6 @@ export class SoloGameService {
                 tempCoord.y++;
             }
         }
-
         // Generate all words created
         let tempScrabbleWords: ScrabbleWord[];
         if (placeParams.orientation === 'h') {
@@ -281,10 +289,11 @@ export class SoloGameService {
         } else {
             tempScrabbleWords = this.wordBuilder.buildWordOnBoard(placeParams.word, placeParams.position, WordOrientation.Vertical);
         }
-
         // Call validation method and end turn
         if (this.validationService.validateWordsAndCalculateScore(tempScrabbleWords) === 0) {
-            // Retake lettres
+            // Retake letters
+            const removedLetters = this.gridService.removeInvalidLetters(placeParams.position, placeParams.word.length, placeParams.orientation);
+            this.addRackLetters(removedLetters);
         } else {
             // Score
             this.validationService.updatePlayerScore(tempScrabbleWords, player);
@@ -295,12 +304,8 @@ export class SoloGameService {
                 player.letters.push(letter);
             }
         }
-
         this.passTurn();
-        this.passTurn();
-
-        // TODO Optional : update la vue de ScrabbleLetter automatically
-        return ErrorType.NoError; // TODO change to "no error"
+        return ErrorType.NoError;
     }
 
     placeLetter(playerLetters: ScrabbleLetter[], letter: string, position: Vec2) {
@@ -308,9 +313,17 @@ export class SoloGameService {
         if (this.gridService.scrabbleBoard.squares[position.x][position.y].occupied) {
             return;
         }
-
+        // Making a temporary letter and checking if "*" is needed (for upper cases)
+        let tempLetter = letter;
+        if (tempLetter === tempLetter.toUpperCase()) {
+            tempLetter = '*';
+        }
         for (let i = 0; i < playerLetters.length; i++) {
-            if (playerLetters[i].character === letter) {
+            if (playerLetters[i].character === tempLetter) {
+                if (letter === letter.toUpperCase()) {
+                    playerLetters[i].character = letter;
+                }
+                playerLetters[i].tile = this.gridService.scrabbleBoard.squares[position.x][position.y];
                 this.gridService.drawLetter(playerLetters[i], position.x, position.y);
                 this.rackService.removeLetter(playerLetters[i]);
                 playerLetters.splice(i, 1);
