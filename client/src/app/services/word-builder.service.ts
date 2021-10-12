@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
+import { ScrabbleWord } from '@app/classes/scrabble-word';
+import { Axis, invertAxis } from '@app/classes/utilities';
 import { GridService } from './grid.service';
 import { Vec2 } from '@app/classes/vec2';
 
@@ -15,13 +16,12 @@ const MIN_WORD_LENGHT = 2;
 export class WordBuilderService {
     constructor(private gridService: GridService) {}
 
-    buildWordOnBoard(word: string, coord: Vec2, axis: WordOrientation): ScrabbleWord[] {
+    buildWordsOnBoard(word: string, coord: Vec2, axis: Axis): ScrabbleWord[] {
         const result: ScrabbleWord[] = [];
 
         // get full word that can be read on the placed word's row/column
         let wordBuilt = this.buildScrabbleWord(coord, axis);
         const placedWord = wordBuilt;
-        console.log('placed word: ' + wordBuilt.stringify());
         if (wordBuilt.content.length >= MIN_WORD_LENGHT) {
             result.push(wordBuilt);
         }
@@ -31,22 +31,20 @@ export class WordBuilderService {
             const currentCoord = letter.tile.position;
             // if the current letter is not a newly placed letter, there is no need to check if word can be built from it
             if (this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y].isValidated) {
-                console.log('letter ' + letter.character + ' at (' + currentCoord.x + ',' + currentCoord.y + ') was already validated');
                 continue;
             }
 
-            const oppositeAxis = axis === WordOrientation.Horizontal ? WordOrientation.Vertical : WordOrientation.Horizontal;
+            const oppositeAxis = invertAxis[axis];
             wordBuilt = this.buildScrabbleWord(currentCoord, oppositeAxis);
             if (wordBuilt.content.length >= MIN_WORD_LENGHT) {
                 result.push(wordBuilt);
-                console.log('found the word ' + wordBuilt.stringify() + ' based on the placed letter ' + letter.character);
             }
         }
         return result;
     }
 
     // out of range begining coord or square without a letter at the begining coord will return the begining coord
-    findWordEdge(coord: Vec2, axis: WordOrientation, isTowardStart: boolean): Vec2 {
+    findWordEdge(coord: Vec2, axis: Axis, isTowardStart: boolean): Vec2 {
         if (!this.gridService.scrabbleBoard.isCoordInsideBoard(coord)) {
             return coord;
         }
@@ -54,7 +52,7 @@ export class WordBuilderService {
         const currentCoord = new Vec2(coord.x, coord.y);
         const nextCoord = new Vec2(coord.x, coord.y);
         do {
-            if (axis === WordOrientation.Horizontal) {
+            if (axis === Axis.H) {
                 currentCoord.x = nextCoord.x;
                 nextCoord.x += step;
             } else {
@@ -70,13 +68,13 @@ export class WordBuilderService {
         return currentCoord;
     }
 
-    buildScrabbleWord(coord: Vec2, axis: WordOrientation): ScrabbleWord {
+    buildScrabbleWord(coord: Vec2, axis: Axis): ScrabbleWord {
         const word = new ScrabbleWord();
         if (this.gridService.scrabbleBoard.isCoordInsideBoard(coord)) {
             const startCoord = this.findWordEdge(coord, axis, TOWARD_START);
             const endCoord = this.findWordEdge(coord, axis, TOWARD_END);
             // Adding 1 to get the correct word lenght since coordinates start at 0
-            const lenght = axis === WordOrientation.Horizontal ? endCoord.x - startCoord.x + 1 : endCoord.y - startCoord.y + 1;
+            const lenght = axis === Axis.H ? endCoord.x - startCoord.x + 1 : endCoord.y - startCoord.y + 1;
             word.startPosition = startCoord;
             word.orientation = axis;
 
@@ -87,7 +85,7 @@ export class WordBuilderService {
                 word.content[i] = currentLetter;
                 word.value += currentLetter.value;
 
-                if (axis === WordOrientation.Horizontal) {
+                if (axis === Axis.H) {
                     currentCoord.x += 1;
                 } else {
                     currentCoord.y += 1;

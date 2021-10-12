@@ -4,7 +4,7 @@ import { ScrabbleBoard, Row, Column, BOARD_SIZE } from '@app/classes/scrabble-bo
 import { WordBuilderService } from './word-builder.service';
 import { Vec2 } from '@app/classes/vec2';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { WordOrientation } from '@app/classes/scrabble-word';
+import { Axis } from '@app/classes/utilities';
 
 const TOWARD_START = true;
 
@@ -36,12 +36,12 @@ describe('WordBuilderService', () => {
         service['gridService'].scrabbleBoard.squares[centerCoord.x][centerCoord.y].letter = new ScrabbleLetter('a', 1);
         service['gridService'].scrabbleBoard.squares[centerCoord.x][centerCoord.y].occupied = true;
 
-        expect(service.findWordEdge(centerCoord, WordOrientation.Horizontal, TOWARD_START)).toEqual(centerCoord);
-        expect(service.findWordEdge(centerCoord, WordOrientation.Horizontal, !TOWARD_START)).toEqual(centerCoord);
-        expect(service.findWordEdge(centerCoord, WordOrientation.Vertical, TOWARD_START)).toEqual(centerCoord);
-        expect(service.findWordEdge(centerCoord, WordOrientation.Vertical, !TOWARD_START)).toEqual(centerCoord);
-        expect(service.findWordEdge(emptySquareCoord, WordOrientation.Horizontal, TOWARD_START)).toEqual(emptySquareCoord);
-        expect(service.findWordEdge(outsideBoardCoord, WordOrientation.Vertical, !TOWARD_START)).toEqual(outsideBoardCoord);
+        expect(service.findWordEdge(centerCoord, Axis.H, TOWARD_START)).toEqual(centerCoord);
+        expect(service.findWordEdge(centerCoord, Axis.H, !TOWARD_START)).toEqual(centerCoord);
+        expect(service.findWordEdge(centerCoord, Axis.V, TOWARD_START)).toEqual(centerCoord);
+        expect(service.findWordEdge(centerCoord, Axis.V, !TOWARD_START)).toEqual(centerCoord);
+        expect(service.findWordEdge(emptySquareCoord, Axis.H, TOWARD_START)).toEqual(emptySquareCoord);
+        expect(service.findWordEdge(outsideBoardCoord, Axis.V, !TOWARD_START)).toEqual(outsideBoardCoord);
     });
 
     it('should find coordinates of first and last horizontal letter', () => {
@@ -54,8 +54,8 @@ describe('WordBuilderService', () => {
             service['gridService'].scrabbleBoard.squares[startCoord.x + i][startCoord.y].occupied = true;
         }
 
-        expect(service.findWordEdge(initialCoord, WordOrientation.Horizontal, TOWARD_START)).toEqual(startCoord);
-        expect(service.findWordEdge(initialCoord, WordOrientation.Horizontal, !TOWARD_START)).toEqual(endCoordHorizontal);
+        expect(service.findWordEdge(initialCoord, Axis.H, TOWARD_START)).toEqual(startCoord);
+        expect(service.findWordEdge(initialCoord, Axis.H, !TOWARD_START)).toEqual(endCoordHorizontal);
     });
 
     it('should find coordinates of first and last vertical letter', () => {
@@ -68,8 +68,8 @@ describe('WordBuilderService', () => {
             service['gridService'].scrabbleBoard.squares[startCoord.x][startCoord.y + j].occupied = true;
         }
 
-        expect(service.findWordEdge(initialCoord, WordOrientation.Vertical, TOWARD_START)).toEqual(startCoord);
-        expect(service.findWordEdge(initialCoord, WordOrientation.Vertical, !TOWARD_START)).toEqual(endCoordVertical);
+        expect(service.findWordEdge(initialCoord, Axis.V, TOWARD_START)).toEqual(startCoord);
+        expect(service.findWordEdge(initialCoord, Axis.V, !TOWARD_START)).toEqual(endCoordVertical);
     });
 
     // wip
@@ -81,17 +81,17 @@ describe('WordBuilderService', () => {
             service['gridService'].scrabbleBoard.squares[i][0].letter = new ScrabbleLetter('a', 1);
             service['gridService'].scrabbleBoard.squares[i][0].occupied = true;
         }
-        expect(service.findWordEdge(topCenter, WordOrientation.Horizontal, TOWARD_START)).toEqual(topLeft);
-        expect(service.findWordEdge(topCenter, WordOrientation.Horizontal, !TOWARD_START)).toEqual(topRight);
+        expect(service.findWordEdge(topCenter, Axis.H, TOWARD_START)).toEqual(topLeft);
+        expect(service.findWordEdge(topCenter, Axis.H, !TOWARD_START)).toEqual(topRight);
     });
 
-    // buildScrabbleWord(word: string, coord: Vec2, axis: WordOrientation)
+    // buildScrabbleWord(word: string, coord: Vec2, axis: Axis)
     // build word from empty square = should be empty word
     // build word from one letter square = should be empty word
     // try build from out of bound coord = should be empty word
     // build normal word in both orientation = should return scrabble word of the word
 
-    // buildWordsOnBoard(coord: Vec2, axis: WordOrientation):
+    // buildWordsOnBoard(coord: Vec2, axis: Axis):
     // try putting out of bound coord
     // put word surrounded by tiles = should be all those words
     // put words surrounded by tiles, first placed letter already validated

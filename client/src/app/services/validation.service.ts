@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { Player } from '@app/classes/player';
-import { Axis, ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { Axis } from '@app/classes/utilities';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Vec2 } from '@app/classes/vec2';
 import { BonusService } from './bonus.service';
@@ -9,7 +10,7 @@ import { BOARD_SIZE, GridService } from './grid.service';
 
 const BONUS_LETTER_COUNT = 7;
 const BONUS_POINTS = 50;
-const WAIT_TIME = 3000;
+export const WAIT_TIME = 3000;
 
 @Injectable({
     providedIn: 'root',
@@ -17,10 +18,12 @@ const WAIT_TIME = 3000;
 export class ValidationService {
     dictionary: Dictionary;
     words: string[];
+    isTimerElapsed: boolean;
 
     constructor(private readonly gridService: GridService, private bonusService: BonusService) {
         this.dictionary = new Dictionary(DictionaryType.Default);
         this.words = [];
+        this.isTimerElapsed = false;
     }
     /* eslint-disable no-unused-vars */
     isPlacable(arg0: ScrabbleWord, arg1: Vec2, axis: Axis): boolean {
@@ -46,6 +49,7 @@ export class ValidationService {
                     }
                 });
             }
+            this.isTimerElapsed = true; // TODO: ca va ou ca?
         }, WAIT_TIME);
     }
 

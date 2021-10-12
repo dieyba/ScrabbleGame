@@ -3,16 +3,6 @@ import { Square, SquareColor } from './square';
 export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;
 
-export enum Axis {
-    H = 'h',
-    V = 'v',
-}
-// eslint-disable-next-line no-unused-vars
-export const invertAxis = {
-    [Axis.H]: Axis.V,
-    [Axis.V]: Axis.H, // Vertical is the opposite of horizontal
-};
-
 export enum Direction {
     North = 0,
     East = 1,
@@ -46,7 +36,6 @@ export class ScrabbleLetter {
         this.value = DARK_BLUE_FACTOR * this.value;
     }
     setLetter(character: string): void {
-        this.character = character;
-        this.character = this.character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        this.character = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 }
