@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 
 export const RACK_WIDTH = 500;
@@ -6,6 +7,7 @@ export const RACK_HEIGHT = 60;
 const MAX_LETTER_COUNT = 7;
 const OFFSET = 5;
 const DOUBLE_DIGIT = 10;
+const SQUARE_WIDTH = 71;
 
 @Injectable({
     providedIn: 'root',
@@ -80,5 +82,37 @@ export class RackService {
         } else {
             this.gridContext.fillText(String(this.rackLetters[position].value), positionX + RACK_HEIGHT - OFFSET, 0 + RACK_HEIGHT - OFFSET);
         }
+    }
+
+    findSquareOrigin(position: number): number {
+        return (RACK_WIDTH * (position - 1)) / MAX_LETTER_COUNT;
+    }
+
+    selectForExchange(position: number, ctx: CanvasRenderingContext2D, player: LocalPlayer) {
+        // const squareOrigin = this.findSquareOrigin(position);
+        ctx.fillStyle = 'orange';
+        player.exchangeSelected[position - 1] = true;
+        this.handleExchangeSelection(position, ctx);
+    }
+
+    deselectForExchange(position: number, ctx: CanvasRenderingContext2D, player: LocalPlayer) {
+        // const squareOrigin = this.findSquareOrigin(position);
+        ctx.fillStyle = 'white';
+        player.exchangeSelected[position - 1] = false;
+        this.handleExchangeSelection(position, ctx);
+        this.drawRack();
+    }
+
+    deselectAll(player: LocalPlayer) {
+        for (let i = 0; i < player.exchangeSelected.length; i++) {
+            player.exchangeSelected[i] = false;
+        }
+        this.drawRack();
+    }
+
+    handleExchangeSelection(position: number, ctx: CanvasRenderingContext2D) {
+        const squareOrigin = this.findSquareOrigin(position);
+        ctx.fillRect(squareOrigin, 0, SQUARE_WIDTH, RACK_HEIGHT);
+        this.drawExistingLetters();
     }
 }

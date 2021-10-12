@@ -163,7 +163,7 @@ export class SoloGameService {
             const lettersToRemove: ScrabbleLetter[] = [];
             if (player.removeLetter(letters) === true) {
                 for (let i = 0; i < letters.length; i++) {
-                    lettersToRemove[i] = new ScrabbleLetter(letters[i], 1);
+                    lettersToRemove[i] = new ScrabbleLetter(letters[i]);
                 }
 
                 const lettersToAdd: ScrabbleLetter[] = this.stock.exchangeLetters(lettersToRemove);
@@ -177,6 +177,19 @@ export class SoloGameService {
             }
         }
         return ErrorType.ImpossibleCommand;
+    }
+
+    exchangeLettersSelected(player: LocalPlayer) {
+        let letters = '';
+
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < player.exchangeSelected.length; i++) {
+            if (player.exchangeSelected[i] === true) {
+                letters += player.letters[i].character;
+            }
+        }
+
+        this.exchangeLetters(player, letters);
     }
 
     addRackLetters(letters: ScrabbleLetter[]): void {
