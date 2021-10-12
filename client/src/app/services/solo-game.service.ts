@@ -121,7 +121,6 @@ export class SoloGameService {
             this.timerMs = +this.totalCountDown;
             this.secondsToMinutes();
             this.startCountdown();
-            this.passTurn(this.virtualPlayer);
         } else {
             // If the rack is empty, end game + player won
             if (this.virtualPlayer.letters.length === 0 && this.stock.isEmpty()) {

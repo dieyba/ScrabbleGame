@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
-import { ValidationService } from './validation.service';
+import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Vec2 } from '@app/classes/vec2';
+import { BonusService } from './bonus.service';
 import { GridService } from './grid.service';
+import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
@@ -30,7 +31,12 @@ const POSITION_ERROR = -1;
 export class VirtualPlayerService {
     rack: ScrabbleRack;
 
-    constructor(private validationService: ValidationService, private gridService: GridService, private wordBuilderService: WordBuilderService) {
+    constructor(
+        private validationService: ValidationService,
+        private gridService: GridService,
+        private wordBuilderService: WordBuilderService,
+        private bonusService: BonusService,
+    ) {
         // TODO Implement timer (3s and 20s limit)
         this.rack = new ScrabbleRack();
         // const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
@@ -142,7 +148,7 @@ export class VirtualPlayerService {
                     for (let l = 0; l < list.length; l++) {
                         // Remove elements of the list which aren't valid with the points constraint
                         if (this.validationService.isPlacable(list[l], this.findPosition(list[l], axis), axis)) {
-                            if (list[l].totalValue() > points || list[l].totalValue() < points - POINTS_INTERVAL) {
+                            if (this.bonusService.totalValue(list[l]) > points || this.bonusService.totalValue(list[l]) < points - POINTS_INTERVAL) {
                                 list.splice(l);
                             } else {
                                 const currentWord = list[l].stringify();
@@ -203,7 +209,7 @@ export class VirtualPlayerService {
                         message += ' '; // If it's the last letter
                     } else message += '  '; // If it's not
                 }
-                message += i.totalValue() + '\n'; // Add score for each move
+                message += this.bonusService.totalValue(i) + '\n'; // Add score for each move
             }
         return message;
     }
