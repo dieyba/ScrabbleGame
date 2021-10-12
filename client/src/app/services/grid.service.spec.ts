@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
+import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { SquareColor } from '@app/classes/square';
 import { GridService } from '@app/services/grid.service';
@@ -17,6 +18,9 @@ describe('GridService', () => {
         service = TestBed.inject(GridService);
         ctxStub = CanvasTestHelper.createCanvas(DEFAULT_WIDTH, DEFAULT_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
         service.gridContext = ctxStub;
+
+        service.scrabbleBoard = new ScrabbleBoard();
+        service.scrabbleBoard.generateBoard();
     });
 
     it('should be created', () => {
@@ -103,7 +107,85 @@ describe('GridService', () => {
 
     it('removeSquare should call drawSingleSquareColor', () => {
         const spy = spyOn(service, 'drawSingleSquareColor');
+        service.scrabbleBoard.squares[5][7].letter = new ScrabbleLetter('', 0);
         service.removeSquare(5, 7);
         expect(spy).toHaveBeenCalled();
+    });
+
+    // it('removeSquare should not remove validated letters', () => {
+    //     const spy = spyOn(service, 'drawSingleSquareColor');
+    //     service.scrabbleBoard.squares[5][5].isValidated = true;
+    //     service.removeSquare(5, 5);
+    //     expect(spy).not.toHaveBeenCalled();
+    // });
+
+    it('drawSingleSquareColor should use fillRect and fillText if square is unoccupied (dark blue)', () => {
+        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+        const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
+        service.scrabbleBoard.squares[5][5].color = SquareColor.DarkBlue;
+        service.scrabbleBoard.squares[5][5].occupied = false;
+        service.drawSingleSquareColor(5, 5);
+        expect(fillTextSpy).toHaveBeenCalled();
+        expect(fillRectSpy).toHaveBeenCalled();
+    });
+
+    it('drawSingleSquareColor should use fillRect and not fillText if square is occupied (dark blue)', () => {
+        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+        const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
+        service.scrabbleBoard.squares[5][5].color = SquareColor.DarkBlue;
+        service.scrabbleBoard.squares[5][5].occupied = true;
+        service.drawSingleSquareColor(5, 5);
+        expect(fillTextSpy).not.toHaveBeenCalled();
+        expect(fillRectSpy).toHaveBeenCalled();
+    });
+
+    it('drawSingleSquareColor should use fillRect and fillText if square is unoccupied (red)', () => {
+        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+        const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
+        service.scrabbleBoard.squares[0][0].color = SquareColor.Red;
+        service.scrabbleBoard.squares[0][0].occupied = false;
+        service.drawSingleSquareColor(0, 0);
+        expect(fillTextSpy).toHaveBeenCalled();
+        expect(fillRectSpy).toHaveBeenCalled();
+    });
+
+    it('drawSingleSquareColor should use fillRect and not fillText if square is occupied (red)', () => {
+        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+        const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
+        service.scrabbleBoard.squares[0][0].color = SquareColor.Red;
+        service.scrabbleBoard.squares[0][0].occupied = true;
+        service.drawSingleSquareColor(0, 0);
+        expect(fillTextSpy).not.toHaveBeenCalled();
+        expect(fillRectSpy).toHaveBeenCalled();
+    });
+
+    it('drawSingleSquareColor should use fillRect and fillText if square is unoccupied (teal)', () => {
+        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+        const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
+        service.scrabbleBoard.squares[6][6].color = SquareColor.Teal;
+        service.scrabbleBoard.squares[6][6].occupied = false;
+        service.drawSingleSquareColor(6, 6);
+        expect(fillTextSpy).toHaveBeenCalled();
+        expect(fillRectSpy).toHaveBeenCalled();
+    });
+
+    it('drawSingleSquareColor should use fillRect and not fillText if square is occupied (teal)', () => {
+        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+        const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
+        service.scrabbleBoard.squares[6][6].color = SquareColor.Teal;
+        service.scrabbleBoard.squares[6][6].occupied = true;
+        service.drawSingleSquareColor(6, 6);
+        expect(fillTextSpy).not.toHaveBeenCalled();
+        expect(fillRectSpy).toHaveBeenCalled();
+    });
+
+    it('drawSingleSquareColor should use fillRect and not fillText if square is occupied (teal)', () => {
+        const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
+        const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
+        service.scrabbleBoard.squares[1][1].color = SquareColor.Pink;
+        service.scrabbleBoard.squares[1][1].occupied = true;
+        service.drawSingleSquareColor(1, 1);
+        expect(fillTextSpy).not.toHaveBeenCalled();
+        expect(fillRectSpy).toHaveBeenCalled();
     });
 });

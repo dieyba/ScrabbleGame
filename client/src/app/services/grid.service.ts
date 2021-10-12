@@ -81,11 +81,17 @@ export class GridService {
         }
     }
 
-    removeSquare(i: number, j: number) {
+    // reset tile and returns the letter that was on it
+    removeSquare(i: number, j: number): ScrabbleLetter {
+        // Saving information about square
         const color = this.scrabbleBoard.squares[i][j].color;
+        const letter = this.scrabbleBoard.squares[i][j].letter;
+        // Unassign the letter and the letter coordinates (tile)
+        this.scrabbleBoard.squares[i][j].letter.tile = new Square(UNPLACED, UNPLACED);
         this.scrabbleBoard.squares[i][j] = new Square(i, j);
         this.scrabbleBoard.squares[i][j].color = color;
         this.drawSingleSquareColor(i, j);
+        return letter;
     }
 
     // To remove a square, set scrabbleBoard.squares[x][y].occupied to false, set scrabbleBoard.square[x][y].letter = new Scrabble
@@ -241,20 +247,12 @@ export class GridService {
         for (let i = 0; i < length; i++) {
             if (orientation === 'v') {
                 if (this.scrabbleBoard.squares[coord.x][coord.y + i].isValidated === false) {
-                    removedScrabbleLetters.push(this.scrabbleBoard.squares[coord.x][coord.y + i].letter);
-                    this.scrabbleBoard.squares[coord.x][coord.y + i].letter.tile = new Square(UNPLACED, UNPLACED);
-                    this.scrabbleBoard.squares[coord.x][coord.y + i].occupied = false;
-                    this.scrabbleBoard.squares[coord.x][coord.y + i].letter = new ScrabbleLetter('', 0);
-                    this.removeSquare(coord.x, coord.y + i);
+                    removedScrabbleLetters.push(this.removeSquare(coord.x, coord.y + i));
                 }
             }
             if (orientation === 'h') {
                 if (this.scrabbleBoard.squares[coord.x + i][coord.y].isValidated === false) {
-                    removedScrabbleLetters.push(this.scrabbleBoard.squares[coord.x + i][coord.y].letter);
-                    this.scrabbleBoard.squares[coord.x + i][coord.y].letter.tile = new Square(UNPLACED, UNPLACED);
-                    this.scrabbleBoard.squares[coord.x + i][coord.y].occupied = false;
-                    this.scrabbleBoard.squares[coord.x + i][coord.y].letter = new ScrabbleLetter('', 0);
-                    this.removeSquare(coord.x + i, coord.y);
+                    removedScrabbleLetters.push(this.removeSquare(coord.x + i, coord.y));
                 }
             }
         }

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
@@ -5,6 +6,8 @@ import { ErrorType } from '@app/classes/errors';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Column, Row, ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleWord } from '@app/classes/scrabble-word';
+import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
 import { GridService } from './grid.service';
@@ -16,6 +19,8 @@ const DEFAULT_HEIGHT = 600;
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable  @typescript-eslint/no-unused-expressions */
+/* eslint-disable  no-unused-expressions */
 describe('GameService', () => {
     let service: SoloGameService;
     let spyPlayer: LocalPlayer;
@@ -29,7 +34,7 @@ describe('GameService', () => {
     beforeEach(() => {
         ctxStub = CanvasTestHelper.createCanvas(DEFAULT_WIDTH, DEFAULT_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
         gridServiceSpy = jasmine.createSpyObj('GridService', ['drawLetter', 'drawLetters'], { scrabbleBoard: new ScrabbleBoard() });
-        rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'drawLetter', 'removeLetter', 'addLetter'], {
+        rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'drawLetter', 'removeLetter', 'addLetter', 'rackLetters'], {
             rackLetters: [] as ScrabbleLetter[],
         });
         TestBed.configureTestingModule({
@@ -44,7 +49,13 @@ describe('GameService', () => {
         startCountdownSpy = spyOn<any>(service, 'startCountdown').and.callThrough();
         addRackLettersSpy = spyOn<any>(service, 'addRackLetters').and.callThrough();
         spyPlayer = new LocalPlayer('sara');
+    });
 
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
+
+    it('initializeGame should set variables to right value', () => {
         const level = new FormControl('easy', [Validators.required]);
         const name = new FormControl('Ariane', [Validators.required, Validators.pattern('[a-zA-Z]*')]);
         const timer = new FormControl('60', [Validators.required]);
@@ -53,13 +64,6 @@ describe('GameService', () => {
         const opponent = new FormControl('Sara');
         const myForm = new FormGroup({ name, timer, bonus, dictionaryForm, level, opponent });
         service.initializeGame(myForm);
-    });
-
-    it('should be created', () => {
-        expect(service).toBeTruthy();
-    });
-
-    it('initializeGame should set variables to right value', () => {
         expect(service.localPlayer.name).toEqual('Ariane');
         expect(service.localPlayer.letters.length).toEqual(0);
         expect(service.localPlayer.isActive).toEqual(true);
@@ -123,7 +127,7 @@ describe('GameService', () => {
         service.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
         service.localPlayer.letters = [new ScrabbleLetter('D', 1)];
         service.localPlayer.isActive = true;
-        service.passTurn();
+        service.passTurn(service.localPlayer);
         expect(changeActivePlayerSpy).toHaveBeenCalled();
         expect(secondsToMinutesSpy).toHaveBeenCalled();
         expect(service.localPlayer.isActive).toEqual(false);
@@ -134,19 +138,21 @@ describe('GameService', () => {
         service.localPlayer = new LocalPlayer('Ariane');
         service.localPlayer.isActive = false;
         const error = ErrorType.ImpossibleCommand;
-        expect(service.passTurn()).toEqual(error);
+        expect(service.passTurn(service.localPlayer)).toEqual(error);
     });
 
     // Test pour la fonction exchangeLetters
     it('exchangeLetter should call removeLetter of class Player if he is active and if there is at least 7 letters', () => {
         spyPlayer.letters = [new ScrabbleLetter('a', 1)];
         service.localPlayer = spyPlayer;
+        service.virtualPlayer = new VirtualPlayer('Ariane', PlayerType.Easy);
+        service.virtualPlayer.isActive = false;
 
         const spy = spyOn(service.localPlayer, 'removeLetter').and.callThrough();
         expect(spy).not.toHaveBeenCalled();
 
         service.localPlayer.isActive = true;
-        service.exchangeLetters(service.localPlayer, 'a');
+        service.exchangeLetters(spyPlayer, 'a');
 
         expect(spy).toHaveBeenCalled();
     });
@@ -155,6 +161,8 @@ describe('GameService', () => {
         spyPlayer.letters = [new ScrabbleLetter('a', 1)];
         service.localPlayer = spyPlayer;
         service.localPlayer.isActive = true;
+        service.virtualPlayer = new VirtualPlayer('Ariane', PlayerType.Easy);
+        service.virtualPlayer.isActive = false;
 
         const spy = spyOn(service.localPlayer, 'addLetter').and.callThrough();
         service.exchangeLetters(spyPlayer, 'b');
@@ -312,5 +320,85 @@ describe('GameService', () => {
         const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'myWord' };
 
         expect(service.place(spyPlayer, placeParams)).toEqual(ErrorType.SyntaxError);
+    });
+
+    it('endGame should be called when changing players and rack + letterStock is empty (localPlayer)', () => {
+        const endGameSpy = spyOn<any>(service, 'endGame').and.callThrough();
+        spyPlayer.letters = [new ScrabbleLetter('a', 1)];
+        service.localPlayer = spyPlayer;
+        service.localPlayer.isActive = true;
+        service.localPlayer.letters = [];
+        service.stock.letterStock.length = 0;
+        service.virtualPlayer = new VirtualPlayer('Ariane', PlayerType.Easy);
+        service.virtualPlayer.isActive = false;
+        service.changeActivePlayer();
+        expect(endGameSpy).toHaveBeenCalled();
+        expect(service.isEndGame).toEqual(true);
+    });
+
+    it('endGame should be called when changing players and rack + letterStock is empty (virtualPlayer)', () => {
+        const endGameSpy = spyOn<any>(service, 'endGame').and.callThrough();
+        spyPlayer.letters = [new ScrabbleLetter('a', 1)];
+        service.virtualPlayer = new VirtualPlayer('Ariane', PlayerType.Easy);
+        service.virtualPlayer.isActive = true;
+        service.virtualPlayer.letters = [];
+        service.stock.letterStock.length = 0;
+        service.localPlayer = spyPlayer;
+        service.localPlayer.isActive = false;
+        service.changeActivePlayer();
+        expect(endGameSpy).toHaveBeenCalled();
+        expect(service.isEndGame).toEqual(true);
+    });
+
+    it('isTurnsPassedLimit should return true if turn has been passed 6 times', () => {
+        service.hasTurnsBeenPassed = [false, true, true, true, true, true, true];
+        service.turnPassed = true;
+        expect(service.isTurnsPassedLimit()).toEqual(true);
+    });
+
+    it('when passTurn is called 6 times in a row, endGame should be called', () => {
+        const endGameSpy = spyOn<any>(service, 'endGame').and.callThrough();
+        spyPlayer.letters = [new ScrabbleLetter('a', 1)];
+        service.localPlayer = spyPlayer;
+        service.localPlayer.isActive = true;
+        service.stock.letterStock.length = 0;
+        service.virtualPlayer = new VirtualPlayer('Ariane', PlayerType.Easy);
+        service.virtualPlayer.letters = [new ScrabbleLetter('a', 1)];
+        service.virtualPlayer.isActive = false;
+        service.hasTurnsBeenPassed = [false, true, true, true, true, true];
+        service.turnPassed = true;
+        service.passTurn(service.localPlayer);
+        expect(endGameSpy).toHaveBeenCalled();
+        expect(service.isEndGame).toEqual(true);
+    });
+
+    it('drawRack should call addRackLetter', () => {
+        const addRackLetterSpy = spyOn<any>(service, 'addRackLetter').and.callThrough();
+        const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        const letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
+        const letter3: ScrabbleLetter = new ScrabbleLetter('j', 4);
+        const word1: ScrabbleWord = new ScrabbleWord();
+        word1.content = [letter1, letter2, letter3];
+        word1.orientation = Axis.H;
+        const word2: ScrabbleWord = new ScrabbleWord();
+        word2.orientation = Axis.V;
+        word2.content = [letter1, letter2, letter3];
+        const words: ScrabbleWord[] = [word1, word2];
+        service.localPlayer = new LocalPlayer('Ariane');
+        service.localPlayer.letters = [letter1];
+        rackServiceSpy.rackLetters = [letter1];
+        service.drawRack(words);
+        expect(addRackLetterSpy).toHaveBeenCalled;
+    });
+
+    it('removeLetter should call rackService', () => {
+        const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
+        const letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
+        rackServiceSpy.rackLetters = [letter1, letter2];
+        service.localPlayer = new LocalPlayer('Ariane');
+        service.localPlayer.letters = [letter1, letter2];
+        service.removeRackLetter(letter2);
+        expect(rackServiceSpy.removeLetter).toHaveBeenCalled;
+        expect(service.localPlayer.letters.length).toEqual(1);
     });
 });

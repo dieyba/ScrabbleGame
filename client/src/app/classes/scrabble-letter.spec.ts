@@ -10,8 +10,20 @@ describe('ScrabbleLetter', () => {
         expect(letter.getTealBonus()).toEqual(2);
     });
 
+    it('tealBonus should mutliply the value by 2', () => {
+        const letter = new ScrabbleLetter('a', 1);
+        letter.setTealBonus();
+        expect(letter.value).toEqual(2);
+    });
+
     it('darkBlueBonus should mutliply the value by 3', () => {
         const letter = new ScrabbleLetter('a', 1);
         expect(letter.getDarkBlueBonus()).toEqual(3);
+    });
+
+    it('darkBlueBonus should mutliply the value by 3', () => {
+        const letter = new ScrabbleLetter('a', 1);
+        letter.setDarkBlueBonus();
+        expect(letter.value).toEqual(3);
     });
 });

@@ -87,7 +87,7 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     passTurn() {
-        this.soloGameService.passTurn();
+        this.soloGameService.passTurn(this.soloGameService.localPlayer);
     }
 
     isLocalPlayerActive(): boolean {
