@@ -1,7 +1,7 @@
 import { Square, SquareColor } from './square';
 import { Vec2 } from './vec2';
 
-const BOARD_SIZE = 15;
+export const BOARD_SIZE = 15;
 
 export enum Row {
     A = 0,
