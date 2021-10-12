@@ -38,6 +38,7 @@ export class VirtualPlayerService {
         private wordBuilderService: WordBuilderService,
         private bonusService: BonusService,
     ) {
+        // TODO: MOVE ALL THIS TO GAMELOOP
         // TODO Implement timer (3s and 20s limit)
         this.rack = new ScrabbleRack();
         // const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
@@ -46,7 +47,7 @@ export class VirtualPlayerService {
         // } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
         //     this.chooseTilesFromRack(); // 10% chance to exchange tiles
         // } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
-        //     // =100
+        //     // = 100
         //     this.makeMoves(); // 80% chance to make a move
         // }
     }
@@ -103,7 +104,7 @@ export class VirtualPlayerService {
         }
         return possibleMoves;
     }
-    // I have to do this, sorry everyone. If it wasn't for the randomizing we wouldn't have to go this far.
+    // I have to do this, sorry everyone. If it wasn't for the randomizing we wouldn't have to go this far. Current complexity: 16
     // eslint-disable-next-line complexity
     possibleMoves(points: number, axis: Axis): ScrabbleWord[] {
         const listLength = 4; // How many words we should aim for
@@ -143,7 +144,9 @@ export class VirtualPlayerService {
                     if (this.gridService.scrabbleBoard.squares[j][k].occupied) {
                         const newWords = this.movesWithGivenLetter(this.gridService.scrabbleBoard.squares[j][k].letter);
                         for (const newWord of newWords) {
-                            if (!list.includes(newWord)) list.push(newWord);
+                            if (!list.includes(newWord)) {
+                                list.push(newWord);
+                            }
                         }
                     }
                     for (let l = 0; l < list.length; l++) {
