@@ -38,6 +38,7 @@ export class VirtualPlayerService {
         private wordBuilderService: WordBuilderService,
         private bonusService: BonusService,
     ) {
+        // TODO: MOVE ALL THIS TO GAMELOOP
         // TODO Implement timer (3s and 20s limit)
         this.rack = new ScrabbleRack();
         // const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
@@ -46,7 +47,7 @@ export class VirtualPlayerService {
         // } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
         //     this.chooseTilesFromRack(); // 10% chance to exchange tiles
         // } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
-        //     // =100
+        //     // = 100
         //     this.makeMoves(); // 80% chance to make a move
         // }
     }

@@ -41,6 +41,8 @@ export class BonusService {
                 } else {
                     total += scrabbleWord.content[i].value;
                 }
+            } else {
+                total += scrabbleWord.content[i].value; // For purposes of testing, when we don't need an orientation.
             }
         }
         // Word pink/red bonuses
