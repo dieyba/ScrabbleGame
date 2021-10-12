@@ -160,7 +160,6 @@ export class SoloGameService {
 
     exchangeLetters(player: Player, letters: string): ErrorType {
         if (player.isActive && this.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
-            // console.log('Exchanging these letters:' + letters + " ...");
             const lettersToRemove: ScrabbleLetter[] = [];
             if (player.removeLetter(letters) === true) {
                 for (let i = 0; i < letters.length; i++) {
@@ -284,8 +283,23 @@ export class SoloGameService {
         }
 
         // Call validation method and end turn
-        if (this.validationService.validateWordsAndCalculateScore(tempScrabbleWords) === 0) {
+        if (!this.validationService.validateWords(tempScrabbleWords)) {
             // Retake lettres
+            let removedLetter: ScrabbleLetter;
+            for (let i = 0; i < placeParams.word.length; i++) {
+                const letterToRemovePosition =
+                    placeParams.orientation === 'h'
+                        ? new Vec2(placeParams.position.x + i, placeParams.position.y)
+                        : new Vec2(placeParams.position.x, placeParams.position.y + i);
+
+                // put the letter back in the rack if it was newly placed
+                if (!this.gridService.scrabbleBoard.squares[letterToRemovePosition.x][letterToRemovePosition.y].isValidated) {
+                    removedLetter = this.gridService.removeSquare(letterToRemovePosition.x, letterToRemovePosition.y);
+                    this.addRackLetter(removedLetter);
+                }
+            }
+            this.passTurn();
+            return ErrorType.ImpossibleCommand;
         } else {
             // Score
             this.validationService.updatePlayerScore(tempScrabbleWords, player);
@@ -295,13 +309,11 @@ export class SoloGameService {
                 this.rackService.addLetter(letter);
                 player.letters.push(letter);
             }
+            this.passTurn();
         }
 
-        this.passTurn();
-        this.passTurn();
-
         // TODO Optional : update la vue de ScrabbleLetter automatically
-        return ErrorType.NoError; // TODO change to "no error"
+        return ErrorType.NoError;
     }
 
     placeLetter(playerLetters: ScrabbleLetter[], letter: string, position: Vec2) {
