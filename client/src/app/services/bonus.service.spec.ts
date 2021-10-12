@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
+import { ScrabbleWord } from '@app/classes/scrabble-word';
+import { Axis } from '@app/classes/utilities';
 import { SquareColor } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
 import { BonusService } from '@app/services/bonus.service';
@@ -36,7 +37,7 @@ describe('BonusService', () => {
         const letter4 = new ScrabbleLetter('d', 1);
         letter4.color = SquareColor.Red;
         const word = new ScrabbleWord();
-        word.orientation = WordOrientation.Horizontal;
+        word.orientation = Axis.H;
         word.startPosition = new Vec2(11, 0);
         word.content = [letter1, letter2, letter3, letter4];
         service.totalValue(word);
@@ -50,7 +51,7 @@ describe('BonusService', () => {
         const letter3 = new ScrabbleLetter('c', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(5, 5);
-        word.orientation = WordOrientation.Vertical;
+        word.orientation = Axis.V;
         word.content = [letter1, letter2, letter3];
         service.totalValue(word);
         expect(word.value).toEqual(5);
@@ -63,7 +64,7 @@ describe('BonusService', () => {
         const letter3 = new ScrabbleLetter('c', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(1, 1);
-        word.orientation = WordOrientation.Horizontal;
+        word.orientation = Axis.H;
         word.content = [letter1, letter2, letter3];
         service.totalValue(word);
         expect(word.value).toEqual(6);
@@ -76,7 +77,7 @@ describe('BonusService', () => {
         const letter3 = new ScrabbleLetter('c', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(2, 2);
-        word.orientation = WordOrientation.Vertical;
+        word.orientation = Axis.V;
         word.content = [letter1, letter2, letter3];
         gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed = true;
         service.totalValue(word);
@@ -90,7 +91,7 @@ describe('BonusService', () => {
         const letter3 = new ScrabbleLetter('c', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(2, 2);
-        word.orientation = WordOrientation.Horizontal;
+        word.orientation = Axis.H;
         word.content = [letter1, letter2, letter3];
         gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed = true;
         service.totalValue(word);
@@ -104,7 +105,7 @@ describe('BonusService', () => {
         const letter3 = new ScrabbleLetter('c', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(5, 5);
-        word.orientation = WordOrientation.Horizontal;
+        word.orientation = Axis.H;
         word.content = [letter1, letter2, letter3];
         service.useBonus(word);
         expect(gridServiceSpy.scrabbleBoard.squares[5][5].isBonusUsed).toEqual(true);
@@ -121,7 +122,7 @@ describe('BonusService', () => {
         const letter4 = new ScrabbleLetter('d', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(5, 5);
-        word.orientation = WordOrientation.Vertical;
+        word.orientation = Axis.V;
         word.content = [letter1, letter2, letter3, letter4];
         service.useBonus(word);
         expect(gridServiceSpy.scrabbleBoard.squares[5][5].isBonusUsed).toEqual(true);
@@ -137,7 +138,7 @@ describe('BonusService', () => {
         const letter2 = new ScrabbleLetter('b', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(6, 6);
-        word.orientation = WordOrientation.Vertical;
+        word.orientation = Axis.V;
         word.content = [letter1, letter2];
         service.useBonus(word);
         expect(gridServiceSpy.scrabbleBoard.squares[6][6].isBonusUsed).toEqual(true);
@@ -151,7 +152,7 @@ describe('BonusService', () => {
         const letter2 = new ScrabbleLetter('b', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(1, 1);
-        word.orientation = WordOrientation.Vertical;
+        word.orientation = Axis.V;
         word.content = [letter1, letter2];
         service.useBonus(word);
         expect(gridServiceSpy.scrabbleBoard.squares[1][1].isBonusUsed).toEqual(true);
@@ -165,7 +166,7 @@ describe('BonusService', () => {
         const letter2 = new ScrabbleLetter('b', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(0, 0);
-        word.orientation = WordOrientation.Vertical;
+        word.orientation = Axis.V;
         word.content = [letter1, letter2];
         service.useBonus(word);
         expect(gridServiceSpy.scrabbleBoard.squares[0][0].isBonusUsed).toEqual(true);
@@ -179,7 +180,7 @@ describe('BonusService', () => {
         const letter2 = new ScrabbleLetter('b', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(6, 6);
-        word.orientation = WordOrientation.Horizontal;
+        word.orientation = Axis.H;
         word.content = [letter1, letter2];
         service.useBonus(word);
         expect(gridServiceSpy.scrabbleBoard.squares[6][6].isBonusUsed).toEqual(true);
@@ -193,7 +194,7 @@ describe('BonusService', () => {
         const letter2 = new ScrabbleLetter('b', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(1, 1);
-        word.orientation = WordOrientation.Horizontal;
+        word.orientation = Axis.H;
         word.content = [letter1, letter2];
         service.useBonus(word);
         expect(gridServiceSpy.scrabbleBoard.squares[1][1].isBonusUsed).toEqual(true);
@@ -207,7 +208,7 @@ describe('BonusService', () => {
         const letter2 = new ScrabbleLetter('b', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(0, 0);
-        word.orientation = WordOrientation.Horizontal;
+        word.orientation = Axis.H;
         word.content = [letter1, letter2];
         service.useBonus(word);
         expect(gridServiceSpy.scrabbleBoard.squares[0][0].isBonusUsed).toEqual(true);
@@ -221,7 +222,7 @@ describe('BonusService', () => {
         const letter2 = new ScrabbleLetter('b', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(2, 2);
-        word.orientation = WordOrientation.Vertical;
+        word.orientation = Axis.V;
         word.content = [letter1, letter2];
         gridServiceSpy.scrabbleBoard.squares[2][2].isBonusUsed = true;
         service.useBonus(word);
@@ -235,7 +236,7 @@ describe('BonusService', () => {
         const letter2 = new ScrabbleLetter('b', 1);
         const word = new ScrabbleWord();
         word.startPosition = new Vec2(6, 6);
-        word.orientation = WordOrientation.Horizontal;
+        word.orientation = Axis.H;
         word.content = [letter1, letter2];
         gridServiceSpy.scrabbleBoard.squares[6][6].isBonusUsed = true;
         service.useBonus(word);

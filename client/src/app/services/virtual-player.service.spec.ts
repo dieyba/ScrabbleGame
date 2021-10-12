@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { Axis, ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { Axis } from '@app/classes/utilities';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayerService } from './virtual-player.service';

@@ -81,13 +81,14 @@ export class GridService {
         }
     }
 
-    removeSquare(i: number, j: number) {
-        if (this.scrabbleBoard.squares[i][j].isValidated === false) {
-            const color = this.scrabbleBoard.squares[i][j].color;
-            this.scrabbleBoard.squares[i][j] = new Square(i, j);
-            this.scrabbleBoard.squares[i][j].color = color;
-            this.drawSingleSquareColor(i, j);
-        }
+    // reset tile and returns the letter that was on it
+    removeSquare(i: number, j: number): ScrabbleLetter {
+        const color = this.scrabbleBoard.squares[i][j].color;
+        const letter = this.scrabbleBoard.squares[i][j].letter;
+        this.scrabbleBoard.squares[i][j] = new Square(i, j);
+        this.scrabbleBoard.squares[i][j].color = color;
+        this.drawSingleSquareColor(i, j);
+        return letter;
     }
 
     // To remove a square, set scrabbleBoard.squares[x][y].occupied to false, set scrabbleBoard.square[x][y].letter = new Scrabble

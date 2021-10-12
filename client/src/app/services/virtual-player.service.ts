@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Axis, ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { Axis } from '@app/classes/utilities';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Vec2 } from '@app/classes/vec2';
@@ -155,7 +156,7 @@ export class VirtualPlayerService {
                             } else {
                                 const currentWord = list[l].stringify();
                                 const position = this.findPosition(list[l], axis);
-                                const otherWords: ScrabbleWord[] = this.wordBuilderService.allWordsCreated(currentWord, position, axis);
+                                const otherWords: ScrabbleWord[] = this.wordBuilderService.buildWordsOnBoard(currentWord, position, axis);
                                 let sum = 0;
                                 for (const word of otherWords) {
                                     sum += word.value;

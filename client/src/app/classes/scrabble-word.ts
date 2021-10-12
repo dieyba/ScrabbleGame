@@ -1,16 +1,11 @@
 import { ScrabbleLetter } from './scrabble-letter';
 import { Vec2 } from './vec2';
-
-export enum WordOrientation {
-    Horizontal = 0,
-    Vertical = 1,
-}
-
+import { Axis } from './utilities';
 export class ScrabbleWord {
     content: ScrabbleLetter[]; // Array of ScrabbleLetters continually growing to represent the word
     value: number;
     startPosition: Vec2;
-    orientation: WordOrientation;
+    orientation: Axis;
 
     constructor() {
         this.content = [];

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
+import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { SquareColor } from '@app/classes/square';
 import { GridService } from './grid.service';
+import { Axis } from '@app/classes/utilities';
 
 const PINK_FACTOR = 2;
 const RED_FACTOR = 3;
@@ -22,7 +23,7 @@ export class BonusService {
         let total = 0;
         for (let i = 0; i < scrabbleWord.content.length; i++) {
             // Account for letter pale/dark blue bonuses
-            if (scrabbleWord.orientation === WordOrientation.Horizontal) {
+            if (scrabbleWord.orientation === Axis.H) {
                 if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed) {
                     total += this.calculateValue(
                         scrabbleWord.content[i],
@@ -31,7 +32,7 @@ export class BonusService {
                 } else {
                     total += scrabbleWord.content[i].value;
                 }
-            } else if (scrabbleWord.orientation === WordOrientation.Vertical) {
+            } else if (scrabbleWord.orientation === Axis.V) {
                 if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed) {
                     total += this.calculateValue(
                         scrabbleWord.content[i],
@@ -79,11 +80,11 @@ export class BonusService {
 
     useBonus(scrabbleWord: ScrabbleWord) {
         for (let i = 0; i < scrabbleWord.content.length; i++) {
-            if (scrabbleWord.orientation === WordOrientation.Horizontal) {
+            if (scrabbleWord.orientation === Axis.H) {
                 if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed) {
                     this.useHorizontalWordBonus(scrabbleWord, i);
                 }
-            } else if (scrabbleWord.orientation === WordOrientation.Vertical) {
+            } else if (scrabbleWord.orientation === Axis.V) {
                 if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed) {
                     this.useVerticalWordBonus(scrabbleWord, i);
                 }

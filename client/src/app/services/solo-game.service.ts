@@ -7,14 +7,15 @@ import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
+import { ScrabbleWord } from '@app/classes/scrabble-word';
+import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { LetterStock } from '@app/services/letter-stock.service';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
-import { ValidationService, WAIT_TIME } from './validation.service';
+import { ValidationService /* , WAIT_TIME*/ } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 export const TIMER_INTERVAL = 1000;
 const DEFAULT_LETTER_COUNT = 7;
@@ -137,7 +138,6 @@ export class SoloGameService {
     }
 
     passTurn(player: Player) {
-        // TODO : Remove if when
         if (player.isActive) {
             this.turnPassed = true;
             if (this.isTurnsPassedLimit() && this.hasTurnsBeenPassed.length >= MAX_TURNS_PASSED) {
@@ -165,12 +165,12 @@ export class SoloGameService {
     drawRack(newWords: ScrabbleWord[]): void {
         newWords.forEach((newWord) => {
             for (let j = 0; j < newWord.content.length; j++) {
-                if (newWord.orientation === WordOrientation.Vertical) {
+                if (newWord.orientation === Axis.V) {
                     if (this.gridService.scrabbleBoard.squares[newWord.startPosition.x][newWord.startPosition.y + j].isValidated !== true) {
                         this.addRackLetter(newWord.content[j]);
                     }
                 }
-                if (newWord.orientation === WordOrientation.Horizontal) {
+                if (newWord.orientation === Axis.H) {
                     if (this.gridService.scrabbleBoard.squares[newWord.startPosition.x + j][newWord.startPosition.y].isValidated !== true) {
                         this.addRackLetter(newWord.content[j]);
                     }
@@ -181,7 +181,6 @@ export class SoloGameService {
 
     exchangeLetters(player: Player, letters: string): ErrorType {
         if (player.isActive && this.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
-            // console.log('Exchanging these letters:' + letters + " ...");
             const lettersToRemove: ScrabbleLetter[] = [];
             if (player.removeLetter(letters) === true) {
                 for (let i = 0; i < letters.length; i++) {
@@ -300,37 +299,74 @@ export class SoloGameService {
         // Generate all words created
         let tempScrabbleWords: ScrabbleWord[];
         if (placeParams.orientation === 'h') {
-            tempScrabbleWords = this.wordBuilder.buildWordOnBoard(placeParams.word, placeParams.position, WordOrientation.Horizontal);
+            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
         } else {
-            tempScrabbleWords = this.wordBuilder.buildWordOnBoard(placeParams.word, placeParams.position, WordOrientation.Vertical);
+            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
         }
 
         // Call validation method and end turn
-        this.validationService.updatePlayerScore(tempScrabbleWords, this.localPlayer);
-        setTimeout(() => {
-            if (this.validationService.isTimerElapsed === true) {
-                this.changeActivePlayer();
-                this.drawRack(tempScrabbleWords);
-                const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-                for (const letter of newLetters) {
-                    this.rackService.addLetter(letter);
-                    player.letters.push(letter);
+        if (!this.validationService.validateWords(tempScrabbleWords)) {
+            // TODO: temporary code to put letters back in the rack
+            // Retake lettres
+            let removedLetter: ScrabbleLetter;
+            for (let i = 0; i < placeParams.word.length; i++) {
+                const letterToRemovePosition =
+                    placeParams.orientation === 'h'
+                        ? new Vec2(placeParams.position.x + i, placeParams.position.y)
+                        : new Vec2(placeParams.position.x, placeParams.position.y + i);
+
+                // put the letter back in the rack if it was newly placed
+                if (!this.gridService.scrabbleBoard.squares[letterToRemovePosition.x][letterToRemovePosition.y].isValidated) {
+                    removedLetter = this.gridService.removeSquare(letterToRemovePosition.x, letterToRemovePosition.y);
+                    this.addRackLetter(removedLetter);
                 }
             }
-        }, WAIT_TIME);
+            this.passTurn(player);
+            return ErrorType.ImpossibleCommand;
+        } else {
+            // Score
+            this.validationService.updatePlayerScore(tempScrabbleWords, player);
+            // Take new letters
+            const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+            for (const letter of newLetters) {
+                this.rackService.addLetter(letter);
+                player.letters.push(letter);
+            }
+            this.passTurn(player);
+        }
+
+        // TODO: version de ce qu'il y avait dans le merge d'ariane, à garder?
+        // this.validationService.updatePlayerScore(tempScrabbleWords, this.localPlayer);
+        // setTimeout(() => {
+        //     if (this.validationService.isTimerElapsed === true) {
+        //         this.changeActivePlayer();
+        //         this.drawRack(tempScrabbleWords);
+        //         const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+        //         for (const letter of newLetters) {
+        //             this.rackService.addLetter(letter);
+        //             player.letters.push(letter);
+        //         }
+        //     }
+        // }, WAIT_TIME);
 
         // TODO Optional : update la vue de ScrabbleLetter automatically
-        return ErrorType.NoError; // TODO change to "no error"
+        return ErrorType.NoError;
     }
 
     placeLetter(playerLetters: ScrabbleLetter[], letter: string, position: Vec2) {
-        playerLetters.forEach((playerLetter) => {
-            if (playerLetter.character === letter) {
-                this.gridService.drawLetter(playerLetter, position.x, position.y);
-                this.removeRackLetter(playerLetter);
-                return;
+        // Position already occupied
+        if (this.gridService.scrabbleBoard.squares[position.x][position.y].occupied) {
+            return;
+        }
+
+        for (let i = 0; i < playerLetters.length; i++) {
+            if (playerLetters[i].character === letter) {
+                this.gridService.drawLetter(playerLetters[i], position.x, position.y);
+                playerLetters[i].tile = this.gridService.scrabbleBoard.squares[position.x][position.y];
+                this.rackService.removeLetter(playerLetters[i]);
+                playerLetters.splice(i, 1);
             }
-        });
+        }
     }
 
     canPlaceWord(player: Player, placeParams: PlaceParams): boolean {
