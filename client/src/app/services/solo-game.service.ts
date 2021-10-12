@@ -329,9 +329,9 @@ export class SoloGameService {
                 }
                 playerLetters[i].tile = this.gridService.scrabbleBoard.squares[position.x][position.y];
                 this.gridService.drawLetter(playerLetters[i], position.x, position.y);
-                playerLetters[i].tile = this.gridService.scrabbleBoard.squares[position.x][position.y];
                 this.rackService.removeLetter(playerLetters[i]);
                 playerLetters.splice(i, 1);
+                break;
             }
         }
     }

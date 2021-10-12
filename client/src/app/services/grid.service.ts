@@ -87,7 +87,7 @@ export class GridService {
         const color = this.scrabbleBoard.squares[i][j].color;
         const letter = this.scrabbleBoard.squares[i][j].letter;
         // Unassign the letter and the letter coordinates (tile)
-        this.scrabbleBoard.squares[i][j].letter.tile = new Square(UNPLACED, UNPLACED);
+        letter.tile = new Square(UNPLACED, UNPLACED);
         this.scrabbleBoard.squares[i][j] = new Square(i, j);
         this.scrabbleBoard.squares[i][j].color = color;
         this.drawSingleSquareColor(i, j);
@@ -256,6 +256,6 @@ export class GridService {
                 }
             }
         }
-        return removedScrabbleLetters;
+        return removedScrabbleLetters; // TODO check if letter is a star
     }
 }
