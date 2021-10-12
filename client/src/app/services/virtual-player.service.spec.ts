@@ -75,8 +75,6 @@ describe('VirtualPlayerService', () => {
         expect(result >= MIN_RNG && result <= MAX_RNG).toBeTruthy();
     });
     // chooseTilesFromRack
-    // TODO : Not working
-    /*
     it('chooseTilesFromRack should select a random number of tiles to exchange from the rack', () => {
         expect(service.chooseTilesFromRack().length).toBeLessThanOrEqual(service.rack.letters.length);
         expect(service.chooseTilesFromRack().length).toBeGreaterThanOrEqual(1);
@@ -86,7 +84,6 @@ describe('VirtualPlayerService', () => {
         const found = testArray.every((elem) => service.rack.letters.includes(elem));
         expect(found).toBeTruthy();
     });
-    */
     // findPosition
     it('findPosition should return the position of the first letter of the word', () => {
         const gap = 1;
@@ -201,8 +198,7 @@ describe('VirtualPlayerService', () => {
         service['gridService'].scrabbleBoard.squares[0][0].occupied = true;
         expect(service.possibleMoves(POINTS, Axis.H)).toEqual([]);
     });
-    // TODO : Doesn't work
-    /*
+
     it('possibleMoves should only return moves that are validated in the dictionary by the validation service', () => {
         // eslint-disable-next-line dot-notation
         spyOn(service['validationService'], 'isPlacable').and.returnValue(true); // Method not implemented; change later
@@ -213,7 +209,7 @@ describe('VirtualPlayerService', () => {
         spyOn(service, 'movesWithGivenLetter').and.returnValue([testWord]);
         expect(service.possibleMoves(POINTS, Axis.H)).toEqual([testWord]);
     });
-    */
+
     it('possibleMoves should not return moves if they are worth too many or too few points', () => {
         // eslint-disable-next-line dot-notation
         spyOn(service['validationService'], 'isPlacable').and.returnValue(true); // Method not implemented; change later

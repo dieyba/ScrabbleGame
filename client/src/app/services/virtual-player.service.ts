@@ -102,7 +102,7 @@ export class VirtualPlayerService {
         }
         return possibleMoves;
     }
-    // I have to do this, sorry everyone. If it wasn't for the randomizing we wouldn't have to go this far.
+    // I have to do this, sorry everyone. If it wasn't for the randomizing we wouldn't have to go this far. Current complexity: 16
     // eslint-disable-next-line complexity
     possibleMoves(points: number, axis: Axis): ScrabbleWord[] {
         const listLength = 4; // How many words we should aim for
@@ -142,7 +142,9 @@ export class VirtualPlayerService {
                     if (this.gridService.scrabbleBoard.squares[j][k].occupied) {
                         const newWords = this.movesWithGivenLetter(this.gridService.scrabbleBoard.squares[j][k].letter);
                         for (const newWord of newWords) {
-                            if (!list.includes(newWord)) list.push(newWord);
+                            if (!list.includes(newWord)) {
+                                list.push(newWord);
+                            }
                         }
                     }
                     for (let l = 0; l < list.length; l++) {
