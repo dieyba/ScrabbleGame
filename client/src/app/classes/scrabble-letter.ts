@@ -20,6 +20,8 @@ export enum Direction {
     West = 3,
 }
 
+export const UNPLACED = -1;
+
 export class ScrabbleLetter {
     character: string; // One word string, depending on which letter it is
     value: number; // How many points the letter is worth before blue bonuses
@@ -28,12 +30,11 @@ export class ScrabbleLetter {
     tile: Square;
 
     constructor(letter: string, value: number) {
-        const unplaced = -1;
         this.setLetter(letter);
         this.value = value;
         this.nextLetters = [];
         this.color = SquareColor.None;
-        this.tile = new Square(unplaced, unplaced); // -1, -1 means it is not placed yet
+        this.tile = new Square(UNPLACED, UNPLACED); // -1, -1 means it is not placed yet
     }
     getTealBonus(): number {
         return PALE_BLUE_FACTOR * this.value;
