@@ -1,0 +1,12 @@
+<div class="waitingArea">
+    <img class="image" src="https://bit.ly/3m206ss" width="600" height="100" alt="Logo Scrabble" />
+    <div>
+        <h1>Vous etes en attente d'un autre joueur</h1>
+        <mat-spinner></mat-spinner>
+    </div>
+    <div class="cart-item" *ngFor="let item of game">
+        <h1>{{ item }}</h1>
+    </div>
+    <button routerLink="/game" (click)="closeDialog()">commencer</button>
+    <button (click)="closeDialog(); openForm()">Annuler</button>
+</div>

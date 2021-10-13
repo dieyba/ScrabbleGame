@@ -22,6 +22,7 @@ import { StartingPageComponent } from '@app/pages/starting-page/starting-page.co
 import { ChatDisplayComponent } from './components/chat-display/chat-display.component';
 import { FormComponent } from './components/form/form.component';
 import { TextEntryComponent } from './components/text-entry/text-entry.component';
+import { WaitingAreaComponent } from './components/waiting-area/waiting-area.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
 
 /**
@@ -46,6 +47,7 @@ import { AutofocusDirective } from './directives/autofocus.directive';
         StartingPageComponent,
         ClassicModeComponent,
         FormComponent,
+        WaitingAreaComponent,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     imports: [
