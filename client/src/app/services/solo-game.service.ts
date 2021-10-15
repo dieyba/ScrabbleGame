@@ -11,7 +11,7 @@ import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
-import { LetterStock } from '@app/services/letter-stock.service';
+import { LetterStock } from '@app/classes/letter-stock';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
