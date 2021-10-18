@@ -93,6 +93,9 @@ export class FormComponent implements OnInit {
         this.selectedPlayer = list[this.random];
         this.myForm.controls.opponent.setValue(this.selectedPlayer);
     }
+    convert() {
+        this.dialog.open(FormComponent, { data: this.isSolo === true });
+    }
 
     changeName(list: string[]): void {
         if (this.name.value === this.selectedPlayer) {
@@ -102,30 +105,32 @@ export class FormComponent implements OnInit {
     }
 
     submit(): void {
-        if (this.myForm.valid && this.isSolo == true) {
-            this.closeDialog();
-            this.router.navigate(['/game']);
-            this.soloGameService.initializeGame(this.myForm);
-        } else {
-            // this.closeDialog();
-            // console.log(this.myForm.value);
-            this.dialog.open(WaitingAreaComponent, { disableClose: true });
-            // let singleGame = new GameParameters(
-            //     this.myForm.controls.name.value,
-            //     this.myForm.controls.dictionaryForm.value,
-            //     this.myForm.controls.bonus.value,
-            //     this.myForm.controls.timer.value,
-            // );
+        console.log(this.myForm.valid);
+        console.log(this.isSolo);
+        if (this.myForm.valid) {
+            if (this.isSolo === true) {
+                this.closeDialog();
+                this.router.navigate(['/game']);
+                this.soloGameService.initializeGame(this.myForm);
+            } else {
+                // let singleGame = new GameParameters(
+                //     this.myForm.controls.name.value,
+                //     this.myForm.controls.dictionaryForm.value,
+                //     this.myForm.controls.bonus.value,
+                //     this.myForm.controls.timer.value,
+                // );
 
-            // this.singleGame.initializing(this.myForm);
-            // console.log(this.singleGame);
-            let single = this.soloGameService.initializingMultijoueur(this.myForm);
-            // console.log(single.dictionary, single.player, single.totalCountDown + 'submit');
-            this.gameList.addGame(single);
-            console.log(this.gameList);
+                // this.singleGame.initializing(this.myForm);
+                // console.log(this.singleGame);
+                this.closeDialog();
+                let single = this.soloGameService.initializingMultijoueur(this.myForm);
+                this.gameList.createRoom(single);
+                this.dialog.open(WaitingAreaComponent, { disableClose: true });
+                console.log(single);
+            }
         }
     }
-    addGame(game: GameParameters) {
-        this.gameList.addGame(game);
-    }
+    // addGame(game: GameParameters) {
+    //     this.gameList.addGame(game);
+    // }
 }

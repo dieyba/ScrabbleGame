@@ -36,6 +36,7 @@ export class SoloGameService {
     turnPassed: boolean;
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
+    id: number = 0;
 
     constructor(private gridService: GridService, private rackService: RackService) {
         this.hasTurnsBeenPassed = [];
@@ -56,12 +57,12 @@ export class SoloGameService {
 
     initializingMultijoueur(form: FormGroup): GameParameters {
         this.localPlayer = new LocalPlayer(form.controls.name.value);
-        this.dictionary = new Dictionary(+form.controls.dictionaryForm.value);
-        this.randomBonus = form.controls.bonus.value;
+        // this.dictionary = new Dictionary(+form.controls.dictionaryForm.value);
+        // this.randomBonus = form.controls.bonus.value;
         this.totalCountDown = +form.controls.timer.value;
         this.timerMs = +this.totalCountDown;
         console.log(this.localPlayer.name + ' sologame local player');
-        return new GameParameters(this.localPlayer.name, this.dictionary, this.timerMs);
+        return new GameParameters(this.localPlayer.name, this.timerMs);
     }
 
     createNewGame() {
