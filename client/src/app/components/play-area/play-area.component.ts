@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
+import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
 
@@ -37,6 +38,7 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly gridService: GridService,
         private readonly rackService: RackService,
         private readonly soloGameService: SoloGameService, // private readonly validationService: ValidationService,
+        private readonly multiPlayerGameService: MultiPlayerGameService,
     ) {}
 
     ngAfterViewInit(): void {
@@ -44,6 +46,7 @@ export class PlayAreaComponent implements AfterViewInit {
         this.rackService.gridContext = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.soloGameService.createNewGame();
         this.gridService.drawGrid();
+        this.multiPlayerGameService.createNewGame();
         this.gridService.drawColors();
         this.rackService.drawRack();
 

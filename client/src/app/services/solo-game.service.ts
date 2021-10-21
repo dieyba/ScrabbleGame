@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { PlaceParams } from '@app/classes/commands';
 import { Dictionary } from '@app/classes/dictionary';
@@ -18,7 +18,7 @@ import { RackService } from './rack.service';
 import { ValidationService, WAIT_TIME } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 export const TIMER_INTERVAL = 1000;
-const DEFAULT_LETTER_COUNT = 7;
+export const DEFAULT_LETTER_COUNT = 7;
 const DOUBLE_DIGIT = 10;
 const MINUTE_IN_SEC = 60;
 const MAX_TURNS_PASSED = 6;
@@ -26,7 +26,7 @@ const MAX_TURNS_PASSED = 6;
 @Injectable({
     providedIn: 'root',
 })
-export class SoloGameService {
+export class SoloGameService implements OnInit {
     localPlayer: LocalPlayer;
     virtualPlayer: VirtualPlayer;
     totalCountDown: number;
@@ -40,15 +40,19 @@ export class SoloGameService {
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
     constructor(
-        private gridService: GridService,
-        private rackService: RackService,
-        private chatDisplayService: ChatDisplayService,
-        private validationService: ValidationService,
-        private wordBuilder: WordBuilderService,
+        protected gridService: GridService,
+        protected rackService: RackService,
+        protected chatDisplayService: ChatDisplayService,
+        protected validationService: ValidationService,
+        protected wordBuilder: WordBuilderService,
     ) {
+        this.chatDisplayService.entries = [];
         this.hasTurnsBeenPassed = [];
         this.turnPassed = false;
         this.isEndGame = false;
+    }
+    ngOnInit(): void {
+        throw new Error('Method not implemented.');
     }
     initializeGame(gameInfo: FormGroup) {
         this.chatDisplayService.entries = [];

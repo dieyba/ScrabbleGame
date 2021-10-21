@@ -1,18 +1,20 @@
-import { LetterStock } from './letter-stock';
 import { Dictionary } from './dictionary';
+import { LetterStock } from './letter-stock';
 import { LocalPlayer } from './local-player';
 import { ScrabbleBoard } from './scrabble-board';
-import { VirtualPlayer } from './virtual-player';
+import { ScrabbleWord } from './scrabble-word';
 
-export class Game {
+export interface Game {
+    id: string;
     scrabbleBoard: ScrabbleBoard;
-    localPlayer: LocalPlayer;
-    virtualPlayer: VirtualPlayer;
+    player1: LocalPlayer;
+    player2: LocalPlayer;
     totalCountDown: number;
     dictionary: Dictionary;
     randomBonus: boolean;
-    stock: LetterStock = new LetterStock();
+    stock: LetterStock;
     turnPassed: boolean;
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
+    newWord: ScrabbleWord;
 }

@@ -1,6 +1,6 @@
 import { ScrabbleLetter } from './scrabble-letter';
 
-export abstract class Player {
+export class Player {
     name: string;
     score: number;
     letters: ScrabbleLetter[];

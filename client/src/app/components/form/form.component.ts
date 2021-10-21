@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
 import { SoloGameService } from '@app/services/solo-game.service';
 
 @Component({
@@ -23,8 +24,14 @@ export class FormComponent implements OnInit {
     dictionary: string;
     defaultTimer = '60';
     defaultDictionary = '0';
+    defaultBonus = false;
 
-    constructor(private dialog: MatDialogRef<FormComponent>, private router: Router, private soloGameService: SoloGameService) {
+    constructor(
+        private dialog: MatDialogRef<FormComponent>,
+        private router: Router,
+        private soloGameService: SoloGameService,
+        private multiPlayerGameService: MultiPlayerGameService,
+    ) {
         this.dictionary = 'Français';
         this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
     }
@@ -88,6 +95,7 @@ export class FormComponent implements OnInit {
             this.closeDialog();
             this.router.navigate(['/game']);
             this.soloGameService.initializeGame(this.myForm);
+            this.multiPlayerGameService.initializeGame(this.myForm);
         }
     }
 }

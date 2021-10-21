@@ -1,6 +1,7 @@
 import { Game } from '@app/classes/game';
 import { GameService } from '@app/services/game.service';
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
+import * as fs from 'fs';
 import * as Httpstatus from 'http-status-codes';
 import { Service } from 'typedi';
 
@@ -10,6 +11,7 @@ export class GameController {
 
     constructor(private readonly gameService: GameService) {
         this.configureRouter();
+        this.gameService.start();
     }
 
     private configureRouter(): void {
@@ -17,7 +19,7 @@ export class GameController {
 
         this.router.get('/', async (req: Request, res: Response) => {
             this.gameService
-                .getGameInfo()
+                .getAllGames()
                 .then((games: Game[]) => {
                     res.json(games);
                 })
@@ -27,11 +29,28 @@ export class GameController {
         });
 
         this.router.post('/', async (req: Request, res: Response) => {
-            // tslint:disable-next-line:no-string-literal
             this.gameService
-                .updateGameInfo(req.body)
+                .addGameInfo(req.body)
                 .then((id: string): void => {
                     res.sendStatus(Httpstatus.StatusCodes.CREATED).send();
+                })
+                .catch((error: Error) => {
+                    res.status(Httpstatus.StatusCodes.NOT_FOUND).send(error.message);
+                });
+        });
+
+        this.router.delete('/:gameId', async (req: Request, res: Response) => {
+            const path = './' + req.params.gameId;
+            try {
+                // remove the png file from the folder
+                fs.unlinkSync(path);
+            } catch (err) {
+                console.error(err);
+            }
+            this.gameService
+                .deleteGame(req.params.gameId)
+                .then(() => {
+                    res.send('GAME ' + req.params.gameId + ' DELETED').send();
                 })
                 .catch((error: Error) => {
                     res.status(Httpstatus.StatusCodes.NOT_FOUND).send(error.message);

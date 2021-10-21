@@ -9,6 +9,7 @@ import * as logger from 'morgan';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
+import { GameController } from './controllers/game.controller';
 
 @Service()
 export class Application {
@@ -16,7 +17,11 @@ export class Application {
     private readonly internalError: number = StatusCodes.INTERNAL_SERVER_ERROR;
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
-    constructor(private readonly exampleController: ExampleController, private readonly dateController: DateController) {
+    constructor(
+        private readonly exampleController: ExampleController,
+        private readonly dateController: DateController,
+        private readonly gameController: GameController,
+    ) {
         this.app = express();
 
         this.swaggerOptions = {
@@ -39,8 +44,23 @@ export class Application {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/api/example', this.exampleController.router);
         this.app.use('/api/date', this.dateController.router);
+        this.app.use('/api/game', this.gameController.router);
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
+        });
+        // Add headers
+        this.app.use(function (req, res, next) {
+            // Website you wish to allow to connect
+            res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+
+            // Request methods you wish to allow
+            res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+            // Request headers you wish to allow
+            res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+            // Pass to next layer of middleware
+            next();
         });
         this.errorHandling();
     }
@@ -48,7 +68,7 @@ export class Application {
     private config(): void {
         // Middlewares configuration
         this.app.use(logger('dev'));
-        this.app.use(express.json());
+        this.app.use(express.json({ limit: '500mb' }));
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(cookieParser());
         this.app.use(cors());
