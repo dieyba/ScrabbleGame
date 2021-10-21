@@ -10,7 +10,7 @@ import { FormComponent } from '@app/components/form/form.component';
 export class ClassicModeComponent {
     constructor(private dialog: MatDialog) {}
 
-    openDialog(): void {
-        this.dialog.open(FormComponent, {});
+    openDialog(isSolo: boolean): void {
+        this.dialog.open(FormComponent, { data: isSolo });
     }
 }

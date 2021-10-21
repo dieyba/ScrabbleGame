@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { PlaceParams } from '@app/classes/commands';
 import { Dictionary } from '@app/classes/dictionary';
 import { ErrorType } from '@app/classes/errors';
+import { GameParameters } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
@@ -17,6 +18,7 @@ import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 import { ValidationService, WAIT_TIME } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
+
 export const TIMER_INTERVAL = 1000;
 export const DEFAULT_LETTER_COUNT = 7;
 const DOUBLE_DIGIT = 10;
@@ -39,6 +41,8 @@ export class SoloGameService implements OnInit {
     turnPassed: boolean;
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
+    id: number = 0;
+    
     constructor(
         protected gridService: GridService,
         protected rackService: RackService,
@@ -65,6 +69,17 @@ export class SoloGameService implements OnInit {
         this.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.randomBonus = gameInfo.controls.bonus.value;
     }
+
+    initializingMultijoueur(form: FormGroup): GameParameters {
+        this.localPlayer = new LocalPlayer(form.controls.name.value);
+        // this.dictionary = new Dictionary(+form.controls.dictionaryForm.value);
+        // this.randomBonus = form.controls.bonus.value;
+        this.totalCountDown = +form.controls.timer.value;
+        this.timerMs = +this.totalCountDown;
+        console.log(this.localPlayer.name + ' sologame local player');
+        return new GameParameters(this.localPlayer.name, this.timerMs);
+    }
+
     createNewGame() {
         // Empty board and stack
         this.rackService.rackLetters = [];
