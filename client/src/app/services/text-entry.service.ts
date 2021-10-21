@@ -7,6 +7,8 @@ import { createPassCmd } from '@app/classes/pass-command';
 import { createPlaceCmd } from '@app/classes/place-command';
 import { Player } from '@app/classes/player';
 import { Column, Row } from '@app/classes/scrabble-board';
+import { createStockCmd } from '@app/classes/stock-command';
+import { scrabbleLetterstoString } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { ChatDisplayService } from './chat-display.service';
 import { SoloGameService } from './solo-game.service';
@@ -15,6 +17,7 @@ const DEBUG_CMD = 'debug';
 const EXCHANGE_CMD = 'échanger';
 const PASS_CMD = 'passer';
 const PLACE_CMD = 'placer';
+const STOCK_CMD = 'réserve';
 
 const PARSE_INT_BASE = 10;
 const MIN_EXCHANGE_LETTERS = 1;
@@ -44,11 +47,13 @@ export class TextEntryService {
         this.commandsMap.set(EXCHANGE_CMD, createExchangeCmd);
         this.commandsMap.set(PASS_CMD, createPassCmd);
         this.commandsMap.set(PLACE_CMD, createPlaceCmd);
+        this.commandsMap.set(STOCK_CMD, createStockCmd);
 
         this.paramsMap.set(DEBUG_CMD, this.extractDebugParams);
         this.paramsMap.set(EXCHANGE_CMD, this.extractExchangeParams);
         this.paramsMap.set(PLACE_CMD, this.extractPlaceParams);
         this.paramsMap.set(PASS_CMD, this.extractPassParams);
+        this.paramsMap.set(STOCK_CMD, this.extractStockParams);
     }
 
     /**
@@ -67,6 +72,8 @@ export class TextEntryService {
                 const isCreated = commandCreationResult !== ErrorType.SyntaxError && commandCreationResult !== ErrorType.InvalidCommand;
                 if (isCreated) {
                     commandCreationResult = commandCreationResult as Command;
+
+                    // TODO: put this in a command invoker service
                     const commandExecutionResult = commandCreationResult.execute();
                     if (commandExecutionResult === ErrorType.NoError) {
                         // In this sprint, only exchange command success message depends on who called the command
@@ -77,6 +84,7 @@ export class TextEntryService {
                     } else {
                         this.chatDisplayService.addErrorMessage(commandExecutionResult, userInput);
                     }
+                    //
                 } else {
                     this.chatDisplayService.addErrorMessage(commandCreationResult as ErrorType, userInput);
                 }
@@ -127,6 +135,15 @@ export class TextEntryService {
     extractDebugParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
             return { player, serviceCalled: this.chatDisplayService };
+        }
+        return undefined;
+    }
+
+    extractStockParams(player: Player, paramsInput: string[]): CommandParams {
+        if (paramsInput.length === 0) {
+            const defaultParams = { player, serviceCalled: this.chatDisplayService };
+            const stockLetters: string = scrabbleLetterstoString(this.gameService.stock.letterStock);
+            return { defaultParams, specificParams: stockLetters };
         }
         return undefined;
     }
@@ -228,6 +245,7 @@ export class TextEntryService {
         return isValid;
     }
 
+    // TODO: move the necessary methods in utilities
     removeAccents(letters: string): string {
         return letters.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
