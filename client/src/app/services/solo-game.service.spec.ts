@@ -285,7 +285,7 @@ describe('GameService', () => {
         expect(letterStar.tile).toEqual(service['gridService'].scrabbleBoard.squares[coord.x][coord.y]);
     });
 
-    it('"placeLetter" should not place letter if the is already a letter', () => {
+    it('"placeLetter" should not place letter if the letter is already a there', () => {
         const playerLetters: ScrabbleLetter[] = [];
         const letterA = new ScrabbleLetter('a', 1);
         const letterStar = new ScrabbleLetter('*', 0);
@@ -318,6 +318,32 @@ describe('GameService', () => {
 
         spyPlayer.isActive = true;
         const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'myWord' };
+
+        expect(service.place(spyPlayer, placeParams)).toEqual(ErrorType.SyntaxError);
+    });
+
+    it('"place" should return a syntax error if all letters are already placed on board', () => {
+        const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'house' };
+        spyPlayer.isActive = true;
+        service.localPlayer = spyPlayer;
+
+        const coord = new Vec2(placeParams.position.x, placeParams.position.y);
+        for (const letter of 'house') {
+            // eslint-disable-next-line dot-notation
+            const tempSquare = service['gridService'].scrabbleBoard.squares[coord.x][coord.y];
+            tempSquare.letter = new ScrabbleLetter(letter, 1);
+            tempSquare.occupied = true;
+            tempSquare.letter.tile = tempSquare;
+            coord.x++; // Because it's horizontal
+        }
+
+        expect(service.place(spyPlayer, placeParams)).toEqual(ErrorType.SyntaxError);
+    });
+
+    it('"place" should return a syntax error if the player doesn\'t have the necessary letters', () => {
+        const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'myWord' };
+        spyPlayer.isActive = true;
+        spyPlayer.letters = []; // No letters
 
         expect(service.place(spyPlayer, placeParams)).toEqual(ErrorType.SyntaxError);
     });
