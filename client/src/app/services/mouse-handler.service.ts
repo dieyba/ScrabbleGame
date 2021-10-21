@@ -25,16 +25,18 @@ export class MouseHandlerService {
 
     mouseHitDetect(event: MouseEvent) {
         console.log(event.button)
-        if (event.button === MouseButton.Right) {
+        if (event.button === MouseButton.Left) {
             this.mousePosition.x = event.offsetX;
             this.mousePosition.y = event.offsetY;
             console.log('x : ', this.mousePosition.x);
             console.log('y : ', this.mousePosition.y);
+            console.log('x dans tout le doc : ', event.pageX);
+            console.log('y dans tout le doc : ', event.pageY);
         }
-        else if (event.button === MouseButton.Left) {
-            this.mousePosition.x = -1;
-            this.mousePosition.y = -1;
-        }
+        // else if (event.button === MouseButton.Left) {
+        //     this.mousePosition.x = -1;
+        //     this.mousePosition.y = -1;
+        // }
     }
 
     isCoordInsideRack(): boolean {

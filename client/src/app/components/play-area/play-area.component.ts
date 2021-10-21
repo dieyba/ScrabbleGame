@@ -154,7 +154,12 @@ export class PlayAreaComponent implements AfterViewInit {
         }
     }
 
-    clickOutsideRack() {
+    clickOutsideRack(event: Event) {
+        const evt = event as FocusEvent;
+        console.log(evt);
+        console.log(event);
+        const x = (evt.relatedTarget as HTMLElement).id;
+        console.log(x);
         const ctx = this.rackCanvas.nativeElement.getContext('2d');
         if (!ctx?.fillStyle) return;
         this.rackService.deselectAll(this.soloGameService.localPlayer, ctx);
