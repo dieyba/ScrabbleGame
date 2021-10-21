@@ -10,14 +10,15 @@ export class SidebarComponent {
     player1Name: string;
     player2Name: string;
     winnerName: string;
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    lettersLeftCount: number = 15; // TODO - get actual value
 
     constructor(public sologameService: SoloGameService) {
         this.player1Name = this.sologameService.localPlayer.name;
         this.player2Name = this.sologameService.virtualPlayer.name;
         this.winnerName = '';
-        this.lettersLeftCount = this.sologameService.stock.letterStock.length;
+    }
+
+    getLettersLeftCount(): number {
+        return this.sologameService.stock.letterStock.length;
     }
 
     getPlayer1LetterCount(): number {

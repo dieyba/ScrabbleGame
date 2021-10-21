@@ -61,9 +61,13 @@ describe('ScrabbleBoard', () => {
         position.y = 7;
         expect(board.isWordPassingInCenter(motAPlacer, position, orientation)).toBeTrue();
 
+        motAPlacer = 'oui'; // le mot est trop court donc il ne passe pas par le milieu
+        expect(board.isWordPassingInCenter(motAPlacer, position, orientation)).toBeFalse();
+
         position.x = 7;
         position.y = 4;
         orientation = 'v';
+        motAPlacer = 'maison';
         expect(board.isWordPassingInCenter(motAPlacer, position, orientation)).toBeTrue();
 
         motAPlacer = 'oui'; // le mot est trop court donc il ne passe pas par le milieu
@@ -167,6 +171,27 @@ describe('ScrabbleBoard', () => {
     it('isWordTouchingOtherWord should call isCoordInsideBoard', () => {
         const spy = spyOn(board, 'isCoordInsideBoard');
         board.isWordTouchingOtherWord(motAPlacer, position, orientation);
-        expect(spy).toHaveBeenCalledTimes(2);
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('getStringFromCoord should return the correct string (maison )', () => {
+        const centerColomnRow = 8;
+
+        // Creating letters to be placed on board for testing
+        const letterAlreadyPlaced: ScrabbleLetter[] = [];
+        for (const letter of motAPlacer) {
+            letterAlreadyPlaced.push(new ScrabbleLetter(letter, 1));
+        }
+
+        // Placing letters horizontally
+        for (let i = 0; i < motAPlacer.length; i++) {
+            board.squares[centerColomnRow + i][centerColomnRow].letter = letterAlreadyPlaced[i];
+            board.squares[centerColomnRow + i][centerColomnRow].occupied = true;
+        }
+
+        // Checking all squares of the new word plus one horizontally. The last squares isn't occupied.
+        expect(board.getStringFromCoord(new Vec2(centerColomnRow, centerColomnRow), motAPlacer.length + 1, 'h')).toEqual('maison ');
+        // Same vertically
+        expect(board.getStringFromCoord(new Vec2(centerColomnRow, centerColomnRow), motAPlacer.length + 1, 'v')).toEqual('m      ');
     });
 });

@@ -22,6 +22,7 @@ export class Square {
         this.color = SquareColor.None;
         this.occupied = false;
         this.isValidated = false;
+        this.isBonusUsed = false;
         this.position.x = horizontalPosition;
         this.position.y = verticalPosition;
     }

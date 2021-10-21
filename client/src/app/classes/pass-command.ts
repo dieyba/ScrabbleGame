@@ -11,7 +11,7 @@ export class PassTurnCmd extends Command {
     }
 
     execute(): ErrorType {
-        return this.gameService.passTurn();
+        return this.gameService.passTurn(this.gameService.localPlayer);
     }
 }
 
