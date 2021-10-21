@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { MouseButton, RACK_WIDTH, RACK_HEIGHT } from '@app/components/play-area/play-area.component';
 import { Vec2 } from '@app/classes/vec2';
+import { MouseButton, RACK_HEIGHT, RACK_WIDTH } from '@app/components/play-area/play-area.component';
 
 enum Case {
     FirstCaseValue = 71,
@@ -24,9 +24,16 @@ export class MouseHandlerService {
     // }
 
     mouseHitDetect(event: MouseEvent) {
-        if (event.button === MouseButton.Left) {
+        console.log(event.button)
+        if (event.button === MouseButton.Right) {
             this.mousePosition.x = event.offsetX;
             this.mousePosition.y = event.offsetY;
+            console.log('x : ', this.mousePosition.x);
+            console.log('y : ', this.mousePosition.y);
+        }
+        else if (event.button === MouseButton.Left) {
+            this.mousePosition.x = -1;
+            this.mousePosition.y = -1;
         }
     }
 

@@ -2,22 +2,27 @@
     <div class="row">
         <div class="column">
             <mat-card class="card">
-                <canvas id="canvas" #gridCanvas [attr.width]="width" [attr.height]="height"></canvas>
+                <canvas id="canvas" #gridCanvas (click)="clickOutsideRack()" [attr.width]="width" [attr.height]="height"></canvas>
             </mat-card>
             <mat-card class="rack">
-                <canvas id="rack-canvas" #rackCanvas [attr.width]="rackWidth" [attr.height]="rackHeight"></canvas>
+                <canvas id="rack-canvas" #rackCanvas (click)="selection($event)"  (contextmenu)="selection($event)" [attr.width]="rackWidth" [attr.height]="rackHeight"></canvas>
             </mat-card>
         </div>
         <div class="column">
-            <button class="size-btn" (click)="sizeUpLetters()">
+            <button class="size-btn" (click)="sizeUpLetters(); clickOutsideRack()">
                 <img src="https://img.icons8.com/ios-glyphs/30/000000/collapse-arrow.png" />
             </button>
-            <button class="size-btn" (click)="sizeDownLetters()">
+            <button class="size-btn" (click)="sizeDownLetters(); clickOutsideRack()">
                 <img src="https://img.icons8.com/ios-glyphs/30/000000/expand-arrow--v1.png" />
             </button>
-            <div class="row">
+            <div class="row" style="background-color:black" (click)="clickOutsideRack()">
                 <button class="btn" (click)="passTurn()" *ngIf="isLocalPlayerActive() && !isEndGame()">Passer mon tour</button>
                 <button class="btn" disabled="true" *ngIf="!isLocalPlayerActive() || isEndGame()" style="opacity: 1">Passer mon tour</button>
+            </div>
+            <div class="echange">
+                <button class="echanger" (click)="exchange()" *ngIf="(!isEndGame() && atLeastOneLetterSelected()) && (isLocalPlayerActive() && !lessThanSevenLettersInStock())" >Echanger</button>
+                <button class="echanger" disabled="true" *ngIf="(!isEndGame() && atLeastOneLetterSelected()) && (!isLocalPlayerActive() || lessThanSevenLettersInStock())" style="opacity: 1">Echanger</button>
+                <button class="annuler" (click)="cancelExchange()" *ngIf="!isEndGame() && atLeastOneLetterSelected()">Annuler</button>
             </div>
         </div>
     </div>

@@ -103,11 +103,15 @@ export class RackService {
         this.drawRack();
     }
 
-    deselectAll(player: LocalPlayer) {
+    deselectAll(player: LocalPlayer, ctx: CanvasRenderingContext2D) {
         for (let i = 0; i < player.exchangeSelected.length; i++) {
-            player.exchangeSelected[i] = false;
+            this.deselectForExchange(i + 1, ctx, player);
         }
-        this.drawRack();
+
+        // for (let i = 0; i < player.exchangeSelected.length; i++) {
+        //     player.exchangeSelected[i] = false;
+        // }
+        // this.drawRack();
     }
 
     handleExchangeSelection(position: number, ctx: CanvasRenderingContext2D) {

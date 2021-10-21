@@ -13,7 +13,7 @@ const routes: Routes = [
     { path: 'classic', component: ClassicModeComponent },
     { path: 'game', component: GamePageComponent },
     { path: 'material', component: MaterialPageComponent },
-    { path: '**', redirectTo: '/home' },
+    { path: '**', redirectTo: '/start' },
 ];
 
 @NgModule({

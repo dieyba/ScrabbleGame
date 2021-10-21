@@ -168,7 +168,7 @@ export class SoloGameService {
 
                 const lettersToAdd: ScrabbleLetter[] = this.stock.exchangeLetters(lettersToRemove);
                 for (let i = 0; i < lettersToAdd.length; i++) {
-                    player.addLetter(lettersToAdd[i]);
+                    // player.addLetter(lettersToAdd[i]);
                     this.rackService.removeLetter(lettersToRemove[i]);
                     this.addRackLetter(lettersToAdd[i]);
                 }

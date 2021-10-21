@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
+import { MouseHandlerService } from '@app/services/mouse-handler.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
 
@@ -34,10 +35,14 @@ export class PlayAreaComponent implements AfterViewInit {
     private rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
 
     constructor(
+        private readonly mouseService: MouseHandlerService,
         private readonly gridService: GridService,
         private readonly rackService: RackService,
         private readonly soloGameService: SoloGameService, // private readonly validationService: ValidationService,
-    ) {}
+    ) {
+
+
+    }
 
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
@@ -120,5 +125,68 @@ export class PlayAreaComponent implements AfterViewInit {
 
     sizeDownLetters(): void {
         this.gridService.sizeDownLetters();
+    }
+
+    atLeastOneLetterSelected(): boolean {
+        for (const selected of this.soloGameService.localPlayer.exchangeSelected) {
+            if (selected === true) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    lessThanSevenLettersInStock(): boolean {
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        return this.soloGameService.stock.letterStock.length < 7;
+    }
+
+    exchange() {
+        this.soloGameService.exchangeLettersSelected(this.soloGameService.localPlayer);
+        // this.rackService.deselectAll(this.soloGameService.localPlayer);
+    }
+
+    cancelExchange() {
+        const ctx = this.rackCanvas.nativeElement.getContext('2d');
+        if (!ctx?.fillStyle) return;
+        for (let i = 1; i <= this.soloGameService.localPlayer.letters.length; i++) {
+            this.rackService.deselectForExchange(i, ctx, this.soloGameService.localPlayer);
+        }
+    }
+
+    clickOutsideRack() {
+        const ctx = this.rackCanvas.nativeElement.getContext('2d');
+        if (!ctx?.fillStyle) return;
+        this.rackService.deselectAll(this.soloGameService.localPlayer, ctx);
+    }
+
+    selection(event: MouseEvent) {
+        event.preventDefault()
+        const ctx = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+
+        this.mouseService.mouseHitDetect(event);
+        const position = this.mouseService.selectedLetterPosition();
+        if (this.soloGameService.localPlayer.exchangeSelected[position - 1] === true) {
+            this.rackService.deselectForExchange(position, ctx, this.soloGameService.localPlayer);
+        } else {
+            this.rackService.selectForExchange(position, ctx, this.soloGameService.localPlayer);
+        }
+
+        // if (event.button === MouseButton.Left) {
+        //     this.mousePosition.x = event.offsetX;
+        //     this.mousePosition.y = event.offsetY;
+        //     const ctx = this.rackCanvas.nativeElement.getContext('2d');
+        //     if (!ctx?.fillStyle) return;
+        //     // this.rackCanvas.nativeElement.style.background = 'orange';
+        //     ctx.fillStyle = 'orange';
+        //     // ctx.shadowColor = 'red';
+        //     ctx.fillRect(0, 0, 71, 60);
+        //     ctx.fillStyle = 'red';
+        //     ctx.fillRect(71, 0, 71, 60);
+        //     this.rackService.drawExistingLetters();
+        //     // style="background-color: blue;"
+        // }
+        // // console.log('x : ', this.mousePosition.x);
+        // // console.log('y : ', this.mousePosition.y);
     }
 }
