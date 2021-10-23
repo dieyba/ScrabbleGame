@@ -30,7 +30,11 @@ describe('PlayAreaComponent', () => {
             'changeActivePlayer',
             'removeLetter',
         ]);
-        rackServiceSpy = jasmine.createSpyObj('RackService', ['drawRack', 'deselectForExchange', 'selectForExchange']);
+        // pour les properties, cette faôn de faire empêche les modifs. check sur le lien suivant pour modifer ça.
+        // https://stackoverflow.com/questions/64560390/jasmine-createspyobj-with-properties
+        rackServiceSpy = jasmine.createSpyObj('RackService', ['drawRack', 'deselectForExchange', 'selectForExchange'], {
+            ['exchangeSelected']: [false, false, false, false, false, false, false],
+        });
         await TestBed.configureTestingModule({
             declarations: [PlayAreaComponent],
             providers: [
