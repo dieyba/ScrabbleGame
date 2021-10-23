@@ -29,6 +29,7 @@ export enum MouseButton {
 })
 export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('rackCanvas', { static: false }) private rackCanvas!: ElementRef<HTMLCanvasElement>;
 
     mousePosition: Vec2 = new Vec2(0, 0);
     buttonPressed = '';
@@ -52,6 +53,7 @@ export class PlayAreaComponent implements AfterViewInit {
 
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        this.rackService.gridContext = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.rackContext = this.rackService.gridContext;
         this.soloGameService.createNewGame();
         this.gridService.drawGrid();

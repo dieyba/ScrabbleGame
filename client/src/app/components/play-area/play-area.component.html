@@ -4,7 +4,18 @@
             <mat-card class="card">
                 <canvas id="canvas" #gridCanvas [attr.width]="width" [attr.height]="height"></canvas>
             </mat-card>
-            <app-rack></app-rack>
+            <mat-card class="rack">
+                <canvas
+                    id="rack-canvas"
+                    #rackCanvas
+                    (click)="selection($event)"
+                    (contextmenu)="selection($event)"
+                    tabindex="0"
+                    (focusout)="clickOutsideRack($event)"
+                    [attr.width]="rackWidth"
+                    [attr.height]="rackHeight"
+                ></canvas>
+            </mat-card>
         </div>
         <div class="column">
             <button class="size-btn" (click)="sizeUpLetters()">
