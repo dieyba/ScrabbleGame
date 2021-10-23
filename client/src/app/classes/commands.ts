@@ -1,6 +1,6 @@
+import { Player } from '@app/classes/player';
 import { ChatDisplayService } from '@app/services/chat-display.service';
 import { SoloGameService } from '@app/services/solo-game.service';
-import { Player } from '@app/classes/player';
 import { ErrorType } from './errors';
 import { Vec2 } from './vec2';
 
@@ -9,8 +9,6 @@ export interface DefaultCommandParams {
     serviceCalled: SoloGameService | ChatDisplayService;
 }
 
-export type ExchangeParams = string;
-
 export interface PlaceParams {
     position: Vec2;
     orientation: string;
@@ -18,9 +16,9 @@ export interface PlaceParams {
 }
 
 export type CommandParams =
-    | { defaultParams: DefaultCommandParams; specificParams: PlaceParams }
-    | { defaultParams: DefaultCommandParams; specificParams: ExchangeParams }
-    | DefaultCommandParams
+    | { defaultParams: DefaultCommandParams; specificParams: PlaceParams } // place command
+    | { defaultParams: DefaultCommandParams; specificParams: string } // extract and stock command
+    | DefaultCommandParams // debug and pass commands
     | undefined;
 
 export abstract class Command {
@@ -31,4 +29,5 @@ export abstract class Command {
     }
 
     abstract execute(): ErrorType;
+    // abstract addExecutionResultMessage():string;
 }

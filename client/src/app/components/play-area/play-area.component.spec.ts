@@ -28,7 +28,7 @@ describe('PlayAreaComponent', () => {
             'createNewGame',
             'passTurn',
             'changeActivePlayer',
-            'removeLetter',
+            'removeRackLetter',
         ]);
         // pour les properties, cette faôn de faire empêche les modifs. check sur le lien suivant pour modifer ça.
         // https://stackoverflow.com/questions/64560390/jasmine-createspyobj-with-properties

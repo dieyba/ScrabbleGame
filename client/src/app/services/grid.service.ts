@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleLetter, UNPLACED } from '@app/classes/scrabble-letter';
 import { Square, SquareColor } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
 
@@ -81,11 +81,17 @@ export class GridService {
         }
     }
 
-    removeSquare(i: number, j: number) {
+    // reset tile and returns the letter that was on it
+    removeSquare(i: number, j: number): ScrabbleLetter {
+        // Saving information about square
         const color = this.scrabbleBoard.squares[i][j].color;
+        const letter = this.scrabbleBoard.squares[i][j].letter;
+        // Unassign the letter and the letter coordinates (tile)
+        letter.tile = new Square(UNPLACED, UNPLACED);
         this.scrabbleBoard.squares[i][j] = new Square(i, j);
         this.scrabbleBoard.squares[i][j].color = color;
         this.drawSingleSquareColor(i, j);
+        return letter;
     }
 
     // To remove a square, set scrabbleBoard.squares[x][y].occupied to false, set scrabbleBoard.square[x][y].letter = new Scrabble
@@ -168,7 +174,7 @@ export class GridService {
     drawLetters(): void {
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
-                if (this.scrabbleBoard.squares[i][j].letter != null) {
+                if (this.scrabbleBoard.squares[i][j].occupied === true) {
                     const positionX = (this.width * i) / BOARD_SIZE + BOARD_OFFSET;
                     const positionY = (this.height * j) / BOARD_SIZE + BOARD_OFFSET;
 
@@ -234,5 +240,22 @@ export class GridService {
         this.drawGrid();
         this.drawColors();
         this.drawLetters();
+    }
+
+    removeInvalidLetters(coord: Vec2, length: number, orientation: string): ScrabbleLetter[] {
+        const removedScrabbleLetters: ScrabbleLetter[] = [];
+        for (let i = 0; i < length; i++) {
+            if (orientation === 'v') {
+                if (this.scrabbleBoard.squares[coord.x][coord.y + i].isValidated === false) {
+                    removedScrabbleLetters.push(this.removeSquare(coord.x, coord.y + i));
+                }
+            }
+            if (orientation === 'h') {
+                if (this.scrabbleBoard.squares[coord.x + i][coord.y].isValidated === false) {
+                    removedScrabbleLetters.push(this.removeSquare(coord.x + i, coord.y));
+                }
+            }
+        }
+        return removedScrabbleLetters; // TODO check if letter is a star
     }
 }

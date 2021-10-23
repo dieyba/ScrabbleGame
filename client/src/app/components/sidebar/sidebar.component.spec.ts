@@ -33,9 +33,7 @@ describe('SidebarComponent', () => {
         soloGameServiceSpy.virtualPlayer = new VirtualPlayer('Sara', PlayerType.Easy);
         soloGameServiceSpy.virtualPlayer.score = 70;
         soloGameServiceSpy.virtualPlayer.letters = [firstLetter, thirdLetter, firstLetter];
-
-        const stock = new LetterStock();
-        soloGameServiceSpy.stock = stock;
+        soloGameServiceSpy.stock = new LetterStock();
     });
 
     beforeEach(() => {
