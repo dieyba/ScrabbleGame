@@ -51,9 +51,9 @@ export class SoloGameService {
         this.isEndGame = false;
     }
     initializeGame(gameInfo: FormGroup) {
-        this.chatDisplayService.initialize();
         this.localPlayer = new LocalPlayer(gameInfo.controls.name.value);
         this.localPlayer.isActive = true;
+        this.chatDisplayService.initialize(this.localPlayer.name);
         this.virtualPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
         this.virtualPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.totalCountDown = +gameInfo.controls.timer.value;

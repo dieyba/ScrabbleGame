@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Command, CommandParams } from '@app/classes/commands';
+import { Command, CommandParams, CommandName } from '@app/classes/commands';
 import { createDebugCmd } from '@app/classes/debug-command';
 import { ErrorType } from '@app/classes/errors';
-import { createExchangeCmd, ExchangeCmd } from '@app/classes/exchange-command';
+import { createExchangeCmd } from '@app/classes/exchange-command';
 import { createPassCmd } from '@app/classes/pass-command';
 import { createPlaceCmd } from '@app/classes/place-command';
 import { Player } from '@app/classes/player';
@@ -12,12 +12,7 @@ import { scrabbleLetterstoString } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { ChatDisplayService } from './chat-display.service';
 import { SoloGameService } from './solo-game.service';
-
-const DEBUG_CMD = 'debug';
-const EXCHANGE_CMD = 'échanger';
-const PASS_CMD = 'passer';
-const PLACE_CMD = 'placer';
-const STOCK_CMD = 'réserve';
+import { createPlayerEntry, createErrorEntry } from '@app/classes/chat-display-entry';
 
 const PARSE_INT_BASE = 10;
 const MIN_EXCHANGE_LETTERS = 1;
@@ -43,17 +38,17 @@ export class TextEntryService {
         this.commandsMap = new Map();
         this.paramsMap = new Map();
 
-        this.commandsMap.set(DEBUG_CMD, createDebugCmd);
-        this.commandsMap.set(EXCHANGE_CMD, createExchangeCmd);
-        this.commandsMap.set(PASS_CMD, createPassCmd);
-        this.commandsMap.set(PLACE_CMD, createPlaceCmd);
-        this.commandsMap.set(STOCK_CMD, createStockCmd);
+        this.commandsMap.set(CommandName.DEBUG_CMD, createDebugCmd);
+        this.commandsMap.set(CommandName.EXCHANGE_CMD, createExchangeCmd);
+        this.commandsMap.set(CommandName.PASS_CMD, createPassCmd);
+        this.commandsMap.set(CommandName.PLACE_CMD, createPlaceCmd);
+        this.commandsMap.set(CommandName.STOCK_CMD, createStockCmd);
 
-        this.paramsMap.set(DEBUG_CMD, this.extractDebugParams);
-        this.paramsMap.set(EXCHANGE_CMD, this.extractExchangeParams);
-        this.paramsMap.set(PLACE_CMD, this.extractPlaceParams);
-        this.paramsMap.set(PASS_CMD, this.extractPassParams);
-        this.paramsMap.set(STOCK_CMD, this.extractStockParams);
+        this.paramsMap.set(CommandName.DEBUG_CMD, this.extractDebugParams);
+        this.paramsMap.set(CommandName.EXCHANGE_CMD, this.extractExchangeParams);
+        this.paramsMap.set(CommandName.PLACE_CMD, this.extractPlaceParams);
+        this.paramsMap.set(CommandName.PASS_CMD, this.extractPassParams);
+        this.paramsMap.set(CommandName.STOCK_CMD, this.extractStockParams);
     }
 
     /**
@@ -67,30 +62,25 @@ export class TextEntryService {
         userInput = this.trimSpaces(userInput);
         if (!this.isEmpty(userInput)) {
             // After the end game, messages starting with ! can't call commands and are considered normal chat messages
-            if (userInput.startsWith('!') && !this.gameService.isEndGame) {
+            const isACommand = userInput.startsWith('!') && !this.gameService.isEndGame;
+            if (isACommand) {
                 let commandCreationResult = this.createCommand(userInput, player);
                 const isCreated = commandCreationResult !== ErrorType.SyntaxError && commandCreationResult !== ErrorType.InvalidCommand;
                 if (isCreated) {
                     commandCreationResult = commandCreationResult as Command;
 
-                    // TODO: put this in a command invoker service
-                    const commandExecutionResult = commandCreationResult.execute();
-                    if (commandExecutionResult === ErrorType.NoError) {
-                        // In this sprint, only exchange command success message depends on who called the command
-                        if (commandCreationResult instanceof ExchangeCmd) {
-                            userInput = this.chatDisplayService.createExchangeMessage(isLocalPlayer, userInput);
-                        }
-                        this.chatDisplayService.addPlayerEntry(isLocalPlayer, player.name, userInput);
-                    } else {
-                        this.chatDisplayService.addErrorMessage(commandExecutionResult, userInput);
+                    // TODO:add command created to invoker, which will call it and display the right execution msg in chatbox
+                    const executionResult = commandCreationResult.execute();
+                    for(let entry of executionResult){
+                        this.chatDisplayService.addEntry(entry);
                     }
-                    //
+                    
                 } else {
-                    this.chatDisplayService.addErrorMessage(commandCreationResult as ErrorType, userInput);
+                    this.chatDisplayService.addEntry( createErrorEntry(commandCreationResult as ErrorType, userInput) );
                 }
             } else {
                 // Not a command input. Send normal chat message
-                this.chatDisplayService.addPlayerEntry(isLocalPlayer, player.name, userInput);
+                this.chatDisplayService.addEntry( createPlayerEntry(isLocalPlayer, player.name, userInput) );
             }
         }
     }

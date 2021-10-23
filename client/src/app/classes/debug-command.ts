@@ -1,6 +1,8 @@
 import { ChatDisplayService } from '@app/services/chat-display.service';
-import { Command, DefaultCommandParams } from './commands';
-import { ErrorType } from './errors';
+import { ChatDisplayEntry, createPlayerEntry, createSystemEntry } from './chat-display-entry';
+import { Command, DefaultCommandParams, CommandName } from './commands';
+
+const IS_LOCAL_PLAYER = true; // debug is always only displayed locally
 
 export class DebugCmd extends Command {
     chatDisplayService: ChatDisplayService;
@@ -10,8 +12,13 @@ export class DebugCmd extends Command {
         this.chatDisplayService = defaultParams.serviceCalled as ChatDisplayService;
     }
 
-    execute(): ErrorType {
-        return this.chatDisplayService.invertDebugState();
+    execute(): ChatDisplayEntry[] {
+        let executionMessages:ChatDisplayEntry[] = [];
+        const commandMessage = '!' + CommandName.DEBUG_CMD;
+        const debugActivationMessage = this.chatDisplayService.invertDebugState();
+        executionMessages.push(createPlayerEntry(IS_LOCAL_PLAYER,this.player.name, commandMessage));
+        executionMessages.push(createSystemEntry(debugActivationMessage));
+        return executionMessages;
     }
 }
 

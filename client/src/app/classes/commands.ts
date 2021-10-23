@@ -1,9 +1,16 @@
 import { Player } from '@app/classes/player';
 import { ChatDisplayService } from '@app/services/chat-display.service';
 import { SoloGameService } from '@app/services/solo-game.service';
-import { ErrorType } from './errors';
 import { Vec2 } from './vec2';
+import { ChatDisplayEntry } from './chat-display-entry';
 
+export enum CommandName {
+    DEBUG_CMD = 'debug',
+    EXCHANGE_CMD = 'échanger',
+    PASS_CMD = 'passer',
+    PLACE_CMD = 'placer',
+    STOCK_CMD = 'réserve',
+}
 export interface DefaultCommandParams {
     player: Player;
     serviceCalled: SoloGameService | ChatDisplayService;
@@ -28,6 +35,13 @@ export abstract class Command {
         this.player = player;
     }
 
-    abstract execute(): ErrorType;
-    // abstract addExecutionResultMessage():string;
+    abstract execute():ChatDisplayEntry[];
+
+    createCommandInput(userInput?:string):string{
+        const commandInput = '';
+        if(userInput) {
+            userInput = commandInput;
+        }
+        return commandInput;
+    }
 }
