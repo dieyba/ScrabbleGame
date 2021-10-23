@@ -23,6 +23,7 @@ import { ChatDisplayComponent } from './components/chat-display/chat-display.com
 import { FormComponent } from './components/form/form.component';
 import { TextEntryComponent } from './components/text-entry/text-entry.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
+import { RackComponent } from './components/rack/rack.component';
 
 /**
  * Main module that is used in main.ts.
@@ -46,6 +47,7 @@ import { AutofocusDirective } from './directives/autofocus.directive';
         StartingPageComponent,
         ClassicModeComponent,
         FormComponent,
+        RackComponent,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     imports: [

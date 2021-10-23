@@ -39,14 +39,10 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly gridService: GridService,
         private readonly rackService: RackService,
         private readonly soloGameService: SoloGameService, // private readonly validationService: ValidationService,
-    ) {
-
-
-    }
+    ) {}
 
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        this.rackService.gridContext = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.soloGameService.createNewGame();
         this.gridService.drawGrid();
         this.gridService.drawColors();
@@ -155,13 +151,13 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     clickOutsideRack() {
-        const ctx = this.rackCanvas.nativeElement.getContext('2d');
-        if (!ctx?.fillStyle) return;
-        this.rackService.deselectAll(this.soloGameService.localPlayer, ctx);
+        // const ctx = this.rackCanvas.nativeElement.getContext('2d');
+        // if (!ctx?.fillStyle) return;
+        // this.rackService.deselectAll(this.soloGameService.localPlayer, ctx);
     }
 
     selection(event: MouseEvent) {
-        event.preventDefault()
+        event.preventDefault();
         const ctx = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
 
         this.mouseService.mouseHitDetect(event);

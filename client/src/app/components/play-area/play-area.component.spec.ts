@@ -5,6 +5,7 @@ import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
 import { GridService } from '@app/services/grid.service';
+import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
 
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -14,6 +15,7 @@ describe('PlayAreaComponent', () => {
     let fixture: ComponentFixture<PlayAreaComponent>;
     let gridServiceSpy: jasmine.SpyObj<GridService>;
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
+    let rackServiceSpy: jasmine.SpyObj<RackService>;
 
     beforeEach(async () => {
         TestBed.configureTestingModule({
@@ -28,11 +30,13 @@ describe('PlayAreaComponent', () => {
             'changeActivePlayer',
             'removeLetter',
         ]);
+        rackServiceSpy = jasmine.createSpyObj('RackService', ['drawRack', 'deselectForExchange', 'selectForExchange']);
         await TestBed.configureTestingModule({
             declarations: [PlayAreaComponent],
             providers: [
                 { provide: GridService, useValue: gridServiceSpy },
                 { provide: SoloGameService, useValue: soloGameServiceSpy },
+                { provide: RackService, useValue: rackServiceSpy },
             ],
         }).compileComponents();
 

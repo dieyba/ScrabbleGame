@@ -1,0 +1,10 @@
+<mat-card class="rack">
+    <canvas
+        id="rack-canvas"
+        #rackCanvas
+        (click)="selection($event)"
+        (contextmenu)="selection($event)"
+        [attr.width]="rackWidth"
+        [attr.height]="rackHeight"
+    ></canvas>
+</mat-card>
