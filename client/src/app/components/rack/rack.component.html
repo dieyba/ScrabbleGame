@@ -2,8 +2,12 @@
     <canvas
         id="rack-canvas"
         #rackCanvas
-        (click)="selection($event)"
-        (contextmenu)="selection($event)"
+        (click)="onLeftClick($event)"
+        (contextmenu)="onRightClick($event)"
+        tabindex="0"
+        (focusout)="onFocusOut($event)"
+        (keyup)="onKeyUp($event)"
+        (wheel)="onWheel($event)"
         [attr.width]="rackWidth"
         [attr.height]="rackHeight"
     ></canvas>
