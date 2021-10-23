@@ -93,8 +93,7 @@ export class RackService {
         if (isExchange) {
             ctx.fillStyle = 'orange';
             this.exchangeSelected[position - 1] = true;
-        }
-        else {
+        } else {
             ctx.fillStyle = 'red';
             this.handlingSelected[position - 1] = true;
             for (let i = 0; i < this.exchangeSelected.length; i++) {
@@ -108,8 +107,7 @@ export class RackService {
     deselect(position: number, ctx: CanvasRenderingContext2D, isExchange: boolean) {
         if (isExchange) {
             this.exchangeSelected[position - 1] = false;
-        }
-        else {
+        } else {
             this.handlingSelected[position - 1] = false;
         }
 

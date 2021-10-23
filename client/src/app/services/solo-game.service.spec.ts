@@ -20,6 +20,7 @@ describe('GameService', () => {
     let secondsToMinutesSpy: jasmine.Spy<any>;
     let startCountdownSpy: jasmine.Spy<any>;
     let addRackLettersSpy: jasmine.Spy<any>;
+    let addRackLetterSpy: jasmine.Spy<any>;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
     let ctxStub: CanvasRenderingContext2D;
     beforeEach(() => {
@@ -33,6 +34,7 @@ describe('GameService', () => {
         secondsToMinutesSpy = spyOn<any>(service, 'secondsToMinutes').and.callThrough();
         startCountdownSpy = spyOn<any>(service, 'startCountdown').and.callThrough();
         addRackLettersSpy = spyOn<any>(service, 'addRackLetters').and.callThrough();
+        addRackLetterSpy = spyOn<any>(service, 'addRackLetter').and.callThrough();
 
         const level = new FormControl('easy', [Validators.required]);
         const name = new FormControl('Ariane', [Validators.required, Validators.pattern('[a-zA-Z]*')]);
@@ -145,14 +147,14 @@ describe('GameService', () => {
         service.localPlayer = spyPlayer;
         service.localPlayer.isActive = true;
 
-        const spy = spyOn(service.localPlayer, 'addLetter').and.callThrough();
+        // const spy = spyOn(service.localPlayer, 'addLetter').and.callThrough();
         service.exchangeLetters(spyPlayer, 'b');
-        expect(spy).not.toHaveBeenCalled();
+        expect(addRackLetterSpy).not.toHaveBeenCalled();
         expect(rackServiceSpy.removeLetter).not.toHaveBeenCalled();
         expect(rackServiceSpy.addLetter).not.toHaveBeenCalled();
 
         service.exchangeLetters(spyPlayer, 'a');
-        expect(spy).toHaveBeenCalled();
+        expect(addRackLetterSpy).toHaveBeenCalled();
         expect(rackServiceSpy.removeLetter).toHaveBeenCalled();
         expect(rackServiceSpy.addLetter).toHaveBeenCalled();
     });

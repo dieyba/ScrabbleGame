@@ -45,6 +45,11 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly manipulateRackService: ManipulationRackService,
     ) {}
 
+    @HostListener('keydown', ['$event'])
+    buttonDetect(event: KeyboardEvent) {
+        this.buttonPressed = event.key;
+    }
+
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.rackContext = this.rackService.gridContext;
@@ -90,11 +95,6 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.sizeDownLetters();
     }
 
-    @HostListener('keydown', ['$event'])
-    buttonDetect(event: KeyboardEvent) {
-        this.buttonPressed = event.key;
-    }
-
     atLeastOneLetterSelected(): boolean {
         return this.exchangeService.atLeastOneLetterSelected();
     }
@@ -114,13 +114,13 @@ export class PlayAreaComponent implements AfterViewInit {
 
     clickOutsideRack(event: Event) {
         const evt = event as FocusEvent;
-        console.log(evt);
-        console.log(event);
-        let newFocus: String;
+        // console.log(evt);
+        // console.log(event);
+        let newFocus: string;
 
         if (evt.relatedTarget !== null) {
             newFocus = (evt.relatedTarget as HTMLElement).id;
-            console.log(newFocus);
+            // console.log(newFocus);
             if (newFocus === 'exchangeButton') {
                 this.exchange();
             } else {
