@@ -17,24 +17,28 @@ enum Case {
 })
 export class MouseHandlerService {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    mousePosition = new Vec2();
+    private mousePosition = new Vec2();
+    private isLeftClick = false;
 
     // constructor(position: Vec2) {
     //     this.mousePosition = position;
     // }
 
-    mouseHitDetect(event: MouseEvent) {
+    mouseHitDetect(event: MouseEvent): boolean {
         console.log(event.button)
-        if (event.button === MouseButton.Right) {
-            this.mousePosition.x = event.offsetX;
-            this.mousePosition.y = event.offsetY;
-            console.log('x : ', this.mousePosition.x);
-            console.log('y : ', this.mousePosition.y);
+        if (event.button === MouseButton.Left) {
+            this.isLeftClick = true;
         }
-        else if (event.button === MouseButton.Left) {
-            this.mousePosition.x = -1;
-            this.mousePosition.y = -1;
+        else if (event.button === MouseButton.Right) {
+            this.isLeftClick = false;
         }
+
+        this.mousePosition.x = event.offsetX;
+        this.mousePosition.y = event.offsetY;
+        console.log('x : ', this.mousePosition.x);
+        console.log('y : ', this.mousePosition.y);
+
+        return this.isLeftClick;
     }
 
     isCoordInsideRack(): boolean {

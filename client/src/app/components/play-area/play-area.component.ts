@@ -1,6 +1,8 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
+import { ExchangeService } from '@app/services/exchange.service';
 import { GridService } from '@app/services/grid.service';
+import { ManipulationRackService } from '@app/services/manipulation-rack.service';
 import { MouseHandlerService } from '@app/services/mouse-handler.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
@@ -27,64 +29,29 @@ export enum MouseButton {
 })
 export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
-    @ViewChild('rackCanvas', { static: false }) private rackCanvas!: ElementRef<HTMLCanvasElement>;
 
     mousePosition: Vec2 = new Vec2(0, 0);
     buttonPressed = '';
     private canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     private rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
+    private rackContext: CanvasRenderingContext2D;
 
     constructor(
         private readonly mouseService: MouseHandlerService,
         private readonly gridService: GridService,
         private readonly rackService: RackService,
         private readonly soloGameService: SoloGameService, // private readonly validationService: ValidationService,
+        private readonly exchangeService: ExchangeService,
+        private readonly manipulateRackService: ManipulationRackService,
     ) {}
 
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        this.rackContext = this.rackService.gridContext;
         this.soloGameService.createNewGame();
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
-
-        // TODO : Remove tests validation
-        // const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
-        // this.gridService.drawLetter(letter1, 0, 0);
-        // const letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
-        // this.gridService.drawLetter(letter2, 1, 0);
-        // // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        // const letter3: ScrabbleLetter = new ScrabbleLetter('j', 4);
-        // this.gridService.drawLetter(letter3, 2, 0);
-        // const letter4: ScrabbleLetter = new ScrabbleLetter('à', 3);
-        // this.gridService.drawLetter(letter4, 3, 0);
-        // const letter5: ScrabbleLetter = new ScrabbleLetter('a', 1);
-        // this.gridService.drawLetter(letter5, 0, 2);
-        // const letter6: ScrabbleLetter = new ScrabbleLetter('m', 2);
-        // this.gridService.drawLetter(letter6, 0, 3);
-        // // Uncomment next two lines for words to be valid
-        // // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        // const letter7: ScrabbleLetter = new ScrabbleLetter('i', 4);
-        // // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        // this.gridService.drawLetter(letter7, 0, 4);
-        // const word1: ScrabbleWord = new ScrabbleWord();
-        // word1.content = [letter1, letter2, letter3, letter4];
-        // word1.startPosition = new Vec2(0, 0);
-        // word1.orientation = WordOrientation.Horizontal;
-        // const word2: ScrabbleWord = new ScrabbleWord();
-        // word2.content = [letter5, letter6, letter7];
-        // word2.startPosition = new Vec2(0, 2);
-        // word2.orientation = WordOrientation.Vertical;
-        // const words: ScrabbleWord[] = [word1, word2];
-        // this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
-        // this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
-        // this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
-        // this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
-        // this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
-        // this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
-        // this.soloGameService.removeLetter(this.soloGameService.localPlayer.letters[0]);
-        // this.validationService.updatePlayerScore(words, this.soloGameService.localPlayer);
-        // this.gridCanvas.nativeElement.focus();
     }
 
     passTurn() {
@@ -123,13 +90,13 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.sizeDownLetters();
     }
 
+    @HostListener('keydown', ['$event'])
+    buttonDetect(event: KeyboardEvent) {
+        this.buttonPressed = event.key;
+    }
+
     atLeastOneLetterSelected(): boolean {
-        for (const selected of this.soloGameService.localPlayer.exchangeSelected) {
-            if (selected === true) {
-                return true;
-            }
-        }
-        return false;
+        return this.exchangeService.atLeastOneLetterSelected();
     }
 
     lessThanSevenLettersInStock(): boolean {
@@ -138,51 +105,39 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     exchange() {
-        this.soloGameService.exchangeLettersSelected(this.soloGameService.localPlayer);
-        // this.rackService.deselectAll(this.soloGameService.localPlayer);
+        this.exchangeService.exchange();
     }
 
     cancelExchange() {
-        const ctx = this.rackCanvas.nativeElement.getContext('2d');
-        if (!ctx?.fillStyle) return;
-        for (let i = 1; i <= this.soloGameService.localPlayer.letters.length; i++) {
-            this.rackService.deselectForExchange(i, ctx, this.soloGameService.localPlayer);
-        }
+        this.exchangeService.cancelExchange(this.rackContext);
     }
 
-    clickOutsideRack() {
-        // const ctx = this.rackCanvas.nativeElement.getContext('2d');
-        // if (!ctx?.fillStyle) return;
-        // this.rackService.deselectAll(this.soloGameService.localPlayer, ctx);
+    clickOutsideRack(event: Event) {
+        const evt = event as FocusEvent;
+        console.log(evt);
+        console.log(event);
+        let newFocus: String;
+
+        if (evt.relatedTarget !== null) {
+            newFocus = (evt.relatedTarget as HTMLElement).id;
+            console.log(newFocus);
+            if (newFocus === 'exchangeButton') {
+                this.exchange();
+            } else {
+                this.rackService.deselectAll(this.rackContext);
+            }
+        } else {
+            this.rackService.deselectAll(this.rackContext);
+        }
     }
 
     selection(event: MouseEvent) {
         event.preventDefault();
-        const ctx = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
 
-        this.mouseService.mouseHitDetect(event);
-        const position = this.mouseService.selectedLetterPosition();
-        if (this.soloGameService.localPlayer.exchangeSelected[position - 1] === true) {
-            this.rackService.deselectForExchange(position, ctx, this.soloGameService.localPlayer);
+        if (this.mouseService.mouseHitDetect(event)) {
+            this.manipulateRackService.handleSelection(this.rackContext);
         } else {
-            this.rackService.selectForExchange(position, ctx, this.soloGameService.localPlayer);
+            this.exchangeService.handleSelection(this.rackContext);
         }
-
-        // if (event.button === MouseButton.Left) {
-        //     this.mousePosition.x = event.offsetX;
-        //     this.mousePosition.y = event.offsetY;
-        //     const ctx = this.rackCanvas.nativeElement.getContext('2d');
-        //     if (!ctx?.fillStyle) return;
-        //     // this.rackCanvas.nativeElement.style.background = 'orange';
-        //     ctx.fillStyle = 'orange';
-        //     // ctx.shadowColor = 'red';
-        //     ctx.fillRect(0, 0, 71, 60);
-        //     ctx.fillStyle = 'red';
-        //     ctx.fillRect(71, 0, 71, 60);
-        //     this.rackService.drawExistingLetters();
-        //     // style="background-color: blue;"
-        // }
-        // // console.log('x : ', this.mousePosition.x);
-        // // console.log('y : ', this.mousePosition.y);
     }
 }
