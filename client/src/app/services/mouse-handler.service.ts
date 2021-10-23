@@ -25,18 +25,16 @@ export class MouseHandlerService {
     // }
 
     mouseHitDetect(event: MouseEvent): boolean {
-        console.log(event.button)
         if (event.button === MouseButton.Left) {
             this.isLeftClick = true;
-        }
-        else if (event.button === MouseButton.Right) {
+        } else if (event.button === MouseButton.Right) {
             this.isLeftClick = false;
         }
 
         this.mousePosition.x = event.offsetX;
         this.mousePosition.y = event.offsetY;
-        console.log('x : ', this.mousePosition.x);
-        console.log('y : ', this.mousePosition.y);
+        // console.log('x : ', this.mousePosition.x);
+        // console.log('y : ', this.mousePosition.y);
 
         return this.isLeftClick;
     }

@@ -201,7 +201,8 @@ export class SoloGameService {
 
     addRackLetter(letter: ScrabbleLetter): void {
         this.rackService.addLetter(letter);
-        this.localPlayer.letters[this.localPlayer.letters.length] = letter;
+        // this.localPlayer.letters[this.localPlayer.letters.length] = letter;
+        this.localPlayer.addLetter(letter);
     }
 
     removeLetter(scrabbleLetter: ScrabbleLetter): void {

@@ -3,14 +3,14 @@ import { TestBed } from '@angular/core/testing';
 import { ManipulationRackService } from './manipulation-rack.service';
 
 describe('ManipulationRackService', () => {
-  let service: ManipulationRackService;
+    let service: ManipulationRackService;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(ManipulationRackService);
-  });
+    beforeEach(() => {
+        TestBed.configureTestingModule({});
+        service = TestBed.inject(ManipulationRackService);
+    });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
 });

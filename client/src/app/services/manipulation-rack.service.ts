@@ -3,14 +3,10 @@ import { MouseHandlerService } from './mouse-handler.service';
 import { RackService } from './rack.service';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class ManipulationRackService {
-
-    constructor(
-        private readonly mouseService: MouseHandlerService,
-        private readonly rackService: RackService,
-    ) {}
+    constructor(private readonly mouseService: MouseHandlerService, private readonly rackService: RackService) {}
 
     handleSelection(rackContext: CanvasRenderingContext2D) {
         const position = this.mouseService.selectedLetterPosition();
