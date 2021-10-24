@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { PlaceParams } from '@app/classes/commands';
 import { Dictionary } from '@app/classes/dictionary';
 import { ErrorType } from '@app/classes/errors';
+import { GameParameters } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
@@ -18,6 +19,7 @@ import { RackService } from './rack.service';
 import { ValidationService, WAIT_TIME } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 export const TIMER_INTERVAL = 1000;
+
 const DEFAULT_LETTER_COUNT = 7;
 const DOUBLE_DIGIT = 10;
 const MINUTE_IN_SEC = 60;
@@ -39,6 +41,7 @@ export class SoloGameService {
     turnPassed: boolean;
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
+    id: number = 0;
     constructor(
         private gridService: GridService,
         private rackService: RackService,
@@ -46,6 +49,7 @@ export class SoloGameService {
         private validationService: ValidationService,
         private wordBuilder: WordBuilderService,
     ) {
+        this.id = 0;
         this.hasTurnsBeenPassed = [];
         this.turnPassed = false;
         this.isEndGame = false;
@@ -63,6 +67,17 @@ export class SoloGameService {
         this.isEndGame = false;
         this.stock = new LetterStock();
     }
+
+    initializingMultijoueur(form: FormGroup): GameParameters {
+        this.localPlayer = new LocalPlayer(form.controls.name.value);
+        // this.dictionary = new Dictionary(+form.controls.dictionaryForm.value);
+        // this.randomBonus = form.controls.bonus.value;
+        this.totalCountDown = +form.controls.timer.value;
+        this.timerMs = +this.totalCountDown;
+        console.log(this.localPlayer.name + ' sologame local player');
+        return new GameParameters(this.localPlayer.name, this.timerMs);
+    }
+
     createNewGame() {
         // Empty board and stack
         this.rackService.rackLetters = [];
