@@ -1,9 +1,9 @@
 import * as io from 'socket.io-client';
 
-export module SocketHandler {
+export namespace SocketHandler {
     let activeSocket: io.Socket;
 
-    export function requestSocket(server: string): any {
+    export function requestSocket(server: string): unknown {
         if (activeSocket === undefined) {
             activeSocket = io.connect(server);
             console.log(activeSocket);

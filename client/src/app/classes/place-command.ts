@@ -21,19 +21,18 @@ export class PlaceCmd extends Command {
     }
 
     execute(): ChatDisplayEntry[] {
-
         // TODO: wait after the 3 seconds before displaying the !placer h8h fdsfsdfds message in chat
 
-        let executionMessages: ChatDisplayEntry[] = [];
+        const executionMessages: ChatDisplayEntry[] = [];
         const commandMessage = '!' + CommandName.PLACE_CMD + ' ' + this.position.x + this.position.y + this.orientation + ' ' + this.word;
         const placeParams = { position: this.position, orientation: this.orientation, word: this.word };
         const executionResult = this.gameService.place(this.player, placeParams);
-        
-        if(executionResult !== ErrorType.NoError){
-            executionMessages.push(createErrorEntry(executionResult,commandMessage));
-        }else {
+
+        if (executionResult !== ErrorType.NoError) {
+            executionMessages.push(createErrorEntry(executionResult, commandMessage));
+        } else {
             const isFromLocalPlayer = this.player.name === this.gameService.localPlayer.name;
-            executionMessages.push(createPlayerEntry(isFromLocalPlayer,this.player.name,commandMessage));
+            executionMessages.push(createPlayerEntry(isFromLocalPlayer, this.player.name, commandMessage));
         }
         return executionMessages;
     }

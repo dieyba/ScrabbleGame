@@ -14,7 +14,7 @@ import { FormComponent } from '../form/form.component';
 export class WaitingAreaComponent {
     private playerList: string[];
     isStarting: boolean;
-    private timer: any;
+    private timer: NodeJS.Timeout; // TODO: why was this unknown type?
     list: GameParameters[] = [];
     constructor(
         private router: Router,
@@ -24,7 +24,7 @@ export class WaitingAreaComponent {
     ) {
         this.gameList = gameList;
         this.timer = setInterval(() => {
-            let roomInfo = this.gameList;
+            const roomInfo = this.gameList;
             this.playerList = roomInfo.roomInfo.playersName;
             this.start();
         }, 1000);
@@ -39,7 +39,7 @@ export class WaitingAreaComponent {
         console.log(document.URL);
     }
 
-    public start(): void {
+    start(): void {
         if (this.playerList.length === 2) {
             this.isStarting = true;
             clearInterval(this.timer);

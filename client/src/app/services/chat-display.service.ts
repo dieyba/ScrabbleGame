@@ -21,16 +21,16 @@ export class ChatDisplayService {
         this.localPlayerName = '';
     }
 
-    addEntry(entry:ChatDisplayEntry):void{
+    addEntry(entry: ChatDisplayEntry): void {
         this.entries.push(entry);
     }
 
     addVirtalPlayerEntry(playername: string, commandInput: string, debugMessages?: string[]) {
         const isFromLocalPlayer = playername === this.localPlayerName;
-        this.addEntry( createPlayerEntry(isFromLocalPlayer, playername, commandInput) ); // display command entered
+        this.addEntry(createPlayerEntry(isFromLocalPlayer, playername, commandInput)); // display command entered
         if (this.isActiveDebug && debugMessages) {
             for (const message of debugMessages) {
-                this.addEntry( createDebugEntry(message) );
+                this.addEntry(createDebugEntry(message));
             }
         }
     }
@@ -59,7 +59,7 @@ export class ChatDisplayService {
         return this.isActiveDebug ? ACTIVE_DEBUG_MESSAGE : INACTIVE_DEBUG_MESSAGE;
     }
 
-    initialize(localPlayerName:string): void {
+    initialize(localPlayerName: string): void {
         this.entries = [];
         this.isActiveDebug = false;
         this.localPlayerName = localPlayerName;

@@ -35,11 +35,11 @@ export abstract class Command {
         this.player = player;
     }
 
-    abstract execute():ChatDisplayEntry[];
+    abstract execute(): ChatDisplayEntry[];
 
-    createCommandInput(userInput?:string):string{
+    createCommandInput(userInput?: string): string {
         const commandInput = '';
-        if(userInput) {
+        if (userInput) {
             userInput = commandInput;
         }
         return commandInput;

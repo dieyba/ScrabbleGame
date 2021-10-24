@@ -8,22 +8,22 @@ export class PassTurnCmd extends Command {
     private gameService: SoloGameService;
     // private commandInput: string;
 
-    constructor(defaultParams: DefaultCommandParams, commandInput?:string) {
+    constructor(defaultParams: DefaultCommandParams, commandInput?: string) {
         super(defaultParams.player);
         this.gameService = defaultParams.serviceCalled as SoloGameService;
         // this.commandInput = (commandInput) ? commandInput : "!passer";
     }
 
-    execute():ChatDisplayEntry[] {
-        let executionMessages: ChatDisplayEntry[] = [];
+    execute(): ChatDisplayEntry[] {
+        const executionMessages: ChatDisplayEntry[] = [];
         const commandMessage = '!' + CommandName.PASS_CMD;
-        const executionResult =  this.gameService.passTurn(this.player);
-        
-        if(executionResult === ErrorType.ImpossibleCommand){
-            executionMessages.push(createErrorEntry(executionResult,commandMessage));
-        }else if(executionResult === ErrorType.NoError) {
+        const executionResult = this.gameService.passTurn(this.player);
+
+        if (executionResult === ErrorType.ImpossibleCommand) {
+            executionMessages.push(createErrorEntry(executionResult, commandMessage));
+        } else if (executionResult === ErrorType.NoError) {
             const isFromLocalPlayer = this.player.name === this.gameService.localPlayer.name;
-            executionMessages.push(createPlayerEntry(isFromLocalPlayer,this.player.name,commandMessage));
+            executionMessages.push(createPlayerEntry(isFromLocalPlayer, this.player.name, commandMessage));
         }
         return executionMessages;
     }

@@ -14,18 +14,18 @@ export class ExchangeCmd extends Command {
     }
 
     execute(): ChatDisplayEntry[] {
-        let executionMessages: ChatDisplayEntry[] = [];
+        const executionMessages: ChatDisplayEntry[] = [];
         const commandMessage = '!' + CommandName.EXCHANGE_CMD;
         const executionResult = this.gameService.exchangeLetters(this.player, this.letters);
-        
-        if(executionResult === ErrorType.ImpossibleCommand){
+
+        if (executionResult === ErrorType.ImpossibleCommand) {
             const commandAndLetters = commandMessage + ' ' + this.letters;
-            executionMessages.push(createErrorEntry(executionResult,commandAndLetters));
-        }else{
+            executionMessages.push(createErrorEntry(executionResult, commandAndLetters));
+        } else {
             const isFromLocalPLayer = this.player.name === this.gameService.localPlayer.name;
             const exchangeMessage = this.createExchangeMessage(isFromLocalPLayer, this.letters);
             const commandAndLetters = commandMessage + ' ' + exchangeMessage;
-            executionMessages.push(createPlayerEntry(isFromLocalPLayer,this.player.name,commandAndLetters));
+            executionMessages.push(createPlayerEntry(isFromLocalPLayer, this.player.name, commandAndLetters));
         }
         return executionMessages;
     }

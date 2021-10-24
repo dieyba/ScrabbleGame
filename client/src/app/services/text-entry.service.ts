@@ -71,16 +71,15 @@ export class TextEntryService {
 
                     // TODO:add command created to invoker, which will call it and display the right execution msg in chatbox
                     const executionResult = commandCreationResult.execute();
-                    for(let entry of executionResult){
+                    for (const entry of executionResult) {
                         this.chatDisplayService.addEntry(entry);
                     }
-                    
                 } else {
-                    this.chatDisplayService.addEntry( createErrorEntry(commandCreationResult as ErrorType, userInput) );
+                    this.chatDisplayService.addEntry(createErrorEntry(commandCreationResult as ErrorType, userInput));
                 }
             } else {
                 // Not a command input. Send normal chat message
-                this.chatDisplayService.addEntry( createPlayerEntry(isLocalPlayer, player.name, userInput) );
+                this.chatDisplayService.addEntry(createPlayerEntry(isLocalPlayer, player.name, userInput));
             }
         }
     }

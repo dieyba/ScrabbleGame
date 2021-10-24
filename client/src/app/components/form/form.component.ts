@@ -123,7 +123,7 @@ export class FormComponent implements OnInit {
                 // this.singleGame.initializing(this.myForm);
                 // console.log(this.singleGame);
                 this.closeDialog();
-                let single = this.soloGameService.initializingMultijoueur(this.myForm);
+                const single = this.soloGameService.initializingMultijoueur(this.myForm);
                 this.gameList.createRoom(single);
                 this.dialog.open(WaitingAreaComponent, { disableClose: true });
                 console.log(single);

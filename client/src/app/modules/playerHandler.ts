@@ -1,6 +1,6 @@
 import { LocalPlayer } from '@app/classes/local-player';
 
-export module PlayerHandler {
+export namespace PlayerHandler {
     let activePlayer: LocalPlayer;
 
     export function requestPlayer(): LocalPlayer {

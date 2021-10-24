@@ -30,7 +30,7 @@ export class GameListService {
     // randomBonus: boolean;
     // totalCountDown: number;
     constructor(private http: HttpClient) {
-        this.socket = SocketHandler.requestSocket(this.server);
+        this.socket = SocketHandler.requestSocket(this.server) as io.Socket; // TODO: this line didnt work is it fine fixed like this?
         this.player = PlayerHandler.requestPlayer();
         this.socket.on('roomCreated', (roomInf: GameParameters) => {
             // Set the information of the room
@@ -64,7 +64,7 @@ export class GameListService {
     getList(): Observable<GameParameters[]> {
         return this.http.get<GameParameters[]>('http://' + window.location.hostname + ':3000/api/gameList');
     }
-    public createRoom(game: GameParameters): void {
+    createRoom(game: GameParameters): void {
         console.log('createRoom' + game.createrPlayer.name + ' ' + game.totalCountDown);
         this.socket.emit('createRoom', { name: game.createrPlayer.name, timer: game.totalCountDown });
     }

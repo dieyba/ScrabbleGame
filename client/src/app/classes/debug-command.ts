@@ -13,10 +13,10 @@ export class DebugCmd extends Command {
     }
 
     execute(): ChatDisplayEntry[] {
-        let executionMessages:ChatDisplayEntry[] = [];
+        const executionMessages: ChatDisplayEntry[] = [];
         const commandMessage = '!' + CommandName.DEBUG_CMD;
         const debugActivationMessage = this.chatDisplayService.invertDebugState();
-        executionMessages.push(createPlayerEntry(IS_LOCAL_PLAYER,this.player.name, commandMessage));
+        executionMessages.push(createPlayerEntry(IS_LOCAL_PLAYER, this.player.name, commandMessage));
         executionMessages.push(createSystemEntry(debugActivationMessage));
         return executionMessages;
     }

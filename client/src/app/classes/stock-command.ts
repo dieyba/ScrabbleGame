@@ -1,5 +1,5 @@
 import { ChatDisplayService } from '@app/services/chat-display.service';
-import { ChatDisplayEntry, ChatEntryColor, createErrorEntry, createPlayerEntry  } from './chat-display-entry';
+import { ChatDisplayEntry, ChatEntryColor, createErrorEntry, createPlayerEntry } from './chat-display-entry';
 import { Command, DefaultCommandParams, CommandName } from './commands';
 import { ErrorType } from './errors';
 
@@ -17,39 +17,36 @@ export class StockCmd extends Command {
     }
 
     execute(): ChatDisplayEntry[] {
-        let executionMessages: ChatDisplayEntry[] = [];
+        const executionMessages: ChatDisplayEntry[] = [];
         const commandMessage = '!' + CommandName.STOCK_CMD;
         const executionResult = this.createStockMessage(this.stockLetters);
-        
-        if(executionResult === ErrorType.ImpossibleCommand){
-            executionMessages.push(createErrorEntry(executionResult,commandMessage));
-        }else{
-            executionMessages.push(createPlayerEntry(IS_LOCAL_PLAYER,this.player.name,commandMessage));
-            for(let message of executionResult){
-                executionMessages.push({color:ChatEntryColor.SystemColor, message:message});
+
+        if (executionResult === ErrorType.ImpossibleCommand) {
+            executionMessages.push(createErrorEntry(executionResult, commandMessage));
+        } else {
+            executionMessages.push(createPlayerEntry(IS_LOCAL_PLAYER, this.player.name, commandMessage));
+            for (const message of executionResult) {
+                executionMessages.push({ color: ChatEntryColor.SystemColor, message });
             }
         }
         return executionMessages;
     }
 
-    createStockMessage(stockLetters: string): ErrorType.ImpossibleCommand|string[] {
+    createStockMessage(stockLetters: string): ErrorType.ImpossibleCommand | string[] {
         if (this.chatDisplayService.isActiveDebug) {
-            let letterCountMessages: string[] = [];
+            const letterCountMessages: string[] = [];
             for (const letter of ALPHABET) {
                 const regExp = new RegExp(letter, 'g');
                 const letterQuantity = (stockLetters.match(regExp) || []).length;
-                letterCountMessages.push( letter + ' : ' + letterQuantity );
+                letterCountMessages.push(letter + ' : ' + letterQuantity);
             }
             const asterisksQuantity = (stockLetters.match(/\*/g) || []).length;
-            letterCountMessages.push( '* : ' + asterisksQuantity );
+            letterCountMessages.push('* : ' + asterisksQuantity);
 
             return letterCountMessages;
         }
         return ErrorType.ImpossibleCommand;
     }
-
-    
-
 }
 
 export const createStockCmd = (params: { defaultParams: DefaultCommandParams; specificParams: string }): StockCmd => {
