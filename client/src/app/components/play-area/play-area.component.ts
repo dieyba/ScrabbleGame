@@ -49,6 +49,11 @@ export class PlayAreaComponent implements AfterViewInit {
     @HostListener('keydown', ['$event'])
     buttonDetect(event: KeyboardEvent) {
         this.buttonPressed = event.key;
+        if (this.buttonPressed === 'ArrowLeft') {
+            this.manipulateRackService.switchLeft();
+        } else if (this.buttonPressed === 'ArrowRight') {
+            this.manipulateRackService.switchRight();
+        }
     }
 
     ngAfterViewInit(): void {

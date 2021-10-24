@@ -64,6 +64,12 @@ export class RackService {
         return pos;
     }
 
+    clearRack() {
+        this.gridContext.clearRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
+        this.drawRack();
+        this.drawExistingLetters();
+    }
+
     drawExistingLetters() {
         for (let i = 0; i < this.rackLetters.length; i++) {
             this.drawLetter(i);
@@ -94,7 +100,11 @@ export class RackService {
             ctx.fillStyle = 'orange';
             this.exchangeSelected[position - 1] = true;
         } else {
+            for (let i = 0; i < this.handlingSelected.length; i++) {
+                this.deselect(i + 1, this.gridContext, false);
+            }
             ctx.fillStyle = 'red';
+
             this.handlingSelected[position - 1] = true;
             for (let i = 0; i < this.exchangeSelected.length; i++) {
                 this.exchangeSelected[i] = false;
