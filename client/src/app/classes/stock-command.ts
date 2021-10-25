@@ -1,6 +1,6 @@
 import { ChatDisplayService } from '@app/services/chat-display.service';
 import { ChatDisplayEntry, ChatEntryColor, createErrorEntry, createPlayerEntry } from './chat-display-entry';
-import { Command, DefaultCommandParams, CommandName } from './commands';
+import { Command, CommandName, CommandResult, DefaultCommandParams } from './commands';
 import { ErrorType } from './errors';
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
@@ -16,20 +16,21 @@ export class StockCmd extends Command {
         this.stockLetters = stockLetters;
     }
 
-    execute(): ChatDisplayEntry[] {
+    execute(): CommandResult {
         const executionMessages: ChatDisplayEntry[] = [];
-        const commandMessage = '!' + CommandName.STOCK_CMD;
+        const commandMessage = '!' + CommandName.StockCmd;
         const executionResult = this.createStockMessage(this.stockLetters);
 
         if (executionResult === ErrorType.ImpossibleCommand) {
             executionMessages.push(createErrorEntry(executionResult, commandMessage));
         } else {
+            this.isExecuted = true;
             executionMessages.push(createPlayerEntry(IS_LOCAL_PLAYER, this.player.name, commandMessage));
             for (const message of executionResult) {
                 executionMessages.push({ color: ChatEntryColor.SystemColor, message });
             }
         }
-        return executionMessages;
+        return { isExecuted: this.isExecuted, executionMessages };
     }
 
     createStockMessage(stockLetters: string): ErrorType.ImpossibleCommand | string[] {

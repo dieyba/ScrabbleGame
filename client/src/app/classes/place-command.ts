@@ -1,8 +1,9 @@
-import { Command, CommandName, DefaultCommandParams, PlaceParams } from './commands';
 import { SoloGameService } from '@app/services/solo-game.service';
-import { Vec2 } from './vec2';
 import { ChatDisplayEntry, createErrorEntry, createPlayerEntry } from './chat-display-entry';
+import { Command, CommandName, CommandResult, DefaultCommandParams, PlaceParams } from './commands';
 import { ErrorType } from './errors';
+import { convertCoordToString } from './utilities';
+import { Vec2 } from './vec2';
 
 export class PlaceCmd extends Command {
     private gameService: SoloGameService;
@@ -20,21 +21,25 @@ export class PlaceCmd extends Command {
         this.word = params.word;
     }
 
-    execute(): ChatDisplayEntry[] {
-        // TODO: wait after the 3 seconds before displaying the !placer h8h fdsfsdfds message in chat
-
+    execute(): CommandResult {
         const executionMessages: ChatDisplayEntry[] = [];
-        const commandMessage = '!' + CommandName.PLACE_CMD + ' ' + this.position.x + this.position.y + this.orientation + ' ' + this.word;
+        const stringCoord = convertCoordToString(this.position);
+        const commandMessage = '!' + CommandName.PlaceCmd + ' ' + stringCoord + this.orientation + ' ' + this.word;
+
         const placeParams = { position: this.position, orientation: this.orientation, word: this.word };
         const executionResult = this.gameService.place(this.player, placeParams);
+
+        // TODO: wait after the 3 seconds before displaying the execution result message,
+        // here also seems to cause bugs with waiting after the validation is done
 
         if (executionResult !== ErrorType.NoError) {
             executionMessages.push(createErrorEntry(executionResult, commandMessage));
         } else {
+            this.isExecuted = true;
             const isFromLocalPlayer = this.player.name === this.gameService.localPlayer.name;
             executionMessages.push(createPlayerEntry(isFromLocalPlayer, this.player.name, commandMessage));
         }
-        return executionMessages;
+        return { isExecuted: this.isExecuted, executionMessages };
     }
 }
 

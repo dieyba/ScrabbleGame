@@ -288,6 +288,10 @@ export class SoloGameService {
         if (wordCopy !== '') {
             return ErrorType.SyntaxError;
         }
+        // if the command has the right syntax but not the player's turn, should return impossible command error
+        if (!player.isActive) {
+            return ErrorType.ImpossibleCommand;
+        }
         // Placing letters
         tempCoord.clone(placeParams.position);
         for (const letter of placeParams.word) {
@@ -308,6 +312,7 @@ export class SoloGameService {
         } else {
             tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
         }
+
         // Call validation method and end turn
         setTimeout(() => {
             if (!this.validationService.validateWords(tempScrabbleWords)) {

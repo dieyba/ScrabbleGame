@@ -1,6 +1,6 @@
 import { SoloGameService } from '@app/services/solo-game.service';
 import { ChatDisplayEntry, createErrorEntry, createPlayerEntry } from './chat-display-entry';
-import { Command, CommandName, DefaultCommandParams } from './commands';
+import { Command, CommandName, CommandResult, DefaultCommandParams } from './commands';
 import { ErrorType } from './errors';
 
 export class ExchangeCmd extends Command {
@@ -13,21 +13,22 @@ export class ExchangeCmd extends Command {
         this.letters = letters;
     }
 
-    execute(): ChatDisplayEntry[] {
+    execute(): CommandResult {
         const executionMessages: ChatDisplayEntry[] = [];
-        const commandMessage = '!' + CommandName.EXCHANGE_CMD;
+        const commandMessage = '!' + CommandName.ExchangeCmd;
         const executionResult = this.gameService.exchangeLetters(this.player, this.letters);
 
         if (executionResult === ErrorType.ImpossibleCommand) {
             const commandAndLetters = commandMessage + ' ' + this.letters;
             executionMessages.push(createErrorEntry(executionResult, commandAndLetters));
         } else {
+            this.isExecuted = true;
             const isFromLocalPLayer = this.player.name === this.gameService.localPlayer.name;
             const exchangeMessage = this.createExchangeMessage(isFromLocalPLayer, this.letters);
             const commandAndLetters = commandMessage + ' ' + exchangeMessage;
             executionMessages.push(createPlayerEntry(isFromLocalPLayer, this.player.name, commandAndLetters));
         }
-        return executionMessages;
+        return { isExecuted: this.isExecuted, executionMessages };
     }
 
     createExchangeMessage(isFromLocalPLayer: boolean, letters: string): string {

@@ -1,15 +1,15 @@
 import { Player } from '@app/classes/player';
 import { ChatDisplayService } from '@app/services/chat-display.service';
 import { SoloGameService } from '@app/services/solo-game.service';
-import { Vec2 } from './vec2';
 import { ChatDisplayEntry } from './chat-display-entry';
+import { Vec2 } from './vec2';
 
 export enum CommandName {
-    DEBUG_CMD = 'debug',
-    EXCHANGE_CMD = 'échanger',
-    PASS_CMD = 'passer',
-    PLACE_CMD = 'placer',
-    STOCK_CMD = 'réserve',
+    DebugCmd = 'debug',
+    ExchangeCmd = 'échanger',
+    PassCmd = 'passer',
+    PlaceCmd = 'placer',
+    StockCmd = 'réserve',
 }
 export interface DefaultCommandParams {
     player: Player;
@@ -28,20 +28,16 @@ export type CommandParams =
     | DefaultCommandParams // debug and pass commands
     | undefined;
 
+export type CommandResult = { isExecuted: boolean; executionMessages: ChatDisplayEntry[] };
+
 export abstract class Command {
     player: Player;
+    isExecuted: boolean;
 
     constructor(player: Player) {
         this.player = player;
+        this.isExecuted = false;
     }
 
-    abstract execute(): ChatDisplayEntry[];
-
-    createCommandInput(userInput?: string): string {
-        const commandInput = '';
-        if (userInput) {
-            userInput = commandInput;
-        }
-        return commandInput;
-    }
+    abstract execute(): CommandResult;
 }

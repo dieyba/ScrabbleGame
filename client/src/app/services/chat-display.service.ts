@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ChatDisplayEntry, ChatEntryColor, createPlayerEntry, createDebugEntry } from '@app/classes/chat-display-entry';
+import { ChatDisplayEntry, ChatEntryColor, createDebugEntry, createPlayerEntry } from '@app/classes/chat-display-entry';
 import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { scrabbleLetterstoString } from '@app/classes/utilities';
