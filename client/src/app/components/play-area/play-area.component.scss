@@ -60,3 +60,17 @@
 .size-btn:hover {
     opacity: 0.6;
 }
+
+#canvas {
+    position: absolute;
+    left: 13px;
+    top: 13px;
+    z-index: 1;
+}
+
+#mousePlaceOverlay {
+    position: absolute;
+    left: 13px;
+    top: 13px;
+    z-index: 2;
+}

@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
+import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
 
@@ -37,6 +38,7 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly gridService: GridService,
         private readonly rackService: RackService,
         private readonly soloGameService: SoloGameService, // private readonly validationService: ValidationService,
+        private readonly mouseWordPlacerService: MouseWordPlacerService,
     ) {}
 
     ngAfterViewInit(): void {
@@ -120,5 +122,11 @@ export class PlayAreaComponent implements AfterViewInit {
 
     sizeDownLetters(): void {
         this.gridService.sizeDownLetters();
+    }
+    onMouseDown(event: MouseEvent) {
+        this.mouseWordPlacerService.onMouseClick(event);
+    }
+    onKeyDown(event: KeyboardEvent) {
+        this.mouseWordPlacerService.onKeyDown(event);
     }
 }
