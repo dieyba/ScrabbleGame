@@ -28,8 +28,8 @@ export class GameListService {
         console.log(this.player);
         console.log(this.socket.id);
         this.socket.on('roomcreated', (roomInf: GameParameters) => {
-            this.player.name = roomInf.createrPlayer.name;
-            this.player.roomId = roomInf.gameRoom.idGame;
+            // this.player.name = roomInf.createrPlayer.name;
+            // this.player.roomId = roomInf.gameRoom.idGame;
             // this.roomInfo = roomInf.gameRoom;
             // this.myRoom.push(this.roomInfo);
             // console.log(this.roomInfo);
