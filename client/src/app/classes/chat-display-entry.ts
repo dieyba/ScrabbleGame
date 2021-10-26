@@ -7,6 +7,11 @@ export interface ChatDisplayEntry {
     message: string;
 }
 
+export interface ServerChatEntry {
+    senderName: string,
+    message: string
+}
+
 export enum ChatEntryColor {
     SystemColor = 'black',
     LocalPlayer = 'blue',

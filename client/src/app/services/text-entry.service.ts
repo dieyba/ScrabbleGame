@@ -15,7 +15,7 @@ import {
     isValidLetter,
     removeAccents,
     scrabbleLetterstoString,
-    trimSpaces,
+    trimSpaces
 } from '@app/classes/utilities';
 import { ChatDisplayService } from './chat-display.service';
 import { CommandInvokerService } from './command-invoker.service';
@@ -69,6 +69,8 @@ export class TextEntryService {
      */
     handleInput(userInput: string, isLocalPlayer: boolean) {
         const isMultiplayer = this.gameService.currentGameService instanceof MultiPlayerGameService;
+        // TODO: isLocalPlayer, since handleInput in text entry always going to be from local player. 
+        // (and virtual player has its own method to send messages)
         const player: Player = isLocalPlayer
             ? this.gameService.currentGameService.game.creatorPlayer
             : this.gameService.currentGameService.game.opponentPlayer;
@@ -78,16 +80,19 @@ export class TextEntryService {
             const isACommand = userInput.startsWith('!') && !this.gameService.currentGameService.game.isEndGame;
             if (!isACommand) {
                 if (isMultiplayer) {
-                    // TODO: send createPlayerEntry result to server, then server receives the entry and sends it to both chat display
+                    // send to server to display on both players' screen
+                    this.chatDisplayService.sendMessageToServer(userInput);
                 } else {
+                    // display locally only
                     this.chatDisplayService.addEntry(createPlayerEntry(isLocalPlayer, player.name, userInput));
                 }
             } else {
                 const commandCreationResult = this.createCommand(userInput, player);
                 const isCreated = commandCreationResult instanceof Command;
                 if (isCreated) {
+                    // execute command takes care of sending and displaying messages after execution
                     this.commandInvokerService.executeCommand(commandCreationResult as Command);
-                } else {
+                } else { 
                     this.chatDisplayService.addEntry(createErrorEntry(commandCreationResult as ErrorType, userInput));
                 }
             }

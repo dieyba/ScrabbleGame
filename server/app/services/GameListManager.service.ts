@@ -35,11 +35,11 @@ export class GameListManager {
     public addRoom(creator: string, timer: number): GameParameters {
         let newRoom = new GameParameters(creator, timer, this.currentRoomID++);
         newRoom.setPlayerName(creator);
-        newRoom.creatorPlayer.setRoomId(this.currentRoomID);
+        newRoom.creatorPlayer.roomId = this.currentRoomID;
         newRoom.setIdGame(this.currentRoomID);
         this.existingRooms.push(newRoom);
 
-        // newRoom.creatorPlayer.setRoomId(newRoom.gameRoom.idGame);
+        // newRoom.creatorPlayer.roomId = newRoom.gameRoom.idGame;
         return newRoom;
     }
     public deleteRoom(index: number): void {

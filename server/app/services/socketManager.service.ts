@@ -48,6 +48,12 @@ export class SocketManager {
             // socket.on('getAllGames', (game: Array<GameParameters>) => {
             //     this.getAllGames(socket, game);
             // });
+            socket.on('sendChatEntry', (message:string) => {
+                console.log('client sent a new message');
+                this.displayChatEntry(socket, message);
+            });
+
+
         });
         setInterval(() => {}, 1000);
     }
@@ -56,7 +62,7 @@ export class SocketManager {
         let index = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
         // console.log(index);
         let newPlayer = new Player(game.name, socket.id);
-        newPlayer.setRoomId(room.gameRoom.idGame);
+        newPlayer.roomId = room.gameRoom.idGame;
         // console.log(newPlayer.name + 'newPlayer.name');
         this.playerMan.allPlayers.splice(index, 1);
         this.playerMan.allPlayers[index] = newPlayer;
@@ -74,7 +80,7 @@ export class SocketManager {
         let player = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
         // console.log(player);
         if (player > -1) {
-            let room = this.gameListMan.existingRooms.findIndex((p) => p.gameRoom.idGame === this.playerMan.allPlayers[player].getRoomId());
+            let room = this.gameListMan.existingRooms.findIndex((p) => p.gameRoom.idGame === this.playerMan.allPlayers[player].roomId);
             // console.log(this.playerMan.allPlayers);
             this.gameListMan.deleteRoom(room);
         }
@@ -101,7 +107,7 @@ export class SocketManager {
         let room = this.gameListMan.existingRooms.findIndex((r) => r.gameRoom.idGame === game.game);
         // console.log(this.playerMan.allPlayers.length);
         let roomGame = this.gameListMan.existingRooms[room];
-        this.playerMan.allPlayers[joinerIndex].setRoomId(roomGame.gameRoom.idGame);
+        this.playerMan.allPlayers[joinerIndex].roomId = roomGame.gameRoom.idGame;
         this.gameListMan.existingRooms[room].setPlayerName(this.playerMan.allPlayers[joinerIndex].name);
         // console.log(this.gameListMan.existingRooms[room].gameRoom.playersName);
         console.log(socket.id);
@@ -112,4 +118,13 @@ export class SocketManager {
         this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
         // io.Socket().emit('roomJoined', roomGame);
     }
+
+    private displayChatEntry(socket: io.Socket, message:string){
+        const senderId = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
+        const sender = this.playerMan.allPlayers[senderId];
+        const senderName = sender.name;
+        const roomId = sender.roomId.toString();
+        const chatEntry = {senderName: senderName,message: message}
+        this.sio.in(roomId).emit('addChatEntry',chatEntry);
+    };
 }

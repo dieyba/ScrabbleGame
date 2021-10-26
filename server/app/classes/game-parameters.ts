@@ -36,7 +36,7 @@ export class GameParameters {
     }
     addPlayer(player: Player) {
         if (this.gameRoom.playersName.length < this.gameRoom.capacity) {
-            this.gameRoom.playersName.push(player.getName());
+            this.gameRoom.playersName.push(player.name);
             // this.player.push(player);
         }
     }
