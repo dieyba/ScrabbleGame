@@ -49,6 +49,7 @@ export class GameListService {
             // this.existingRooms = game;
             console.log('catch');
             this.roomInfo = game.gameRoom;
+            this.socket.emit('deleteRoom');
         });
         // });
     }
