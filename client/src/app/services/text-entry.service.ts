@@ -19,7 +19,8 @@ import {
 } from '@app/classes/utilities';
 import { ChatDisplayService } from './chat-display.service';
 import { CommandInvokerService } from './command-invoker.service';
-import { SoloGameService } from './solo-game.service';
+import { GameService } from './game.service';
+import { MultiPlayerGameService } from './multi-player-game.service';
 
 const MIN_EXCHANGE_LETTERS = 1;
 const MAX_EXCHANGE_LETTERS = 7;
@@ -37,10 +38,11 @@ type CommandCreationResult = Command | ErrorType.SyntaxError | ErrorType.Invalid
 export class TextEntryService {
     commandsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
     paramsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
+    isSolo: boolean;
 
     constructor(
         private chatDisplayService: ChatDisplayService,
-        private gameService: SoloGameService,
+        private gameService: GameService,
         private commandInvokerService: CommandInvokerService,
     ) {
         this.commandsMap = new Map();
@@ -66,16 +68,20 @@ export class TextEntryService {
      * @param text Text input from user
      */
     handleInput(userInput: string, isLocalPlayer: boolean) {
-        const player: Player = isLocalPlayer ? this.gameService.localPlayer : this.gameService.virtualPlayer;
+        const isMultiplayer = this.gameService.currentGameService instanceof MultiPlayerGameService;
+        const player: Player = isLocalPlayer
+            ? this.gameService.currentGameService.game.creatorPlayer
+            : this.gameService.currentGameService.game.opponentPlayer;
+
         userInput = trimSpaces(userInput);
         if (!isEmpty(userInput)) {
-            const isACommand = userInput.startsWith('!') && !this.gameService.isEndGame;
+            const isACommand = userInput.startsWith('!') && !this.gameService.currentGameService.game.isEndGame;
             if (!isACommand) {
-                // if(this.gameService.isMultiplayer){
-                // TODO: send createPlayerEntry result to server, then server receives the entry and sends it to both chat display
-                // }else{
-                this.chatDisplayService.addEntry(createPlayerEntry(isLocalPlayer, player.name, userInput));
-                // }
+                if (isMultiplayer) {
+                    // TODO: send createPlayerEntry result to server, then server receives the entry and sends it to both chat display
+                } else {
+                    this.chatDisplayService.addEntry(createPlayerEntry(isLocalPlayer, player.name, userInput));
+                }
             } else {
                 const commandCreationResult = this.createCommand(userInput, player);
                 const isCreated = commandCreationResult instanceof Command;
@@ -135,7 +141,7 @@ export class TextEntryService {
     extractStockParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
             const defaultParams = { player, serviceCalled: this.chatDisplayService };
-            const stockLetters: string = scrabbleLetterstoString(this.gameService.stock.letterStock);
+            const stockLetters: string = scrabbleLetterstoString(this.gameService.currentGameService.game.stock.letterStock);
             return { defaultParams, specificParams: stockLetters };
         }
         return undefined;

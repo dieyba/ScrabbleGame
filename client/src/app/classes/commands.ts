@@ -1,6 +1,6 @@
 import { Player } from '@app/classes/player';
 import { ChatDisplayService } from '@app/services/chat-display.service';
-import { SoloGameService } from '@app/services/solo-game.service';
+import { GameService } from '@app/services/game.service';
 import { ChatDisplayEntry } from './chat-display-entry';
 import { Vec2 } from './vec2';
 
@@ -13,7 +13,7 @@ export enum CommandName {
 }
 export interface DefaultCommandParams {
     player: Player;
-    serviceCalled: SoloGameService | ChatDisplayService;
+    serviceCalled: GameService | ChatDisplayService;
 }
 
 export interface PlaceParams {

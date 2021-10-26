@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { LetterStock } from '@app/services/letter-stock.service';
+import { LetterStock } from './letter-stock';
 
 const VALUE_LETTER_10 = 10;
 const OCCURENCE_NUMBER_5 = 5;

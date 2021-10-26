@@ -38,7 +38,6 @@ export class ValidationService {
         setTimeout(() => {
             if (this.validateWords(newWords)) {
                 newWords.forEach((newWord) => {
-                    // actually what was this method supposed to do? seemmed to do a few things at the same time
                     for (const letter of newWord.content) {
                         if (wordsValue === 0) {
                             this.gridService.removeSquare(letter.tile.position.x, letter.tile.position.y);
@@ -49,7 +48,7 @@ export class ValidationService {
                     }
                 });
             }
-            this.isTimerElapsed = true; // TODO: ca va ou ca?
+            this.isTimerElapsed = true;
         }, WAIT_TIME);
     }
 

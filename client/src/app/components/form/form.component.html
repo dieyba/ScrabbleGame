@@ -45,7 +45,7 @@
         </div>
 
         <div class="form-check">
-            <mat-checkbox formControlName="bonus" class="form check-input">Bonus aléatoire</mat-checkbox>
+            <mat-checkbox formControlName="bonus" [(ngModel)]="defaultBonus" class="form check-input">Bonus aléatoire</mat-checkbox>
         </div>
         <div *ngIf="isSolo">
             <p>Veuillez choisir le niveau de votre adversaire</p>

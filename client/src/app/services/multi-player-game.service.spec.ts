@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { GameListService } from './game-list.service';
+import { MultiPlayerGameService } from './multi-player-game.service';
 
-describe('GameListService', () => {
-    let service: GameListService;
+describe('MultiPlayerGameService', () => {
+    let service: MultiPlayerGameService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(GameListService);
+        service = TestBed.inject(MultiPlayerGameService);
     });
 
     it('should be created', () => {

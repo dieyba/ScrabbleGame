@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GameParameters } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
-import { PlayerHandler } from '@app/modules/playerHandler';
-import { SocketHandler } from '@app/modules/socketHandler';
+import { PlayerHandler } from '@app/modules/player-handler';
+import { SocketHandler } from '@app/modules/socket-handler';
 import { Observable } from 'rxjs';
 import * as io from 'socket.io-client';
 export interface Game {
@@ -20,10 +20,10 @@ export class GameListService {
     // const socket = io(urlString);
     // private readonly HOST_NAME = 'http://' + window.location.hostname;
     // private readonly SERVER_PORT = ':3000';
+    roomInfo = { idGame: -1, capacity: 0, playersName: new Array<string>() };
     private readonly server = 'http://' + window.location.hostname + ':3000';
     private socket: io.Socket;
     private player: LocalPlayer;
-    roomInfo = { idGame: -1, capacity: 0, playersName: new Array<string>() };
     // gameList: Array<GameParameters>;
     // player: LocalPlayer;
     // dictionary: Dictionary;
@@ -65,7 +65,7 @@ export class GameListService {
         return this.http.get<GameParameters[]>('http://' + window.location.hostname + ':3000/api/gameList');
     }
     createRoom(game: GameParameters): void {
-        console.log('createRoom' + game.createrPlayer.name + ' ' + game.totalCountDown);
-        this.socket.emit('createRoom', { name: game.createrPlayer.name, timer: game.totalCountDown });
+        // console.log('creatoroom' + game.creatorPlayer.name + ' ' + game.totalCountDown);
+        this.socket.emit('creatoroom', { name: game.creatorPlayer.name, timer: game.totalCountDown });
     }
 }

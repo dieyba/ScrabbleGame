@@ -1,4 +1,4 @@
-import { SoloGameService } from '@app/services/solo-game.service';
+import { GameService } from '@app/services/game.service';
 import { ChatDisplayEntry, createErrorEntry, createPlayerEntry } from './chat-display-entry';
 import { Command, CommandName, CommandResult, DefaultCommandParams, PlaceParams } from './commands';
 import { ErrorType } from './errors';
@@ -6,14 +6,14 @@ import { convertCoordToString } from './utilities';
 import { Vec2 } from './vec2';
 
 export class PlaceCmd extends Command {
-    private gameService: SoloGameService;
+    private gameService: GameService;
     private position: Vec2;
     private orientation: string;
     private word: string;
 
     constructor(defaultParams: DefaultCommandParams, params: PlaceParams) {
         super(defaultParams.player);
-        this.gameService = defaultParams.serviceCalled as SoloGameService;
+        this.gameService = defaultParams.serviceCalled as GameService;
         this.position = new Vec2();
         this.position.x = params.position.x;
         this.position.y = params.position.y;
@@ -27,7 +27,7 @@ export class PlaceCmd extends Command {
         const commandMessage = '!' + CommandName.PlaceCmd + ' ' + stringCoord + this.orientation + ' ' + this.word;
 
         const placeParams = { position: this.position, orientation: this.orientation, word: this.word };
-        const executionResult = this.gameService.place(this.player, placeParams);
+        const executionResult = this.gameService.currentGameService.place(this.player, placeParams);
 
         // TODO: wait after the 3 seconds before displaying the execution result message,
         // here also seems to cause bugs with waiting after the validation is done
@@ -36,7 +36,8 @@ export class PlaceCmd extends Command {
             executionMessages.push(createErrorEntry(executionResult, commandMessage));
         } else {
             this.isExecuted = true;
-            const isFromLocalPlayer = this.player.name === this.gameService.localPlayer.name;
+            const localPlayerName = this.gameService.currentGameService.game.creatorPlayer.name;
+            const isFromLocalPlayer = this.player.name === localPlayerName;
             executionMessages.push(createPlayerEntry(isFromLocalPlayer, this.player.name, commandMessage));
         }
         return { isExecuted: this.isExecuted, executionMessages };
