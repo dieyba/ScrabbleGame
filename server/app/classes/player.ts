@@ -1,11 +1,11 @@
 export class Player {
-    private name: string;
+    name: string;
     private socketId: string;
-    private roomId: number;
+    roomId: number;
 
-    constructor(name: string /*socketId: string*/) {
+    constructor(name: string, socketId: string) {
         this.name = name;
-        // this.socketId = socketId;
+        this.socketId = socketId;
         this.roomId = -1;
     }
     public getName(): string {
