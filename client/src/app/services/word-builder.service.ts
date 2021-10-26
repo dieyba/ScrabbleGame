@@ -1,169 +1,99 @@
 import { Injectable } from '@angular/core';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleWord, WordOrientation } from '@app/classes/scrabble-word';
+import { ScrabbleWord } from '@app/classes/scrabble-word';
+import { Axis, invertAxis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
+import { GridService } from './grid.service';
+
+const TOWARD_START = true;
+const TOWARD_END = false;
+const BACKWARD_STEP = -1;
+const FORWARD_STEP = 1;
+const MIN_WORD_LENGHT = 2;
 
 @Injectable({
     providedIn: 'root',
 })
 export class WordBuilderService {
-    buildWordOnBoard(word: string, coord: Vec2, axis: WordOrientation): ScrabbleWord[] {
+    constructor(private gridService: GridService) {}
+
+    buildWordsOnBoard(word: string, coord: Vec2, axis: Axis): ScrabbleWord[] {
         const result: ScrabbleWord[] = [];
-        const scrabbleWord = new ScrabbleWord();
-        scrabbleWord.startPosition = new Vec2(coord.x, coord.y);
-        scrabbleWord.orientation = axis;
-        for (const letter of word) {
-            scrabbleWord.content.push(new ScrabbleLetter(letter, 1));
-            scrabbleWord.value++;
+
+        // get full word that can be read on the placed word's row/column
+        let wordBuilt = this.buildScrabbleWord(coord, axis);
+        wordBuilt.startPosition = coord;
+        wordBuilt.orientation = axis;
+        const placedWord = wordBuilt;
+        if (wordBuilt.content.length >= MIN_WORD_LENGHT) {
+            result.push(wordBuilt);
         }
-        result.push(scrabbleWord);
+
+        // adding all the opposite axis words that could be created from the word placed
+        for (const letter of placedWord.content) {
+            const currentCoord = letter.tile.position;
+            // if the current letter is not a newly placed letter, there is no need to check if word can be built from it
+            if (this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y].isValidated) {
+                continue;
+            }
+
+            const oppositeAxis = invertAxis[axis];
+            wordBuilt = this.buildScrabbleWord(currentCoord, oppositeAxis);
+            wordBuilt.startPosition = coord;
+            wordBuilt.orientation = axis;
+            if (wordBuilt.content.length >= MIN_WORD_LENGHT) {
+                result.push(wordBuilt);
+            }
+        }
         return result;
     }
-    /*
-  buildWordOnBoard(direction : number) : void{ //direction is either h or v inputed by the user through the communication window
-    if(this.validation.isWordValid){ //bug here?
-      for(let i = 0; i < this.board.boardSize; i++){
-        for(let j = 0; j < this.board.boardSize; j++){ //iterate through the board
-          //WORK IN PROGRESS
-    // All words created from the letters placed on the board
 
-    constructor(private gridService: GridService) {
+    // out of range begining coord or square without a letter at the begining coord will return the begining coord
+    findWordEdge(coord: Vec2, axis: Axis, isTowardStart: boolean): Vec2 {
+        if (!this.gridService.scrabbleBoard.isCoordInsideBoard(coord)) {
+            return coord;
+        }
+        const step = isTowardStart ? BACKWARD_STEP : FORWARD_STEP;
+        const currentCoord = new Vec2(coord.x, coord.y);
+        const nextCoord = new Vec2(coord.x, coord.y);
+        do {
+            if (axis === Axis.H) {
+                currentCoord.x = nextCoord.x;
+                nextCoord.x += step;
+            } else {
+                currentCoord.y = nextCoord.y;
+                nextCoord.y += step;
+            }
+            // if at the board's boarder
+            if (!this.gridService.scrabbleBoard.isCoordInsideBoard(nextCoord)) {
+                break;
+            }
+        } while (this.gridService.scrabbleBoard.squares[nextCoord.x][nextCoord.y].occupied);
 
+        return currentCoord;
     }
 
-    // this.gridService.scrabbleBoard.square[][]
-    allWordsCreated(word: string, coord : Vec2, axis: WordOrientation): ScrabbleWord[] {
-        let newLetters : ScrabbleLetter[] = [];
-        for(let i = 0; i < word.length; i++){
-          let letterfromString = word[i]
-          newLetters[i] = new ScrabbleLetter(letterfromString, LetterValue[letterfromString as keyof typeof LetterValue])
-        }
-        let wordList: ScrabbleWord[] = [];
-        wordList[0] = this.wordify(newLetters);
-        let currentTile : Square = this.gridService.scrabbleBoard.squares[coord.x][coord.y];
-        let newWord = new ScrabbleWord;
-        for(let i = 0; i < word.length; i++){
-          if(axis = WordOrientation.Horizontal){
-            currentTile = this.gridService.scrabbleBoard.squares[coord.x+i][coord.y];
-            newWord = this.completeWordInADirection(currentTile, WordOrientation.Horizontal);
-          }
-          else{
-            currentTile = this.gridService.scrabbleBoard.squares[coord.x][coord.y+i];
-            newWord = this.completeWordInADirection(currentTile, WordOrientation.Vertical);
-          }
-          if(newWord.content.length > 0)
-            wordList[i+1] = newWord;
-        }
-        return wordList;
-    }
-    
-    wordify(letters: ScrabbleLetter[]): ScrabbleWord {
-      const word = new ScrabbleWord();
-      for(let i = 0; i < letters.length; i++){
-          word.content[i] = letters[i];
-      }
-      return word;
-    }
+    buildScrabbleWord(coord: Vec2, axis: Axis): ScrabbleWord {
+        const word = new ScrabbleWord();
+        if (this.gridService.scrabbleBoard.isCoordInsideBoard(coord)) {
+            const startCoord = this.findWordEdge(coord, axis, TOWARD_START);
+            const endCoord = this.findWordEdge(coord, axis, TOWARD_END);
+            // Adding 1 to get the correct word lenght since coordinates start at 0
+            const lenght = axis === Axis.H ? endCoord.x - startCoord.x + 1 : endCoord.y - startCoord.y + 1;
 
-    // THIS FUNCTION WILL BREAK WHEN CODE STRUCTURE CHANGES. BEWARE.
-    completeWordInADirection(firstTile: Square, direction: WordOrientation): ScrabbleWord {
-        let found : boolean = false;
-        let steps = 0;
-        if (direction === WordOrientation.Horizontal) {
-            while(!found){
-              let previoustile = this.gridService.scrabbleBoard.squares[firstTile.position.x-1-steps][firstTile.position.y];
-              if(!previoustile.occupied){
-                found = true;
-              }
-              else steps++;
-            }
-        } else if (direction === WordOrientation.Vertical) {
-          while(!found){
-            let previoustile = this.gridService.scrabbleBoard.squares[firstTile.position.x][firstTile.position.y-1-steps];
-            if(!previoustile.occupied){
-              found = true;
-            }
-            else steps++;
-          }
-        }
-        found = false;
-        let currentSquare : Square = this.gridService.scrabbleBoard.squares[firstTile.position.x][firstTile.position.y];
-        while(!found){
-          if(direction === WordOrientation.Horizontal)
-            currentSquare = this.gridService.scrabbleBoard.squares[firstTile.position.x - steps][firstTile.position.y];
-          else currentSquare = this.gridService.scrabbleBoard.squares[firstTile.position.x][firstTile.position.y - steps];
-            if(!currentSquare.occupied) {
-            found = true;
-          }
-        }
-        let end : boolean = false;
-        let sizeOfWord = 0;
-        let currentSquareLast : Square;
-        let letters : ScrabbleLetter[] = [];
-        while(!end){
-          if(direction = WordOrientation.Horizontal)
-            currentSquareLast = this.gridService.scrabbleBoard.squares[currentSquare.position.x+sizeOfWord][currentSquare.position.y];
-          else  currentSquareLast = this.gridService.scrabbleBoard.squares[currentSquare.position.x][currentSquare.position.y+sizeOfWord];
-          if(!currentSquareLast.occupied)
-            end = true
-          else {
-            letters[sizeOfWord] = currentSquareLast.letter;
-            sizeOfWord++;
-          }
-        }
-        return this.wordify(letters);        
-    }*/
-    // All words created from the letters placed on the board
+            const currentCoord = startCoord;
+            let currentLetter;
+            for (let i = 0; i < lenght; i++) {
+                currentLetter = this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y].letter;
+                word.content[i] = currentLetter;
+                word.value += currentLetter.value;
 
-    /*
-    allWordsCreated(newLetters: ScrabbleLetter[], axis: Axis): ScrabbleWord[] {
-        const wordList: ScrabbleWord[] = [];
-        let i = 0;
-        const horizontalResult = this.completeWordInADirection(newLetters[0], axis);
-        if (horizontalResult.content !== []) {
-            wordList[i] = horizontalResult;
-            i++;
-        }
-        for (const index of newLetters) {
-            const verticalResult = this.completeWordInADirection(index, invertAxis[axis]);
-            if (verticalResult.content !== []) {
-                wordList[i] = verticalResult;
-                i++;
+                if (axis === Axis.H) {
+                    currentCoord.x += 1;
+                } else {
+                    currentCoord.y += 1;
+                }
             }
         }
-        return wordList;
+        return word;
     }
-
-    // THIS FUNCTION WILL BREAK WHEN CODE STRUCTURE CHANGES. BEWARE.
-    completeWordInADirection(firstLetter: ScrabbleLetter, direction: Axis): ScrabbleWord {
-        const wordInConstruction = new ScrabbleWord();
-        let directionOrigin: Direction;
-        let directionLast: Direction;
-        if (direction === 'h') {
-            directionOrigin = Direction.West;
-            directionLast = Direction.East;
-        } else if (direction === 'v') {
-            directionOrigin = Direction.North;
-            directionLast = Direction.South;
-        } else {
-            return new ScrabbleWord();
-            // TEMPORARY
-            // TODO : Throw exception
-        }
-        let nextLetter = firstLetter.nextLetters[directionOrigin];
-        if (nextLetter) {
-            let temp = new ScrabbleLetter('', 0);
-            while (nextLetter) {
-                temp = nextLetter;
-                nextLetter = temp.nextLetters[directionOrigin];
-            } // When we get out of the loop, temp is the letter furthest left and leftwardsLetter is invalid
-            let i = 0;
-            wordInConstruction.content[i] = temp; // first letter of the horizontal word
-            while (wordInConstruction.content[i].nextLetters[directionLast]) {
-                i++;
-                wordInConstruction.content[i] = wordInConstruction.content[i - 1].nextLetters[directionLast];
-            }
-        }
-        return wordInConstruction;
-    }*/
 }

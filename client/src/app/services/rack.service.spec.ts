@@ -7,6 +7,7 @@ export const RACK_WIDTH = 500;
 export const RACK_HEIGHT = 60;
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 describe('RackService', () => {
     let service: RackService;
     let ctxStub: CanvasRenderingContext2D;
@@ -45,13 +46,37 @@ describe('RackService', () => {
         expect(lineToSpy).toHaveBeenCalledTimes(expectedCallTimes);
     });
 
-    it('removeLetter should decrease rack length by 1', () => {
+    it('removeLetter should decrease rack length by 1 and return position', () => {
         const letter1 = new ScrabbleLetter('a', 1);
         const letter2 = new ScrabbleLetter('o', 1);
         const letter3 = new ScrabbleLetter('w', 10);
         const letter4 = new ScrabbleLetter('k', 2);
         service.rackLetters = [letter1, letter2, letter3, letter4];
-        service.removeLetter(letter1);
+        expect(service.removeLetter(letter1)).toEqual(0);
+    });
+
+    it('removeLetter should not remove letter not in the rack', () => {
+        const letter1 = new ScrabbleLetter('a', 1);
+        const letter2 = new ScrabbleLetter('o', 1);
+        const letter3 = new ScrabbleLetter('w', 10);
+        const letter4 = new ScrabbleLetter('k', 2);
+        service.rackLetters = [letter1, letter2, letter4];
+        service.removeLetter(letter3);
         expect(service.rackLetters.length).toEqual(3);
+    });
+
+    it('addLetter should not call drawLetter when rack length is 7', () => {
+        const drawLetterSpy = spyOn<any>(service, 'drawLetter').and.callThrough();
+        const letter1 = new ScrabbleLetter('a', 1);
+        const letter2 = new ScrabbleLetter('o', 1);
+        const letter3 = new ScrabbleLetter('w', 10);
+        const letter4 = new ScrabbleLetter('k', 2);
+        const letter5 = new ScrabbleLetter('k', 2);
+        const letter6 = new ScrabbleLetter('k', 2);
+        const letter7 = new ScrabbleLetter('k', 2);
+        service.rackLetters = [letter1, letter2, letter3, letter4, letter5, letter6, letter7];
+        service.addLetter(letter7);
+        expect(service.rackLetters.length).toEqual(7);
+        expect(drawLetterSpy).not.toHaveBeenCalled();
     });
 });
