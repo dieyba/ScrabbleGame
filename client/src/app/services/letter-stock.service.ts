@@ -31,36 +31,6 @@ enum LetterQuantity {
     Star = 2,
 }
 
-// export const lettersValue: Map<string, number> = new Map<string, number>([
-//     ['a', 1],
-//     ['b', 3],
-//     ['c', 3],
-//     ['d', 2],
-//     ['e', 1],
-//     ['f', 4],
-//     ['g', 2],
-//     ['h', 4],
-//     ['i', 1],
-//     ['j', 8],
-//     ['k', 10],
-//     ['l', 1],
-//     ['m', 2],
-//     ['n', 1],
-//     ['o', 1],
-//     ['p', 3],
-//     ['q', 8],
-//     ['r', 1],
-//     ['s', 1],
-//     ['t', 1],
-//     ['u', 1],
-//     ['v', 4],
-//     ['w', 10],
-//     ['x', 10],
-//     ['y', 10],
-//     ['z', 10],
-//     ['*', 0]
-// ]);
-
 export enum LetterValue {
     A = 1,
     B = 3,
@@ -90,36 +60,6 @@ export enum LetterValue {
     Z = 10,
     Star = 0,
 }
-
-// export const lettersValue2: Map<string, number> = new Map<string, LetterValue>([
-//     ['a', LetterValue.A],
-//     ['b', LetterValue.B],
-//     ['c', LetterValue.C],
-//     ['d', LetterValue.D],
-//     ['e', LetterValue.E],
-//     ['f', LetterValue.F],
-//     ['g', LetterValue.G],
-//     ['h', LetterValue.H],
-//     ['i', LetterValue.I],
-//     ['j', LetterValue.J],
-//     ['k', LetterValue.K],
-//     ['l', LetterValue.L],
-//     ['m', LetterValue.M],
-//     ['n', LetterValue.N],
-//     ['o', LetterValue.O],
-//     ['p', LetterValue.P],
-//     ['q', LetterValue.Q],
-//     ['r', LetterValue.R],
-//     ['s', LetterValue.S],
-//     ['t', LetterValue.T],
-//     ['u', LetterValue.U],
-//     ['v', LetterValue.V],
-//     ['w', LetterValue.W],
-//     ['x', LetterValue.X],
-//     ['y', LetterValue.Y],
-//     ['z', LetterValue.Z],
-//     ['*', LetterValue.Star]
-// ])
 
 @Injectable({
     providedIn: 'root',

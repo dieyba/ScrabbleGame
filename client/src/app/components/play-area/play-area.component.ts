@@ -53,6 +53,9 @@ export class PlayAreaComponent implements AfterViewInit {
             this.manipulateRackService.switchLeft();
         } else if (this.buttonPressed === 'ArrowRight') {
             this.manipulateRackService.switchRight();
+        } else {
+            this.manipulateRackService.selectByLetter(this.buttonPressed);
+            this.rackCanvas.nativeElement.focus();
         }
     }
 
@@ -136,6 +139,8 @@ export class PlayAreaComponent implements AfterViewInit {
         } else {
             this.rackService.deselectAll(this.rackContext);
         }
+        this.manipulateRackService.clearManipValues();
+        console.log('manip selection : ', this.rackService.handlingSelected);
     }
 
     selection(event: MouseEvent) {
@@ -144,6 +149,7 @@ export class PlayAreaComponent implements AfterViewInit {
         if (this.mouseService.mouseHitDetect(event)) {
             this.manipulateRackService.handleSelection(this.rackContext);
         } else {
+            this.manipulateRackService.clearManipValues();
             this.exchangeService.handleSelection(this.rackContext);
         }
     }
