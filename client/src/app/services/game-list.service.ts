@@ -39,8 +39,8 @@ export class GameListService {
         console.log(this.player);
         console.log(this.socket.id);
         this.socket.on('roomcreated', (roomInf: GameParameters) => {
-            this.player.name = roomInf.creatorPlayer.name;
-            this.player.roomId = roomInf.gameRoom.idGame;
+            // this.player.name = roomInf.creatorPlayer.name;
+            // this.player.roomId = roomInf.gameRoom.idGame;
             // this.roomInfo = roomInf.gameRoom;
             // this.myRoom.push(this.roomInfo);
             // console.log(this.roomInfo);
@@ -60,6 +60,7 @@ export class GameListService {
             // this.existingRooms = game;
             console.log('catch');
             this.roomInfo = game.gameRoom;
+            this.socket.emit('deleteRoom');
         });
         // });
     }

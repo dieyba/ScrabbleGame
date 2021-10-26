@@ -1,29 +1,44 @@
 <div class="waitingArea">
     <img class="image" src="https://bit.ly/3m206ss" width="600" height="100" alt="Logo Scrabble" />
-    <div>
+    <div *ngIf="!gameSelected">
         <h1>Vous etes en attente d'un autre joueur</h1>
         <mat-spinner></mat-spinner>
+
+        <div *ngFor="let game of list">
+            <button>
+                <span>
+                    {{ game.gameRoom.idGame }}
+                </span>
+                <span> Createur:{{ game.createrPlayer.name }} </span>
+                <span> Type de Dictionnaire: {{ game.dictionary.title }} </span>
+                <span> Temps:{{ game.totalCountDown }} </span>
+            </button>
+        </div>
+        <button (click)="convert(true); deleteRoom()">Convertir en Mode Solo</button>
+        <button (click)="closeDialog(); openForm(); deleteRoom()">Annuler</button>
     </div>
-    <button (click)="convert(true); deleteRoom()">Convertir en Mode Solo</button>
-    <button (click)="closeDialog(); openForm(); deleteRoom()">Annuler</button>
-    <div *ngFor="let game of list">
-        <button (click)="openName(true); onSelect(game)"></button>
-        <span>
-            {{ game.gameRoom.idGame }}
-        </span>
-        <span> {{ game.creatorPlayer.name }} </span>
-        <span> {{ game.dictionary.title }} </span>
-        <span> {{ game.totalCountDown }} </span>
+    <div *ngIf="gameSelected">
+        <h3>Veuillez selectionner la partie que vous souhaitez rejoindre</h3>
+        <div *ngFor="let game of list">
+            <button (click)="openName(true); onSelect(game)">
+                <span>
+                    {{ game.gameRoom.idGame }}
+                </span>
+                <span> Createur:{{ game.creatorPlayer.name }} </span>
+                <span> Type de Dictionnaire: {{ game.dictionary.title }} </span>
+                <span> Temps:{{ game.totalCountDown }} </span>
+            </button>
+        </div>
+        <div *ngIf="name">
+            <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill">
+                <mat-label>Entrez votre nom</mat-label>
+                <input matInput #input maxlength="10" #input2 minlength="3" placeholder="Ex. Nougat" [formControl]="playerName" />
+                <mat-hint align="end">{{ input.value?.length || 0 }}/10</mat-hint>
+                <div class="error" *ngIf="playerName.errors?.pattern">Le nom ne doit pas contenir de chiffres et de caractères</div>
+                <!--div *ngIf="confirmName()">vous ne pouvez pas avoir le meme non que l'autre joueur</div-->
+            </mat-form-field>
+            <button (click)="start()">Joindre</button>
+        </div>
+        <button (click)="closeDialog()">Retour</button>
     </div>
-    <div *ngIf="name">
-        <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill">
-            <mat-label>Entrez votre nom</mat-label>
-            <input matInput #input maxlength="10" #input2 minlength="3" placeholder="Ex. Nougat" [formControl]="playerName" />
-            <mat-hint align="end">{{ input.value?.length || 0 }}/10</mat-hint>
-            <div class="error" *ngIf="playerName.errors?.pattern">Le nom ne doit pas contenir de chiffres et de caractères</div>
-            <!--div *ngIf="confirmName()">vous ne pouvez pas avoir le meme non que l'autre joueur</div-->
-        </mat-form-field>
-        <button (click)="start()">Joindre</button>
-    </div>
-    <button (click)="closeDialog()">Retour</button>
 </div>

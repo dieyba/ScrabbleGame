@@ -65,6 +65,9 @@ export class SocketManager {
         // console.log(this.gameListMan.existingRooms[0].gameRoom.playersName[0]);
         // console.log(this.gameListMan.existingRooms);
         // console.log(socket.id + 'creation');
+        console.log(socket.id);
+        console.log(room.gameRoom.idGame.toString());
+        socket.join(room.gameRoom.idGame.toString());
         this.sio.emit('roomcreated', room);
     }
     private deleteRoom(socket: io.Socket): void {
@@ -101,7 +104,12 @@ export class SocketManager {
         this.playerMan.allPlayers[joinerIndex].setRoomId(roomGame.gameRoom.idGame);
         this.gameListMan.existingRooms[room].setPlayerName(this.playerMan.allPlayers[joinerIndex].name);
         // console.log(this.gameListMan.existingRooms[room].gameRoom.playersName);
+        console.log(socket.id);
+        console.log(roomGame.gameRoom.idGame.toString());
+        console.log(this.gameListMan.existingRooms[room].gameRoom.playersName);
+        console.log(this.gameListMan.existingRooms[room + 1].gameRoom.playersName);
         socket.join(roomGame.gameRoom.idGame.toString());
-        this.sio.emit('roomJoined', roomGame);
+        this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
+        // io.Socket().emit('roomJoined', roomGame);
     }
 }
