@@ -16,4 +16,13 @@ export class Square {
     isValidated: boolean;
     isBonusUsed: boolean;
     letter: ScrabbleLetter;
+    
+    constructor(horizontalPosition: number, verticalPosition: number) {
+        this.color = SquareColor.None;
+        this.occupied = false;
+        this.isValidated = false;
+        this.isBonusUsed = false;
+        this.position.x = horizontalPosition;
+        this.position.y = verticalPosition;
+    }
 }

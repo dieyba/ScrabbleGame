@@ -1,7 +1,13 @@
+import { ScrabbleLetter } from "./scrabble-letter";
+
 export class Player {
     private name: string;
     private socketId: string;
     private roomId: number;
+    score: number;
+    letters: ScrabbleLetter[];
+    isActive: boolean; // True is it is this players turn, false if not.
+    isWinner: boolean;
 
     constructor(name: string /*socketId: string*/) {
         this.name = name;

@@ -1,12 +1,12 @@
-import { ChatDisplayService } from '@app/services/chat-display.service';
-import { SoloGameService } from '@app/services/solo-game.service';
 import { Player } from '@app/classes/player';
+import { ChatDisplayService } from '@app/services/chat-display.service';
+import { GameService } from '@app/services/game.service';
 import { ErrorType } from './errors';
 import { Vec2 } from './vec2';
 
 export interface DefaultCommandParams {
     player: Player;
-    serviceCalled: SoloGameService | ChatDisplayService;
+    serviceCalled: GameService | ChatDisplayService;
 }
 
 export type ExchangeParams = string;

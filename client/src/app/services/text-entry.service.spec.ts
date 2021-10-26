@@ -1,8 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { LocalPlayer } from '@app/classes/local-player';
-import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
 import { ErrorType } from '@app/classes/errors';
+import { GameParameters } from '@app/classes/game-parameters';
+import { LocalPlayer } from '@app/classes/local-player';
 import { Vec2 } from '@app/classes/vec2';
+import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
 import { ChatDisplayService } from './chat-display.service';
 import { SoloGameService } from './solo-game.service';
 import { TextEntryService } from './text-entry.service';
@@ -11,6 +12,7 @@ const LOCAL_PLAYER_NAME = 'Local Player';
 const VIRTUAL_PLAYER_NAME = 'Virtual Player';
 const IS_LOCAL_PLAYER = true;
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('TextEntryService', () => {
     let service: TextEntryService;
     let chatDisplayServiceSpy: jasmine.SpyObj<ChatDisplayService>;
@@ -31,8 +33,9 @@ describe('TextEntryService', () => {
             ],
         });
         service = TestBed.inject(TextEntryService);
-        gameServiceSpy.localPlayer = new LocalPlayer(LOCAL_PLAYER_NAME);
-        gameServiceSpy.virtualPlayer = new VirtualPlayer(VIRTUAL_PLAYER_NAME, PlayerType.Easy);
+        gameServiceSpy.game = new GameParameters(LOCAL_PLAYER_NAME, 60);
+        gameServiceSpy.game.creatorPlayer = new LocalPlayer(LOCAL_PLAYER_NAME);
+        gameServiceSpy.game.opponentPlayer = new VirtualPlayer(VIRTUAL_PLAYER_NAME, PlayerType.Easy);
     });
 
     it('should be created', () => {
@@ -43,7 +46,7 @@ describe('TextEntryService', () => {
         const spy = spyOn(service, 'createCommand').and.callThrough();
         const fakeCommand = '!fake command name';
         service.handleInput(fakeCommand, IS_LOCAL_PLAYER);
-        expect(spy).toHaveBeenCalledWith(fakeCommand, gameServiceSpy.localPlayer);
+        expect(spy).toHaveBeenCalledWith(fakeCommand, gameServiceSpy.game.creatorPlayer);
     });
 
     it('should send input as normal chat message', () => {

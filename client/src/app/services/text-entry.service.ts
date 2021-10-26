@@ -9,7 +9,7 @@ import { Player } from '@app/classes/player';
 import { Column, Row } from '@app/classes/scrabble-board';
 import { Vec2 } from '@app/classes/vec2';
 import { ChatDisplayService } from './chat-display.service';
-import { SoloGameService } from './solo-game.service';
+import { GameService } from './game.service';
 
 const DEBUG_CMD = 'debug';
 const EXCHANGE_CMD = 'échanger';
@@ -35,8 +35,9 @@ type CommandCreationResult = Command | ErrorType.SyntaxError | ErrorType.Invalid
 export class TextEntryService {
     commandsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
     paramsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
+    isSolo: boolean;
 
-    constructor(private chatDisplayService: ChatDisplayService, private gameService: SoloGameService) {
+    constructor(private chatDisplayService: ChatDisplayService, private gameService: GameService) {
         this.commandsMap = new Map();
         this.paramsMap = new Map();
 
@@ -58,11 +59,13 @@ export class TextEntryService {
      * @param text Text input from user
      */
     handleInput(userInput: string, isLocalPlayer: boolean) {
-        const player: Player = isLocalPlayer ? this.gameService.localPlayer : this.gameService.virtualPlayer;
+        const player: Player = isLocalPlayer
+            ? this.gameService.currentGameService.game.creatorPlayer
+            : this.gameService.currentGameService.game.opponentPlayer;
         userInput = this.trimSpaces(userInput);
         if (!this.isEmpty(userInput)) {
             // After the end game, messages starting with ! can't call commands and are considered normal chat messages
-            if (userInput.startsWith('!') && !this.gameService.isEndGame) {
+            if (userInput.startsWith('!') && !this.gameService.currentGameService.game.isEndGame) {
                 let commandCreationResult = this.createCommand(userInput, player);
                 const isCreated = commandCreationResult !== ErrorType.SyntaxError && commandCreationResult !== ErrorType.InvalidCommand;
                 if (isCreated) {

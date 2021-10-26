@@ -1,15 +1,8 @@
 import { Dictionary } from './dictionary';
-import { LetterStock } from './letter-stock';
-import { LocalPlayer } from './local-player';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
+import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
-
-export enum GameType {
-    Solo = 0,
-    MultiPlayer = 1,
-    MultiPlayerLog = 2,
-}
 
 export interface GameRoom {
     idGame: number;
@@ -24,25 +17,20 @@ export class GameParameters {
     dictionary: Dictionary;
     randomBonus: boolean;
     totalCountDown: number;
-    timerMs: number;
     creatorName: string;
     scrabbleBoard: ScrabbleBoard;
-    stock: LetterStock;
+    stock: ScrabbleLetter[];
     turnPassed: boolean;
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
     newWords: ScrabbleWord[];
 
-    constructor(creatorPlayerName: string, timer: number) {
+    constructor(creatorPlayerName: string, timer: number, id: number) {
+        this.gameRoom.idGame = id;
         this.gameRoom.capacity = 2;
         this.dictionary = new Dictionary(0);
-        this.creatorPlayer = new LocalPlayer(creatorPlayerName);
-        this.timerMs = timer;
-        this.stock = new LetterStock();
-        this.hasTurnsBeenPassed = [];
-        this.isEndGame = false;
-        this.turnPassed = false;
-        this.randomBonus = false;
-        this.scrabbleBoard = new ScrabbleBoard();
+        // this.randomBonus = boni;
+        this.creatorPlayer = new Player(creatorPlayerName);
+        this.totalCountDown = timer;
     }
 }

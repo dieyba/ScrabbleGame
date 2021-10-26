@@ -20,14 +20,7 @@ describe('PlayAreaComponent', () => {
             imports: [MatCardModule],
         });
         gridServiceSpy = jasmine.createSpyObj('GridService', ['sizeUpLetters', 'sizeDownLetters', 'drawGrid', 'drawColors', 'drawLetter']);
-        soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', [
-            'localPlayer',
-            'virtualPlayer',
-            'createNewGame',
-            'passTurn',
-            'changeActivePlayer',
-            'removeRackLetter',
-        ]);
+        soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['game', 'createNewGame', 'passTurn', 'changeActivePlayer', 'removeRackLetter']);
         await TestBed.configureTestingModule({
             declarations: [PlayAreaComponent],
             providers: [
@@ -38,9 +31,9 @@ describe('PlayAreaComponent', () => {
 
         gridServiceSpy.scrabbleBoard = new ScrabbleBoard();
         const letter: ScrabbleLetter = new ScrabbleLetter('a', 1);
-        soloGameServiceSpy.localPlayer = new LocalPlayer('Arianne');
-        soloGameServiceSpy.localPlayer.score = 73;
-        soloGameServiceSpy.localPlayer.letters = [letter];
+        soloGameServiceSpy.game.creatorPlayer = new LocalPlayer('Ariane');
+        soloGameServiceSpy.game.creatorPlayer.score = 73;
+        soloGameServiceSpy.game.creatorPlayer.letters = [letter];
     });
 
     beforeEach(() => {

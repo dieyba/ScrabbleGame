@@ -1,21 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GameParameters } from '@app/classes/game-parameters';
+import { FormComponent } from '@app/components/form/form.component';
 import { GameListService } from '@app/services/game-list.service';
-import { FormComponent } from '../form/form.component';
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 @Component({
     selector: 'app-waiting-area',
     templateUrl: './waiting-area.component.html',
     styleUrls: ['./waiting-area.component.scss'],
     providers: [GameListService],
 })
-export class WaitingAreaComponent {
-    private playerList: string[];
+export class WaitingAreaComponent implements OnInit {
     isStarting: boolean;
-    private timer: any;
     list: GameParameters[] = [];
+    private playerList: string[];
+    private timer: any;
     constructor(
         private router: Router,
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
@@ -24,7 +26,7 @@ export class WaitingAreaComponent {
     ) {
         this.gameList = gameList;
         this.timer = setInterval(() => {
-            let roomInfo = this.gameList;
+            const roomInfo = this.gameList;
             this.playerList = roomInfo.roomInfo.playersName;
             this.start();
         }, 1000);
@@ -35,11 +37,9 @@ export class WaitingAreaComponent {
 
     getList(): void {
         this.gameList.getList().subscribe((game) => (this.list = game));
-        console.log(this.list + 'est afficher');
-        console.log(document.URL);
     }
 
-    public start(): void {
+    start(): void {
         if (this.playerList.length === 2) {
             this.isStarting = true;
             clearInterval(this.timer);

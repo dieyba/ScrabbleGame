@@ -1,17 +1,17 @@
+import { GameService } from '@app/services/game.service';
 import { Command, DefaultCommandParams } from './commands';
-import { SoloGameService } from '@app/services/solo-game.service';
 import { ErrorType } from './errors';
 
 export class PassTurnCmd extends Command {
-    private gameService: SoloGameService;
+    private gameService: GameService;
 
     constructor(defaultParams: DefaultCommandParams) {
         super(defaultParams.player);
-        this.gameService = defaultParams.serviceCalled as SoloGameService;
+        this.gameService = defaultParams.serviceCalled as GameService;
     }
 
     execute(): ErrorType {
-        return this.gameService.passTurn(this.gameService.localPlayer);
+        return this.gameService.currentGameService.passTurn(this.gameService.currentGameService.game.creatorPlayer);
     }
 }
 
