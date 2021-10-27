@@ -28,6 +28,7 @@ export enum MouseButton {
 export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
     @ViewChild('rackCanvas', { static: false }) private rackCanvas!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('overlayCanvas', { static: false }) private overlayCanvas!: ElementRef<HTMLCanvasElement>;
 
     mousePosition: Vec2 = new Vec2(0, 0);
     buttonPressed = '';
@@ -44,10 +45,12 @@ export class PlayAreaComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.rackService.gridContext = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        this.mouseWordPlacerService.overlayContext = this.overlayCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.soloGameService.createNewGame();
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
+        this.mouseWordPlacerService.drawOverlay();
 
         // TODO : Remove tests validation
         // const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
@@ -128,5 +131,8 @@ export class PlayAreaComponent implements AfterViewInit {
     }
     onKeyDown(event: KeyboardEvent) {
         this.mouseWordPlacerService.onKeyDown(event);
+    }
+    onBlur() {
+        this.mouseWordPlacerService.onBlur();
     }
 }

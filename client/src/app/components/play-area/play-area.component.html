@@ -4,11 +4,13 @@
             <mat-card class="card">
                 <canvas id="canvas" #gridCanvas [attr.width]="width" [attr.height]="height"></canvas>
                 <canvas
-                    id="mousePlaceOverlay"
+                    id="overlayCanvas"
+                    #overlayCanvas
                     [attr.width]="width"
                     [attr.height]="height"
                     (click)="onMouseDown($event)"
                     (keydown)="onKeyDown($event)"
+                    (blur)="onBlur()"
                 ></canvas>
             </mat-card>
             <mat-card class="rack">

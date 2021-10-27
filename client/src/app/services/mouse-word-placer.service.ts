@@ -12,6 +12,7 @@ export class MouseWordPlacerService {
     latestPosition: Vec2;
     latestKey: string;
     currentWord: ScrabbleLetter[];
+    overlayContext: CanvasRenderingContext2D;
     constructor(private gridService: GridService, private rackService: RackService) {
         this.currentAxis = Axis.H;
         this.latestPosition = new Vec2();
@@ -19,6 +20,9 @@ export class MouseWordPlacerService {
         this.currentWord = [];
     }
 
+    drawOverlay() {
+        // Do nothing since canvas is already completely clear, just like we want it to be.
+    }
     onMouseClick(e: MouseEvent) {
         // Mouse position relative to the start of the grid in the canvas
         const mousePositionX = e.offsetX + BOARD_OFFSET;
@@ -44,11 +48,11 @@ export class MouseWordPlacerService {
                 nextSquare = this.findNextSquare(this.currentAxis, clickedSquare);
             }
             this.latestPosition = nextSquare;
-            this.gridService.gridContext.beginPath();
+            this.overlayContext.beginPath();
             // const arrowOrigin = new Vec2(nextSquare.x + BOARD_OFFSET, nextSquare.y + BOARD_OFFSET);
             // const arrowEnd = new Vec2(arrowOrigin.x + 15, arrowOrigin.y);
             // Rework function : this.canvasArrow(arrowOrigin, arrowEnd);
-            this.gridService.gridContext.fillRect(nextSquare.x, nextSquare.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
+            this.overlayContext.fillRect(nextSquare.x, nextSquare.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
         } else {
             switch (this.currentAxis) {
                 case Axis.H:
@@ -60,9 +64,19 @@ export class MouseWordPlacerService {
             }
             nextSquare = this.findNextSquare(this.currentAxis, clickedSquare);
             this.latestPosition = nextSquare;
-            this.gridService.gridContext.beginPath();
-            this.gridService.gridContext.fillRect(nextSquare.x, nextSquare.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
+            this.overlayContext.beginPath();
+            this.overlayContext.fillRect(nextSquare.x, nextSquare.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
         }
+    }
+    // Resets the canvas and the word in progress
+    // this does not work for some ungodly reason. Maybe the canvas can't handle focus events?
+    onBlur() {
+        this.currentAxis = Axis.H;
+        this.latestPosition = new Vec2();
+        this.latestKey = '';
+        this.currentWord = [];
+        this.overlayContext.beginPath();
+        this.overlayContext.clearRect(0, 0, this.gridService.gridContext.canvas.width, this.gridService.gridContext.canvas.height);
     }
     findNextSquare(axis: Axis, position: Vec2): Vec2 {
         const newPosition = new Vec2(position.x, position.y);
