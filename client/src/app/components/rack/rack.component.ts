@@ -46,17 +46,19 @@ export class RackComponent implements AfterViewInit {
     onFocusOut(event: Event) {
         const evt = event as FocusEvent;
         let newFocus: string;
-
-        if (evt.relatedTarget !== null) {
-            newFocus = (evt.relatedTarget as HTMLElement).id;
-            if (newFocus !== 'exchangeButton') {
-                // If the exchangeButton is pressed, play-area.component will handle the call to exchange letters
+        // Is the user didn't change tab or window, do something
+        if (document.hasFocus()) {
+            if (evt.relatedTarget !== null) {
+                newFocus = (evt.relatedTarget as HTMLElement).id;
+                if (newFocus !== 'exchangeButton') {
+                    // If the exchangeButton is pressed, play-area.component will handle the call to exchange letters
+                    this.rackService.deselectAll(this.rackContext);
+                }
+            } else {
                 this.rackService.deselectAll(this.rackContext);
             }
-        } else {
-            this.rackService.deselectAll(this.rackContext);
+            this.manipulationRackService.clearManipValues();
         }
-        this.manipulationRackService.clearManipValues();
     }
 
     onKeyDown(event: Event) {
@@ -68,7 +70,8 @@ export class RackComponent implements AfterViewInit {
         } else if (buttonPressed === 'ArrowRight') {
             this.manipulationRackService.switchRight();
         } else {
-            if (evt.key !== 'Shift') {
+            // If the key is a letter, number or special character
+            if (evt.key.length === 1) {
                 this.manipulationRackService.selectByLetter(buttonPressed);
                 this.rackCanvas.nativeElement.focus();
             }
@@ -79,9 +82,9 @@ export class RackComponent implements AfterViewInit {
         event.preventDefault();
         const evt = event as WheelEvent;
         if (evt.deltaY > 0) {
-            this.manipulationRackService.switchLeft();
-        } else {
             this.manipulationRackService.switchRight();
+        } else {
+            this.manipulationRackService.switchLeft();
         }
     }
 

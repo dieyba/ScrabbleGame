@@ -83,8 +83,8 @@ export class ManipulationRackService {
             const letterToSwitchLeft = this.rackService.rackLetters[this.letterSelectedPosition];
 
             if (this.letterSelectedPosition === 0) {
-                this.rackService.rackLetters[this.letterSelectedPosition] = this.rackService.rackLetters[this.rackService.rackLetters.length - 1];
-                this.rackService.rackLetters[this.rackService.rackLetters.length - 1] = letterToSwitchLeft;
+                this.rackService.rackLetters.shift();
+                this.rackService.rackLetters.push(letterToSwitchLeft);
                 this.letterSelectedPosition = this.rackService.rackLetters.length - 1;
                 this.rackService.clearRack();
                 this.rackService.select(this.rackService.rackLetters.length, this.rackService.gridContext, false);
@@ -106,8 +106,10 @@ export class ManipulationRackService {
             const letterToSwitchRight = this.rackService.rackLetters[this.letterSelectedPosition];
 
             if (this.letterSelectedPosition === this.rackService.rackLetters.length - 1) {
-                this.rackService.rackLetters[this.letterSelectedPosition] = this.rackService.rackLetters[0];
-                this.rackService.rackLetters[0] = letterToSwitchRight;
+                // Removing last letter
+                this.rackService.rackLetters.pop();
+                // Placing letter at the beginning
+                this.rackService.rackLetters.unshift(letterToSwitchRight);
                 this.letterSelectedPosition = 0;
                 this.rackService.clearRack();
                 this.rackService.select(1, this.rackService.gridContext, false);

@@ -95,7 +95,7 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     exchange() {
-        this.exchangeService.exchange();
+        this.exchangeService.exchange(); // TODO Must send command text to chat. Create command instead here or in ExchangeService
     }
 
     cancelExchange() {
