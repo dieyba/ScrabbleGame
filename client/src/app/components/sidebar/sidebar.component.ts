@@ -24,7 +24,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         this.players = new Array<LocalPlayer>();
         this.socket = SocketHandler.requestSocket(this.server);
         this.socket.on('updateInfo', (players: Array<LocalPlayer>) => {
-            console.log(players);
+            // console.log(players);
             this.players = players;
         });
     }
@@ -61,7 +61,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     // }
 
     isPlayer1Active(): boolean {
-        console.log(this.players);
+        // console.log(this.players);
         return this.gameList.roomInfo.creatorPlayer.isActive;
     }
 

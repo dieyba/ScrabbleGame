@@ -61,7 +61,7 @@ export class GameListService {
         });
         this.socket.on('roomJoined', (game: GameParameters) => {
             // this.existingRooms = game;
-            console.log('catch');
+            // console.log('catch');
             this.roomInfo = game;
             this.roomInfo.gameRoom = game.gameRoom;
             this.socket.emit('deleteRoom');
@@ -78,7 +78,7 @@ export class GameListService {
         this.socket.emit('deleteRoom');
     }
     start(game: GameParameters, name: string): void {
-        console.log(this.socket);
+        // console.log(this.socket);
         this.socket.emit('joinRoom', { game: game.gameRoom.idGame, joinerName: name });
     }
     initializeGame(roomId: number) {
@@ -86,7 +86,7 @@ export class GameListService {
     }
     confirmName(name: string, game: GameParameters): boolean {
         if (name !== game.creatorPlayer.name) {
-            console.log('confirmation');
+            // console.log('confirmation');
             // this.socket.emit('joinRoom', game);
             return true;
         }

@@ -48,9 +48,14 @@ export class SocketManager {
             //     // this.addPlayer(socket, player);
             //     // this.getAllGames(socket, game);
             // });
-            socket.on('sendChatEntry', (message:string) => {
-                console.log('client sent a new message');
-                this.displayChatEntry(socket, message);
+            socket.on('sendChatEntry', (message:string, messageToOpponent?:string) => {
+                console.log('client sent a new message: '+ message);
+                if(messageToOpponent) {
+                    console.log('message to opponent of the sender: ' + messageToOpponent);
+                    this.displayDifferentChatEntry(socket, message, messageToOpponent);
+                }else{
+                    this.displayChatEntry(socket, message);
+                }
             });
             socket.on('getAllGames', (game: Array<GameParameters>) => {
                 this.getAllGames(socket, game);
@@ -116,7 +121,25 @@ export class SocketManager {
         const sender = this.playerMan.allPlayers[senderId];
         const senderName = sender.name;
         const roomId = sender.roomId.toString();
-        const chatEntry = {senderName: senderName,message: message}
+        const chatEntry = {senderName: senderName,message: message};
         this.sio.in(roomId).emit('addChatEntry',chatEntry);
+    };
+    private displayDifferentChatEntry(socket: io.Socket, messageToSender:string, messageToOpponent:string){
+        const senderId = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id).toString();
+        const sender = this.playerMan.allPlayers[senderId];
+        const senderName = sender.name;
+        
+        const roomId = sender.roomId.toString();
+        
+        const opponentId = this.gameListMan.existingRooms[roomId].opponentPlayer.getSocketId().toString();
+        const opponentName = this.gameListMan.existingRooms[roomId].opponentPlayer.name;
+
+        const chatEntrySender = {senderName: senderName,message: messageToSender};
+        const chatEntryOpponent = {senderName: opponentName,message: messageToOpponent};
+        console.log("sender name: " + senderName);
+        console.log("opponent name: " + opponentName);
+        
+        this.sio.to(senderId).emit('addChatEntry',chatEntrySender);
+        this.sio.to(opponentId).emit('addChatEntry',chatEntryOpponent);
     };
 }

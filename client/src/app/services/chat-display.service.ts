@@ -27,7 +27,7 @@ export class ChatDisplayService {
         // TODO: get if the game is multiplayer and only initiate socket if it is
         this.socket = SocketHandler.requestSocket(this.server);
         this.socket.on('addChatEntry', (chatEntry:ServerChatEntry) => {
-            console.log('received message from server:' + chatEntry.message);
+            console.log('received message from ' + chatEntry.senderName + ' : ' + chatEntry.message);
             const color = chatEntry.senderName === this.localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
             this.addEntry({color:color, message: chatEntry.message});
         });
@@ -40,6 +40,7 @@ export class ChatDisplayService {
     }
     
     sendMessageToServer(messageFromLocalPlayer:string, messageToRemotePlayer?:string) {
+        console.log('sending a message to server');
         if(this.socket){
             if(messageToRemotePlayer){
                 this.socket.emit('sendChatEntry', messageFromLocalPlayer, messageToRemotePlayer);
