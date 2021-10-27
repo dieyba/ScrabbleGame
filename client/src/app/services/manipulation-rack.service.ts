@@ -24,7 +24,6 @@ export class ManipulationRackService {
             this.rackService.select(position, rackContext, false);
             this.letterSelectedPosition = position - 1;
         }
-        console.log(this.letterSelectedPosition);
     }
 
     clearManipValues() {
@@ -96,9 +95,6 @@ export class ManipulationRackService {
                 this.rackService.select(this.letterSelectedPosition + 1, this.rackService.gridContext, false);
             }
         }
-        console.log(this.letterSelectedPosition);
-        console.log(this.rackService.exchangeSelected);
-        console.log(this.rackService.handlingSelected);
     }
 
     switchRight() {
@@ -121,8 +117,5 @@ export class ManipulationRackService {
                 this.rackService.select(this.letterSelectedPosition + 1, this.rackService.gridContext, false);
             }
         }
-        console.log(this.letterSelectedPosition);
-        console.log(this.rackService.exchangeSelected);
-        console.log(this.rackService.handlingSelected);
     }
 }
