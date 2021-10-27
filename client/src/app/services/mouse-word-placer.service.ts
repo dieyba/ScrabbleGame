@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Axis } from '@app/classes/utilities';
+import { Axis, invertAxis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { BOARD_OFFSET, GridService, SQUARE_SIZE } from './grid.service';
 import { RackService } from './rack.service';
@@ -42,17 +42,18 @@ export class MouseWordPlacerService {
         }
         let nextSquare: Vec2 = new Vec2();
         nextSquare = this.findNextSquare(this.currentAxis, clickedSquare);
-        if (nextSquare.x !== this.latestPosition.x && nextSquare.y !== this.latestPosition.y) {
+        if (clickedSquare.x !== this.latestPosition.x || clickedSquare.y !== this.latestPosition.y) {
+            this.removeLatestCurrentSquare();
+            this.removeLatestPreview(invertAxis[this.currentAxis]);
+            this.drawSquare(clickedSquare, 'green');
             if (this.currentAxis !== Axis.H) {
                 this.currentAxis = Axis.H;
                 nextSquare = this.findNextSquare(this.currentAxis, clickedSquare);
             }
-            this.latestPosition = nextSquare;
+            this.latestPosition = clickedSquare;
             this.overlayContext.beginPath();
-            // const arrowOrigin = new Vec2(nextSquare.x + BOARD_OFFSET, nextSquare.y + BOARD_OFFSET);
-            // const arrowEnd = new Vec2(arrowOrigin.x + 15, arrowOrigin.y);
-            // Rework function : this.canvasArrow(arrowOrigin, arrowEnd);
-            this.overlayContext.fillRect(nextSquare.x, nextSquare.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
+            this.removeLatestPreview(this.currentAxis);
+            this.drawSquare(nextSquare, 'yellow');
         } else {
             switch (this.currentAxis) {
                 case Axis.H:
@@ -62,11 +63,39 @@ export class MouseWordPlacerService {
                     this.currentAxis = Axis.H;
                     break;
             }
+            this.removeLatestPreview(this.currentAxis);
             nextSquare = this.findNextSquare(this.currentAxis, clickedSquare);
-            this.latestPosition = nextSquare;
+            this.latestPosition = clickedSquare;
             this.overlayContext.beginPath();
-            this.overlayContext.fillRect(nextSquare.x, nextSquare.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
+            this.drawSquare(nextSquare, 'yellow');
         }
+    }
+    // Draws a square on the canvas at the given position with the given color
+    drawSquare(position: Vec2, color: string) {
+        this.overlayContext.beginPath();
+        switch (color) {
+            case 'green':
+                this.overlayContext.fillStyle = 'rgba(0, 255, 50, 0.5)';
+                break;
+            case 'yellow':
+                this.overlayContext.fillStyle = 'rgba(255, 255, 100, 0.5)';
+                break;
+            default:
+                break;
+        }
+        this.overlayContext.fillRect(position.x, position.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
+    }
+
+    // Removes the latest drawn square preview from the canvas
+    removeLatestPreview(axis: Axis) {
+        const previousSquareDrawn = this.findNextSquare(invertAxis[axis], this.latestPosition);
+        this.overlayContext.beginPath();
+        this.overlayContext.clearRect(previousSquareDrawn.x, previousSquareDrawn.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
+    }
+    // Removes latest current square selected
+    removeLatestCurrentSquare() {
+        this.overlayContext.beginPath();
+        this.overlayContext.clearRect(this.latestPosition.x, this.latestPosition.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
     }
     // Resets the canvas and the word in progress
     // this does not work for some ungodly reason. Maybe the canvas can't handle focus events?
@@ -95,9 +124,26 @@ export class MouseWordPlacerService {
     onKeyDown(e: KeyboardEvent) {
         const keyPressed = e.key;
         const alphabet = 'abcdefghijklmnopqrstuvwxyzàâçéèêëïîöôûü';
+        switch (keyPressed) {
+            case 'Backspace':
+                this.removeLetter();
+                break;
+            case 'Enter':
+                // TODO: Confirm word
+                break;
+            case 'Escape':
+                // TODO: Reset the canvas
+                this.onBlur();
+                break;
+            default:
+                if (alphabet.includes(keyPressed)) {
+                    this.placeLetter(keyPressed);
+                }
+                break;
+        }
         if (keyPressed === 'Backspace') {
             this.removeLetter();
-        } else if (this.latestKey === 'Shift' && keyPressed !== 'Shift') {
+        } else if (keyPressed !== 'Shift') {
             this.placeBlankLetter(keyPressed);
             this.latestKey = keyPressed;
             // use this for blank pieces.
@@ -106,7 +152,10 @@ export class MouseWordPlacerService {
         }
     }
     removeLetter() {
-        // TODO : removeLetter temporary function
+        // TODO : remove letter
+        this.currentWord.pop();
+        this.overlayContext.beginPath();
+        this.overlayContext.clearRect(this.latestPosition.x, this.latestPosition.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
     }
     placeBlankLetter(keyPressed: string) {
         // Normalize key pressed, decomposes "è" into "e`"
