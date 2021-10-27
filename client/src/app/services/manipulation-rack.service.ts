@@ -13,21 +13,17 @@ export class ManipulationRackService {
 
     constructor(private readonly mouseService: MouseHandlerService, private readonly rackService: RackService) {}
 
-    handleSelection(rackContext: CanvasRenderingContext2D) {
+    handleSelection() {
         const position = this.mouseService.selectedLetterPosition();
 
         if (this.rackService.handlingSelected[position - 1] === false) {
             if (this.rackService.exchangeSelected[position - 1] === true) {
                 this.rackService.exchangeSelected[position - 1] = false;
             }
-
-            // for (let i = 0; i < this.rackService.handlingSelected.length; i++) {
-            //     this.rackService.deselect(i + 1, rackContext, false);
-            // }
-            this.rackService.select(position, rackContext, false);
+            this.rackService.select(position, this.rackService.gridContext, false);
             this.letterSelectedPosition = position - 1;
         }
-        console.log(this.letterSelectedPosition);
+        // console.log(this.letterSelectedPosition);
     }
 
     clearManipValues() {
@@ -99,9 +95,9 @@ export class ManipulationRackService {
                 this.rackService.select(this.letterSelectedPosition + 1, this.rackService.gridContext, false);
             }
         }
-        console.log(this.letterSelectedPosition);
-        console.log(this.rackService.exchangeSelected);
-        console.log(this.rackService.handlingSelected);
+        // console.log(this.letterSelectedPosition);
+        // console.log(this.rackService.exchangeSelected);
+        // console.log(this.rackService.handlingSelected);
     }
 
     switchRight() {
@@ -122,8 +118,8 @@ export class ManipulationRackService {
                 this.rackService.select(this.letterSelectedPosition + 1, this.rackService.gridContext, false);
             }
         }
-        console.log(this.letterSelectedPosition);
-        console.log(this.rackService.exchangeSelected);
-        console.log(this.rackService.handlingSelected);
+        // console.log(this.letterSelectedPosition);
+        // console.log(this.rackService.exchangeSelected);
+        // console.log(this.rackService.handlingSelected);
     }
 }

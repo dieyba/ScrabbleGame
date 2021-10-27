@@ -119,7 +119,7 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     cancelExchange() {
-        this.exchangeService.cancelExchange(this.rackContext);
+        this.exchangeService.cancelExchange();
     }
 
     clickOutsideRack(event: Event) {
@@ -140,17 +140,17 @@ export class PlayAreaComponent implements AfterViewInit {
             this.rackService.deselectAll(this.rackContext);
         }
         this.manipulateRackService.clearManipValues();
-        console.log('manip selection : ', this.rackService.handlingSelected);
+        // console.log('manip selection : ', this.rackService.handlingSelected);
     }
 
     selection(event: MouseEvent) {
         event.preventDefault();
 
         if (this.mouseService.mouseHitDetect(event)) {
-            this.manipulateRackService.handleSelection(this.rackContext);
+            this.manipulateRackService.handleSelection();
         } else {
             this.manipulateRackService.clearManipValues();
-            this.exchangeService.handleSelection(this.rackContext);
+            this.exchangeService.handleSelection();
         }
     }
 }
