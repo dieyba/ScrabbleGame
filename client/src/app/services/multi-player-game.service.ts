@@ -9,6 +9,7 @@ import { Player } from '@app/classes/player';
 import { Vec2 } from '@app/classes/vec2';
 import * as io from 'socket.io-client';
 import { ChatDisplayService } from './chat-display.service';
+import { GameListService } from './game-list.service';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 import { DEFAULT_LETTER_COUNT, SoloGameService } from './solo-game.service';
@@ -28,8 +29,9 @@ export class MultiPlayerGameService extends SoloGameService {
         protected chatDisplayService: ChatDisplayService,
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
+        protected gameList: GameListService,
     ) {
-        super(gridService, rackService, chatDisplayService, validationService, wordBuilder);
+        super(gridService, rackService, chatDisplayService, validationService, wordBuilder, gameList);
     }
 
     override initializeGame(gameInfo: FormGroup) {
@@ -46,6 +48,20 @@ export class MultiPlayerGameService extends SoloGameService {
         this.game.timerMs = +this.game.totalCountDown;
         return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
     }
+    // override initializeGame() {
+    //     this.game = this.gameList.roomInfo;
+    //     this.game.creatorPlayer = new LocalPlayer(this.gameList.roomInfo.gameRoom.playersName[0]);
+    //     this.game.creatorPlayer.isActive = true;
+    //     this.game.opponentPlayer = new LocalPlayer(this.gameList.roomInfo.gameRoom.playersName[0]);
+    //     this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+    //     this.game.opponentPlayer.isActive = false;
+    //     this.game.dictionary = new Dictionary(0);
+    //     this.game.totalCountDown = this.gameList.roomInfo.totalCountDown;
+    //     // this.game.randomBonus = gameInfo.controls.bonus.value;
+    //     this.chatDisplayService.entries = [];
+    //     this.game.timerMs = +this.game.totalCountDown;
+    //     return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
+    // }
 
     override createNewGame() {
         // Empty board and stack

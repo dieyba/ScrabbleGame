@@ -111,7 +111,7 @@ export class FormComponent implements OnInit {
                 this.closeDialog();
                 this.router.navigate(['/game']);
                 this.gameService.initializeGameType(GameType.Solo);
-                this.gameService.currentGameService.initializeGame(this.myForm);
+                // this.gameService.currentGameService.initializeGame(this.myForm);
             } else {
                 // let singleGame = new GameParameters(
                 //     this.myForm.controls.name.value,
@@ -127,7 +127,9 @@ export class FormComponent implements OnInit {
                 this.gameService.currentGameService.initializeGame(this.myForm);
                 const single = this.gameService.currentGameService.game;
                 this.gameList.createRoom(single);
+                console.log('!');
                 this.dialog.open(WaitingAreaComponent, { disableClose: true });
+                console.log('!');
             }
         }
     }

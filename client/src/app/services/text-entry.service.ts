@@ -80,8 +80,10 @@ export class TextEntryService {
             const isACommand = userInput.startsWith('!') && !this.gameService.currentGameService.game.isEndGame;
             if (!isACommand) {
                 if (isMultiplayer) {
+                    // TODO: send createPlayerEntry result to server, then server receives the entry and sends it to both chat display
                     // send to server to display on both players' screen
                     this.chatDisplayService.sendMessageToServer(userInput);
+                    // this.chatDisplayService.addEntry(createPlayerEntry(isLocalPlayer, player.name, userInput));
                 } else {
                     // display locally only
                     this.chatDisplayService.addEntry(createPlayerEntry(isLocalPlayer, player.name, userInput));

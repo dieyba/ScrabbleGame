@@ -29,13 +29,16 @@ export class GameListService {
     player: LocalPlayer;
     existingRooms: GameParameters[];
     myRoom: GameRoom[];
-    roomInfo = { idGame: -1, capacity: 0, playersName: new Array<string>() };
+    roomInfo: GameParameters;
+    roomInf = { idGame: -1, capacity: 0, playersName: new Array<string>() };
 
     constructor() {
         this.existingRooms = new Array<GameParameters>();
         this.myRoom = new Array<GameRoom>();
         this.socket = SocketHandler.requestSocket(this.server);
         this.player = PlayerHandler.requestPlayer();
+        this.roomInfo = new GameParameters('', 0);
+        this.roomInfo.gameRoom = { idGame: -1, capacity: 0, playersName: new Array<string>() };
         console.log(this.player);
         console.log(this.socket.id);
         this.socket.on('roomcreated', (roomInf: GameParameters) => {
@@ -59,7 +62,8 @@ export class GameListService {
         this.socket.on('roomJoined', (game: GameParameters) => {
             // this.existingRooms = game;
             console.log('catch');
-            this.roomInfo = game.gameRoom;
+            this.roomInfo = game;
+            this.roomInfo.gameRoom = game.gameRoom;
             this.socket.emit('deleteRoom');
         });
         // });
@@ -76,6 +80,9 @@ export class GameListService {
     start(game: GameParameters, name: string): void {
         console.log(this.socket);
         this.socket.emit('joinRoom', { game: game.gameRoom.idGame, joinerName: name });
+    }
+    initializeGame(roomId: number) {
+        this.socket.emit('initializeGame', roomId);
     }
     confirmName(name: string, game: GameParameters): boolean {
         if (name !== game.creatorPlayer.name) {

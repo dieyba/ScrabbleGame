@@ -10,13 +10,13 @@
                 <div class="row">
                     <label class="info">Points: {{ getPlayer1Score() }}</label>
                 </div>
-                <div class="row" *ngIf="getPlayer1LetterCount() < 7">
+                <!--div class="row" *ngIf="getPlayer1LetterCount() < 7">
                     <label class="info">Nombre de lettres: {{ getPlayer1LetterCount() }}</label>
-                </div>
+                </div-->
             </div>
         </mat-card-content>
     </mat-card>
-    <mat-card class="card" [ngStyle]="{ 'background-color': isPlayer2Active() ? '#8ABBF5' : '#DCECFF' }">
+    <!--mat-card class="card" [ngStyle]="{ 'background-color': isPlayer2Active() ? '#8ABBF5' : '#DCECFF' }">
         <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': isPlayer2Active() ? 'bold' : 'normal' }">{{
             player2Name
         }}</mat-card-title>
@@ -24,27 +24,27 @@
             <div>
                 <div class="row">
                     <label class="info">Points: {{ getPlayer2Score() }}</label>
-                </div>
-                <div class="row" *ngIf="getPlayer2LetterCount() < 7">
+                </div-->
+    <!--div class="row" *ngIf="getPlayer2LetterCount() < 7">
                     <label class="info">Nombre de lettres: {{ getPlayer2LetterCount() }}</label>
                 </div>
             </div>
         </mat-card-content>
-    </mat-card>
+    </mat-card-->
     <hr />
-    <mat-card class="card">
+    <!--mat-card class="card">
         <mat-card-title class="card-title" align="center">Lettres restantes</mat-card-title>
         <label class="values">{{ getLettersLeftCount() }}</label>
-    </mat-card>
-    <mat-card class="card">
+    </mat-card-->
+    <!--mat-card class="card">
         <mat-card-title class="card-title" align="center">Temps restant</mat-card-title>
         <mat-card-content>
             <label class="values">{{ getTimer() }}</label>
         </mat-card-content>
-    </mat-card>
-    <mat-card *ngIf="isEndGame() && hasWinner()">
+    </mat-card-->
+    <!--mat-card *ngIf="isEndGame() && hasWinner()">
         <mat-card-title *ngIf="!isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br>tu as gagné!</mat-card-title>
         <mat-card-title *ngIf="isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br>vous avez gagné!</mat-card-title>
-    </mat-card>
+    </mat-card-->
     <button class="return" routerLink="/start">Quitter la partie</button>
 </div>
