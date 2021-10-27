@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { MouseHandlerService } from './mouse-handler.service';
 import { RackService } from './rack.service';
 import { SoloGameService } from './solo-game.service';
 
@@ -7,16 +6,9 @@ import { SoloGameService } from './solo-game.service';
     providedIn: 'root',
 })
 export class ExchangeService {
-    constructor(
-        private readonly mouseService: MouseHandlerService,
-        private readonly rackService: RackService,
-        private readonly soloGameService: SoloGameService,
-    ) {}
+    constructor(private readonly rackService: RackService, private readonly soloGameService: SoloGameService) {}
 
-    handleSelection(rackContext: CanvasRenderingContext2D) {
-        // this.mouseService.mouseHitDetect(event);
-        const position = this.mouseService.selectedLetterPosition();
-
+    handleSelection(rackContext: CanvasRenderingContext2D, position: number) {
         if (this.rackService.handlingSelected[position - 1] === true) {
             this.rackService.handlingSelected[position - 1] = false;
         }

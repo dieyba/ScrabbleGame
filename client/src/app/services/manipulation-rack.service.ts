@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { MouseHandlerService } from './mouse-handler.service';
 import { RackService } from './rack.service';
 
 const ERROR_NUMBER = -1;
@@ -11,11 +10,9 @@ export class ManipulationRackService {
     private letterSelectedPosition = ERROR_NUMBER;
     private firstOccurencePosition = ERROR_NUMBER;
 
-    constructor(private readonly mouseService: MouseHandlerService, private readonly rackService: RackService) {}
+    constructor(private readonly rackService: RackService) {}
 
-    handleSelection(rackContext: CanvasRenderingContext2D) {
-        const position = this.mouseService.selectedLetterPosition();
-
+    handleSelection(rackContext: CanvasRenderingContext2D, position: number) {
         if (this.rackService.handlingSelected[position - 1] === false) {
             if (this.rackService.exchangeSelected[position - 1] === true) {
                 this.rackService.exchangeSelected[position - 1] = false;

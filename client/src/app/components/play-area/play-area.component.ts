@@ -1,9 +1,7 @@
-import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { ExchangeService } from '@app/services/exchange.service';
 import { GridService } from '@app/services/grid.service';
-import { ManipulationRackService } from '@app/services/manipulation-rack.service';
-import { MouseHandlerService } from '@app/services/mouse-handler.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
 
@@ -31,32 +29,16 @@ export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
 
     mousePosition: Vec2 = new Vec2(0, 0);
-    buttonPressed = '';
     private canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     private rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
     private rackContext: CanvasRenderingContext2D;
 
     constructor(
-        private readonly mouseService: MouseHandlerService,
         private readonly gridService: GridService,
         private readonly rackService: RackService,
         private readonly soloGameService: SoloGameService, // private readonly validationService: ValidationService,
         private readonly exchangeService: ExchangeService,
-        private readonly manipulateRackService: ManipulationRackService,
     ) {}
-
-    @HostListener('keydown', ['$event'])
-    buttonDetect(event: KeyboardEvent) {
-        this.buttonPressed = event.key;
-        if (this.buttonPressed === 'ArrowLeft') {
-            this.manipulateRackService.switchLeft();
-        } else if (this.buttonPressed === 'ArrowRight') {
-            this.manipulateRackService.switchRight();
-        } else {
-            this.manipulateRackService.selectByLetter(this.buttonPressed);
-            this.rackCanvas.nativeElement.focus();
-        }
-    }
 
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
@@ -64,6 +46,7 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
+        this.rackContext = this.rackService.gridContext;
     }
 
     passTurn() {
@@ -117,37 +100,5 @@ export class PlayAreaComponent implements AfterViewInit {
 
     cancelExchange() {
         this.exchangeService.cancelExchange(this.rackContext);
-    }
-
-    clickOutsideRack(event: Event) {
-        const evt = event as FocusEvent;
-        // console.log(evt);
-        // console.log(event);
-        let newFocus: string;
-
-        if (evt.relatedTarget !== null) {
-            newFocus = (evt.relatedTarget as HTMLElement).id;
-            // console.log(newFocus);
-            if (newFocus === 'exchangeButton') {
-                this.exchange();
-            } else {
-                this.rackService.deselectAll(this.rackContext);
-            }
-        } else {
-            this.rackService.deselectAll(this.rackContext);
-        }
-        this.manipulateRackService.clearManipValues();
-        console.log('manip selection : ', this.rackService.handlingSelected);
-    }
-
-    selection(event: MouseEvent) {
-        event.preventDefault();
-
-        if (this.mouseService.mouseHitDetect(event)) {
-            this.manipulateRackService.handleSelection(this.rackContext);
-        } else {
-            this.manipulateRackService.clearManipValues();
-            this.exchangeService.handleSelection(this.rackContext);
-        }
     }
 }
