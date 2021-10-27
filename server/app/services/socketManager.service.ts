@@ -40,76 +40,66 @@ export class SocketManager {
                 this.joinRoom(socket, game);
                 // this.getAllGames(socket, game);
             });
+            socket.on('initializeGame', (roomId: number) => {
+                this.initializeGame(socket, roomId);
+            });
             // socket.on('confirmName', (name: string) => {
             //     this.confirmName(socket, name);
             //     // this.addPlayer(socket, player);
             //     // this.getAllGames(socket, game);
             // });
-            // socket.on('getAllGames', (game: Array<GameParameters>) => {
-            //     this.getAllGames(socket, game);
-            // });
+            socket.on('getAllGames', (game: Array<GameParameters>) => {
+                this.getAllGames(socket, game);
+            });
         });
         setInterval(() => {}, 1000);
     }
     private createRoom(socket: io.Socket, game: any): void {
         let room = this.gameListMan.createRoom(game.name, game.timer);
         let index = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
-        // console.log(index);
         let newPlayer = new Player(game.name, socket.id);
         newPlayer.setRoomId(room.gameRoom.idGame);
-        // console.log(newPlayer.name + 'newPlayer.name');
+        room.addPlayer(newPlayer);
         this.playerMan.allPlayers.splice(index, 1);
         this.playerMan.allPlayers[index] = newPlayer;
-        // this.allPlayers.push(newPlayer);
-        // console.log(this.gameListMan.existingRooms);
-        // console.log(this.gameListMan.existingRooms[0].gameRoom.playersName[0]);
-        // console.log(this.gameListMan.existingRooms);
-        // console.log(socket.id + 'creation');
-        console.log(socket.id);
-        console.log(room.gameRoom.idGame.toString());
         socket.join(room.gameRoom.idGame.toString());
         this.sio.emit('roomcreated', room);
     }
     private deleteRoom(socket: io.Socket): void {
         let player = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
-        // console.log(player);
         if (player > -1) {
             let room = this.gameListMan.existingRooms.findIndex((p) => p.gameRoom.idGame === this.playerMan.allPlayers[player].getRoomId());
-            // console.log(this.playerMan.allPlayers);
             this.gameListMan.deleteRoom(room);
         }
-        // console.log(this.gameListMan.existingRooms);
-        // console.log(this.gameListMan.existingRooms[0].gameRoom.playersName[0]);
-        // console.log(socket.id + 'suppression');
-        // console.log(gameIndex);
 
         this.sio.emit('roomdeleted');
     }
     private getAllGames(socket: io.Socket, game: any) {
         game = this.gameListMan.existingRooms;
-        // console.log(game);
         this.sio.emit('getAllGames', game);
     }
     private addPlayer(socket: io.Socket, player: any) {
         this.playerMan.addPlayer(player.player.name, socket.id);
-        // console.log(this.playerMan.allPlayers);
     }
-    // private confirmName(socket: io.Socket, name: string) {}
     private joinRoom(socket: io.Socket, game: any) {
         let joinerIndex = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
         this.playerMan.allPlayers[joinerIndex].name = game.joinerName;
         let room = this.gameListMan.existingRooms.findIndex((r) => r.gameRoom.idGame === game.game);
-        // console.log(this.playerMan.allPlayers.length);
         let roomGame = this.gameListMan.existingRooms[room];
+        console.log(roomGame.players);
         this.playerMan.allPlayers[joinerIndex].setRoomId(roomGame.gameRoom.idGame);
-        this.gameListMan.existingRooms[room].setPlayerName(this.playerMan.allPlayers[joinerIndex].name);
-        // console.log(this.gameListMan.existingRooms[room].gameRoom.playersName);
-        console.log(socket.id);
-        console.log(roomGame.gameRoom.idGame.toString());
-        console.log(this.gameListMan.existingRooms[room].gameRoom.playersName);
-        // console.log(this.gameListMan.existingRooms[room + 1].gameRoom.playersName);
+        // this.gameListMan.existingRooms[room].setPlayerName(this.playerMan.allPlayers[joinerIndex].name);
+        let newPlayer = new Player(game.joinerName, socket.id);
+        newPlayer.setRoomId(roomGame.gameRoom.idGame);
+        roomGame.addPlayer(newPlayer);
+        console.log(roomGame.players);
         socket.join(roomGame.gameRoom.idGame.toString());
         this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
-        // io.Socket().emit('roomJoined', roomGame);
+        this.sio.emit('updateInfo', roomGame.players);
+    }
+    private initializeGame(socket: io.Socket, roomId: number) {
+        // let room = this.gameListMan.existingRooms.findIndex((r) => r.gameRoom.idGame === roomId);
+        // let roomGame = this.gameListMan.existingRooms[room];
+        // socket.emit('updateInfo', roomGame.players);
     }
 }

@@ -1,3 +1,4 @@
+// import { MultiPlayerGameService } from './services/multi-player-game.service';
 import { Dictionary } from './dictionary';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
@@ -11,7 +12,7 @@ export interface GameRoom {
 }
 export class GameParameters {
     gameRoom: GameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
-    // players: Player[];
+    players: Player[];
     creatorPlayer: Player;
     opponentPlayer: Player;
     dictionary: Dictionary;
@@ -24,20 +25,22 @@ export class GameParameters {
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
     newWords: ScrabbleWord[];
+    // multiplayerGame: MultiPlayerGameService;
 
     constructor(creatorPlayerName: string, timer: number, id: number) {
-        // this.player = new Array<Player>();
+        this.players = new Array<Player>();
         // this.randomBonus = boni;
         this.creatorPlayer = new Player(creatorPlayerName, '');
         this.totalCountDown = timer;
         this.gameRoom.idGame = id;
         this.gameRoom.capacity = 2;
         this.dictionary = new Dictionary(0);
+        // this.multiplayerGame = new MultiPlayerGameService(this.players);
     }
     addPlayer(player: Player) {
         if (this.gameRoom.playersName.length < this.gameRoom.capacity) {
             this.gameRoom.playersName.push(player.getName());
-            // this.player.push(player);
+            this.players.push(player);
         }
     }
     setPlayerName(name: string) {

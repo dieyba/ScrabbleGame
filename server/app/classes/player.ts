@@ -1,4 +1,4 @@
-import { ScrabbleLetter } from "./scrabble-letter";
+import { ScrabbleLetter } from './scrabble-letter';
 
 export class Player {
     name: string;
@@ -13,6 +13,8 @@ export class Player {
         this.name = name;
         this.socketId = socketId;
         this.roomId = -1;
+        this.isActive = false;
+        this.score = 0;
     }
     public getName(): string {
         return this.name;

@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
+import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
 import { GridService } from '@app/services/grid.service';
 import { RackService } from '@app/services/rack.service';
@@ -36,6 +37,7 @@ export class PlayAreaComponent implements AfterViewInit {
     constructor(
         private readonly gridService: GridService,
         private readonly rackService: RackService,
+        private gameList: GameListService,
         private readonly gameService: GameService, // private readonly validationService: ValidationService,
     ) {}
 
@@ -53,7 +55,7 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     isLocalPlayerActive(): boolean {
-        return this.gameService.currentGameService.game.creatorPlayer.isActive;
+        return this.gameList.roomInfo.creatorPlayer.isActive;
     }
 
     isEndGame(): boolean {

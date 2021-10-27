@@ -13,6 +13,7 @@ import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { ChatDisplayService } from './chat-display.service';
+import { GameListService } from './game-list.service';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 import { ValidationService, WAIT_TIME } from './validation.service';
@@ -39,6 +40,7 @@ export class SoloGameService {
         protected chatDisplayService: ChatDisplayService,
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
+        protected gameList: GameListService,
     ) {}
 
     initializeGame(gameInfo: FormGroup) {
@@ -53,6 +55,20 @@ export class SoloGameService {
         this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.game.randomBonus = gameInfo.controls.bonus.value;
     }
+    // initializeGame() {
+    //     this.game = this.gameList.roomInfo;
+    //     this.game.creatorPlayer = new LocalPlayer(this.gameList.roomInfo.gameRoom.playersName[0]);
+    //     this.game.creatorPlayer.isActive = true;
+    //     this.game.opponentPlayer = new LocalPlayer(this.gameList.roomInfo.gameRoom.playersName[1]);
+    //     this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+    //     this.game.opponentPlayer.isActive = false;
+    //     this.game.dictionary = new Dictionary(0);
+    //     this.game.totalCountDown = this.gameList.roomInfo.totalCountDown;
+    //     // this.game.randomBonus = gameInfo.controls.bonus.value;
+    //     this.chatDisplayService.entries = [];
+    //     this.game.timerMs = +this.game.totalCountDown;
+    //     return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
+    // }
     createNewGame() {
         // Empty board and stack
         this.rackService.rackLetters = [];

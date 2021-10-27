@@ -34,7 +34,7 @@ export class GameListManager {
     }
     public addRoom(creator: string, timer: number): GameParameters {
         let newRoom = new GameParameters(creator, timer, this.currentRoomID++);
-        newRoom.setPlayerName(creator);
+        // newRoom.setPlayerName(creator);
         newRoom.creatorPlayer.setRoomId(this.currentRoomID);
         newRoom.setIdGame(this.currentRoomID);
         this.existingRooms.push(newRoom);

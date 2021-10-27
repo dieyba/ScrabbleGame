@@ -34,6 +34,7 @@ export class WaitingAreaComponent {
         @Inject(MAT_DIALOG_DATA) public gameSelected: boolean,
     ) {
         if (gameSelected) {
+            console.log('waiiittttt');
             this.selectedGame = new GameParameters('', 0);
             this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
         }
@@ -50,7 +51,7 @@ export class WaitingAreaComponent {
 
             this.list = this.gameList.getList();
             const roomInfo = this.gameList.roomInfo;
-            this.playerList = roomInfo.playersName;
+            this.playerList = roomInfo.gameRoom.playersName;
             console.log(this.playerList);
             this.startIfFull();
             // console.log(this.list[0].creatorPlayer.roomId);
@@ -84,6 +85,7 @@ export class WaitingAreaComponent {
 
             setTimeout(() => {
                 this.dialogRef.close();
+                this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
                 this.router.navigate(['/game']);
                 // this.soloGameService.initializeGame(this.myForm);
             }, 500);
