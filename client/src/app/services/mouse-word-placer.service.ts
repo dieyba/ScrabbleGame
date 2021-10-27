@@ -10,12 +10,14 @@ import { RackService } from './rack.service';
 export class MouseWordPlacerService {
     currentAxis: Axis;
     latestPosition: Vec2;
+    currentPosition: Vec2;
     latestKey: string;
     currentWord: ScrabbleLetter[];
     overlayContext: CanvasRenderingContext2D;
     constructor(private gridService: GridService, private rackService: RackService) {
         this.currentAxis = Axis.H;
         this.latestPosition = new Vec2();
+        this.currentPosition = new Vec2();
         this.latestKey = '';
         this.currentWord = [];
     }
@@ -36,6 +38,7 @@ export class MouseWordPlacerService {
         let yBaseOfSquare = Math.floor(mousePositionY / mouseRound) * mouseRound;
         yBaseOfSquare = yBaseOfSquare - mouseRound / 2;
         const clickedSquare: Vec2 = new Vec2(xBaseOfSquare, yBaseOfSquare);
+        this.currentPosition = clickedSquare;
         const indexes = this.convertPositionToGridIndex(clickedSquare);
         if (this.gridService.scrabbleBoard.squares[indexes[0]][indexes[1]].occupied === true) {
             return; // Don't do anything since square is occupied
@@ -118,21 +121,22 @@ export class MouseWordPlacerService {
     }
     convertPositionToGridIndex(position: Vec2): number[] {
         const positionInGrid: Vec2 = new Vec2(position.x - BOARD_OFFSET, position.y - BOARD_OFFSET);
+        // gridIndex : [row, column]
         const gridIndex: number[] = [Math.floor(positionInGrid.x / (SQUARE_SIZE + 2)), Math.floor(positionInGrid.y / (SQUARE_SIZE + 2))];
         return gridIndex;
     }
     onKeyDown(e: KeyboardEvent) {
         const keyPressed = e.key;
-        const alphabet = 'abcdefghijklmnopqrstuvwxyzàâçéèêëïîöôûü';
+        const alphabet = 'abcdefghijklmnopqrstuvwxyzàâçéèêëïîöôùûü*ABCDEFGHIJLKMNOPQRSTUVWXYZÀÂÇÉÈÊËÏÎÖÔÙÛÜ';
         switch (keyPressed) {
             case 'Backspace':
                 this.removeLetter();
                 break;
             case 'Enter':
-                // TODO: Confirm word
+                this.confirmWord();
                 break;
             case 'Escape':
-                // TODO: Reset the canvas
+                // Resets the canvas
                 this.onBlur();
                 break;
             default:
@@ -141,39 +145,58 @@ export class MouseWordPlacerService {
                 }
                 break;
         }
-        if (keyPressed === 'Backspace') {
-            this.removeLetter();
-        } else if (keyPressed !== 'Shift') {
-            this.placeBlankLetter(keyPressed);
-            this.latestKey = keyPressed;
-            // use this for blank pieces.
-        } else if (this.latestKey !== 'Shift' && alphabet.includes(keyPressed)) {
-            this.placeLetter(keyPressed);
-        }
     }
     removeLetter() {
-        // TODO : remove letter
-        this.currentWord.pop();
+        const lastLetter = this.currentWord.pop();
+        if (lastLetter !== undefined) this.rackService.rackLetters.push(lastLetter);
         this.overlayContext.beginPath();
         this.overlayContext.clearRect(this.latestPosition.x, this.latestPosition.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
     }
-    placeBlankLetter(keyPressed: string) {
-        // Normalize key pressed, decomposes "è" into "e`"
+    drawCurrentWord() {
+        this.overlayContext.beginPath();
+        const indexes = this.convertPositionToGridIndex(this.currentPosition);
+        for (let i = 0; i < this.currentWord.length; i++) {
+            if (this.currentAxis === Axis.H) {
+                this.gridService.drawLetter(this.currentWord[i], indexes[0] + i, indexes[1]);
+            } else {
+                this.gridService.drawLetter(this.currentWord[i], indexes[0], indexes[1] + i);
+            }
+            i++;
+        }
+    }
+    normalizeLetter(keyPressed: string): string {
         const letter = keyPressed.normalize('NFD').replace(/\p{Diacritic}/gu, '')[0];
-        this.placeLetter(letter);
+        return letter;
     }
     placeLetter(letter: string) {
-        // Check for the letter on the rack
+        let foundLetter: ScrabbleLetter = new ScrabbleLetter('', 0);
         if (letter === letter.toUpperCase()) {
-            // look for a blank piece
+            // Look for a blank piece
             for (const rackLetter of this.rackService.rackLetters) {
                 if (rackLetter.character === '*') {
-                    // TODO: Remove letter, place on board
+                    foundLetter = rackLetter;
+                    this.currentWord.push(rackLetter);
+                    this.rackService.rackLetters.splice(this.rackService.rackLetters.indexOf(rackLetter), 1);
+                    break;
                 }
             }
         } else {
-            // Disregard the blank pieces
+            // Check for the (non-blank) letter on the rack
+            for (const rackLetter of this.rackService.rackLetters) {
+                if (rackLetter.character === letter) {
+                    foundLetter = rackLetter;
+                    this.currentWord.push(rackLetter);
+                    this.rackService.rackLetters.splice(this.rackService.rackLetters.indexOf(rackLetter), 1);
+                    break;
+                }
+            }
         }
+        if (foundLetter.character !== '') {
+            this.drawCurrentWord();
+        }
+    }
+    confirmWord() {
+        throw new Error('Method not implemented.');
     }
     // canvasArrow(origin: Vec2, end: Vec2) {
     //     const headLength = 10; // length of head in pixels
