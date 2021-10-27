@@ -27,16 +27,15 @@ export class ChatDisplayService {
         // TODO: get if the game is multiplayer and only initiate socket if it is
         this.socket = SocketHandler.requestSocket(this.server);
         this.socket.on('addChatEntry', (chatEntry:ServerChatEntry) => {
-            console.log('received message from ' + chatEntry.senderName + ' : ' + chatEntry.message);
-            const color = chatEntry.senderName === this.localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
-            this.addEntry({color:color, message: chatEntry.message});
+            const isLocalPlayer = chatEntry.senderName === this.localPlayerName ? false : true;
+            this.addEntry(createPlayerEntry(isLocalPlayer, chatEntry.senderName, chatEntry.message));
         });
     }
     
     initialize(localPlayerName: string): void {
         this.entries = [];
         this.isActiveDebug = false;
-        this.localPlayerName = localPlayerName;
+        this.localPlayerName = localPlayerName; // TODO: to initialize somewhere and then chat should work
     }
     
     sendMessageToServer(messageFromLocalPlayer:string, messageToRemotePlayer?:string) {

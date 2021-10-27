@@ -1,4 +1,5 @@
 import { GameParameters } from '@app/classes/game-parameters';
+import { Player } from '@app/classes/player';
 import { Service } from 'typedi';
 
 @Service()
@@ -16,15 +17,23 @@ export class GameListManager {
         // console.log(this.existingRooms);
         return this.existingRooms;
     }
+    getGame(roomID: number): GameParameters|undefined {
+        return this.existingRooms.find((r) => r.gameRoom.idGame=== roomID);
+    }
+    getOtherPlayer(playerID:string, roomId: number): Player|undefined{
+        const game = this.getGame(roomId);
+        if(game){
+            return game.creatorPlayer.getSocketId() === playerID? game.opponentPlayer : game.creatorPlayer ;
+        }
+        return undefined;
+    }
+    
     // storeMessage(message: Message): void {
     //     // eslint-disable-next-line no-console
     //     console.log(message);
     //     this.clientMessages.push(message);
     // }
-    // public findRoom(roomID: number): GameParameters {
-    //     let room = this.existingRooms.find((r) => r.gameRoom.idGame=== roomID);
-    //     return room;
-    // }
+    
 
     public createRoom(creator: string, timer: number): GameParameters {
         let room = this.addRoom(creator, timer);

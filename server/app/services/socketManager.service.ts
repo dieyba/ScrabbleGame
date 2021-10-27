@@ -117,29 +117,24 @@ export class SocketManager {
     }
 
     private displayChatEntry(socket: io.Socket, message:string){
-        const senderId = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
-        const sender = this.playerMan.allPlayers[senderId];
+        const sender = this.playerMan.getPlayerBySocketID(socket.id);
         const senderName = sender.name;
         const roomId = sender.roomId.toString();
         const chatEntry = {senderName: senderName,message: message};
         this.sio.in(roomId).emit('addChatEntry',chatEntry);
     };
     private displayDifferentChatEntry(socket: io.Socket, messageToSender:string, messageToOpponent:string){
-        const senderId = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id).toString();
-        const sender = this.playerMan.allPlayers[senderId];
-        const senderName = sender.name;
-        
-        const roomId = sender.roomId.toString();
-        
-        const opponentId = this.gameListMan.existingRooms[roomId].opponentPlayer.getSocketId().toString();
-        const opponentName = this.gameListMan.existingRooms[roomId].opponentPlayer.name;
+        const sender = this.playerMan.getPlayerBySocketID(socket.id);
+        const senderId = sender.getSocketId();
+        const roomId = sender.roomId;        
+        const opponent = this.gameListMan.getOtherPlayer(senderId, roomId) as Player;
+        const opponentId = opponent.getSocketId().toString();
 
-        const chatEntrySender = {senderName: senderName,message: messageToSender};
-        const chatEntryOpponent = {senderName: opponentName,message: messageToOpponent};
-        console.log("sender name: " + senderName);
-        console.log("opponent name: " + opponentName);
+        const chatEntrySender = {senderName: sender.name,message: messageToSender};
+        const chatEntryOpponent = {senderName: opponent.name,message: messageToOpponent};
         
         this.sio.to(senderId).emit('addChatEntry',chatEntrySender);
         this.sio.to(opponentId).emit('addChatEntry',chatEntryOpponent);
-    };
+    };    
+
 }
