@@ -4,16 +4,19 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { Router } from '@angular/router';
 import { GameParameters } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
-import { PlayerHandler } from '@app/modules/playerHandler';
+import { FormComponent } from '@app/components/form/form.component';
+import { PlayerHandler } from '@app/modules/player-handler';
 import { GameListService } from '@app/services/game-list.service';
-import { FormComponent } from '../form/form.component';
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 @Component({
     selector: 'app-waiting-area',
     templateUrl: './waiting-area.component.html',
     styleUrls: ['./waiting-area.component.scss'],
     providers: [GameListService],
 })
+// export class WaitingAreaComponent implements OnInit {
 export class WaitingAreaComponent {
     selectedGame: GameParameters;
     playerName: FormControl;
@@ -38,12 +41,19 @@ export class WaitingAreaComponent {
         this.player = PlayerHandler.requestPlayer();
         this.player.roomId = this.gameList.player.roomId;
         this.timer = setInterval(() => {
+            /* TODO: vielle version à supprimer?
+            const roomInfo = this.gameList;
+            this.playerList = roomInfo.roomInfo.playersName;
+            this.start();
+        }, 1000);
+        */
+
             this.list = this.gameList.getList();
-            let roomInfo = this.gameList.roomInfo;
+            const roomInfo = this.gameList.roomInfo;
             this.playerList = roomInfo.playersName;
             console.log(this.playerList);
             this.startIfFull();
-            // console.log(this.list[0].createrPlayer.roomId);
+            // console.log(this.list[0].creatorPlayer.roomId);
             // let roomInfo = this.gameList;
             // this.playerList = roomInfo.roomInfo.playersName;
             // this.start();
@@ -62,12 +72,12 @@ export class WaitingAreaComponent {
         // this.dialog.open(JoinRoomComponent, { data: selected });
         // selected === true;
         if (this.gameSelected) {
-            //this.name = true;
+            // this.name = true;
             return (this.name = selected);
         }
         return false;
     }
-    public startIfFull(): void {
+    startIfFull(): void {
         if (this.playerList.length == 2) {
             this.isStarting = true;
             clearInterval(this.timer);

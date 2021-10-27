@@ -1,31 +1,48 @@
 import { Dictionary } from './dictionary';
+import { LetterStock } from './letter-stock';
 import { LocalPlayer } from './local-player';
+import { Player } from './player';
+import { ScrabbleBoard } from './scrabble-board';
+import { ScrabbleWord } from './scrabble-word';
+
+export enum GameType {
+    Solo = 0,
+    MultiPlayer = 1,
+    MultiPlayerLog = 2,
+}
+
 export interface GameRoom {
     idGame: number;
     capacity: number;
     playersName: string[];
 }
+
 export class GameParameters {
-    gameRoom: GameRoom = { idGame: 15, capacity: 0, playersName: new Array<string>() };
-    createrPlayer: LocalPlayer;
+    gameRoom: GameRoom = { idGame: 15, capacity: 2, playersName: new Array<string>() };
+    creatorPlayer: Player;
+    opponentPlayer: Player;
     dictionary: Dictionary;
     randomBonus: boolean;
     totalCountDown: number;
-    constructor(createrPlayerName: string, timer: number) {
+    timerMs: number;
+    creatorName: string;
+    scrabbleBoard: ScrabbleBoard;
+    stock: LetterStock;
+    turnPassed: boolean;
+    hasTurnsBeenPassed: boolean[];
+    isEndGame: boolean;
+    newWords: ScrabbleWord[];
+
+    constructor(creatorPlayerName: string, timer: number) {
         this.gameRoom.capacity = 2;
         this.dictionary = new Dictionary(0);
-        this.createrPlayer = new LocalPlayer(createrPlayerName);
-        this.totalCountDown = timer;
+        this.creatorPlayer = new LocalPlayer(creatorPlayerName);
+        this.timerMs = timer;
+        this.stock = new LetterStock();
+        this.hasTurnsBeenPassed = [];
+        this.isEndGame = false;
+        this.turnPassed = false;
+        this.randomBonus = false;
+        this.scrabbleBoard = new ScrabbleBoard();
     }
-    addPlayer(player: LocalPlayer) {
-        if (this.gameRoom.playersName.length < this.gameRoom.capacity) {
-            this.gameRoom.playersName.push(player.name);
-        }
-    }
-    // initializing(form: FormGroup) {
-    //     this.player = new LocalPlayer(form.controls.name.value);
-    //     this.dictionary = new Dictionary(+form.controls.dictionaryForm.value);
-    //     this.randomBonus = form.controls.bonus.value;
-    //     this.totalCountDown = +form.controls.timer.value;
-    // }
 }

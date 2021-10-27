@@ -1,4 +1,4 @@
-import { GameParameters } from '@app/classes/GameParameters';
+import { GameParameters } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import * as http from 'http';
 import * as io from 'socket.io';
@@ -7,11 +7,9 @@ import { PlayerManagerService } from './player-manager.service';
 
 export class SocketManager {
     private sio: io.Server;
-    gameListMan: GameListManager;
+    private gameListMan: GameListManager;
     playerMan: PlayerManagerService;
-    // private allPlayers: Player[];
-    // private gameListMan: GameListManager;
-    constructor(server: http.Server) {
+    constructor(server: http.Server /*, private readonly gameService: GameService*/) {
         this.gameListMan = new GameListManager();
         this.playerMan = new PlayerManagerService();
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
@@ -24,6 +22,11 @@ export class SocketManager {
                 this.createRoom(socket, game);
                 this.getAllGames(socket, gameList);
             });
+
+            // socket.on('placeLetter', (game: GameParameters, placeParams: PlaceParams) => {
+            //     this.gameService.placeLetter(game, placeParams);
+            // });
+
             socket.on('deleteRoom', (game: any) => {
                 this.deleteRoom(socket);
                 this.getAllGames(socket, game);
@@ -104,7 +107,7 @@ export class SocketManager {
         console.log(socket.id);
         console.log(roomGame.gameRoom.idGame.toString());
         console.log(this.gameListMan.existingRooms[room].gameRoom.playersName);
-        console.log(this.gameListMan.existingRooms[room + 1].gameRoom.playersName);
+        // console.log(this.gameListMan.existingRooms[room + 1].gameRoom.playersName);
         socket.join(roomGame.gameRoom.idGame.toString());
         this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
         // io.Socket().emit('roomJoined', roomGame);

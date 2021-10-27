@@ -4,7 +4,7 @@ import { ChatEntryColor } from '@app/classes/chat-display-entry';
 import { ErrorType } from '@app/classes/errors';
 import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { PlayerType, VirtualPlayer } from '@app/classes/virtual-player';
+import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { ChatDisplayService } from './chat-display.service';
 
 describe('ChatDisplayService', () => {
@@ -81,14 +81,14 @@ describe('ChatDisplayService', () => {
     });
 
     it('should add remaining letters and both players remaining letters', () => {
-        const toStringSpy = spyOn(service, 'scrabbleLetterstoString').and.callThrough();
+        // const toStringSpy = spyOn(service, 'scrabbleLetterstoString').and.callThrough(); this function was moved to utilities
 
         const remainingLetters: ScrabbleLetter[] = [new ScrabbleLetter('a', 1), new ScrabbleLetter('b', 1)];
         const firstPlayerLetters: ScrabbleLetter[] = [new ScrabbleLetter('c', 1), new ScrabbleLetter('d', 1)];
         const secondPlayerLetters: ScrabbleLetter[] = [new ScrabbleLetter('e', 1), new ScrabbleLetter('f', 1)];
 
         const firstPlayer = new LocalPlayer('Local player');
-        const secondPlayer = new VirtualPlayer('Virtual Player', PlayerType.Easy);
+        const secondPlayer = new VirtualPlayer('Virtual Player', Difficulty.Easy);
         firstPlayer.letters = firstPlayerLetters;
         secondPlayer.letters = secondPlayerLetters;
 
@@ -101,7 +101,7 @@ describe('ChatDisplayService', () => {
         expect(service.entries[0]).toEqual(remainingLettersEntry);
         expect(service.entries[1]).toEqual(firstPlayerEntry);
         expect(service.entries[2]).toEqual(secondPlayerEntry);
-        expect(toStringSpy).toHaveBeenCalledTimes(3);
+        // expect(toStringSpy).toHaveBeenCalledTimes(3);
     });
 
     it('should be able to create Exchange Message when true ', () => {

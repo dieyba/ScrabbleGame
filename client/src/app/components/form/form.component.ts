@@ -2,9 +2,9 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { GameParameters } from '@app/classes/game-parameters';
+import { GameParameters, GameType } from '@app/classes/game-parameters';
 import { GameListService } from '@app/services/game-list.service';
-import { SoloGameService } from '@app/services/solo-game.service';
+import { GameService } from '@app/services/game.service';
 import { WaitingAreaComponent } from '../waiting-area/waiting-area.component';
 
 @Component({
@@ -29,16 +29,17 @@ export class FormComponent implements OnInit {
 
     defaultTimer = '60';
     defaultDictionary = '0';
+    defaultBonus = false;
 
     constructor(
         private dialog: MatDialog,
         private dialogRef: MatDialogRef<FormComponent>,
         private router: Router,
-        private soloGameService: SoloGameService,
+        private gameService: GameService,
         private gameList: GameListService,
         @Inject(MAT_DIALOG_DATA) public isSolo: boolean,
     ) {
-        if (this.isSolo == true) {
+        if (this.isSolo === true) {
             this.level = new FormControl('', [Validators.required]);
         } else {
             this.level = new FormControl('');
@@ -105,13 +106,12 @@ export class FormComponent implements OnInit {
     }
 
     submit(): void {
-        console.log(this.myForm.valid);
-        console.log(this.isSolo);
         if (this.myForm.valid) {
             if (this.isSolo === true) {
                 this.closeDialog();
                 this.router.navigate(['/game']);
-                this.soloGameService.initializeGame(this.myForm);
+                this.gameService.initializeGameType(GameType.Solo);
+                this.gameService.currentGameService.initializeGame(this.myForm);
             } else {
                 // let singleGame = new GameParameters(
                 //     this.myForm.controls.name.value,
@@ -123,10 +123,11 @@ export class FormComponent implements OnInit {
                 // this.singleGame.initializing(this.myForm);
                 // console.log(this.singleGame);
                 this.closeDialog();
-                let single = this.soloGameService.initializingMultijoueur(this.myForm);
+                this.gameService.initializeGameType(GameType.MultiPlayer);
+                this.gameService.currentGameService.initializeGame(this.myForm);
+                const single = this.gameService.currentGameService.game;
                 this.gameList.createRoom(single);
                 this.dialog.open(WaitingAreaComponent, { disableClose: true });
-                console.log(single);
             }
         }
     }

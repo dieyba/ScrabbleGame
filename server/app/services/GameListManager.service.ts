@@ -1,4 +1,4 @@
-import { GameParameters } from '@app/classes/GameParameters';
+import { GameParameters } from '@app/classes/game-parameters';
 import { Service } from 'typedi';
 
 @Service()
@@ -35,11 +35,11 @@ export class GameListManager {
     public addRoom(creator: string, timer: number): GameParameters {
         let newRoom = new GameParameters(creator, timer, this.currentRoomID++);
         newRoom.setPlayerName(creator);
-        newRoom.createrPlayer.setRoomId(this.currentRoomID);
+        newRoom.creatorPlayer.setRoomId(this.currentRoomID);
         newRoom.setIdGame(this.currentRoomID);
         this.existingRooms.push(newRoom);
 
-        // newRoom.createrPlayer.setRoomId(newRoom.gameRoom.idGame);
+        // newRoom.creatorPlayer.setRoomId(newRoom.gameRoom.idGame);
         return newRoom;
     }
     public deleteRoom(index: number): void {
@@ -47,9 +47,9 @@ export class GameListManager {
         // // console.log(this.existingRooms);
         // let indx = tab.findIndex((r) => r === 'e');
         // console.log(indx);
-        // let roomIndex = this.existingRooms.findIndex((r) => r.createrPlayer.getRoomId() === index);
+        // let roomIndex = this.existingRooms.findIndex((r) => r.creatorPlayer.getRoomId() === index);
         // console.log(index);
-        // console.log(this.existingRooms.findIndex((r) => r.createrPlayer.getRoomId() === index));
+        // console.log(this.existingRooms.findIndex((r) => r.creatorPlayer.getRoomId() === index));
         // console.log(roomIndex);
         if (index > -1) {
             this.existingRooms.splice(index, 1);

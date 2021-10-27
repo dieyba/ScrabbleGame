@@ -9,7 +9,7 @@ import { ChatDisplayService } from '@app/services/chat-display.service';
 })
 export class ChatDisplayComponent {
     @ViewChild('chatDisplayBox') chatDisplayBox!: ElementRef;
-    entries: ChatDisplayEntry[] = [];
+    entries: ChatDisplayEntry[];
     lastEntry: ChatDisplayEntry;
 
     constructor(private chatDisplayService: ChatDisplayService) {
