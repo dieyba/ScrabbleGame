@@ -21,6 +21,7 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { StartingPageComponent } from '@app/pages/starting-page/starting-page.component';
 import { ChatDisplayComponent } from './components/chat-display/chat-display.component';
 import { FormComponent } from './components/form/form.component';
+import { RackComponent } from './components/rack/rack.component';
 import { TextEntryComponent } from './components/text-entry/text-entry.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
 
@@ -36,6 +37,7 @@ import { AutofocusDirective } from './directives/autofocus.directive';
         GamePageComponent,
         MainPageComponent,
         MaterialPageComponent,
+        RackComponent,
         PlayAreaComponent,
         SidebarComponent,
         ChatDisplayComponent,
@@ -46,6 +48,7 @@ import { AutofocusDirective } from './directives/autofocus.directive';
         StartingPageComponent,
         ClassicModeComponent,
         FormComponent,
+        RackComponent,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     imports: [
