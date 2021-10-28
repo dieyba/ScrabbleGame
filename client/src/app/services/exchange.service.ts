@@ -29,7 +29,7 @@ export class ExchangeService {
     }
 
     exchange() {
-        this.soloGameService.exchangeLettersSelected(this.soloGameService.localPlayer);
+        this.soloGameService.exchangeLettersSelected(this.soloGameService.localPlayer); // TODO Make a command instead
     }
 
     cancelExchange(rackContext: CanvasRenderingContext2D) {
