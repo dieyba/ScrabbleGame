@@ -97,13 +97,13 @@ export class RackService {
 
     select(position: number, ctx: CanvasRenderingContext2D, isExchange: boolean) {
         if (isExchange) {
-            ctx.fillStyle = 'orange';
+            ctx.fillStyle = 'lightsalmon';
             this.exchangeSelected[position - 1] = true;
         } else {
             for (let i = 0; i < this.handlingSelected.length; i++) {
                 this.deselect(i + 1, this.gridContext, false);
             }
-            ctx.fillStyle = 'red';
+            ctx.fillStyle = 'lightblue';
 
             this.handlingSelected[position - 1] = true;
             for (let i = 0; i < this.exchangeSelected.length; i++) {
