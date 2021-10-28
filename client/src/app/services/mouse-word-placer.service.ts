@@ -10,6 +10,7 @@ import { BOARD_OFFSET, GridService, SQUARE_SIZE } from './grid.service';
 import { RackService, RACK_HEIGHT, RACK_WIDTH } from './rack.service';
 import { SoloGameService } from './solo-game.service';
 const ABSOLUTE_BOARD_SIZE = 580;
+const ACTUAL_SQUARE_SIZE = SQUARE_SIZE + 2;
 @Injectable({
     providedIn: 'root',
 })
@@ -30,18 +31,23 @@ export class MouseWordPlacerService {
         this.wordString = '';
     }
     onMouseClick(e: MouseEvent) {
+        this.clearOverlay();
+        if (this.initialPosition.x !== 0 && this.initialPosition.y !== 0) {
+            this.drawSquare(this.initialPosition, 'green');
+        }
+        this.removeAllLetters();
         // Mouse position relative to the start of the grid in the canvas
         const mousePositionX = e.offsetX + BOARD_OFFSET;
         const mousePositionY = e.offsetY + BOARD_OFFSET;
-        const mouseRound = SQUARE_SIZE + 2;
-        if (mousePositionX < mouseRound || mousePositionY < mouseRound) return;
+        if (mousePositionX < ACTUAL_SQUARE_SIZE || mousePositionY < ACTUAL_SQUARE_SIZE) return;
         // Square would be out of bounds.
         // Now we find the origin of the square in which we clicked
-        let xBaseOfSquare = Math.floor(mousePositionX / mouseRound) * mouseRound;
-        xBaseOfSquare = xBaseOfSquare - mouseRound / 2;
-        let yBaseOfSquare = Math.floor(mousePositionY / mouseRound) * mouseRound;
-        yBaseOfSquare = yBaseOfSquare - mouseRound / 2;
+        let xBaseOfSquare = Math.floor(mousePositionX / ACTUAL_SQUARE_SIZE) * ACTUAL_SQUARE_SIZE;
+        xBaseOfSquare = xBaseOfSquare - ACTUAL_SQUARE_SIZE / 2;
+        let yBaseOfSquare = Math.floor(mousePositionY / ACTUAL_SQUARE_SIZE) * ACTUAL_SQUARE_SIZE;
+        yBaseOfSquare = yBaseOfSquare - ACTUAL_SQUARE_SIZE / 2;
         const clickedSquare: Vec2 = new Vec2(xBaseOfSquare, yBaseOfSquare);
+        console.log(clickedSquare);
         this.currentPosition = clickedSquare;
         this.initialPosition = clickedSquare;
         const indexes = this.convertPositionToGridIndex(clickedSquare);
@@ -52,8 +58,6 @@ export class MouseWordPlacerService {
         let nextSquare: Vec2 = new Vec2();
         nextSquare = this.findNextSquare(this.currentAxis, clickedSquare);
         if (clickedSquare.x !== this.latestPosition.x || clickedSquare.y !== this.latestPosition.y) {
-            this.removeLatestCurrentSquare();
-            this.removeLatestPreview(invertAxis[this.currentAxis]);
             this.removeAllLetters();
             this.clearOverlay();
             this.drawSquare(clickedSquare, 'green');
@@ -62,7 +66,6 @@ export class MouseWordPlacerService {
                 nextSquare = this.findNextSquare(this.currentAxis, clickedSquare);
             }
             this.latestPosition = clickedSquare;
-            this.overlayContext.beginPath();
             this.removeLatestPreview(this.currentAxis);
             this.drawSquare(nextSquare, 'yellow');
         } else {
@@ -78,10 +81,10 @@ export class MouseWordPlacerService {
             if (this.currentWord.length > 0) {
                 this.removeAllLetters();
                 this.clearOverlay();
+                this.wordString = '';
             }
             nextSquare = this.findNextSquare(this.currentAxis, clickedSquare);
             this.latestPosition = clickedSquare;
-            this.overlayContext.beginPath();
             this.drawSquare(nextSquare, 'yellow');
         }
     }
@@ -106,12 +109,11 @@ export class MouseWordPlacerService {
                     if (pos[0] + i >= BOARD_SIZE || pos[1] + i >= BOARD_SIZE) return;
                     while (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied === true && pos[0] < BOARD_SIZE && pos[1] < BOARD_SIZE) {
                         this.wordString += this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].letter.character;
-                        const skipSquare = SQUARE_SIZE + 2;
                         if (pos[0] + i >= BOARD_SIZE || pos[1] + i >= BOARD_SIZE) return;
                         if (this.currentAxis === Axis.H) {
-                            this.currentPosition.x = this.currentPosition.x + skipSquare;
+                            this.currentPosition.x = this.currentPosition.x + ACTUAL_SQUARE_SIZE;
                         } else if (this.currentAxis === Axis.V) {
-                            this.currentPosition.y = this.currentPosition.y + skipSquare;
+                            this.currentPosition.y = this.currentPosition.y + ACTUAL_SQUARE_SIZE;
                         }
                         pos = this.convertPositionToGridIndex(this.currentPosition);
                         i++;
@@ -272,16 +274,18 @@ export class MouseWordPlacerService {
         // Refund letters to rack before placing
         this.removeAllLetters();
         this.soloGameService.place(this.soloGameService.localPlayer, params);
+        // TODO: Wait 3s before clearing overlay
+        this.clearOverlay();
     }
     // Removes the latest drawn square preview from the canvas
     removeLatestPreview(axis: Axis) {
         const previousSquareDrawn = this.findNextSquare(invertAxis[axis], this.latestPosition);
         this.overlayContext.beginPath();
-        this.overlayContext.clearRect(previousSquareDrawn.x, previousSquareDrawn.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
+        this.overlayContext.clearRect(previousSquareDrawn.x, previousSquareDrawn.y, ACTUAL_SQUARE_SIZE, ACTUAL_SQUARE_SIZE);
     }
     removeLatestCurrentSquare() {
         this.overlayContext.beginPath();
-        this.overlayContext.clearRect(this.latestPosition.x, this.latestPosition.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
+        this.overlayContext.clearRect(this.latestPosition.x, this.latestPosition.y, ACTUAL_SQUARE_SIZE, ACTUAL_SQUARE_SIZE);
     }
     removeAllLetters() {
         while (this.currentWord.length > 0) {
@@ -297,10 +301,16 @@ export class MouseWordPlacerService {
     findNextSquare(axis: Axis, position: Vec2): Vec2 {
         const newPosition = new Vec2(position.x, position.y);
         if (axis === Axis.H) {
-            newPosition.x = position.x + SQUARE_SIZE + 2;
+            newPosition.x = position.x + ACTUAL_SQUARE_SIZE;
         } else if (axis === Axis.V) {
-            newPosition.y = position.y + SQUARE_SIZE + 2;
+            newPosition.y = position.y + ACTUAL_SQUARE_SIZE;
         }
+        if (newPosition.x > ABSOLUTE_BOARD_SIZE || newPosition.y > ABSOLUTE_BOARD_SIZE) return this.currentPosition;
+        const newPositionIndexes = this.convertPositionToGridIndex(newPosition);
+        console.log(newPositionIndexes);
+        if (newPositionIndexes[0] > BOARD_SIZE || newPositionIndexes[1] > BOARD_OFFSET) return this.currentPosition;
+        if (this.gridService.scrabbleBoard.squares[newPositionIndexes[0]][newPositionIndexes[1]].occupied)
+            this.findNextSquare(this.currentAxis, newPosition);
         return newPosition;
     }
     findPreviousSquare(axis: Axis, position: Vec2): Vec2 {
@@ -310,12 +320,16 @@ export class MouseWordPlacerService {
         } else if (axis === Axis.V) {
             newPosition.y = position.y - SQUARE_SIZE - 2;
         }
+        if (newPosition.x < 0 || newPosition.y < 0) return this.currentPosition;
+        const newPositionIndexes = this.convertPositionToGridIndex(newPosition);
+        if (this.gridService.scrabbleBoard.squares[newPositionIndexes[0]][newPositionIndexes[1]].occupied)
+            this.findPreviousSquare(this.currentAxis, newPosition);
         return newPosition;
     }
     convertPositionToGridIndex(position: Vec2): number[] {
         const positionInGrid: Vec2 = new Vec2(position.x - BOARD_OFFSET, position.y - BOARD_OFFSET);
         // gridIndex : [row, column]
-        const gridIndex: number[] = [Math.floor(positionInGrid.x / (SQUARE_SIZE + 2)), Math.floor(positionInGrid.y / (SQUARE_SIZE + 2))];
+        const gridIndex: number[] = [Math.floor(positionInGrid.x / ACTUAL_SQUARE_SIZE), Math.floor(positionInGrid.y / ACTUAL_SQUARE_SIZE)];
         return gridIndex;
     }
     removeLetter() {
