@@ -25,6 +25,10 @@ export class RackComponent implements AfterViewInit {
         private exchangeService: ExchangeService,
     ) {}
 
+    public get rackCanvasElement(): HTMLCanvasElement {
+        return this.rackCanvas.nativeElement;
+    }
+
     ngAfterViewInit(): void {
         this.rackService.gridContext = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.rackContext = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
@@ -40,7 +44,7 @@ export class RackComponent implements AfterViewInit {
         event.preventDefault();
         const position = this.selectedLetterPosition(event as MouseEvent);
         this.manipulationRackService.clearManipValues();
-        this.exchangeService.handleSelection(this.rackContext, position);
+        this.exchangeService.handleSelection(position);
     }
 
     onFocusOut(event: Event) {
@@ -49,6 +53,7 @@ export class RackComponent implements AfterViewInit {
         // Is the user didn't change tab or window, do something
         if (document.hasFocus()) {
             if (evt.relatedTarget !== null) {
+                console.log('target : ', evt.relatedTarget);
                 newFocus = (evt.relatedTarget as HTMLElement).id;
                 if (newFocus !== 'exchangeButton') {
                     // If the exchangeButton is pressed, play-area.component will handle the call to exchange letters

@@ -30,8 +30,8 @@ export class PlayAreaComponent implements AfterViewInit {
 
     mousePosition: Vec2 = new Vec2(0, 0);
     private canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    private rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
-    private rackContext: CanvasRenderingContext2D;
+    //private rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
+    //private rackContext: CanvasRenderingContext2D;
 
     constructor(
         private readonly gridService: GridService,
@@ -46,7 +46,7 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
-        this.rackContext = this.rackService.gridContext;
+        //this.rackContext = this.rackService.gridContext;
     }
 
     passTurn() {
@@ -69,13 +69,13 @@ export class PlayAreaComponent implements AfterViewInit {
         return this.canvasSize.y;
     }
 
-    get rackWidth(): number {
-        return this.rackSize.x;
-    }
+    // get rackWidth(): number {
+    //     return this.rackSize.x;
+    // }
 
-    get rackHeight(): number {
-        return this.rackSize.y;
-    }
+    // get rackHeight(): number {
+    //     return this.rackSize.y;
+    // }
 
     sizeUpLetters(): void {
         this.gridService.sizeUpLetters();
