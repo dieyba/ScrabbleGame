@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
 import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service';
@@ -19,7 +19,6 @@ export enum MouseButton {
     Back = 3,
     Forward = 4,
 }
-
 @Component({
     selector: 'app-play-area',
     templateUrl: './play-area.component.html',
@@ -41,7 +40,14 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly soloGameService: SoloGameService, // private readonly validationService: ValidationService,
         private readonly mouseWordPlacerService: MouseWordPlacerService,
     ) {}
-
+    @HostListener('keydown', ['$event'])
+    onKeyDown(event: KeyboardEvent) {
+        this.mouseWordPlacerService.onKeyDown(event);
+    }
+    @HostListener('focusout', ['$event'])
+    onBlur() {
+        this.mouseWordPlacerService.onBlur();
+    }
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.rackService.gridContext = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
@@ -50,8 +56,6 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
-        this.mouseWordPlacerService.drawOverlay();
-
         // TODO : Remove tests validation
         // const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
         // this.gridService.drawLetter(letter1, 0, 0);
@@ -128,11 +132,5 @@ export class PlayAreaComponent implements AfterViewInit {
     }
     onMouseDown(event: MouseEvent) {
         this.mouseWordPlacerService.onMouseClick(event);
-    }
-    onKeyDown(event: KeyboardEvent) {
-        this.mouseWordPlacerService.onKeyDown(event);
-    }
-    onBlur() {
-        this.mouseWordPlacerService.onBlur();
     }
 }
