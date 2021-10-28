@@ -1,4 +1,6 @@
+/* eslint-disable max-lines */
 import { Injectable } from '@angular/core';
+import { PlaceParams } from '@app/classes/commands';
 import { BOARD_SIZE } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { SquareColor } from '@app/classes/square';
@@ -6,6 +8,8 @@ import { Axis, invertAxis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { BOARD_OFFSET, GridService, SQUARE_SIZE } from './grid.service';
 import { RackService, RACK_HEIGHT, RACK_WIDTH } from './rack.service';
+import { SoloGameService } from './solo-game.service';
+const ABSOLUTE_BOARD_SIZE = 580;
 @Injectable({
     providedIn: 'root',
 })
@@ -15,13 +19,15 @@ export class MouseWordPlacerService {
     latestPosition: Vec2;
     currentPosition: Vec2;
     currentWord: ScrabbleLetter[];
+    wordString: string;
     overlayContext: CanvasRenderingContext2D;
-    constructor(private gridService: GridService, private rackService: RackService) {
+    constructor(private gridService: GridService, private rackService: RackService, private soloGameService: SoloGameService) {
         this.currentAxis = Axis.H;
         this.initialPosition = new Vec2();
         this.latestPosition = new Vec2();
         this.currentPosition = new Vec2();
         this.currentWord = [];
+        this.wordString = '';
     }
     onMouseClick(e: MouseEvent) {
         // Mouse position relative to the start of the grid in the canvas
@@ -95,6 +101,21 @@ export class MouseWordPlacerService {
                 break;
             default:
                 if (alphabet.includes(keyPressed)) {
+                    let pos = this.convertPositionToGridIndex(this.currentPosition);
+                    let i = 0;
+                    if (pos[0] + i >= BOARD_SIZE || pos[1] + i >= BOARD_SIZE) return;
+                    while (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied === true && pos[0] < BOARD_SIZE && pos[1] < BOARD_SIZE) {
+                        this.wordString += this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].letter.character;
+                        const skipSquare = SQUARE_SIZE + 2;
+                        if (pos[0] + i >= BOARD_SIZE || pos[1] + i >= BOARD_SIZE) return;
+                        if (this.currentAxis === Axis.H) {
+                            this.currentPosition.x = this.currentPosition.x + skipSquare;
+                        } else if (this.currentAxis === Axis.V) {
+                            this.currentPosition.y = this.currentPosition.y + skipSquare;
+                        }
+                        pos = this.convertPositionToGridIndex(this.currentPosition);
+                        i++;
+                    }
                     this.placeLetter(keyPressed);
                 }
                 break;
@@ -142,7 +163,6 @@ export class MouseWordPlacerService {
         this.overlayContext.fillRect(position.x + 1, position.y + 1, SQUARE_SIZE, SQUARE_SIZE);
     }
     drawLetter(letterToDraw: ScrabbleLetter, pos: Vec2) {
-        const ABSOLUTE_BOARD_SIZE = 580;
         if (
             pos.x >= BOARD_SIZE ||
             pos.y >= BOARD_SIZE ||
@@ -206,6 +226,7 @@ export class MouseWordPlacerService {
                 if (rackLetter.character === '*') {
                     foundLetter = rackLetter;
                     this.currentWord.push(rackLetter);
+                    this.wordString += rackLetter.character;
                     this.rackService.rackLetters.splice(this.rackService.rackLetters.indexOf(rackLetter), 1);
                     break;
                 }
@@ -216,6 +237,7 @@ export class MouseWordPlacerService {
                 if (rackLetter.character === letter) {
                     foundLetter = rackLetter;
                     this.currentWord.push(rackLetter);
+                    this.wordString += rackLetter.character;
                     this.rackService.rackLetters.splice(this.rackService.rackLetters.indexOf(rackLetter), 1);
                     break;
                 }
@@ -244,7 +266,10 @@ export class MouseWordPlacerService {
         // Send a message to the server that we want to place the word
         // Wait for the response from the server
         // If the response is positive, draw the word on the board canvas and remove the overlay
-        // If the response is negative, give back the letters to the player on their rack and set a 3 second timer
+        const posArray = this.convertPositionToGridIndex(this.initialPosition);
+        const posVec = new Vec2(posArray[0], posArray[1]);
+        const params: PlaceParams = { position: posVec, orientation: this.currentAxis, word: this.wordString };
+        this.soloGameService.place(this.soloGameService.localPlayer, params);
     }
     // Removes the latest drawn square preview from the canvas
     removeLatestPreview(axis: Axis) {
@@ -252,7 +277,6 @@ export class MouseWordPlacerService {
         this.overlayContext.beginPath();
         this.overlayContext.clearRect(previousSquareDrawn.x, previousSquareDrawn.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
     }
-    // Removes latest current square selected
     removeLatestCurrentSquare() {
         this.overlayContext.beginPath();
         this.overlayContext.clearRect(this.latestPosition.x, this.latestPosition.y, SQUARE_SIZE + 2, SQUARE_SIZE + 2);
@@ -264,10 +288,10 @@ export class MouseWordPlacerService {
                 this.rackService.addLetter(popped);
             }
         }
+        this.wordString = '';
         this.currentWord = [];
     }
     // Resets the canvas and the word in progress
-    // this does not work for some ungodly reason. Maybe the canvas can't handle focus events?
     findNextSquare(axis: Axis, position: Vec2): Vec2 {
         const newPosition = new Vec2(position.x, position.y);
         if (axis === Axis.H) {
@@ -292,10 +316,15 @@ export class MouseWordPlacerService {
         const gridIndex: number[] = [Math.floor(positionInGrid.x / (SQUARE_SIZE + 2)), Math.floor(positionInGrid.y / (SQUARE_SIZE + 2))];
         return gridIndex;
     }
-
     removeLetter() {
         const lastLetter = this.currentWord.pop();
-        if (lastLetter !== undefined) this.rackService.rackLetters.push(lastLetter);
+        if (lastLetter !== undefined) {
+            this.rackService.rackLetters.push(lastLetter);
+            const charPosition = this.wordString.lastIndexOf(lastLetter.character);
+            const partOne = this.wordString.substring(0, charPosition);
+            const partTwo = this.wordString.substring(charPosition + 1);
+            this.wordString = partOne + partTwo;
+        }
         // Draw letter on the end of the canvas
         this.rackService.drawExistingLetters();
         const lastLetterPos = this.currentPosition;
