@@ -19,7 +19,6 @@ import {
 } from '@app/classes/utilities';
 import { ChatDisplayService } from './chat-display.service';
 import { CommandInvokerService } from './command-invoker.service';
-import { GameService } from './game.service';
 import { MultiPlayerGameService } from './multi-player-game.service';
 
 const MIN_EXCHANGE_LETTERS = 1;
@@ -42,7 +41,7 @@ export class TextEntryService {
 
     constructor(
         private chatDisplayService: ChatDisplayService,
-        private gameService: GameService,
+        private gameService: MultiPlayerGameService,
         private commandInvokerService: CommandInvokerService,
     ) {
         this.commandsMap = new Map();
@@ -68,14 +67,12 @@ export class TextEntryService {
      * @param text Text input from user
      */
     handleInput(userInput: string, isLocalPlayer: boolean) {
-        const isMultiplayer = this.gameService.currentGameService instanceof MultiPlayerGameService;
-        const player: Player = isLocalPlayer
-            ? this.gameService.currentGameService.game.creatorPlayer
-            : this.gameService.currentGameService.game.opponentPlayer;
+        const isMultiplayer = this.gameService instanceof MultiPlayerGameService;
+        const player: Player = isLocalPlayer ? this.gameService.game.creatorPlayer : this.gameService.game.opponentPlayer;
 
         userInput = trimSpaces(userInput);
         if (!isEmpty(userInput)) {
-            const isACommand = userInput.startsWith('!') && !this.gameService.currentGameService.game.isEndGame;
+            const isACommand = userInput.startsWith('!') && !this.gameService.game.isEndGame;
             if (!isACommand) {
                 if (isMultiplayer) {
                     this.chatDisplayService.addEntry(createPlayerEntry(isLocalPlayer, player.name, userInput));
@@ -142,7 +139,7 @@ export class TextEntryService {
     extractStockParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
             const defaultParams = { player, serviceCalled: this.chatDisplayService };
-            const stockLetters: string = scrabbleLetterstoString(this.gameService.currentGameService.game.stock.letterStock);
+            const stockLetters: string = scrabbleLetterstoString(this.gameService.game.stock.letterStock);
             return { defaultParams, specificParams: stockLetters };
         }
         return undefined;

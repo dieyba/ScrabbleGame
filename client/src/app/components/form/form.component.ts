@@ -110,6 +110,7 @@ export class FormComponent implements OnInit {
                 this.closeDialog();
                 this.router.navigate(['/game']);
                 this.gameService.initializeGameType(GameType.Solo);
+                this.gameService.currentGameService.initializeGame(this.myForm);
             } else {
                 this.closeDialog();
                 this.gameService.initializeGameType(GameType.MultiPlayer);

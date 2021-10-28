@@ -38,15 +38,15 @@ export class SoloGameService {
         protected rackService: RackService,
         protected chatDisplayService: ChatDisplayService,
         protected validationService: ValidationService,
-        protected wordBuilder: WordBuilderService,
-    ) // protected gameList: GameListService,
-    {}
+        protected wordBuilder: WordBuilderService, // protected gameList: GameListService,
+    ) {}
 
     initializeGame(gameInfo: FormGroup) {
         this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value);
         this.chatDisplayService.entries = [];
         this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
         this.game.creatorPlayer.isActive = true;
+        console.log('je susi ici');
         this.game.opponentPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
         this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.totalCountDown = +gameInfo.controls.timer.value;

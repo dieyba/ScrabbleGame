@@ -18,22 +18,22 @@ export class SocketManager {
     public handleSockets(): void {
         this.sio.on('connection', (socket) => {
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
-            socket.on('createRoom', (game: GameParameters, gameList: Array<GameParameters>) => {
+            socket.on('createRoom', (game: GameParameters) => {
                 this.createRoom(socket, game);
-                this.getAllGames(socket, gameList);
+                this.getAllGames(socket);
             });
 
             socket.on('deleteRoom', (game: any) => {
                 this.deleteRoom(socket);
-                this.getAllGames(socket, game);
+                this.getAllGames(socket);
             });
             socket.on('addPlayer', (player: any, game: any) => {
                 this.addPlayer(socket, player);
-                this.getAllGames(socket, game);
+                this.getAllGames(socket);
             });
             socket.on('joinRoom', (game: any) => {
                 this.joinRoom(socket, game);
-                this.getAllGames(socket, game);
+                this.getAllGames(socket);
             });
             socket.on('initializeGame', (roomId: number) => {
                 this.initializeGame(socket, roomId);
@@ -42,7 +42,7 @@ export class SocketManager {
                 // this.startGame(socket,)
             });
             socket.on('getAllGames', (game: Array<GameParameters>) => {
-                this.getAllGames(socket, game);
+                this.getAllGames(socket);
             });
         });
         setInterval(() => {}, 1000);
@@ -67,9 +67,8 @@ export class SocketManager {
 
         this.sio.emit('roomdeleted');
     }
-    private getAllGames(socket: io.Socket, game: any) {
-        game = this.gameListMan.existingRooms;
-        this.sio.emit('getAllGames', game);
+    private getAllGames(socket: io.Socket) {
+        this.sio.emit('getAllGames', this.gameListMan.existingRooms);
     }
     private addPlayer(socket: io.Socket, player: any) {
         this.playerMan.addPlayer(player.player.name, socket.id);
@@ -92,6 +91,6 @@ export class SocketManager {
         let roomGame = this.gameListMan.existingRooms[room];
         // this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
         console.log(roomGame.players);
-        this.sio.to(roomGame.gameRoom.idGame.toString()).emit('updateInfo', roomGame.players);
+        this.sio.to(roomGame.gameRoom.idGame.toString()).emit('updateInfo', roomGame);
     }
 }

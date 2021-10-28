@@ -8,6 +8,7 @@ import { FormComponent } from '@app/components/form/form.component';
 import { PlayerHandler } from '@app/modules/player-handler';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
+import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
 import * as io from 'socket.io-client';
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
@@ -28,6 +29,7 @@ export class WaitingAreaComponent {
     list: GameParameters[] = [];
     private socket: io.Socket;
     constructor(
+        private multiManService: MultiPlayerGameService,
         private router: Router,
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
         private dialog: MatDialog,
@@ -47,10 +49,11 @@ export class WaitingAreaComponent {
             this.playerList = this.gameList.roomInfo.gameRoom.playersName;
             // this.startIfFull();
         }, 500);
-        this.socket.on('updateInfo', (players: Array<LocalPlayer>) => {
+        this.socket.on('updateInfo', (game: GameParameters) => {
             // this.players = players;
             this.dialogRef.close();
             this.router.navigate(['/game']);
+            this.multiManService.initializeGame2(game);
             console.log(this.gameList.players);
             // this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
             // this.socket.emit('startGame', this.gameList.roomInfo.gameRoom.idGame);

@@ -2,7 +2,7 @@ import { Component, Optional } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GameListService } from '@app/services/game-list.service';
-import { GameService } from '@app/services/game.service';
+import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
 @Component({
     selector: 'app-sidebar',
     templateUrl: './sidebar.component.html',
@@ -14,40 +14,54 @@ export class SidebarComponent {
     winnerName: string;
     isSolo: boolean;
     private dialogRef: MatDialogRef<EndGamePopupComponent>;
-    constructor(public router: Router, public dialog: MatDialog, private gameService: GameService, private gameList: GameListService) {
+    constructor(public router: Router, public dialog: MatDialog, private gameService: MultiPlayerGameService, private gameList: GameListService) {
         console.log(this.gameList.players);
         this.winnerName = '';
         this.player1Name = this.gameList.roomInfo.players[0].name;
         this.player2Name = this.gameList.roomInfo.players[1].name;
     }
+    getLettersLeftCount(): number {
+        return this.gameService.game.stock.letterStock.length;
+    }
+
+    getPlayer1LetterCount(): number {
+        return this.gameService.game.creatorPlayer.letters.length;
+    }
+
+    getPlayer2LetterCount(): number {
+        return this.gameService.game.opponentPlayer.letters.length;
+    }
 
     getPlayer1Score(): number {
-        return this.gameList.roomInfo.creatorPlayer.score;
+        return this.gameService.game.creatorPlayer.letters.length;
     }
 
     getPlayer2Score(): number {
-        return this.gameList.players[1].score;
+        return this.gameService.game.opponentPlayer.letters.length;
     }
 
     isPlayer1Active(): boolean {
-        return this.gameList.roomInfo.creatorPlayer.isActive;
+        return this.gameService.game.creatorPlayer.isActive;
     }
 
     isPlayer2Active(): boolean {
-        return this.gameList.players[1].isActive;
+        return this.gameService.game.creatorPlayer.isActive;
+    }
+    getTimer(): string {
+        return this.gameService.timer;
     }
 
     isEndGame(): boolean {
         this.getWinnerName();
-        return this.gameService.currentGameService.game.isEndGame;
+        return this.gameService.game.isEndGame;
     }
 
     hasWinner(): boolean {
-        return this.gameService.currentGameService.game.creatorPlayer.isWinner || this.gameService.currentGameService.game.opponentPlayer.isWinner;
+        return this.gameService.game.creatorPlayer.isWinner || this.gameService.game.opponentPlayer.isWinner;
     }
 
     isDrawnGame(): boolean {
-        if (this.gameService.currentGameService.game.creatorPlayer.isWinner && this.gameService.currentGameService.game.opponentPlayer.isWinner) {
+        if (this.gameService.game.creatorPlayer.isWinner && this.gameService.game.opponentPlayer.isWinner) {
             return true;
         } else {
             return false;
@@ -56,14 +70,13 @@ export class SidebarComponent {
 
     getWinnerName() {
         if (this.isDrawnGame()) {
-            this.winnerName =
-                this.gameService.currentGameService.game.creatorPlayer.name + ' et ' + this.gameService.currentGameService.game.opponentPlayer.name;
+            this.winnerName = this.gameService.game.creatorPlayer.name + ' et ' + this.gameService.game.opponentPlayer.name;
         }
-        if (this.gameService.currentGameService.game.creatorPlayer.isWinner) {
-            this.winnerName = this.gameService.currentGameService.game.creatorPlayer.name;
+        if (this.gameService.game.creatorPlayer.isWinner) {
+            this.winnerName = this.gameService.game.creatorPlayer.name;
         }
-        if (this.gameService.currentGameService.game.opponentPlayer.isWinner) {
-            this.winnerName = this.gameService.currentGameService.game.opponentPlayer.name;
+        if (this.gameService.game.opponentPlayer.isWinner) {
+            this.winnerName = this.gameService.game.opponentPlayer.name;
         }
     }
     public quitGame(): void {
