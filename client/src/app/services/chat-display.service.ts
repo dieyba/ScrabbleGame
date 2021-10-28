@@ -5,6 +5,8 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { scrabbleLetterstoString } from '@app/classes/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
+// import { GameService } from './game.service';
+// import { MultiPlayerGameService } from './multi-player-game.service';
 
 const ACTIVE_DEBUG_MESSAGE = 'Affichages de débogage activés';
 const INACTIVE_DEBUG_MESSAGE = 'Affichages de débogage désactivés';
@@ -13,37 +15,47 @@ const INACTIVE_DEBUG_MESSAGE = 'Affichages de débogage désactivés';
     providedIn: 'root',
 })
 export class ChatDisplayService {
-    private readonly server = 'http://' + window.location.hostname + ':3000';
-    entries: ChatDisplayEntry[];
     isActiveDebug: boolean;
+    entries: ChatDisplayEntry[];
+    private readonly server = 'http://' + window.location.hostname + ':3000';
     private localPlayerName: string;
     private socket?: io.Socket;
-    
-    constructor() {
-        this.entries = [];
+
+    constructor(/* private gameService: GameService*/) {
         this.isActiveDebug = false;
+        this.entries = [];
         this.localPlayerName = '';
-        
-        // TODO: get if the game is multiplayer and only initiate socket if it is
+
         this.socket = SocketHandler.requestSocket(this.server);
-        this.socket.on('addChatEntry', (chatEntry:ServerChatEntry) => {
+        this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
             const isLocalPlayer = chatEntry.senderName === this.localPlayerName ? false : true;
             this.addEntry(createPlayerEntry(isLocalPlayer, chatEntry.senderName, chatEntry.message));
         });
+        // TODO: get if the game is multiplayer and only initiate socket if it is
+        // if(gameService.currentGameService instanceof MultiPlayerGameService){
+        //     this.initializeSocket();
+        // }
     }
-    
+
+    // initializeSocket(){
+    //     this.socket = SocketHandler.requestSocket(this.server);
+    //     this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
+    //         const isLocalPlayer = chatEntry.senderName === this.localPlayerName ? false : true;
+    //         this.addEntry(createPlayerEntry(isLocalPlayer, chatEntry.senderName, chatEntry.message));
+    //     });
+    // };
+
     initialize(localPlayerName: string): void {
         this.entries = [];
         this.isActiveDebug = false;
-        this.localPlayerName = localPlayerName; // TODO: to initialize somewhere and then chat should work
+        this.localPlayerName = localPlayerName;
     }
-    
-    sendMessageToServer(messageFromLocalPlayer:string, messageToRemotePlayer?:string) {
-        console.log('sending a message to server');
-        if(this.socket){
-            if(messageToRemotePlayer){
+
+    sendMessageToServer(messageFromLocalPlayer: string, messageToRemotePlayer?: string) {
+        if (this.socket) {
+            if (messageToRemotePlayer) {
                 this.socket.emit('sendChatEntry', messageFromLocalPlayer, messageToRemotePlayer);
-            }else{
+            } else {
                 this.socket.emit('sendChatEntry', messageFromLocalPlayer);
             }
         }
@@ -86,5 +98,4 @@ export class ChatDisplayService {
         this.isActiveDebug = !this.isActiveDebug;
         return this.isActiveDebug ? ACTIVE_DEBUG_MESSAGE : INACTIVE_DEBUG_MESSAGE;
     }
-
 }

@@ -1,11 +1,10 @@
-import { ErrorType } from '@app/classes/errors';
 import { LocalPlayer } from '@app/classes/local-player';
-import { Command } from './commands';
+import { Command, CommandResult } from './commands';
 
 describe('Commands', () => {
     class CommandTest extends Command {
-        execute() {
-            return ErrorType.NoError;
+        execute(): CommandResult {
+            return { isExecuted: true, executionMessages: [] };
         }
     }
     const player = new LocalPlayer('Erika');

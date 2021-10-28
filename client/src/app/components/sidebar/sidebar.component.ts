@@ -16,14 +16,14 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     isSolo: boolean;
     private readonly server = 'http://' + window.location.hostname + ':3000';
     private socket: io.Socket;
-    players: Array<LocalPlayer>;
+    players: LocalPlayer[];
     constructor(private gameService: GameService, private gameList: GameListService) {
         this.player1Name = this.gameList.roomInfo.gameRoom.playersName[0];
         this.player2Name = this.gameList.roomInfo.gameRoom.playersName[1];
         this.winnerName = '';
         this.players = new Array<LocalPlayer>();
         this.socket = SocketHandler.requestSocket(this.server);
-        this.socket.on('updateInfo', (players: Array<LocalPlayer>) => {
+        this.socket.on('updateInfo', (players: LocalPlayer[]) => {
             // console.log(players);
             this.players = players;
         });

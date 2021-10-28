@@ -47,7 +47,34 @@ export class WordBuilderService {
         return result;
     }
 
-    // out of range begining coord or square without a letter at the begining coord will return the begining coord
+    buildScrabbleWord(coord: Vec2, axis: Axis): ScrabbleWord {
+        const word = new ScrabbleWord();
+        if (this.gridService.scrabbleBoard.isCoordInsideBoard(coord)) {
+            if (this.gridService.scrabbleBoard.squares[coord.x][coord.y].occupied) {
+                const startCoord = this.findWordEdge(coord, axis, TOWARD_START);
+                const endCoord = this.findWordEdge(coord, axis, TOWARD_END);
+                // Adding 1 to get the correct word lenght since coordinates start at 0
+                const lenght = axis === Axis.H ? endCoord.x - startCoord.x + 1 : endCoord.y - startCoord.y + 1;
+
+                const currentCoord = startCoord;
+                let currentLetter;
+                for (let i = 0; i < lenght; i++) {
+                    currentLetter = this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y].letter;
+                    word.content[i] = currentLetter;
+                    word.value += currentLetter.value;
+
+                    if (axis === Axis.H) {
+                        currentCoord.x += 1;
+                    } else {
+                        currentCoord.y += 1;
+                    }
+                }
+            }
+        }
+        return word;
+    }
+
+    // out of range begining coordinates or unoccupied begining coordinates will return the begining coord
     findWordEdge(coord: Vec2, axis: Axis, isTowardStart: boolean): Vec2 {
         if (!this.gridService.scrabbleBoard.isCoordInsideBoard(coord)) {
             return coord;
@@ -70,30 +97,5 @@ export class WordBuilderService {
         } while (this.gridService.scrabbleBoard.squares[nextCoord.x][nextCoord.y].occupied);
 
         return currentCoord;
-    }
-
-    buildScrabbleWord(coord: Vec2, axis: Axis): ScrabbleWord {
-        const word = new ScrabbleWord();
-        if (this.gridService.scrabbleBoard.isCoordInsideBoard(coord)) {
-            const startCoord = this.findWordEdge(coord, axis, TOWARD_START);
-            const endCoord = this.findWordEdge(coord, axis, TOWARD_END);
-            // Adding 1 to get the correct word lenght since coordinates start at 0
-            const lenght = axis === Axis.H ? endCoord.x - startCoord.x + 1 : endCoord.y - startCoord.y + 1;
-
-            const currentCoord = startCoord;
-            let currentLetter;
-            for (let i = 0; i < lenght; i++) {
-                currentLetter = this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y].letter;
-                word.content[i] = currentLetter;
-                word.value += currentLetter.value;
-
-                if (axis === Axis.H) {
-                    currentCoord.x += 1;
-                } else {
-                    currentCoord.y += 1;
-                }
-            }
-        }
-        return word;
     }
 }

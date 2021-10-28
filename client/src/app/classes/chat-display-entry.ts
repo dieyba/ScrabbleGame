@@ -8,8 +8,8 @@ export interface ChatDisplayEntry {
 }
 
 export interface ServerChatEntry {
-    senderName: string,
-    message: string
+    senderName: string;
+    message: string;
 }
 
 export enum ChatEntryColor {
