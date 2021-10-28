@@ -179,4 +179,9 @@ describe('PlayAreaComponent', () => {
         component.cancelExchange();
         expect(exchangeServiceSpy.cancelExchange).toHaveBeenCalled();
     });
+
+    // meme probleme de html
+    // it('cancelExchange should be called when we click on cancel button', () => {
+
+    // });
 });

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { MouseHandlerService } from './mouse-handler.service';
 import { RackService } from './rack.service';
 
 const ERROR_NUMBER = -1;
@@ -11,11 +10,9 @@ export class ManipulationRackService {
     private letterSelectedPosition = ERROR_NUMBER;
     private firstOccurencePosition = ERROR_NUMBER;
 
-    constructor(private readonly mouseService: MouseHandlerService, private readonly rackService: RackService) {}
+    constructor(private readonly rackService: RackService) {}
 
-    handleSelection() {
-        const position = this.mouseService.selectedLetterPosition();
-
+    handleSelection(rackContext: CanvasRenderingContext2D, position: number) {
         if (this.rackService.handlingSelected[position - 1] === false) {
             if (this.rackService.exchangeSelected[position - 1] === true) {
                 this.rackService.exchangeSelected[position - 1] = false;
@@ -23,7 +20,6 @@ export class ManipulationRackService {
             this.rackService.select(position, this.rackService.gridContext, false);
             this.letterSelectedPosition = position - 1;
         }
-        // console.log(this.letterSelectedPosition);
     }
 
     clearManipValues() {
@@ -82,8 +78,8 @@ export class ManipulationRackService {
             const letterToSwitchLeft = this.rackService.rackLetters[this.letterSelectedPosition];
 
             if (this.letterSelectedPosition === 0) {
-                this.rackService.rackLetters[this.letterSelectedPosition] = this.rackService.rackLetters[this.rackService.rackLetters.length - 1];
-                this.rackService.rackLetters[this.rackService.rackLetters.length - 1] = letterToSwitchLeft;
+                this.rackService.rackLetters.shift();
+                this.rackService.rackLetters.push(letterToSwitchLeft);
                 this.letterSelectedPosition = this.rackService.rackLetters.length - 1;
                 this.rackService.clearRack();
                 this.rackService.select(this.rackService.rackLetters.length, this.rackService.gridContext, false);
@@ -95,9 +91,6 @@ export class ManipulationRackService {
                 this.rackService.select(this.letterSelectedPosition + 1, this.rackService.gridContext, false);
             }
         }
-        // console.log(this.letterSelectedPosition);
-        // console.log(this.rackService.exchangeSelected);
-        // console.log(this.rackService.handlingSelected);
     }
 
     switchRight() {
@@ -105,8 +98,10 @@ export class ManipulationRackService {
             const letterToSwitchRight = this.rackService.rackLetters[this.letterSelectedPosition];
 
             if (this.letterSelectedPosition === this.rackService.rackLetters.length - 1) {
-                this.rackService.rackLetters[this.letterSelectedPosition] = this.rackService.rackLetters[0];
-                this.rackService.rackLetters[0] = letterToSwitchRight;
+                // Removing last letter
+                this.rackService.rackLetters.pop();
+                // Placing letter at the beginning
+                this.rackService.rackLetters.unshift(letterToSwitchRight);
                 this.letterSelectedPosition = 0;
                 this.rackService.clearRack();
                 this.rackService.select(1, this.rackService.gridContext, false);
@@ -118,8 +113,5 @@ export class ManipulationRackService {
                 this.rackService.select(this.letterSelectedPosition + 1, this.rackService.gridContext, false);
             }
         }
-        // console.log(this.letterSelectedPosition);
-        // console.log(this.rackService.exchangeSelected);
-        // console.log(this.rackService.handlingSelected);
     }
 }
