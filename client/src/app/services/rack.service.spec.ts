@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Square } from '@app/classes/square';
 import { RackService } from './rack.service';
 
 export const RACK_WIDTH = 500;
 export const RACK_HEIGHT = 60;
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 describe('RackService', () => {
     let service: RackService;
     let ctxStub: CanvasRenderingContext2D;
@@ -26,14 +26,14 @@ describe('RackService', () => {
     it('drawLetter should call fillText on the canvas', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
         const letter: ScrabbleLetter = new ScrabbleLetter('D', 1);
-        service.drawLetter(letter);
+        service.addLetter(letter);
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
     it('drawLetter should handle double digit values', () => {
         const fillTextSpy = spyOn(service.gridContext, 'fillText').and.callThrough();
         const letter: ScrabbleLetter = new ScrabbleLetter('D', 12);
-        service.drawLetter(letter);
+        service.addLetter(letter);
         expect(fillTextSpy).toHaveBeenCalled();
     });
 
@@ -46,22 +46,37 @@ describe('RackService', () => {
         expect(lineToSpy).toHaveBeenCalledTimes(expectedCallTimes);
     });
 
-    it('removeLetter should decrease rack length by 1', () => {
-        const square1 = new Square(0, 0);
-        square1.letter = new ScrabbleLetter('a', 1);
-        square1.occupied = true;
-        const square2 = new Square(1, 0);
-        const letter = new ScrabbleLetter('o', 1);
-        square2.letter = letter;
-        square2.occupied = true;
-        const square3 = new Square(2, 0);
-        square3.letter = new ScrabbleLetter('w', 10);
-        square3.occupied = true;
-        const square4 = new Square(0, 0);
-        square4.letter = new ScrabbleLetter('k', 2);
-        square4.occupied = true;
-        service.scrabbleRack.squares = [square1, square2, square3, square4];
-        service.removeLetter(letter);
-        expect(service.scrabbleRack.squares[3].occupied).toEqual(false);
+    it('removeLetter should decrease rack length by 1 and return position', () => {
+        const letter1 = new ScrabbleLetter('a', 1);
+        const letter2 = new ScrabbleLetter('o', 1);
+        const letter3 = new ScrabbleLetter('w', 10);
+        const letter4 = new ScrabbleLetter('k', 2);
+        service.rackLetters = [letter1, letter2, letter3, letter4];
+        expect(service.removeLetter(letter1)).toEqual(0);
+    });
+
+    it('removeLetter should not remove letter not in the rack', () => {
+        const letter1 = new ScrabbleLetter('a', 1);
+        const letter2 = new ScrabbleLetter('o', 1);
+        const letter3 = new ScrabbleLetter('w', 10);
+        const letter4 = new ScrabbleLetter('k', 2);
+        service.rackLetters = [letter1, letter2, letter4];
+        service.removeLetter(letter3);
+        expect(service.rackLetters.length).toEqual(3);
+    });
+
+    it('addLetter should not call drawLetter when rack length is 7', () => {
+        const drawLetterSpy = spyOn<any>(service, 'drawLetter').and.callThrough();
+        const letter1 = new ScrabbleLetter('a', 1);
+        const letter2 = new ScrabbleLetter('o', 1);
+        const letter3 = new ScrabbleLetter('w', 10);
+        const letter4 = new ScrabbleLetter('k', 2);
+        const letter5 = new ScrabbleLetter('k', 2);
+        const letter6 = new ScrabbleLetter('k', 2);
+        const letter7 = new ScrabbleLetter('k', 2);
+        service.rackLetters = [letter1, letter2, letter3, letter4, letter5, letter6, letter7];
+        service.addLetter(letter7);
+        expect(service.rackLetters.length).toEqual(7);
+        expect(drawLetterSpy).not.toHaveBeenCalled();
     });
 });

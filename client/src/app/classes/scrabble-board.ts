@@ -1,7 +1,7 @@
 import { Square, SquareColor } from './square';
 import { Vec2 } from './vec2';
 
-const BOARD_SIZE = 15;
+export const BOARD_SIZE = 15;
 
 export enum Row {
     A = 0,
@@ -148,9 +148,10 @@ export class ScrabbleBoard {
     }
 
     isWordPassingInCenter(word: string, coord: Vec2, orientation: string): boolean {
+        const tempCoord = new Vec2(coord.x, coord.y);
         // Checking if word passing middle vertically
-        const isWordInMiddleColumn = coord.x === Column.Eight && orientation === 'v';
-        const isVerticalWordOnCenter = coord.y < Row.I && coord.y + word.length - 1 >= Row.H;
+        const isWordInMiddleColumn = tempCoord.x === Column.Eight && orientation === 'v';
+        const isVerticalWordOnCenter = tempCoord.y < Row.I && tempCoord.y + word.length - 1 >= Row.H;
         if (isWordInMiddleColumn) {
             if (isVerticalWordOnCenter) {
                 return true;
@@ -158,27 +159,22 @@ export class ScrabbleBoard {
         }
 
         // Checking if word passing middle horizontally
-        const isWordInMiddleRow = coord.y === Row.H && orientation === 'h';
-        const isHorizontalWordOnCenter = coord.x < Column.Nine && coord.x + word.length - 1 >= Column.Eight;
+        const isWordInMiddleRow = tempCoord.y === Row.H && orientation === 'h';
+        const isHorizontalWordOnCenter = tempCoord.x < Column.Nine && tempCoord.x + word.length - 1 >= Column.Eight;
         if (isWordInMiddleRow) {
             if (isHorizontalWordOnCenter) {
                 return true;
             }
         }
-
         return false;
     }
-
-    // TODO add documentation?
     isWordPartOfAnotherWord(word: string, coord: Vec2, orientation: string): boolean {
         let result = false;
         const isVertical = orientation === 'v';
 
         // For each letter in "word", verifies if a Scrabble letter is already place and if it's the same letter
         for (let i = 0; i < word.length; i++) {
-            const tempCoord = new Vec2();
-            tempCoord.x = coord.x;
-            tempCoord.y = coord.y;
+            const tempCoord = new Vec2(coord.x, coord.y);
             if (isVertical) {
                 tempCoord.y += i;
             } else {
@@ -187,7 +183,7 @@ export class ScrabbleBoard {
 
             if (this.squares[tempCoord.x][tempCoord.y].occupied) {
                 // Checking if the letter corresponds with the string's character
-                if (this.squares[tempCoord.x][tempCoord.y].letter.character === word[i]) {
+                if (this.squares[tempCoord.x][tempCoord.y].letter.character.toLowerCase() === word[i]) {
                     result = true;
                 } else {
                     return false;
@@ -210,7 +206,7 @@ export class ScrabbleBoard {
         } else {
             coordBeforeWord.y = coordAfterWord.y = coord.y;
             coordBeforeWord.x = coord.x - 1;
-            coordAfterWord.x = coord.y + word.length;
+            coordAfterWord.x = coord.x + word.length;
         }
 
         if (this.isCoordInsideBoard(coordBeforeWord)) {
@@ -223,8 +219,6 @@ export class ScrabbleBoard {
                 return true;
             }
         }
-
-        // TODO optimize checking word lengthwise
         // Checking if touching word lengthwise (down if horizontal, right if vertical)
         const tempCoord = new Vec2();
         for (let i = 0; i < word.length; i++) {
@@ -235,9 +229,7 @@ export class ScrabbleBoard {
                 tempCoord.y = coord.y + 1;
                 tempCoord.x = coord.x + i;
             }
-            if (this.squares[tempCoord.x][tempCoord.y] === undefined) {
-                continue;
-            } else if (this.squares[tempCoord.x][tempCoord.y].occupied) {
+            if (this.isCoordInsideBoard(tempCoord) && this.squares[tempCoord.x][tempCoord.y].occupied) {
                 return true;
             }
         }
@@ -251,13 +243,38 @@ export class ScrabbleBoard {
                 tempCoord.y = coord.y - 1;
                 tempCoord.x = coord.x + i;
             }
-            if (this.squares[tempCoord.x][tempCoord.y] === undefined) {
-                continue;
-            } else if (this.squares[tempCoord.x][tempCoord.y].occupied) {
+            if (this.isCoordInsideBoard(tempCoord) && this.squares[tempCoord.x][tempCoord.y].occupied) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * @summary Returns a string representing the scrabble letters on the board. When there is not letter
+     * at a given location, a space character is return instead. White letter will be returned as
+     * the letter they represent (not as uppercase).
+     * @param coord Coordinates of the first letter
+     * @param length Length of the word to check
+     * @param orientation Vertical ('v') or horizontal ('h')
+     * @returns The string representation of scrabble letters
+     */
+    getStringFromCoord(coord: Vec2, length: number, orientation: string): string {
+        const tempCoord = new Vec2(coord.x, coord.y);
+        let tempString = '';
+        for (let i = 0; i < length; i++) {
+            if (this.squares[tempCoord.x][tempCoord.y].occupied) {
+                tempString += this.squares[tempCoord.x][tempCoord.y].letter.character;
+            } else {
+                tempString += ' ';
+            }
+            if (orientation === 'h') {
+                tempCoord.x++;
+            } else {
+                tempCoord.y++;
+            }
+        }
+        return tempString;
     }
 }
