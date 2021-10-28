@@ -269,6 +269,8 @@ export class MouseWordPlacerService {
         const posArray = this.convertPositionToGridIndex(this.initialPosition);
         const posVec = new Vec2(posArray[0], posArray[1]);
         const params: PlaceParams = { position: posVec, orientation: this.currentAxis, word: this.wordString };
+        // Refund letters to rack before placing
+        this.removeAllLetters();
         this.soloGameService.place(this.soloGameService.localPlayer, params);
     }
     // Removes the latest drawn square preview from the canvas
