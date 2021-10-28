@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis, invertAxis } from '@app/classes/utilities';
-import { GridService } from './grid.service';
 import { Vec2 } from '@app/classes/vec2';
+import { GridService } from './grid.service';
 
 const TOWARD_START = true;
 const TOWARD_END = false;
@@ -21,6 +21,8 @@ export class WordBuilderService {
 
         // get full word that can be read on the placed word's row/column
         let wordBuilt = this.buildScrabbleWord(coord, axis);
+        wordBuilt.startPosition = coord;
+        wordBuilt.orientation = axis;
         const placedWord = wordBuilt;
         if (wordBuilt.content.length >= MIN_WORD_LENGHT) {
             result.push(wordBuilt);
@@ -36,6 +38,8 @@ export class WordBuilderService {
 
             const oppositeAxis = invertAxis[axis];
             wordBuilt = this.buildScrabbleWord(currentCoord, oppositeAxis);
+            wordBuilt.startPosition = coord;
+            wordBuilt.orientation = axis;
             if (wordBuilt.content.length >= MIN_WORD_LENGHT) {
                 result.push(wordBuilt);
             }
@@ -75,8 +79,6 @@ export class WordBuilderService {
             const endCoord = this.findWordEdge(coord, axis, TOWARD_END);
             // Adding 1 to get the correct word lenght since coordinates start at 0
             const lenght = axis === Axis.H ? endCoord.x - startCoord.x + 1 : endCoord.y - startCoord.y + 1;
-            word.startPosition = startCoord;
-            word.orientation = axis;
 
             const currentCoord = startCoord;
             let currentLetter;

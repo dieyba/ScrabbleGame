@@ -1,3 +1,5 @@
+import { ScrabbleLetter } from './scrabble-letter';
+
 // TODO: déménager les fonctions/enum/constantes/etc concernés ici
 
 export enum Axis {
@@ -8,4 +10,12 @@ export enum Axis {
 export const invertAxis = {
     [Axis.H]: Axis.V,
     [Axis.V]: Axis.H, // Vertical is the opposite of horizontal
+};
+
+export const scrabbleLetterstoString = (letters: ScrabbleLetter[]): string => {
+    let stringLetters = '';
+    for (const letter of letters) {
+        stringLetters += letter.character;
+    }
+    return stringLetters;
 };

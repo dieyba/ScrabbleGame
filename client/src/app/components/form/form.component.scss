@@ -37,43 +37,50 @@ mat-radio-button {
     margin: 0 12px;
 }
 
-.jouer {
+.play {
     position: relative;
     margin-left: auto;
     margin-right: auto;
     margin-top: 60px;
     border-radius: 10px;
-    padding: 5px 5px;
+    padding: 10px 10px;
     font-size: x-large;
-    background-color: #dcecff;
-    border-width: 10px;
-    border-style: double;
+    background-color: #6aa0e0;
+    border-color: #6aa0e0;
+    width: 200px;
+    border-width: 2px;
     display: flex;
     text-align: center;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    opacity: 1;
-    transition: 0.3s;
 }
-.annuler {
+
+.play:hover {
+    opacity: 0.6;
+}
+
+.cancel {
     position: relative;
     margin-top: 20px;
-    padding: 5px 5px;
+    padding: 10px 10px;
     margin-left: auto;
     margin-right: auto;
     border-radius: 10px;
     font-size: x-large;
-    background-color: #dcecff;
-    border-width: 10px;
-    border-style: double;
+    background-color: #6aa0e0;
+    border-color: #6aa0e0;
+    width: 150px;
+    border-width: 2px;
     display: flex;
     text-align: center;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    opacity: 1;
-    transition: 0.3s;
+}
+
+.cancel:hover {
+    opacity: 0.6;
 }
 
 p {

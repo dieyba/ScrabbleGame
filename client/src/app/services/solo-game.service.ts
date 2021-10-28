@@ -92,7 +92,6 @@ export class SoloGameService {
     }
     // New Turn
     changeActivePlayer() {
-        clearInterval(this.intervalValue);
         // Check if last turn was passed by player
         if (this.turnPassed) {
             this.hasTurnsBeenPassed[this.hasTurnsBeenPassed.length] = false;
@@ -115,6 +114,7 @@ export class SoloGameService {
             this.virtualPlayer.isActive = true;
             this.timerMs = +this.totalCountDown;
             this.secondsToMinutes();
+            clearInterval(this.intervalValue);
             this.startCountdown();
         } else {
             // If the rack is empty, end game + player won
@@ -127,6 +127,7 @@ export class SoloGameService {
             this.localPlayer.isActive = true;
             this.timerMs = +this.totalCountDown;
             this.secondsToMinutes();
+            clearInterval(this.intervalValue);
             this.startCountdown();
         }
     }
@@ -221,8 +222,7 @@ export class SoloGameService {
         clearInterval(this.intervalValue);
         this.timerMs = 0;
         this.secondsToMinutes();
-        // Show message in sidebar
-        // Show end of game info in communication box
+        // Show message in sidebar and end of game info in communication box
         this.isEndGame = true;
     }
     calculateRackPoints(player: Player): number {
