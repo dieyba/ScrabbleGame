@@ -1,12 +1,12 @@
 import { SoloGameService } from '@app/services/solo-game.service';
-import { Command, DefaultCommandParams, ExchangeParams } from './commands';
+import { Command, DefaultCommandParams } from './commands';
 import { ErrorType } from './errors';
 
 export class ExchangeCmd extends Command {
     private gameService: SoloGameService;
     private letters: string;
 
-    constructor(defaultParams: DefaultCommandParams, letters: ExchangeParams) {
+    constructor(defaultParams: DefaultCommandParams, letters: string) {
         super(defaultParams.player);
         this.gameService = defaultParams.serviceCalled as SoloGameService;
         this.letters = letters;
@@ -17,6 +17,6 @@ export class ExchangeCmd extends Command {
     }
 }
 
-export const createExchangeCmd = (params: { defaultParams: DefaultCommandParams; specificParams: ExchangeParams }): ExchangeCmd => {
+export const createExchangeCmd = (params: { defaultParams: DefaultCommandParams; specificParams: string }): ExchangeCmd => {
     return new ExchangeCmd(params.defaultParams, params.specificParams);
 };

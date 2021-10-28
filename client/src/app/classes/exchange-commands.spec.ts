@@ -1,4 +1,4 @@
-// import { DefaultCommandParams, ExchangeParams } from '@app/classes/commands';
+// import { DefaultCommandParams } from '@app/classes/commands';
 // import { createExchangeCmd, ExchangeCmd } from '@app/classes/exchange-command';
 // import { BonusService } from '@app/services/bonus.service';
 // import { GridService } from '@app/services/grid.service';
@@ -17,7 +17,7 @@
 //     const wordBuilder = new WordBuilderService();
 //     const service = new SoloGameService(grid, rack, validation, wordBuilder);
 //     const defaultParams: DefaultCommandParams = { player: playerchoice, serviceCalled: service };
-//     const specificParams: ExchangeParams = 'test';
+//     const specificParams: string = 'test';
 //     const exchange = new ExchangeCmd(defaultParams, 'amd');
 
 //     it('should create an instance', () => {
