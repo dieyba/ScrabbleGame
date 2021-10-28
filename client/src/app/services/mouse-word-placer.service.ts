@@ -49,7 +49,7 @@ export class MouseWordPlacerService {
             this.removeLatestCurrentSquare();
             this.removeLatestPreview(invertAxis[this.currentAxis]);
             this.removeAllLetters();
-            this.overlayContext.clearRect(0, 0, this.overlayContext.canvas.width, this.overlayContext.canvas.height);
+            this.clearOverlay();
             this.drawSquare(clickedSquare, 'green');
             if (this.currentAxis !== Axis.H) {
                 this.currentAxis = Axis.H;
@@ -103,7 +103,7 @@ export class MouseWordPlacerService {
         this.initialPosition = new Vec2();
         this.removeAllLetters();
         this.overlayContext.beginPath();
-        this.overlayContext.clearRect(0, 0, this.gridService.gridContext.canvas.width, this.gridService.gridContext.canvas.height);
+        this.clearOverlay();
     }
     // Draws a square on the canvas at the given position with the given color
     drawSquare(position: Vec2, color: string) {
@@ -281,6 +281,8 @@ export class MouseWordPlacerService {
     }
 
     removeLetter() {
+        // Remove marker
+
         const lastLetter = this.currentWord.pop();
         if (lastLetter !== undefined) this.rackService.rackLetters.push(lastLetter);
         // Draw letter on the end of the canvas
@@ -288,24 +290,39 @@ export class MouseWordPlacerService {
         this.rackService.drawExistingLetters();
         const lastLetterPos = this.currentPosition;
         const previousSquare = this.findPreviousSquare(this.currentAxis, lastLetterPos);
-        if (this.currentWord.length > 0 && previousSquare.x >= this.initialPosition.x && previousSquare.y >= this.initialPosition.y) {
+        if (this.currentWord.length >= 0 && previousSquare.x >= this.initialPosition.x && previousSquare.y >= this.initialPosition.y) {
+            // Shift one spot left/up
             this.currentPosition = previousSquare;
             this.drawCurrentWord();
+            // const nextLetter = this.findPreviousSquare(this.currentAxis, this.currentPosition);
+            // const added = 20;
+            this.overlayContext.clearRect(
+                this.currentPosition.x,
+                this.currentPosition.y,
+                this.overlayContext.canvas.width,
+                this.overlayContext.canvas.height,
+            );
+            this.drawSquare(this.currentPosition, 'green');
+            this.drawSquare(this.findNextSquare(this.currentAxis, this.currentPosition), 'yellow');
         }
     }
     drawCurrentWord() {
-        this.overlayContext.beginPath();
         const indexes = this.convertPositionToGridIndex(this.initialPosition);
         for (let i = 0; i < this.currentWord.length; i++) {
+            console.log('letter', this.currentWord[i], 'position', indexes[0] + i, indexes[1]);
             if (this.currentAxis === Axis.H) {
                 this.drawLetter(this.currentWord[i], new Vec2(indexes[0] + i, indexes[1]));
             } else {
                 this.drawLetter(this.currentWord[i], new Vec2(indexes[0], indexes[1] + i));
             }
         }
+        console.log('___________________');
     }
     normalizeLetter(keyPressed: string): string {
         const letter = keyPressed.normalize('NFD').replace(/\p{Diacritic}/gu, '')[0];
         return letter;
+    }
+    clearOverlay() {
+        this.overlayContext.clearRect(0, 0, this.overlayContext.canvas.width, this.overlayContext.canvas.height);
     }
 }
