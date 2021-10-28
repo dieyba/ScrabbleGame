@@ -197,6 +197,8 @@ export class MouseWordPlacerService {
         }
     }
     placeLetter(letter: string) {
+        const indexes = this.convertPositionToGridIndex(this.currentPosition);
+        if (indexes[0] >= BOARD_SIZE || indexes[1] >= BOARD_SIZE) return;
         let foundLetter: ScrabbleLetter = new ScrabbleLetter('', 0);
         if (letter === letter.toUpperCase()) {
             // Look for a blank piece on the rack
