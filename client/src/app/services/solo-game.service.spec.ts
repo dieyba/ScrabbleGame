@@ -415,7 +415,7 @@ describe('GameService', () => {
         service.localPlayer.letters = [letter1];
         rackServiceSpy.rackLetters = [letter1];
         service.drawRack(words);
-        expect(addRackLetterSpy).toHaveBeenCalled;
+        expect(addRackLetterSpy).toHaveBeenCalled();
     });
 
     it('removeLetter should call rackService', () => {

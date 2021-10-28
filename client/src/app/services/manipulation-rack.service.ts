@@ -17,11 +17,7 @@ export class ManipulationRackService {
             if (this.rackService.exchangeSelected[position - 1] === true) {
                 this.rackService.exchangeSelected[position - 1] = false;
             }
-
-            // for (let i = 0; i < this.rackService.handlingSelected.length; i++) {
-            //     this.rackService.deselect(i + 1, rackContext, false);
-            // }
-            this.rackService.select(position, rackContext, false);
+            this.rackService.select(position, this.rackService.gridContext, false);
             this.letterSelectedPosition = position - 1;
         }
     }
