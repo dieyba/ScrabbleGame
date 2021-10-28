@@ -6,25 +6,27 @@ import { GameParameters } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
 import { FormComponent } from '@app/components/form/form.component';
 import { PlayerHandler } from '@app/modules/player-handler';
+import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
-
+import * as io from 'socket.io-client';
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 @Component({
     selector: 'app-waiting-area',
     templateUrl: './waiting-area.component.html',
     styleUrls: ['./waiting-area.component.scss'],
-    providers: [GameListService],
 })
 export class WaitingAreaComponent {
+    private readonly server = 'http://' + window.location.hostname + ':3000';
     selectedGame: GameParameters;
     playerName: FormControl;
-    private playerList: string[] = [];
+    playerList: string[] = [];
     isStarting: boolean;
     name = false;
     private timer: any;
     player: LocalPlayer;
     list: GameParameters[] = [];
+    private socket: io.Socket;
     constructor(
         private router: Router,
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
@@ -36,17 +38,23 @@ export class WaitingAreaComponent {
             this.selectedGame = new GameParameters('', 0);
             this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
         }
+        this.socket = SocketHandler.requestSocket(this.server);
         this.list = this.gameList.getList();
         this.player = PlayerHandler.requestPlayer();
         this.player.roomId = this.gameList.player.roomId;
         this.timer = setInterval(() => {
             this.list = this.gameList.getList();
             this.playerList = this.gameList.roomInfo.gameRoom.playersName;
-            this.startIfFull();
+            // this.startIfFull();
         }, 500);
-    }
-    ngAfterViewInit() {
-        this.list = this.gameList.getList();
+        this.socket.on('updateInfo', (players: Array<LocalPlayer>) => {
+            // this.players = players;
+            this.dialogRef.close();
+            this.router.navigate(['/game']);
+            console.log(this.gameList.players);
+            // this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
+            // this.socket.emit('startGame', this.gameList.roomInfo.gameRoom.idGame);
+        });
     }
     onSelect(game: GameParameters): GameParameters {
         if (this.gameSelected) {
@@ -65,8 +73,8 @@ export class WaitingAreaComponent {
             this.isStarting = true;
             clearInterval(this.timer);
 
-            this.router.navigate(['/game']);
-            this.dialogRef.close();
+            // this.router.navigate(['/game']);
+            // this.dialogRef.close();
             this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
             // setTimeout(() => {
             // }, 5000);

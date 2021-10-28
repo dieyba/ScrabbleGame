@@ -33,7 +33,7 @@ export class SocketManager {
             });
             socket.on('joinRoom', (game: any) => {
                 this.joinRoom(socket, game);
-                // this.getAllGames(socket, game);
+                this.getAllGames(socket, game);
             });
             socket.on('initializeGame', (roomId: number) => {
                 this.initializeGame(socket, roomId);
@@ -85,10 +85,13 @@ export class SocketManager {
         roomGame.addPlayer(newPlayer);
         socket.join(roomGame.gameRoom.idGame.toString());
         this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
+        // this.sio.to(roomGame.gameRoom.idGame.toString()).emit('updateInfo', roomGame.players);
     }
     private initializeGame(socket: io.Socket, roomId: number) {
         let room = this.gameListMan.existingRooms.findIndex((r) => r.gameRoom.idGame === roomId);
         let roomGame = this.gameListMan.existingRooms[room];
-            this.sio.to(roomGame.gameRoom.idGame.toString()).emit('updateInfo', roomGame.players);
+        // this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
+        console.log(roomGame.players);
+        this.sio.to(roomGame.gameRoom.idGame.toString()).emit('updateInfo', roomGame.players);
     }
 }

@@ -14,8 +14,8 @@
             </div>
         </mat-card-content>
     </mat-card>
-    <mat-card class="card" [ngStyle]="{ 'background-color': player2Active ? '#8ABBF5' : '#DCECFF' }">
-        <mat-card-title class="card-title" [ngStyle]="{ 'font-weight': player2Active ? 'bold' : 'normal' }">{{ player2Name }}</mat-card-title>
+    <mat-card class="card" [ngStyle]="{ 'background-color': isPlayer2Active() ? '#8ABBF5' : '#DCECFF' }">
+        <mat-card-title class="card-title" [ngStyle]="{ 'font-weight': isPlayer2Active() ? 'bold' : 'normal' }">{{ player2Name }}</mat-card-title>
         <mat-card-content>
             <div>
                 <div class="row">

@@ -1,60 +1,24 @@
-import { AfterViewInit, Component, OnInit, Optional } from '@angular/core';
+import { Component, Optional } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { LocalPlayer } from '@app/classes/local-player';
-import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
-import * as io from 'socket.io-client';
 @Component({
     selector: 'app-sidebar',
     templateUrl: './sidebar.component.html',
     styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent implements OnInit, AfterViewInit {
+export class SidebarComponent {
     player1Name: string;
     player2Name: string;
-    player1Active: boolean;
-    player2Active: boolean;
     winnerName: string;
     isSolo: boolean;
-    private readonly server = 'http://' + window.location.hostname + ':3000';
-    private socket: io.Socket;
-    players: Array<LocalPlayer>;
     private dialogRef: MatDialogRef<EndGamePopupComponent>;
-    constructor(public router: Router, public dialog: MatDialog,private gameService: GameService, private gameList: GameListService) {
+    constructor(public router: Router, public dialog: MatDialog, private gameService: GameService, private gameList: GameListService) {
+        console.log(this.gameList.players);
         this.winnerName = '';
-        this.socket = SocketHandler.requestSocket(this.server);
-        this.players = new Array<LocalPlayer>();
-        this.player1Active = this.gameList.roomInfo.players[0]?.isActive;
-        this.player2Active = this.gameList.roomInfo.players[1]?.isActive;
-        setInterval(() => {
-            this.player1Name = this.gameList.roomInfo.gameRoom.playersName[0];
-            this.player2Name = this.gameList.roomInfo.gameRoom.playersName[1];
-            this.socket.on('updateInfo', (players: Array<LocalPlayer>) => {
-                this.players = players;
-                this.socket.emit('startGame', this.gameList.roomInfo.gameRoom.idGame);
-            });
-        }, 1000);
-    }
-    ngOnInit() {
-        setInterval(() => {
-            this.player1Name = this.gameList.roomInfo.gameRoom.playersName[0];
-            this.player2Name = this.gameList.roomInfo.gameRoom.playersName[1];
-            this.socket.on('updateInfo', (players: Array<LocalPlayer>) => {
-                this.players = players;
-                this.socket.emit('startGame', this.gameList.roomInfo.gameRoom.idGame);
-            });
-        }, 1000);
-    }
-    ngAfterViewInit() {}
-
-
-    getPlayer1Name(): string {
-        return this.gameList.roomInfo.creatorPlayer.name;
-    }
-    getPlayer2Name(): string {
-        return this.players[1]?.name;
+        this.player1Name = this.gameList.roomInfo.players[0].name;
+        this.player2Name = this.gameList.roomInfo.players[1].name;
     }
 
     getPlayer1Score(): number {
@@ -62,16 +26,15 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     }
 
     getPlayer2Score(): number {
-        return this.players[1]?.score;
+        return this.gameList.players[1].score;
     }
-
 
     isPlayer1Active(): boolean {
         return this.gameList.roomInfo.creatorPlayer.isActive;
     }
 
     isPlayer2Active(): boolean {
-        return this.players[1]?.isActive;
+        return this.gameList.players[1].isActive;
     }
 
     isEndGame(): boolean {
@@ -114,22 +77,19 @@ export class SidebarComponent implements OnInit, AfterViewInit {
             }
         });
     }
-
 }
 
 @Component({
     template: `<h1 md-dialog-title>Fin de la partie</h1>
 
-    <div md-dialog-content>Êtes-vous sûr/sûre de vouloir abandonner la partie</div>
-    
-    <div md-dialog-actions align="center">
-        <button md-raised-button color="warn" (click)="dialogReference.close(true)">OUI</button>
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
-        <button id="cancelQuitButton" md-raised-button color="primary" (click)="dialogReference.close(false)">NON</button>
-    </div>
-    `,
+        <div md-dialog-content>Êtes-vous sûr/sûre de vouloir abandonner la partie</div>
+
+        <div md-dialog-actions align="center">
+            <button md-raised-button color="warn" (click)="dialogReference.close(true)">OUI</button>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
+            <button id="cancelQuitButton" md-raised-button color="primary" (click)="dialogReference.close(false)">NON</button>
+        </div> `,
 })
 export class EndGamePopupComponent {
     constructor(@Optional() public dialogReference: MatDialogRef<any>) {}
 }
-

@@ -14,6 +14,7 @@ export class GameListService {
     isStarting: boolean;
     player: LocalPlayer;
     existingRooms: GameParameters[];
+    players: Array<LocalPlayer>;
     myRoom: GameRoom[];
     roomInfo: GameParameters;
     roomInf = { idGame: -1, capacity: 0, playersName: new Array<string>() };
@@ -24,6 +25,7 @@ export class GameListService {
         this.socket = SocketHandler.requestSocket(this.server);
         this.player = PlayerHandler.requestPlayer();
         this.roomInfo = new GameParameters('', 0);
+        this.players = new Array<LocalPlayer>();
         this.roomInfo.gameRoom = { idGame: -1, capacity: 0, playersName: new Array<string>() };
         this.socket.emit('addPlayer', { player: this.player });
         this.socket.on('getAllGames', (game: GameParameters[]) => {
@@ -32,6 +34,8 @@ export class GameListService {
         this.socket.on('roomJoined', (game: GameParameters) => {
             this.roomInfo = game;
             this.roomInfo.gameRoom = game.gameRoom;
+            this.players = game.players;
+            console.log(this.players);
         });
     }
     getList(): GameParameters[] {
