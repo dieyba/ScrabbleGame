@@ -69,6 +69,10 @@ export class MouseWordPlacerService {
                     break;
             }
             this.removeLatestPreview(this.currentAxis);
+            if (this.currentWord.length > 0) {
+                this.removeAllLetters();
+                this.clearOverlay();
+            }
             nextSquare = this.findNextSquare(this.currentAxis, clickedSquare);
             this.latestPosition = clickedSquare;
             this.overlayContext.beginPath();
@@ -138,7 +142,14 @@ export class MouseWordPlacerService {
         this.overlayContext.fillRect(position.x + 1, position.y + 1, SQUARE_SIZE, SQUARE_SIZE);
     }
     drawLetter(letterToDraw: ScrabbleLetter, pos: Vec2) {
-        if (pos.x >= BOARD_SIZE || pos.y >= BOARD_SIZE) return;
+        const ABSOLUTE_BOARD_SIZE = 580;
+        if (
+            pos.x >= BOARD_SIZE ||
+            pos.y >= BOARD_SIZE ||
+            this.currentPosition.x > ABSOLUTE_BOARD_SIZE ||
+            this.currentPosition.y > ABSOLUTE_BOARD_SIZE
+        )
+            return;
         letterToDraw.color = this.gridService.scrabbleBoard.squares[pos.x][pos.y].color;
         const letter = letterToDraw.character.toUpperCase();
         // Draw background
@@ -281,12 +292,9 @@ export class MouseWordPlacerService {
     }
 
     removeLetter() {
-        // Remove marker
-
         const lastLetter = this.currentWord.pop();
         if (lastLetter !== undefined) this.rackService.rackLetters.push(lastLetter);
         // Draw letter on the end of the canvas
-        // TODO: CHANGE THIS, buggy
         this.rackService.drawExistingLetters();
         const lastLetterPos = this.currentPosition;
         const previousSquare = this.findPreviousSquare(this.currentAxis, lastLetterPos);
@@ -294,14 +302,12 @@ export class MouseWordPlacerService {
             // Shift one spot left/up
             this.currentPosition = previousSquare;
             this.drawCurrentWord();
-            // const nextLetter = this.findPreviousSquare(this.currentAxis, this.currentPosition);
-            // const added = 20;
             this.overlayContext.clearRect(
                 this.currentPosition.x,
                 this.currentPosition.y,
                 this.overlayContext.canvas.width,
                 this.overlayContext.canvas.height,
-            );
+            ); // (Remove marker)
             this.drawSquare(this.currentPosition, 'green');
             this.drawSquare(this.findNextSquare(this.currentAxis, this.currentPosition), 'yellow');
         }
@@ -309,14 +315,14 @@ export class MouseWordPlacerService {
     drawCurrentWord() {
         const indexes = this.convertPositionToGridIndex(this.initialPosition);
         for (let i = 0; i < this.currentWord.length; i++) {
-            console.log('letter', this.currentWord[i], 'position', indexes[0] + i, indexes[1]);
             if (this.currentAxis === Axis.H) {
-                this.drawLetter(this.currentWord[i], new Vec2(indexes[0] + i, indexes[1]));
+                if (indexes[0] + i < BOARD_SIZE || indexes[1] < BOARD_SIZE)
+                    this.drawLetter(this.currentWord[i], new Vec2(indexes[0] + i, indexes[1]));
             } else {
-                this.drawLetter(this.currentWord[i], new Vec2(indexes[0], indexes[1] + i));
+                if (indexes[0] < BOARD_SIZE || indexes[1] + i < BOARD_SIZE)
+                    this.drawLetter(this.currentWord[i], new Vec2(indexes[0], indexes[1] + i));
             }
         }
-        console.log('___________________');
     }
     normalizeLetter(keyPressed: string): string {
         const letter = keyPressed.normalize('NFD').replace(/\p{Diacritic}/gu, '')[0];
