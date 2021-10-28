@@ -12,4 +12,9 @@ export class PlayerManagerService {
         this.allPlayers.push(newPlayer);
         return newPlayer;
     }
+
+    public getPlayerBySocketID(socketId: string): Player{
+        const playerArrayIndex = this.allPlayers.findIndex((p) => p.getSocketId() === socketId);
+        return this.allPlayers[playerArrayIndex];
+    }
 }

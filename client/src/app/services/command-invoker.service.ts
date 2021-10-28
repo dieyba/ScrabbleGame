@@ -4,36 +4,41 @@ import { ExchangeCmd } from '@app/classes/exchange-command';
 import { PassTurnCmd } from '@app/classes/pass-command';
 import { PlaceCmd } from '@app/classes/place-command';
 import { ChatDisplayService } from './chat-display.service';
+import { GameService } from './game.service';
+import { MultiPlayerGameService } from './multi-player-game.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class CommandInvokerService {
-    constructor(private chatDisplayService: ChatDisplayService) {}
-
-    // if problem with order of commands executed or commands overlapping when executed, modify invoker so only one command can be called at a time
-    // create a command waiting queue and call each one after the other
+    constructor(private chatDisplayService: ChatDisplayService, private gameService: GameService) {}
 
     executeCommand(command: Command): void {
         const commandResult = command.execute();
-        const isSendToServer =
-            isToDisplayRemotely(command) &&
-            commandResult.isExecuted; /* && this.gameService.isMultiplayer (add bool as parameter of executeCommand?)*/
+        const isMultiplayer = this.gameService.currentGameService instanceof MultiPlayerGameService;
+        const isExchangeCmd = command instanceof ExchangeCmd;
+        const isToDisplayRemotely = isExchangeCmd || command instanceof PassTurnCmd || command instanceof PlaceCmd;
+        const isSendToServer = isMultiplayer && isToDisplayRemotely && commandResult.isExecuted;
         if (isSendToServer) {
-            commandResult.executionMessages.forEach((chatEntry) => {
-                // TODO : implement server to chat box
-                // create a serverChatEntry (aka with player name instead of color?)
-                // send msg to server, server will then call both chatdisplay.addEntry() with proper message color per entry;
-                console.log('to server: ' + chatEntry.message);
-            });
+            // extract command is the only situation where the message is different for the local/remove player
+            if (isExchangeCmd) {
+                const messageLocalPlayer = commandResult.executionMessages[0].message;
+                const messageRemotePlayer = commandResult.executionMessages[1].message;
+                this.chatDisplayService.sendMessageToServer(messageLocalPlayer, messageRemotePlayer);
+            } else {
+                commandResult.executionMessages.forEach((chatEntry) => {
+                    this.chatDisplayService.sendMessageToServer(chatEntry.message);
+                });
+            }
         } else {
-            commandResult.executionMessages.forEach((chatEntry) => {
-                this.chatDisplayService.addEntry(chatEntry);
-            });
+            // extract command returns both players message, but solo game only displays the local message
+            if (isExchangeCmd) {
+                this.chatDisplayService.addEntry(commandResult.executionMessages[0]);
+            } else {
+                commandResult.executionMessages.forEach((chatEntry) => {
+                    this.chatDisplayService.addEntry(chatEntry);
+                });
+            }
         }
     }
 }
-
-const isToDisplayRemotely = (command: Command): boolean => {
-    return command instanceof PassTurnCmd || command instanceof ExchangeCmd || command instanceof PlaceCmd;
-};

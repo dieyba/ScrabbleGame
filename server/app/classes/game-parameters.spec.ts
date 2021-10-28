@@ -14,7 +14,7 @@ describe('GameParameters', () => {
         let player = new Player('dieyba', '');
         let player1 = new Player('erika', '');
         let player2 = new Player('Sara', '');
-        player.setRoomId(game.gameRoom.idGame);
+        player.roomId = game.gameRoom.idGame;
         game.addPlayer(player);
         expect(game.gameRoom.playersName.length).to.be.equal(1);
         game.addPlayer(player1);

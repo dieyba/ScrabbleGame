@@ -46,7 +46,7 @@ export class SoloGameService {
         this.chatDisplayService.entries = [];
         this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
         this.game.creatorPlayer.isActive = true;
-        console.log('je susi ici');
+        console.log('in SoloGameService initializeGame()');
         this.game.opponentPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
         this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.totalCountDown = +gameInfo.controls.timer.value;

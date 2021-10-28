@@ -103,14 +103,4 @@
 //         expect(service.entries[2]).toEqual(secondPlayerEntry);
 //         // expect(toStringSpy).toHaveBeenCalledTimes(3);
 //     });
-
-//     it('should be able to create Exchange Message when true ', () => {
-//         const exchangemsg = '!échanger bonjour';
-//         expect(service.createExchangeMessage(true, exchangemsg)).toEqual('!échanger bonjour');
-//     });
-
-//     it('should be able to create Exchange Message when false ', () => {
-//         const exchangemsg = '!échanger bonjour';
-//         expect(service.createExchangeMessage(false, exchangemsg)).toEqual('!échanger 7 lettre(s)');
-//     });
 // });
