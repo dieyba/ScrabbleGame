@@ -44,7 +44,7 @@ export class PlayAreaComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.rackService.gridContext = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        this.gameService.currentGameService.createNewGame();
+        // this.gameService.currentGameService.createNewGame();
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();

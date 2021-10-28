@@ -1,4 +1,6 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, Optional } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { LocalPlayer } from '@app/classes/local-player';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
@@ -12,62 +14,65 @@ import * as io from 'socket.io-client';
 export class SidebarComponent implements OnInit, AfterViewInit {
     player1Name: string;
     player2Name: string;
+    player1Active: boolean;
+    player2Active: boolean;
     winnerName: string;
     isSolo: boolean;
     private readonly server = 'http://' + window.location.hostname + ':3000';
     private socket: io.Socket;
     players: Array<LocalPlayer>;
-    constructor(private gameService: GameService, private gameList: GameListService) {
-        this.player1Name = this.gameList.roomInfo.gameRoom.playersName[0];
-        this.player2Name = this.gameList.roomInfo.gameRoom.playersName[1];
+    private dialogRef: MatDialogRef<EndGamePopupComponent>;
+    constructor(public router: Router, public dialog: MatDialog,private gameService: GameService, private gameList: GameListService) {
         this.winnerName = '';
-        this.players = new Array<LocalPlayer>();
         this.socket = SocketHandler.requestSocket(this.server);
-        this.socket.on('updateInfo', (players: Array<LocalPlayer>) => {
-            console.log(players);
-            this.players = players;
-        });
+        this.players = new Array<LocalPlayer>();
+        this.player1Active = this.gameList.roomInfo.players[0]?.isActive;
+        this.player2Active = this.gameList.roomInfo.players[1]?.isActive;
+        setInterval(() => {
+            this.player1Name = this.gameList.roomInfo.gameRoom.playersName[0];
+            this.player2Name = this.gameList.roomInfo.gameRoom.playersName[1];
+            this.socket.on('updateInfo', (players: Array<LocalPlayer>) => {
+                this.players = players;
+                this.socket.emit('startGame', this.gameList.roomInfo.gameRoom.idGame);
+            });
+        }, 1000);
     }
     ngOnInit() {
-        // this.socket = SocketHandler.requestSocket(this.server);
-        // this.socket.on('updateInfo', (players: Array<LocalPlayer>) => {
-        //     this.players = players;
-        // });
+        setInterval(() => {
+            this.player1Name = this.gameList.roomInfo.gameRoom.playersName[0];
+            this.player2Name = this.gameList.roomInfo.gameRoom.playersName[1];
+            this.socket.on('updateInfo', (players: Array<LocalPlayer>) => {
+                this.players = players;
+                this.socket.emit('startGame', this.gameList.roomInfo.gameRoom.idGame);
+            });
+        }, 1000);
     }
     ngAfterViewInit() {}
 
-    // getLettersLeftCount(): number {
-    //     return this.gameService.currentGameService.game.stock.letterStock.length;
-    // }
 
-    // getPlayer1LetterCount(): number {
-    //     return this.gameService.currentGameService.game.creatorPlayer.letters.length;
-    // }
-
-    // getPlayer2LetterCount(): number {
-    //     return this.gameService.currentGameService.game.opponentPlayer.letters.length;
-    // }
+    getPlayer1Name(): string {
+        return this.gameList.roomInfo.creatorPlayer.name;
+    }
+    getPlayer2Name(): string {
+        return this.players[1]?.name;
+    }
 
     getPlayer1Score(): number {
         return this.gameList.roomInfo.creatorPlayer.score;
     }
 
-    // getPlayer2Score(): number {
-    //     return this.players[1].score;
-    // }
+    getPlayer2Score(): number {
+        return this.players[1]?.score;
+    }
 
-    // getTimer(): string {
-    //     return this.gameService.currentGameService.game.totalCountDown.toString();
-    // }
 
     isPlayer1Active(): boolean {
-        console.log(this.players);
         return this.gameList.roomInfo.creatorPlayer.isActive;
     }
 
-    // isPlayer2Active(): boolean {
-    //     return this.players[1].isActive;
-    // }
+    isPlayer2Active(): boolean {
+        return this.players[1]?.isActive;
+    }
 
     isEndGame(): boolean {
         this.getWinnerName();
@@ -98,4 +103,33 @@ export class SidebarComponent implements OnInit, AfterViewInit {
             this.winnerName = this.gameService.currentGameService.game.opponentPlayer.name;
         }
     }
+    public quitGame(): void {
+        // User confirmation popup
+        this.dialogRef = this.dialog.open(EndGamePopupComponent);
+
+        // User confirmation response
+        this.dialogRef.afterClosed().subscribe((confirmQuit) => {
+            if (confirmQuit) {
+                this.router.navigate(['/start']);
+            }
+        });
+    }
+
 }
+
+@Component({
+    template: `<h1 md-dialog-title>Fin de la partie</h1>
+
+    <div md-dialog-content>Êtes-vous sûr/sûre de vouloir abandonner la partie</div>
+    
+    <div md-dialog-actions align="center">
+        <button md-raised-button color="warn" (click)="dialogReference.close(true)">OUI</button>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
+        <button id="cancelQuitButton" md-raised-button color="primary" (click)="dialogReference.close(false)">NON</button>
+    </div>
+    `,
+})
+export class EndGamePopupComponent {
+    constructor(@Optional() public dialogReference: MatDialogRef<any>) {}
+}
+

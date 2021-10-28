@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { FormGroup } from '@angular/forms';
 import { PlaceParams } from '@app/classes/commands';
 import { Dictionary } from '@app/classes/dictionary';
 import { ErrorType } from '@app/classes/errors';
@@ -9,7 +8,6 @@ import { Player } from '@app/classes/player';
 import { Vec2 } from '@app/classes/vec2';
 import * as io from 'socket.io-client';
 import { ChatDisplayService } from './chat-display.service';
-import { GameListService } from './game-list.service';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 import { DEFAULT_LETTER_COUNT, SoloGameService } from './solo-game.service';
@@ -28,40 +26,40 @@ export class MultiPlayerGameService extends SoloGameService {
         protected rackService: RackService,
         protected chatDisplayService: ChatDisplayService,
         protected validationService: ValidationService,
-        protected wordBuilder: WordBuilderService,
-        protected gameList: GameListService,
+        protected wordBuilder: WordBuilderService, // protected gameList: GameListService,
     ) {
-        super(gridService, rackService, chatDisplayService, validationService, wordBuilder, gameList);
+        super(gridService, rackService, chatDisplayService, validationService, wordBuilder);
+        //this.game = new GameParameters('nom', 4);
     }
 
-    override initializeGame(gameInfo: FormGroup) {
-        this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value);
-        this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
-        this.game.creatorPlayer.isActive = true;
-        this.game.opponentPlayer = new LocalPlayer(gameInfo.controls.opponent.value);
-        this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        this.game.opponentPlayer.isActive = false;
-        this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
-        this.game.totalCountDown = +gameInfo.controls.timer.value;
-        this.game.randomBonus = gameInfo.controls.bonus.value;
-        this.chatDisplayService.entries = [];
-        this.game.timerMs = +this.game.totalCountDown;
-        return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
-    }
-    // override initializeGame() {
-    //     this.game = this.gameList.roomInfo;
-    //     this.game.creatorPlayer = new LocalPlayer(this.gameList.roomInfo.gameRoom.playersName[0]);
+    // override initializeGame(gameInfo: FormGroup) {
+    //     this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value);
+    //     this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
     //     this.game.creatorPlayer.isActive = true;
-    //     this.game.opponentPlayer = new LocalPlayer(this.gameList.roomInfo.gameRoom.playersName[0]);
+    //     this.game.opponentPlayer = new LocalPlayer(gameInfo.controls.opponent.value);
     //     this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
     //     this.game.opponentPlayer.isActive = false;
-    //     this.game.dictionary = new Dictionary(0);
-    //     this.game.totalCountDown = this.gameList.roomInfo.totalCountDown;
-    //     // this.game.randomBonus = gameInfo.controls.bonus.value;
+    //     this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
+    //     this.game.totalCountDown = +gameInfo.controls.timer.value;
+    //     this.game.randomBonus = gameInfo.controls.bonus.value;
     //     this.chatDisplayService.entries = [];
     //     this.game.timerMs = +this.game.totalCountDown;
     //     return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
     // }
+    initializeGame2(game: GameParameters) {
+        this.game = game;
+        this.game.creatorPlayer = new LocalPlayer(game.gameRoom.playersName[0]);
+        this.game.creatorPlayer.isActive = true;
+        this.game.opponentPlayer = new LocalPlayer(game.gameRoom.playersName[1]);
+        // this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.opponentPlayer.isActive = false;
+        this.game.dictionary = new Dictionary(0);
+        this.game.totalCountDown = game.totalCountDown;
+        // this.game.randomBonus = gameInfo.controls.bonus.value;
+        this.chatDisplayService.entries = [];
+        this.game.timerMs = +this.game.totalCountDown;
+        return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
+    }
 
     override createNewGame() {
         // Empty board and stack

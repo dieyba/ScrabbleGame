@@ -46,7 +46,6 @@ export class FormComponent implements OnInit {
         }
         this.dictionary = 'Français';
         this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
-        // this.mode = new ClassicModeComponent(this.dialog2);
     }
 
     ngOnInit() {
@@ -111,29 +110,14 @@ export class FormComponent implements OnInit {
                 this.closeDialog();
                 this.router.navigate(['/game']);
                 this.gameService.initializeGameType(GameType.Solo);
-                // this.gameService.currentGameService.initializeGame(this.myForm);
             } else {
-                // let singleGame = new GameParameters(
-                //     this.myForm.controls.name.value,
-                //     this.myForm.controls.dictionaryForm.value,
-                //     this.myForm.controls.bonus.value,
-                //     this.myForm.controls.timer.value,
-                // );
-
-                // this.singleGame.initializing(this.myForm);
-                // console.log(this.singleGame);
                 this.closeDialog();
                 this.gameService.initializeGameType(GameType.MultiPlayer);
                 this.gameService.currentGameService.initializeGame(this.myForm);
                 const single = this.gameService.currentGameService.game;
                 this.gameList.createRoom(single);
-                console.log('!');
-                this.dialog.open(WaitingAreaComponent, { disableClose: true });
-                console.log('!');
+                this.dialog.open(WaitingAreaComponent, {});
             }
         }
     }
-    // addGame(game: GameParameters) {
-    //     this.gameList.addGame(game);
-    // }
 }

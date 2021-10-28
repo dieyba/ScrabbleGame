@@ -13,7 +13,6 @@ import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { ChatDisplayService } from './chat-display.service';
-import { GameListService } from './game-list.service';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 import { ValidationService, WAIT_TIME } from './validation.service';
@@ -40,8 +39,8 @@ export class SoloGameService {
         protected chatDisplayService: ChatDisplayService,
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
-        protected gameList: GameListService,
-    ) {}
+    ) // protected gameList: GameListService,
+    {}
 
     initializeGame(gameInfo: FormGroup) {
         this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value);

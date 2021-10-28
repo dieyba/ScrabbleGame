@@ -25,7 +25,7 @@ describe('GameParameters', () => {
         game.setIdGame(1);
         expect(game.gameRoom.idGame).to.equal(1);
     });
-    it('should set idGame', () => {
+    it('should set playerName in the list', () => {
         game.setPlayerName('dieyba');
         expect(game.gameRoom.playersName.length).to.equal(1);
     });

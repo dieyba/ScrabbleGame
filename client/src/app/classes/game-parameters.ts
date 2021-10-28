@@ -20,6 +20,7 @@ export interface GameRoom {
 export class GameParameters {
     gameRoom: GameRoom = { idGame: 15, capacity: 2, playersName: new Array<string>() };
     creatorPlayer: Player;
+    players: LocalPlayer[];
     opponentPlayer: Player;
     dictionary: Dictionary;
     randomBonus: boolean;
@@ -41,6 +42,7 @@ export class GameParameters {
         this.stock = new LetterStock();
         this.hasTurnsBeenPassed = [];
         this.isEndGame = false;
+        this.players = new Array<LocalPlayer>();
         this.turnPassed = false;
         this.randomBonus = false;
         this.scrabbleBoard = new ScrabbleBoard();

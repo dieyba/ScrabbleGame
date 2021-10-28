@@ -2,7 +2,7 @@ import { GameParameters } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import * as http from 'http';
 import * as io from 'socket.io';
-import { GameListManager } from './GameListManager.service';
+import { GameListManager } from './game-list-manager.service';
 import { PlayerManagerService } from './player-manager.service';
 
 export class SocketManager {
@@ -23,10 +23,6 @@ export class SocketManager {
                 this.getAllGames(socket, gameList);
             });
 
-            // socket.on('placeLetter', (game: GameParameters, placeParams: PlaceParams) => {
-            //     this.gameService.placeLetter(game, placeParams);
-            // });
-
             socket.on('deleteRoom', (game: any) => {
                 this.deleteRoom(socket);
                 this.getAllGames(socket, game);
@@ -36,18 +32,15 @@ export class SocketManager {
                 this.getAllGames(socket, game);
             });
             socket.on('joinRoom', (game: any) => {
-                console.log('socket');
                 this.joinRoom(socket, game);
                 // this.getAllGames(socket, game);
             });
             socket.on('initializeGame', (roomId: number) => {
                 this.initializeGame(socket, roomId);
             });
-            // socket.on('confirmName', (name: string) => {
-            //     this.confirmName(socket, name);
-            //     // this.addPlayer(socket, player);
-            //     // this.getAllGames(socket, game);
-            // });
+            socket.on('startGame', (roomId: number) => {
+                // this.startGame(socket,)
+            });
             socket.on('getAllGames', (game: Array<GameParameters>) => {
                 this.getAllGames(socket, game);
             });
@@ -86,20 +79,16 @@ export class SocketManager {
         this.playerMan.allPlayers[joinerIndex].name = game.joinerName;
         let room = this.gameListMan.existingRooms.findIndex((r) => r.gameRoom.idGame === game.game);
         let roomGame = this.gameListMan.existingRooms[room];
-        console.log(roomGame.players);
         this.playerMan.allPlayers[joinerIndex].setRoomId(roomGame.gameRoom.idGame);
-        // this.gameListMan.existingRooms[room].setPlayerName(this.playerMan.allPlayers[joinerIndex].name);
         let newPlayer = new Player(game.joinerName, socket.id);
         newPlayer.setRoomId(roomGame.gameRoom.idGame);
         roomGame.addPlayer(newPlayer);
-        console.log(roomGame.players);
         socket.join(roomGame.gameRoom.idGame.toString());
         this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
-        this.sio.emit('updateInfo', roomGame.players);
     }
     private initializeGame(socket: io.Socket, roomId: number) {
-        // let room = this.gameListMan.existingRooms.findIndex((r) => r.gameRoom.idGame === roomId);
-        // let roomGame = this.gameListMan.existingRooms[room];
-        // socket.emit('updateInfo', roomGame.players);
+        let room = this.gameListMan.existingRooms.findIndex((r) => r.gameRoom.idGame === roomId);
+        let roomGame = this.gameListMan.existingRooms[room];
+            this.sio.to(roomGame.gameRoom.idGame.toString()).emit('updateInfo', roomGame.players);
     }
 }

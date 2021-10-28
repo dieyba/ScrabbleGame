@@ -2,9 +2,7 @@
     <img src="https://bit.ly/3m206ss" width="300" height="60" class="logo" alt="Logo Scrabble" />
     <hr />
     <mat-card class="card" [ngStyle]="{ 'background-color': isPlayer1Active() ? '#8ABBF5' : '#DCECFF' }">
-        <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': isPlayer1Active() ? 'bold' : 'normal' }">{{
-            player1Name
-        }}</mat-card-title>
+        <mat-card-title class="card-title" [ngStyle]="{ 'font-weight': isPlayer1Active() ? 'bold' : 'normal' }">{{ player1Name }}</mat-card-title>
         <mat-card-content>
             <div>
                 <div class="row">
@@ -16,21 +14,19 @@
             </div>
         </mat-card-content>
     </mat-card>
-    <!--mat-card class="card" [ngStyle]="{ 'background-color': isPlayer2Active() ? '#8ABBF5' : '#DCECFF' }">
-        <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': isPlayer2Active() ? 'bold' : 'normal' }">{{
-            player2Name
-        }}</mat-card-title>
+    <mat-card class="card" [ngStyle]="{ 'background-color': player2Active ? '#8ABBF5' : '#DCECFF' }">
+        <mat-card-title class="card-title" [ngStyle]="{ 'font-weight': player2Active ? 'bold' : 'normal' }">{{ player2Name }}</mat-card-title>
         <mat-card-content>
             <div>
                 <div class="row">
                     <label class="info">Points: {{ getPlayer2Score() }}</label>
-                </div-->
-    <!--div class="row" *ngIf="getPlayer2LetterCount() < 7">
-                    <label class="info">Nombre de lettres: {{ getPlayer2LetterCount() }}</label>
                 </div>
+                <!--div class="row" *ngIf="getPlayer2LetterCount() < 7">
+                    <label class="info">Nombre de lettres: {{ getPlayer2LetterCount() }}</label>
+                </div-->
             </div>
         </mat-card-content>
-    </mat-card-->
+    </mat-card>
     <hr />
     <!--mat-card class="card">
         <mat-card-title class="card-title" align="center">Lettres restantes</mat-card-title>
@@ -47,4 +43,5 @@
         <mat-card-title *ngIf="isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br>vous avez gagné!</mat-card-title>
     </mat-card-->
     <button class="return" routerLink="/start">Quitter la partie</button>
+    <button class="return" (click)="quitGame()">Abandonner la partie</button>
 </div>
