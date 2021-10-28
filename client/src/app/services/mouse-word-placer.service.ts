@@ -47,7 +47,6 @@ export class MouseWordPlacerService {
         let yBaseOfSquare = Math.floor(mousePositionY / ACTUAL_SQUARE_SIZE) * ACTUAL_SQUARE_SIZE;
         yBaseOfSquare = yBaseOfSquare - ACTUAL_SQUARE_SIZE / 2;
         const clickedSquare: Vec2 = new Vec2(xBaseOfSquare, yBaseOfSquare);
-        console.log(clickedSquare);
         this.currentPosition = clickedSquare;
         this.initialPosition = clickedSquare;
         const indexes = this.convertPositionToGridIndex(clickedSquare);
@@ -307,7 +306,6 @@ export class MouseWordPlacerService {
         }
         if (newPosition.x > ABSOLUTE_BOARD_SIZE || newPosition.y > ABSOLUTE_BOARD_SIZE) return this.currentPosition;
         const newPositionIndexes = this.convertPositionToGridIndex(newPosition);
-        console.log(newPositionIndexes);
         if (newPositionIndexes[0] > BOARD_SIZE || newPositionIndexes[1] > BOARD_OFFSET) return this.currentPosition;
         if (this.gridService.scrabbleBoard.squares[newPositionIndexes[0]][newPositionIndexes[1]].occupied)
             this.findNextSquare(this.currentAxis, newPosition);
