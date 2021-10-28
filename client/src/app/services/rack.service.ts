@@ -3,7 +3,7 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 
 export const RACK_WIDTH = 500;
 export const RACK_HEIGHT = 60;
-const MAX_LETTER_COUNT = 7;
+export const MAX_LETTER_COUNT = 7;
 const OFFSET = 5;
 const DOUBLE_DIGIT = 10;
 const SQUARE_WIDTH = 71;
