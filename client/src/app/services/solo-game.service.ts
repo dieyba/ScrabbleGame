@@ -198,7 +198,7 @@ export class SoloGameService {
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for (let i = 0; i < this.rackService.exchangeSelected.length; i++) {
             if (this.rackService.exchangeSelected[i] === true) {
-                letters += player.letters[i].character;
+                letters += this.rackService.rackLetters[i].character;
                 this.rackService.exchangeSelected[i] = false;
             }
         }
