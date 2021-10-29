@@ -9,17 +9,21 @@ import { MultiPlayerGameService } from '@app/services/multi-player-game.service'
     styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent {
-    player1Name: string;
-    player2Name: string;
     winnerName: string;
     isSolo: boolean;
     private dialogRef: MatDialogRef<EndGamePopupComponent>;
     constructor(public router: Router, public dialog: MatDialog, private gameService: MultiPlayerGameService, private gameList: GameListService) {
         console.log(this.gameList.players);
         this.winnerName = '';
-        this.player1Name = this.gameList.roomInfo.players[0].name;
-        this.player2Name = this.gameList.roomInfo.players[1].name;
     }
+    getPlayer1Name(): string {
+        return this.gameService.game.creatorPlayer.name;
+    }
+
+    getPlayer2Name(): string {
+        return this.gameService.game.opponentPlayer.name;
+    }
+
     getLettersLeftCount(): number {
         return this.gameService.game.stock.letterStock.length;
     }
@@ -33,11 +37,11 @@ export class SidebarComponent {
     }
 
     getPlayer1Score(): number {
-        return this.gameService.game.creatorPlayer.letters.length;
+        return this.gameService.game.creatorPlayer.score;
     }
 
     getPlayer2Score(): number {
-        return this.gameService.game.opponentPlayer.letters.length;
+        return this.gameService.game.opponentPlayer.score;
     }
 
     isPlayer1Active(): boolean {

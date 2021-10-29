@@ -7,7 +7,7 @@ import { SoloGameService } from './solo-game.service';
     providedIn: 'root',
 })
 export class GameService {
-    currentGameService: SoloGameService | MultiPlayerGameService;
+    currentGameService: SoloGameService;
 
     constructor(protected soloGameService: SoloGameService, protected multiPlayerGameService: MultiPlayerGameService) {}
 

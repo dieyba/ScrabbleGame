@@ -1,5 +1,5 @@
+import { LetterStock } from '@app/services/letter-stock.service';
 import { Dictionary } from './dictionary';
-import { LetterStock } from './letter-stock';
 import { LocalPlayer } from './local-player';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';

@@ -1,8 +1,8 @@
 // import { MultiPlayerGameService } from './services/multi-player-game.service';
+import { LetterStock } from '@app/services/letter-stock.service';
 import { Dictionary } from './dictionary';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
-import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
 
 export interface GameRoom {
@@ -20,7 +20,7 @@ export class GameParameters {
     totalCountDown: number;
     creatorName: string;
     scrabbleBoard: ScrabbleBoard;
-    stock: ScrabbleLetter[];
+    stock: LetterStock;
     turnPassed: boolean;
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
@@ -35,6 +35,8 @@ export class GameParameters {
         this.gameRoom.idGame = id;
         this.gameRoom.capacity = 2;
         this.dictionary = new Dictionary(0);
+        this.stock = new LetterStock();
+        this.hasTurnsBeenPassed = [false, false, false];
         // this.multiplayerGame = new MultiPlayerGameService(this.players);
     }
     addPlayer(player: Player) {

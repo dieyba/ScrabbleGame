@@ -14,6 +14,7 @@ import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
+import { LetterStock } from './letter-stock.service';
 import { RackService } from './rack.service';
 import { ValidationService, WAIT_TIME } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
@@ -46,6 +47,7 @@ export class SoloGameService {
         this.chatDisplayService.entries = [];
         this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
         this.game.creatorPlayer.isActive = true;
+        this.game.stock = new LetterStock();
         console.log('je susi ici');
         this.game.opponentPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
         this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);

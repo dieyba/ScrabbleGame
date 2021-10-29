@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { GameListService } from '@app/services/game-list.service';
-import { GameService } from '@app/services/game.service';
 import { GridService } from '@app/services/grid.service';
+import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
 import { RackService } from '@app/services/rack.service';
 
 // TODO : Avoir un fichier séparé pour les constantes!
@@ -38,20 +38,20 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly gridService: GridService,
         private readonly rackService: RackService,
         private gameList: GameListService,
-        private readonly gameService: GameService, // private readonly validationService: ValidationService,
+        private readonly gameService: MultiPlayerGameService, // private readonly validationService: ValidationService,
     ) {}
 
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.rackService.gridContext = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        // this.gameService.currentGameService.createNewGame();
+        this.gameService.createNewGame();
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
     }
 
     passTurn() {
-        this.gameService.currentGameService.passTurn(this.gameService.currentGameService.game.creatorPlayer);
+        this.gameService.passTurn(this.gameService.game.creatorPlayer);
     }
 
     isLocalPlayerActive(): boolean {
@@ -59,7 +59,7 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     isEndGame(): boolean {
-        return this.gameService.currentGameService.game.isEndGame;
+        return this.gameService.game.isEndGame;
     }
 
     get width(): number {

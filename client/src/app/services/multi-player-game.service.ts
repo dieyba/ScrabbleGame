@@ -9,6 +9,7 @@ import { Vec2 } from '@app/classes/vec2';
 import * as io from 'socket.io-client';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
+import { LetterStock } from './letter-stock.service';
 import { RackService } from './rack.service';
 import { DEFAULT_LETTER_COUNT, SoloGameService } from './solo-game.service';
 import { ValidationService } from './validation.service';
@@ -48,10 +49,11 @@ export class MultiPlayerGameService extends SoloGameService {
     // }
     initializeGame2(game: GameParameters) {
         this.game = game;
+        this.game.stock = new LetterStock();
         this.game.creatorPlayer = new LocalPlayer(game.gameRoom.playersName[0]);
         this.game.creatorPlayer.isActive = true;
         this.game.opponentPlayer = new LocalPlayer(game.gameRoom.playersName[1]);
-        // this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.opponentPlayer.letters = game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.opponentPlayer.isActive = false;
         this.game.dictionary = new Dictionary(0);
         this.game.totalCountDown = game.totalCountDown;
