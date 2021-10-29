@@ -53,14 +53,14 @@ export class MultiPlayerGameService extends SoloGameService {
         this.game.creatorPlayer = new LocalPlayer(game.gameRoom.playersName[0]);
         this.game.creatorPlayer.isActive = true;
         this.game.opponentPlayer = new LocalPlayer(game.gameRoom.playersName[1]);
-        this.game.opponentPlayer.letters = game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.opponentPlayer.isActive = false;
         this.game.dictionary = new Dictionary(0);
         this.game.totalCountDown = game.totalCountDown;
         // this.game.randomBonus = gameInfo.controls.bonus.value;
         this.chatDisplayService.entries = [];
         this.game.timerMs = +this.game.totalCountDown;
-        console.log("initialize game multiplayer of client " + this.game.creatorPlayer.name);
+        console.log('initialize game multiplayer of client ' + this.game.creatorPlayer.name);
         return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
     }
 

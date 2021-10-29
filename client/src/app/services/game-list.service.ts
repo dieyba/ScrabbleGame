@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { GameParameters, GameRoom } from '@app/classes/game-parameters';
+import { GameParameters, GameRoom, GameType } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
 import { PlayerHandler } from '@app/modules/player-handler';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
+import { GameService } from './game.service';
 
 @Injectable({
     providedIn: 'root',
@@ -17,9 +18,12 @@ export class GameListService {
     players: Array<LocalPlayer>;
     myRoom: GameRoom[];
     roomInfo: GameParameters;
+    // gameService: GameService;
+    // solo: SoloGameService
+    // multi: MultiPlayerGameService
     roomInf = { idGame: -1, capacity: 0, playersName: new Array<string>() };
 
-    constructor() {
+    constructor(private gameService: GameService) {
         this.existingRooms = new Array<GameParameters>();
         this.myRoom = new Array<GameRoom>();
         this.socket = SocketHandler.requestSocket(this.server);
@@ -52,6 +56,7 @@ export class GameListService {
         this.socket.emit('deleteRoom');
     }
     start(game: GameParameters, name: string): void {
+        this.gameService.initializeGameType(GameType.MultiPlayer);
         this.socket.emit('joinRoom', { game: game.gameRoom.idGame, joinerName: name });
     }
     initializeGame(roomId: number) {
