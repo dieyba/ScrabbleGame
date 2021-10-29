@@ -15,7 +15,7 @@ import {
     isValidLetter,
     removeAccents,
     scrabbleLetterstoString,
-    trimSpaces,
+    trimSpaces
 } from '@app/classes/utilities';
 import { ChatDisplayService } from './chat-display.service';
 import { CommandInvokerService } from './command-invoker.service';
@@ -75,8 +75,7 @@ export class TextEntryService {
             const isACommand = userInput.startsWith('!') && !this.gameService.game.isEndGame;
             if (!isACommand) {
                 if (isMultiplayer) {
-                    this.chatDisplayService.addEntry(createPlayerEntry(isLocalPlayer, player.name, userInput));
-                    // TODO: send createPlayerEntry result to server, then server receives the entry and sends it to both chat display
+                    this.chatDisplayService.sendMessageToServer(userInput);
                 } else {
                     this.chatDisplayService.addEntry(createPlayerEntry(isLocalPlayer, player.name, userInput));
                 }
@@ -84,6 +83,7 @@ export class TextEntryService {
                 const commandCreationResult = this.createCommand(userInput, player);
                 const isCreated = commandCreationResult instanceof Command;
                 if (isCreated) {
+                    // execute command takes care of sending and displaying messages after execution
                     this.commandInvokerService.executeCommand(commandCreationResult as Command);
                 } else {
                     this.chatDisplayService.addEntry(createErrorEntry(commandCreationResult as ErrorType, userInput));

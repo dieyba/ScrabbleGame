@@ -60,6 +60,7 @@ export class MultiPlayerGameService extends SoloGameService {
         // this.game.randomBonus = gameInfo.controls.bonus.value;
         this.chatDisplayService.entries = [];
         this.game.timerMs = +this.game.totalCountDown;
+        console.log("initialize game multiplayer of client " + this.game.creatorPlayer.name);
         return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
     }
 
