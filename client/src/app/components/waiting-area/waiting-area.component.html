@@ -4,8 +4,10 @@
         <h1>Vous etes en attente d'un autre joueur</h1>
         <mat-spinner></mat-spinner>
         <div>
-            <div *ngIf="playerList.length === 2">Votre adversaire a rejoint la partie {{ playerList[1] }}</div>
-            <button (click)="startIfFull()">Commencer</button>
+            <div *ngIf="playerList.length === 2">
+                Votre adversaire a rejoint la partie {{ playerList[1] }}
+                <button (click)="startIfFull()">Commencer</button>
+            </div>
         </div>
         <div *ngFor="let game of list">
             <button>
@@ -38,10 +40,19 @@
                 <input matInput #input maxlength="10" #input2 minlength="3" placeholder="Ex. Nougat" [formControl]="playerName" />
                 <mat-hint align="end">{{ input.value?.length || 0 }}/10</mat-hint>
                 <div class="error" *ngIf="playerName.errors?.pattern">Le nom ne doit pas contenir de chiffres et de caractères</div>
-                <!--div *ngIf="confirmName()">vous ne pouvez pas avoir le meme non que l'autre joueur</div-->
+                <md-hint *ngIf="error" align="start">{{ nameErrorMessage }}</md-hint>
+                <md-hint *ngIf="!error" align="start">{{ nameErrorMessage }}</md-hint>
             </mat-form-field>
-            <button (click)="start()">Joindre</button>
+            <button (click)="confirmName(selectedGame)">valider</button>
+            <div *ngIf="joindre">
+                <h4>veuillez cliquer ici pour joindre la partie</h4>
+                <button (click)="start()">Joindre</button>
+            </div>
+            <div *ngIf="nameValid">
+                <h3>veuillez attendre que votre adversaire demarre la partie</h3>
+                <mat-spinner></mat-spinner>
+            </div>
         </div>
-        <button (click)="closeDialog()">Retour</button>
+        <button (click)="closeDialog(); openForm()">Retour</button>
     </div>
 </div>

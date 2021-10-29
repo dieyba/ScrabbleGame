@@ -25,9 +25,13 @@ export class WaitingAreaComponent {
     isStarting: boolean;
     name = false;
     private timer: any;
+    nameErrorMessage: string;
     player: LocalPlayer;
     list: GameParameters[] = [];
     private socket: io.Socket;
+    error: boolean;
+    nameValid: boolean;
+    joindre: boolean;
     constructor(
         private multiManService: MultiPlayerGameService,
         private router: Router,
@@ -44,6 +48,8 @@ export class WaitingAreaComponent {
         this.list = this.gameList.getList();
         this.player = PlayerHandler.requestPlayer();
         this.player.roomId = this.gameList.player.roomId;
+        this.nameErrorMessage = '';
+        this.nameValid = false;
         this.timer = setInterval(() => {
             this.list = this.gameList.getList();
             this.playerList = this.gameList.roomInfo.gameRoom.playersName;
@@ -54,7 +60,7 @@ export class WaitingAreaComponent {
             this.dialogRef.close();
             this.router.navigate(['/game']);
             this.multiManService.initializeGame2(game);
-            console.log(this.gameList.players);
+            this.socket.emit('deleteRoom');
             // this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
             // this.socket.emit('startGame', this.gameList.roomInfo.gameRoom.idGame);
         });
@@ -84,7 +90,18 @@ export class WaitingAreaComponent {
         }
     }
     start(): void {
+        this.nameValid = true;
         this.gameList.start(this.selectedGame, this.playerName.value);
+    }
+    confirmName(game: GameParameters) {
+        if (this.playerName.value === game.creatorPlayer.name) {
+            this.error = true;
+            this.nameErrorMessage = 'Vous ne pouvez pas avoir le meme nom que votre adversaire';
+        } else {
+            this.error = false;
+            this.joindre = true;
+            this.nameErrorMessage = 'Votre nom est valide ;) ';
+        }
     }
     deleteRoom() {
         this.gameList.deleteRoom();

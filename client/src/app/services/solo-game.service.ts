@@ -50,6 +50,7 @@ export class SoloGameService {
         this.game.stock = new LetterStock();
         console.log('je susi ici');
         this.game.opponentPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
+        console.log(this.game.opponentPlayer);
         this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.totalCountDown = +gameInfo.controls.timer.value;
         this.game.timerMs = +this.game.totalCountDown;

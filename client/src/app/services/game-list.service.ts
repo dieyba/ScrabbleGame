@@ -31,6 +31,10 @@ export class GameListService {
         this.socket.on('getAllGames', (game: GameParameters[]) => {
             this.existingRooms = game;
         });
+        this.socket.on('roomcreated', (game: GameParameters) => {
+            this.roomInfo = game;
+            //console.log(PlayerName);
+        });
         this.socket.on('roomJoined', (game: GameParameters) => {
             this.roomInfo = game;
             this.roomInfo.gameRoom = game.gameRoom;
@@ -53,11 +57,4 @@ export class GameListService {
     initializeGame(roomId: number) {
         this.socket.emit('initializeGame', roomId);
     }
-    // confirmName(name: string, game: GameParameters): boolean {
-    //     if (name !== game.creatorPlayer.name) {
-    //         console.log('confirmation');
-    //         return true;
-    //     }
-    //     return false;
-    // }
 }
