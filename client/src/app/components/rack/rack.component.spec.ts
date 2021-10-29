@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ExchangeService } from '@app/services/exchange.service';
 import { ManipulationRackService } from '@app/services/manipulation-rack.service';
-import { RackService } from '@app/services/rack.service';
+import { MAX_LETTER_COUNT, RackService } from '@app/services/rack.service';
 import { RackComponent } from './rack.component';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
@@ -66,41 +66,53 @@ describe('RackComponent', () => {
         expect(exchangeServiceSpy.handleSelection).toHaveBeenCalled();
     });
 
-    // it('onFocusOut should call ', () => {
-    //     let testEvent = new FocusEvent('testEvent');
-    //     let e: any;
-    //     e = testEvent;
-    //     //(e.relatedTarget as EventTarget) = 'non null';
+    it("onFocusOut shouldn't do anything if browser doesn't have focus", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mockEvent: any = { relatedTarget: null };
 
-    //     // Object.defineProperty(testEvent, 'target', { writable: false, value: new EventTarget() });
-    //     console.log(' e related target : ', e.relatedTarget);
-    //     console.log('related target', testEvent.relatedTarget);
-    //     testEvent = e;
-    //     (testEvent.relatedTarget as HTMLElement).id = 'test';
-    //     console.log('related targer after : ', testEvent.relatedTarget);
+        spyOn(document, 'hasFocus').and.returnValue(false);
 
-    //     // const target = new EventTarget();
-    //     // console.log(target);
+        component.onFocusOut(mockEvent);
 
-    //     // component.rackCanvasElement.focus();
-    //     component.onFocusOut(testEvent);
-    // });
+        expect(rackServiceSpy.deselectAll).not.toHaveBeenCalled();
+        expect(manipulateRackServiceSpy.clearManipValues).not.toHaveBeenCalled();
+    });
 
-    // it('onKeyDown should be called when press the keyboard', () => {
-    //     const testEvent = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
-    //     const spy = spyOn(component, 'onKeyDown');
-    //     component.rackCanvasElement.focus();
-    //     fixture.nativeElement.dispatchEvent(testEvent);
-    //     console.log('test event : ', testEvent);
+    it('onFocusOut should deselect all letters on rackComponent when focus is on anything but the exchange button', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mockEvent: any = { relatedTarget: null };
 
-    //     //     const testEvent = new KeyboardEvent('keydown', { key: 'ArrowRight' });
-    //     //     fixture.nativeElement.dispatchEvent(testEvent);
-    //     //     expect(manipulateRackServiceSpy.switchRight).toHaveBeenCalled();
-    //     //     expect(manipulateRackServiceSpy.switchLeft).not.toHaveBeenCalled();
-    //     //     expect(manipulateRackServiceSpy.selectByLetter).not.toHaveBeenCalled();
+        spyOn(document, 'hasFocus').and.returnValue(true);
 
-    //     expect(spy).toHaveBeenCalled();
-    // });
+        component.onFocusOut(mockEvent);
+
+        expect(rackServiceSpy.deselectAll).toHaveBeenCalled();
+        expect(manipulateRackServiceSpy.clearManipValues).toHaveBeenCalled();
+    });
+
+    it('onFocusOut should deselect all letters on rackComponent when focus is on anything but the exchange button', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mockEvent: any = { relatedTarget: { id: 'notExchangeButton' } };
+
+        spyOn(document, 'hasFocus').and.returnValue(true);
+
+        component.onFocusOut(mockEvent);
+
+        expect(rackServiceSpy.deselectAll).toHaveBeenCalled();
+        expect(manipulateRackServiceSpy.clearManipValues).toHaveBeenCalled();
+    });
+
+    it("onFocusOut shouldn't deselect all letters on rackComponent when focus is on exchange button", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mockEvent: any = { relatedTarget: { id: 'exchangeButton' } };
+
+        spyOn(document, 'hasFocus').and.returnValue(true);
+
+        component.onFocusOut(mockEvent);
+
+        expect(rackServiceSpy.deselectAll).not.toHaveBeenCalled();
+        expect(manipulateRackServiceSpy.clearManipValues).toHaveBeenCalled();
+    });
 
     it('onKeyDown should call just manipulationRackService switchLeft if we press on arrowleft button', () => {
         const testEvent = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
@@ -129,7 +141,7 @@ describe('RackComponent', () => {
         expect(manipulateRackServiceSpy.switchRight).not.toHaveBeenCalled();
     });
 
-    it('onKeyDown should not call any method if we press a button else than a letter, number, special character, arowleft and arrowright', () => {
+    it('onKeyDown should not call any method if we press a button else than a letter, number, special character, arrowleft and arrowright', () => {
         const testEvent = new KeyboardEvent('keydown', { key: 'Space' });
         component.onKeyDown(testEvent);
 
@@ -159,7 +171,7 @@ describe('RackComponent', () => {
         expect(component.selectedLetterPosition(testEvent1)).toEqual(1);
 
         const testEvent2 = new MouseEvent('click', { clientX: 450 });
-        expect(component.selectedLetterPosition(testEvent2)).toEqual(7);
+        expect(component.selectedLetterPosition(testEvent2)).toEqual(MAX_LETTER_COUNT);
     });
 
     it('selectedLetterPosition should return 0 if the click is outside the rack', () => {
