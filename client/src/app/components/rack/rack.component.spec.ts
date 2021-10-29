@@ -4,6 +4,7 @@ import { ManipulationRackService } from '@app/services/manipulation-rack.service
 import { RackService } from '@app/services/rack.service';
 import { RackComponent } from './rack.component';
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('RackComponent', () => {
     let component: RackComponent;
     let fixture: ComponentFixture<RackComponent>;
@@ -112,7 +113,6 @@ describe('RackComponent', () => {
 
     it('onKeyDown should call just manipulationRackService switchRight if we press on arrowright button', () => {
         const testEvent = new KeyboardEvent('keydown', { key: 'ArrowRight' });
-        // console.log('test event : ', testEvent);
         component.onKeyDown(testEvent);
 
         expect(manipulateRackServiceSpy.switchRight).toHaveBeenCalled();
@@ -120,7 +120,7 @@ describe('RackComponent', () => {
         expect(manipulateRackServiceSpy.selectByLetter).not.toHaveBeenCalled();
     });
 
-    it('onKeyDown should call manipulationRackService selectByLetter if we press a letter, number or special character else than arowleft and arrowright', () => {
+    it('onKeyDown should call manipulationRackService selectByLetter if we press a character else than arowleft and arrowright', () => {
         const testEvent = new KeyboardEvent('keydown', { key: 'd' });
         component.onKeyDown(testEvent);
 
