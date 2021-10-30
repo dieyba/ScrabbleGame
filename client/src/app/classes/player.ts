@@ -6,6 +6,7 @@ export abstract class Player {
     letters: ScrabbleLetter[];
     isActive: boolean; // True is it is this players turn, false if not.
     isWinner: boolean;
+    socketId: string;
 
     constructor(name: string) {
         this.name = name;
@@ -13,6 +14,7 @@ export abstract class Player {
         this.letters = [];
         this.isActive = false;
         this.isWinner = false;
+        this.socketId = '';
     }
 
     addLetter(letterToAdd: ScrabbleLetter): void {

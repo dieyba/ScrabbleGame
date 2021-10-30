@@ -1,5 +1,5 @@
 import { GameService } from '@app/services/game.service';
-import { ChatDisplayEntry, createErrorEntry, createPlayerEntry } from './chat-display-entry';
+import { ChatDisplayEntry, ChatEntryColor, createErrorEntry } from './chat-display-entry';
 import { Command, CommandName, CommandResult, DefaultCommandParams } from './commands';
 import { ErrorType } from './errors';
 // import { ErrorType } from './errors';
@@ -22,8 +22,8 @@ export class PassTurnCmd extends Command {
         } else if (executionResult === ErrorType.NoError) {
             this.isExecuted = true;
             const localPlayerName = this.gameService.currentGameService.game.creatorPlayer.name;
-            const isFromLocalPlayer = this.player.name === localPlayerName;
-            executionMessages.push(createPlayerEntry(isFromLocalPlayer, this.player.name, commandMessage));
+            const color = this.player.name === localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
+            executionMessages.push({ color, message: commandMessage });
         }
         return { isExecuted: this.isExecuted, executionMessages };
     }

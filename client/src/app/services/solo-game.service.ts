@@ -31,6 +31,8 @@ const MAX_TURNS_PASSED = 6;
 })
 export class SoloGameService {
     game: GameParameters;
+    // TODO: Addapt solo game service to local player instead of creator player (move attrib to gameParameters?)
+    localPlayer: Player;
     timer: string;
     intervalValue: NodeJS.Timeout;
     id: number = 0;
@@ -49,31 +51,19 @@ export class SoloGameService {
         this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
         this.game.creatorPlayer.isActive = true;
         this.game.stock = new LetterStock();
-        console.log('je susi ici');
         this.game.opponentPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
-        console.log(this.game.opponentPlayer);
         this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.totalCountDown = +gameInfo.controls.timer.value;
         this.game.timerMs = +this.game.totalCountDown;
         this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.game.randomBonus = gameInfo.controls.bonus.value;
+        this.localPlayer = this.game.creatorPlayer;
+        console.log('opponent in solo game:', this.game.opponentPlayer);
+        console.log('solo game local player: ', this.localPlayer.name);
     }
-    // initializeGame() {
-    //     this.game = this.gameList.roomInfo;
-    //     this.game.creatorPlayer = new LocalPlayer(this.gameList.roomInfo.gameRoom.playersName[0]);
-    //     this.game.creatorPlayer.isActive = true;
-    //     this.game.opponentPlayer = new LocalPlayer(this.gameList.roomInfo.gameRoom.playersName[1]);
-    //     this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-    //     this.game.opponentPlayer.isActive = false;
-    //     this.game.dictionary = new Dictionary(0);
-    //     this.game.totalCountDown = this.gameList.roomInfo.totalCountDown;
-    //     // this.game.randomBonus = gameInfo.controls.bonus.value;
-    //     this.chatDisplayService.entries = [];
-    //     this.game.timerMs = +this.game.totalCountDown;
-    //     return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
-    // }
     createNewGame() {
         // Empty board and stack
+        this.chatDisplayService.initialize(this.localPlayer.name);
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = new ScrabbleBoard();
         this.addRackLetters(this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT));
@@ -124,8 +114,8 @@ export class SoloGameService {
             }
             this.game.creatorPlayer.isActive = false;
             this.game.opponentPlayer.isActive = true;
-            //this.game.timerMs = +this.game.totalCountDown;
-            //this.secondsToMinutes();
+            // this.game.timerMs = +this.game.totalCountDown;
+            // this.secondsToMinutes();
             // clearInterval(this.intervalValue);
             // this.startCountdown();
         } else {
@@ -137,8 +127,8 @@ export class SoloGameService {
             }
             this.game.opponentPlayer.isActive = false;
             this.game.creatorPlayer.isActive = true;
-            //this.game.timerMs = +this.game.totalCountDown;
-            //this.secondsToMinutes();
+            // this.game.timerMs = +this.game.totalCountDown;
+            // this.secondsToMinutes();
             // clearInterval(this.intervalValue);
             // this.startCountdown();
         }

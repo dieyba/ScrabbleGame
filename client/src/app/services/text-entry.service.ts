@@ -20,7 +20,6 @@ import {
 import { ChatDisplayService } from './chat-display.service';
 import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
-import { MultiPlayerGameService } from './multi-player-game.service';
 
 const MIN_EXCHANGE_LETTERS = 1;
 const MAX_EXCHANGE_LETTERS = 7;
@@ -67,23 +66,20 @@ export class TextEntryService {
      *
      * @param text Text input from user
      */
-    handleInput(userInput: string, isLocalPlayer: boolean) {
-        const isMultiplayer = this.gameService instanceof MultiPlayerGameService;
-        const player: Player = isLocalPlayer
-            ? this.gameService.currentGameService.game.creatorPlayer
-            : this.gameService.currentGameService.game.opponentPlayer;
-
+    handleInput(userInput: string) {
         userInput = trimSpaces(userInput);
         if (!isEmpty(userInput)) {
             const isACommand = userInput.startsWith('!') && !this.gameService.currentGameService.game.isEndGame;
             if (!isACommand) {
-                if (isMultiplayer) {
+                if (this.gameService.isMultiplayerGame) {
+                    console.log('sending chat input to server');
                     this.chatDisplayService.sendMessageToServer(userInput);
                 } else {
-                    this.chatDisplayService.addEntry(createPlayerEntry(isLocalPlayer, player.name, userInput));
+                    console.log('sending chat input locally');
+                    this.chatDisplayService.addEntry(createPlayerEntry(true, this.gameService.currentGameService.localPlayer.name, userInput));
                 }
             } else {
-                const commandCreationResult = this.createCommand(userInput, player);
+                const commandCreationResult = this.createCommand(userInput, this.gameService.currentGameService.localPlayer);
                 const isCreated = commandCreationResult instanceof Command;
                 if (isCreated) {
                     // execute command takes care of sending and displaying messages after execution

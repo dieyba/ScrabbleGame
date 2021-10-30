@@ -15,7 +15,7 @@ export class GameListService {
     isStarting: boolean;
     player: LocalPlayer;
     existingRooms: GameParameters[];
-    players: Array<LocalPlayer>;
+    players: LocalPlayer[];
     myRoom: GameRoom[];
     roomInfo: GameParameters;
     // gameService: GameService;
@@ -37,7 +37,7 @@ export class GameListService {
         });
         this.socket.on('roomcreated', (game: GameParameters) => {
             this.roomInfo = game;
-            //console.log(PlayerName);
+            // console.log(PlayerName);
         });
         this.socket.on('roomJoined', (game: GameParameters) => {
             this.roomInfo = game;
@@ -57,7 +57,7 @@ export class GameListService {
     }
     start(game: GameParameters, name: string): void {
         this.gameService.initializeGameType(GameType.MultiPlayer);
-        this.socket.emit('joinRoom', { game: game.gameRoom.idGame, joinerName: name });
+        this.socket.emit('joinRoom', { gameId: game.gameRoom.idGame, joinerName: name });
     }
     initializeGame(roomId: number) {
         this.socket.emit('initializeGame', roomId);

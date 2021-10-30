@@ -19,14 +19,14 @@ export interface GameRoom {
 
 export class GameParameters {
     gameRoom: GameRoom = { idGame: 15, capacity: 2, playersName: new Array<string>() };
-    creatorPlayer: Player;
     players: LocalPlayer[];
+    creatorPlayer: Player;
+    creatorName: string;
     opponentPlayer: Player;
     dictionary: Dictionary;
     randomBonus: boolean;
     totalCountDown: number;
     timerMs: number;
-    creatorName: string;
     scrabbleBoard: ScrabbleBoard;
     stock: LetterStock;
     turnPassed: boolean;

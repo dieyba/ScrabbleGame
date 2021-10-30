@@ -21,30 +21,17 @@ export class ChatDisplayService {
     private localPlayerName: string;
     private socket?: io.Socket;
 
-    constructor(/* private gameService: GameService*/) {
+    constructor() {
         this.isActiveDebug = false;
         this.entries = [];
-        this.localPlayerName = '';
 
         this.socket = SocketHandler.requestSocket(this.server);
         this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
-            console.log("local player name:" + this.localPlayerName);
-            const isLocalPlayer = chatEntry.senderName === this.localPlayerName ? false : true;
+            console.log('adding entry received from ', chatEntry.senderName);
+            const isLocalPlayer = chatEntry.senderName === this.localPlayerName;
             this.addEntry(createPlayerEntry(isLocalPlayer, chatEntry.senderName, chatEntry.message));
         });
-        // TODO: get if the game is multiplayer and only initiate socket if it is
-        // if(gameService.currentGameService instanceof MultiPlayerGameService){
-        //     this.initializeSocket();
-        // }
     }
-
-    // initializeSocket(){
-    //     this.socket = SocketHandler.requestSocket(this.server);
-    //     this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
-    //         const isLocalPlayer = chatEntry.senderName === this.localPlayerName ? false : true;
-    //         this.addEntry(createPlayerEntry(isLocalPlayer, chatEntry.senderName, chatEntry.message));
-    //     });
-    // };
 
     initialize(localPlayerName: string): void {
         this.entries = [];
@@ -63,7 +50,9 @@ export class ChatDisplayService {
     }
 
     addEntry(entry: ChatDisplayEntry): void {
+        console.log('(' + entry.color + ')' + entry.message);
         this.entries.push(entry);
+        // TODO: add a method to manually trigger the update in chat display component?
     }
 
     addVirtalPlayerEntry(playername: string, commandInput: string, debugMessages?: string[]) {

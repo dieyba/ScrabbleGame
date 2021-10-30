@@ -16,13 +16,17 @@ export class GameListManager {
     getAllGames(): GameParameters[] {
         return this.existingRooms;
     }
-    getGame(roomID: number): GameParameters | undefined {
+    getGameFromExistingRooms(roomID: number): GameParameters | undefined {
+        return this.existingRooms.find((r) => r.gameRoom.idGame === roomID);
+    }
+    getCurrentGame(roomID: number): GameParameters | undefined {
         return this.currentGames.find((r) => r.gameRoom.idGame === roomID);
     }
     getOtherPlayer(playerID: string, roomId: number): Player | undefined {
-        const game = this.getGame(roomId);
+        const game = this.getCurrentGame(roomId);
+        console.log(game?.players);
         if (game) {
-            return game.creatorPlayer.getSocketId() === playerID ? game.opponentPlayer : game.creatorPlayer;
+            return game.players[0].getSocketId() === playerID ? game.players[1] : game.players[0];
         }
         return undefined;
     }
@@ -38,7 +42,8 @@ export class GameListManager {
         this.existingRooms.push(newRoom);
         return newRoom;
     }
-    public deleteRoom(index: number): void {
+    public deleteRoom(roomId: number): void {
+        const index = this.existingRooms.findIndex((r) => r.gameRoom.idGame === roomId)
         if (index > -1) {
             this.existingRooms.splice(index, 1);
         }

@@ -8,6 +8,7 @@ import { SoloGameService } from './solo-game.service';
 })
 export class GameService {
     currentGameService: SoloGameService;
+    isMultiplayerGame: boolean;
 
     constructor(protected soloGameService: SoloGameService, protected multiPlayerGameService: MultiPlayerGameService) {}
 
@@ -15,9 +16,11 @@ export class GameService {
         switch (gameType) {
             case GameType.Solo:
                 this.currentGameService = this.soloGameService;
+                this.isMultiplayerGame = false;
                 break;
             case GameType.MultiPlayer:
                 this.currentGameService = this.multiPlayerGameService;
+                this.isMultiplayerGame = true;
                 break;
         }
     }

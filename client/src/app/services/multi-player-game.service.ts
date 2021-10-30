@@ -38,7 +38,7 @@ export class MultiPlayerGameService extends SoloGameService {
         this.socket.on('timer reset', (timer: number) => {
             // Change active player and reset timer for new turn
             const isLocalPlayerActive = this.game.creatorPlayer.isActive;
-            //console.log('opponent : ', this.game.opponentPlayer);
+            // console.log('opponent : ', this.game.opponentPlayer);
             if (isLocalPlayerActive) {
                 // If the rack is empty, end game + player won
                 if (this.game.creatorPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
@@ -91,17 +91,22 @@ export class MultiPlayerGameService extends SoloGameService {
         this.game.dictionary = new Dictionary(0);
         this.game.totalCountDown = game.totalCountDown;
         // this.game.randomBonus = gameInfo.controls.bonus.value;
-        this.chatDisplayService.entries = [];
         this.game.timerMs = +this.game.totalCountDown;
+        this.game.creatorPlayer.socketId = game.players[0].socketId;
+        this.game.opponentPlayer.socketId = game.players[1].socketId;
+        this.localPlayer = this.socket.id === this.game.creatorPlayer.socketId ? this.game.creatorPlayer : this.game.opponentPlayer;
+        console.log('local player: ' + this.localPlayer.name);
         console.log('initialize game multiplayer of client ' + this.game.creatorPlayer.name);
         return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
     }
 
     override createNewGame() {
+        // TODO: send emit to server so server sends emit to text entry to init it.
+        // I mean only reason chat display is here is also to init it so server could send signal to init both at the same time ig
+        this.chatDisplayService.initialize(this.localPlayer.name);
         // Empty board and stack
         this.rackService.rackLetters = [];
         // Add rack letters for localPlayer and remote player on their own screen
-
         this.addRackLetters(this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT));
         this.startCountdown();
         this.game.hasTurnsBeenPassed[0] = false;
@@ -115,7 +120,7 @@ export class MultiPlayerGameService extends SoloGameService {
                 this.game.timerMs = 0;
                 this.secondsToMinutes();
                 this.changeActivePlayer();
-                //this.resetTimer();
+                // this.resetTimer();
             }
             this.secondsToMinutes();
         }, TIMER_INTERVAL);

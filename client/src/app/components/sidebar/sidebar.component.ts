@@ -83,7 +83,7 @@ export class SidebarComponent {
             this.winnerName = this.gameService.currentGameService.game.opponentPlayer.name;
         }
     }
-    public quitGame(): void {
+    quitGame(): void {
         // User confirmation popup
         this.dialogRef = this.dialog.open(EndGamePopupComponent);
 
@@ -110,7 +110,7 @@ export class SidebarComponent {
 export class EndGamePopupComponent {
     // private readonly server = 'http://' + window.location.hostname + ':3000';
     // private socket: io.Socket;
-    constructor(@Optional() public dialogReference: MatDialogRef<any>, private gameList: GameListService) {}
+    constructor(@Optional() public dialogReference: MatDialogRef<unknown>, private gameList: GameListService) {}
     disconnect() {
         this.gameList.disconnectUser();
     }

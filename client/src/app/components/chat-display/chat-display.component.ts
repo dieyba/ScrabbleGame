@@ -17,6 +17,7 @@ export class ChatDisplayComponent {
     }
 
     updateScroll(entry: ChatDisplayEntry) {
+        console.log('updating scroll to add new entry:', entry.message);
         if (this.isNewEntry(entry)) {
             this.lastEntry = entry;
             this.scrollDown();

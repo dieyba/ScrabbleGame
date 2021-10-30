@@ -5,7 +5,6 @@ import { PassTurnCmd } from '@app/classes/pass-command';
 import { PlaceCmd } from '@app/classes/place-command';
 import { ChatDisplayService } from './chat-display.service';
 import { GameService } from './game.service';
-import { MultiPlayerGameService } from './multi-player-game.service';
 
 @Injectable({
     providedIn: 'root',
@@ -15,12 +14,12 @@ export class CommandInvokerService {
 
     executeCommand(command: Command): void {
         const commandResult = command.execute();
-        const isMultiplayer = this.gameService.currentGameService instanceof MultiPlayerGameService;
         const isExchangeCmd = command instanceof ExchangeCmd;
         const isToDisplayRemotely = isExchangeCmd || command instanceof PassTurnCmd || command instanceof PlaceCmd;
-        const isSendToServer = isMultiplayer && isToDisplayRemotely && commandResult.isExecuted;
+        const isSendToServer = this.gameService.isMultiplayerGame && isToDisplayRemotely && commandResult.isExecuted;
         if (isSendToServer) {
             // extract command is the only situation where the message is different for the local/remove player
+            // TODO: fix extract messages
             if (isExchangeCmd) {
                 const messageLocalPlayer = commandResult.executionMessages[0].message;
                 const messageRemotePlayer = commandResult.executionMessages[1].message;

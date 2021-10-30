@@ -26,7 +26,7 @@ export class ExchangeCmd extends Command {
             const localPlayerName = this.gameService.currentGameService.game.creatorPlayer.name;
             const isFromLocalPLayer = this.player.name === localPlayerName;
             const lettersMessageLocal = this.createExchangeMessage(isFromLocalPLayer, this.letters);
-            const lettersMessageRemote = this.createExchangeMessage(isFromLocalPLayer, this.letters);
+            const lettersMessageRemote = this.createExchangeMessage(!isFromLocalPLayer, this.letters);
             const executionMessageLocal = commandMessage + ' ' + lettersMessageLocal;
             const executionMessageRemote = commandMessage + ' ' + lettersMessageRemote;
             executionMessages.push(createPlayerEntry(isFromLocalPLayer, this.player.name, executionMessageLocal));
