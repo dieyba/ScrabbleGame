@@ -18,6 +18,7 @@ export class GameListService {
     players: LocalPlayer[];
     myRoom: GameRoom[];
     roomInfo: GameParameters;
+    full: boolean
     // gameService: GameService;
     // solo: SoloGameService
     // multi: MultiPlayerGameService
@@ -30,6 +31,7 @@ export class GameListService {
         this.player = PlayerHandler.requestPlayer();
         this.roomInfo = new GameParameters('', 0);
         this.players = new Array<LocalPlayer>();
+        this.full = false;
         this.roomInfo.gameRoom = { idGame: -1, capacity: 0, playersName: new Array<string>() };
         this.socket.emit('addPlayer', { player: this.player });
         this.socket.on('getAllGames', (game: GameParameters[]) => {
@@ -56,6 +58,7 @@ export class GameListService {
     start(game: GameParameters, name: string): void {
         this.gameService.initializeGameType(GameType.MultiPlayer);
         this.socket.emit('joinRoom', { gameId: game.gameRoom.idGame, joinerName: name });
+
     }
     initializeGame(roomId: number) {
         this.socket.emit('initializeGame', roomId);

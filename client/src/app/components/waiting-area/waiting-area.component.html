@@ -48,6 +48,9 @@
                 <h4>veuillez cliquer ici pour joindre la partie</h4>
                 <button (click)="start()">Joindre</button>
             </div>
+            <div *ngIf="full">
+                <h3>cette salle est remplie veuillez selectionner une autre salle</h3>
+            </div>
             <div *ngIf="nameValid">
                 <h3>veuillez attendre que votre adversaire demarre la partie</h3>
                 <mat-spinner></mat-spinner>

@@ -32,6 +32,8 @@ export class WaitingAreaComponent {
     error: boolean;
     nameValid: boolean;
     joindre: boolean;
+    full: boolean
+
     constructor(
         private multiManService: MultiPlayerGameService,
         private router: Router,
@@ -46,6 +48,7 @@ export class WaitingAreaComponent {
         }
         this.socket = SocketHandler.requestSocket(this.server);
         this.list = this.gameList.getList();
+        this.full = false;
         this.player = PlayerHandler.requestPlayer();
         this.player.roomId = this.gameList.player.roomId;
         this.nameErrorMessage = '';
@@ -90,8 +93,15 @@ export class WaitingAreaComponent {
         }
     }
     start(): void {
-        this.nameValid = true;
-        this.gameList.start(this.selectedGame, this.playerName.value);
+        // if (this.gameList.roomInfo.gameRoom.playersName.length !== 2) {
+        console.log(this.gameList.roomInfo.gameRoom.playersName)
+        if (this.gameList.roomInfo.gameRoom.playersName.length === 1) {
+            this.nameValid = true;
+            this.gameList.start(this.selectedGame, this.playerName.value);
+        }
+        else {
+            this.full = true
+        }
     }
     confirmName(game: GameParameters) {
         if (this.playerName.value === game.creatorPlayer.name) {
