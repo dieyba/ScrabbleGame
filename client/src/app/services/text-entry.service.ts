@@ -72,10 +72,8 @@ export class TextEntryService {
             const isACommand = userInput.startsWith('!') && !this.gameService.currentGameService.game.isEndGame;
             if (!isACommand) {
                 if (this.gameService.isMultiplayerGame) {
-                    console.log('sending chat input to server');
-                    this.chatDisplayService.sendMessageToServer(userInput);
+                    this.chatDisplayService.sendMessageToServer(this.gameService.currentGameService.localPlayer.name + ' >> ' + userInput);
                 } else {
-                    console.log('sending chat input locally');
                     this.chatDisplayService.addEntry(createPlayerEntry(true, this.gameService.currentGameService.localPlayer.name, userInput));
                 }
             } else {

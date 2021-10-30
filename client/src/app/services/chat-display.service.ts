@@ -27,9 +27,8 @@ export class ChatDisplayService {
 
         this.socket = SocketHandler.requestSocket(this.server);
         this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
-            console.log('adding entry received from ', chatEntry.senderName);
-            const isLocalPlayer = chatEntry.senderName === this.localPlayerName;
-            this.addEntry(createPlayerEntry(isLocalPlayer, chatEntry.senderName, chatEntry.message));
+            const chatEntryColor = chatEntry.senderName === this.localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
+            this.addEntry({ color: chatEntryColor, message: chatEntry.message });
         });
     }
 
@@ -50,9 +49,7 @@ export class ChatDisplayService {
     }
 
     addEntry(entry: ChatDisplayEntry): void {
-        console.log('(' + entry.color + ')' + entry.message);
         this.entries.push(entry);
-        // TODO: add a method to manually trigger the update in chat display component?
     }
 
     addVirtalPlayerEntry(playername: string, commandInput: string, debugMessages?: string[]) {
