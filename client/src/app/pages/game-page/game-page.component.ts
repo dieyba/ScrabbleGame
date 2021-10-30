@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { GameListService } from '@app/services/game-list.service';
 
 @Component({
     selector: 'app-game-page',
@@ -7,7 +6,6 @@ import { GameListService } from '@app/services/game-list.service';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
-    constructor(private gameList: GameListService) {
-        console.log(this.gameList.players);
+    constructor() {
     }
 }

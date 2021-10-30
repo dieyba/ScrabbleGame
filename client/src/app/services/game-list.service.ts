@@ -37,13 +37,11 @@ export class GameListService {
         });
         this.socket.on('roomcreated', (game: GameParameters) => {
             this.roomInfo = game;
-            // console.log(PlayerName);
         });
         this.socket.on('roomJoined', (game: GameParameters) => {
             this.roomInfo = game;
             this.roomInfo.gameRoom = game.gameRoom;
             this.players = game.players;
-            console.log(this.players);
         });
     }
     getList(): GameParameters[] {

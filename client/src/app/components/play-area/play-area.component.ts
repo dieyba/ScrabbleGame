@@ -61,11 +61,11 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     passTurn() {
-        this.gameService.currentGameService.passTurn(this.gameService.currentGameService.game.creatorPlayer);
+        this.gameService.currentGameService.passTurn(this.gameService.currentGameService.localPlayer);
     }
 
     isLocalPlayerActive(): boolean {
-        return this.gameService.currentGameService.game.creatorPlayer.isActive;
+        return this.gameService.currentGameService.localPlayer.isActive;
     }
 
     isEndGame(): boolean {

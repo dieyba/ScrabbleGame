@@ -29,11 +29,11 @@ export class ExchangeService {
     }
 
     exchange() {
-        this.gameService.currentGameService.exchangeLettersSelected(this.gameService.currentGameService.game.creatorPlayer);
+        this.gameService.currentGameService.exchangeLettersSelected(this.gameService.currentGameService.localPlayer);
     }
 
     cancelExchange(rackContext: CanvasRenderingContext2D) {
-        for (let i = 1; i <= this.gameService.currentGameService.game.creatorPlayer.letters.length; i++) {
+        for (let i = 1; i <= this.gameService.currentGameService.localPlayer.letters.length; i++) {
             this.rackService.deselect(i, rackContext, true);
         }
     }

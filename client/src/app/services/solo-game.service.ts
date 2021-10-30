@@ -58,8 +58,6 @@ export class SoloGameService {
         this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.game.randomBonus = gameInfo.controls.bonus.value;
         this.localPlayer = this.game.creatorPlayer;
-        console.log('opponent in solo game:', this.game.opponentPlayer);
-        console.log('solo game local player: ', this.localPlayer.name);
     }
     createNewGame() {
         // Empty board and stack
@@ -193,6 +191,7 @@ export class SoloGameService {
                 for (let i = 0; i < lettersToAdd.length; i++) {
                     this.rackService.removeLetter(lettersToRemove[i]);
                     this.addRackLetter(lettersToAdd[i]);
+                    // player.letters[this.game.creatorPlayer.letters.length] = lettersToAdd[i];
                 }
                 this.passTurn(this.game.creatorPlayer);
                 return ErrorType.NoError;
