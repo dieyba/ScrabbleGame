@@ -1,5 +1,5 @@
 import { GameService } from '@app/services/game.service';
-import { ChatDisplayEntry, createErrorEntry, createPlayerEntry } from './chat-display-entry';
+import { ChatDisplayEntry, ChatEntryColor, createErrorEntry } from './chat-display-entry';
 import { Command, CommandName, CommandResult, DefaultCommandParams } from './commands';
 import { ErrorType } from './errors';
 
@@ -23,14 +23,15 @@ export class ExchangeCmd extends Command {
             executionMessages.push(createErrorEntry(executionResult, commandAndLetters));
         } else {
             this.isExecuted = true;
-            const localPlayerName = this.gameService.currentGameService.game.creatorPlayer.name;
+            const localPlayerName = this.gameService.currentGameService.localPlayer.name;
             const isFromLocalPLayer = this.player.name === localPlayerName;
-            const lettersMessageLocal = this.createExchangeMessage(isFromLocalPLayer, this.letters);
-            const lettersMessageRemote = this.createExchangeMessage(!isFromLocalPLayer, this.letters);
-            const executionMessageLocal = commandMessage + ' ' + lettersMessageLocal;
-            const executionMessageRemote = commandMessage + ' ' + lettersMessageRemote;
-            executionMessages.push(createPlayerEntry(isFromLocalPLayer, this.player.name, executionMessageLocal));
-            executionMessages.push(createPlayerEntry(!isFromLocalPLayer, this.player.name, executionMessageRemote));
+            const colorFirstMessage = isFromLocalPLayer ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
+            const colorSecondMessage = !isFromLocalPLayer ? ChatEntryColor.RemotePlayer : ChatEntryColor.LocalPlayer;
+            const preMessage = localPlayerName + ' >> ';
+            const executionMessageLocal = preMessage + commandMessage + ' ' + this.createExchangeMessage(isFromLocalPLayer, this.letters);
+            const executionMessageRemote = preMessage + commandMessage + ' ' + this.createExchangeMessage(!isFromLocalPLayer, this.letters);
+            executionMessages.push({ color: colorFirstMessage, message: executionMessageLocal });
+            executionMessages.push({ color: colorSecondMessage, message: executionMessageRemote });
         }
         return { isExecuted: this.isExecuted, executionMessages };
     }

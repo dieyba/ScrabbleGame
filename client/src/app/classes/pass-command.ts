@@ -23,7 +23,7 @@ export class PassTurnCmd extends Command {
             this.isExecuted = true;
             const localPlayerName = this.gameService.currentGameService.game.creatorPlayer.name;
             const color = this.player.name === localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
-            executionMessages.push({ color, message: commandMessage });
+            executionMessages.push({ color, message: localPlayerName + ' >> ' + commandMessage });
         }
         return { isExecuted: this.isExecuted, executionMessages };
     }

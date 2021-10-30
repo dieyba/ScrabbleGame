@@ -52,8 +52,8 @@ describe('GameService', () => {
         service.game.creatorPlayer = new LocalPlayer('Ariane');
         service.game.creatorPlayer.score = 73;
         service.game.creatorPlayer.letters = [letter];
-        addRackLetterSpy = spyOn<any>(service, 'addRackLetter').and.callThrough();
-        spyPlayer = new LocalPlayer('sara');
+        // addRackLetterSpy = spyOn<any>(service, 'addRackLetter').and.callThrough();
+        // spyPlayer = new LocalPlayer('sara');
     });
 
     it('should be created', () => {

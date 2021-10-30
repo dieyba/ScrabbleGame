@@ -45,10 +45,8 @@ export class SocketManager {
             socket.on('sendChatEntry', (message: string, messageToOpponent?: string) => {
                 // TODO: fix sending different message if its command exchange
                 if (messageToOpponent !== undefined) {
-                    console.log('message to opponent is different: ' + messageToOpponent);
                     this.displayDifferentChatEntry(socket, message, messageToOpponent);
                 } else {
-                    console.log('same message for both clients: ' + message);
                     this.displayChatEntry(socket, message);
                 }
             });

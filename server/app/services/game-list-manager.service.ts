@@ -24,7 +24,6 @@ export class GameListManager {
     }
     getOtherPlayer(playerID: string, roomId: number): Player | undefined {
         const game = this.getCurrentGame(roomId);
-        console.log(game?.players);
         if (game) {
             return game.players[0].getSocketId() === playerID ? game.players[1] : game.players[0];
         }

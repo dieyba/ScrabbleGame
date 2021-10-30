@@ -102,8 +102,6 @@ export class MultiPlayerGameService extends SoloGameService {
     }
 
     override createNewGame() {
-        // TODO: send emit to server so server sends emit to text entry to init it.
-        // I mean only reason chat display is here is also to init it so server could send signal to init both at the same time ig
         this.chatDisplayService.initialize(this.localPlayer.name);
         // Empty board and stack
         this.rackService.rackLetters = [];
