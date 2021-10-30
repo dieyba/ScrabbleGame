@@ -5,22 +5,24 @@ import { Service } from 'typedi';
 @Service()
 export class GameListManager {
     existingRooms: Array<GameParameters>;
+    currentGames: Array<GameParameters>;
     private currentRoomID: number;
     constructor() {
         this.existingRooms = new Array<GameParameters>();
+        this.currentGames = new Array<GameParameters>();
         this.currentRoomID = this.existingRooms.length;
     }
 
     getAllGames(): GameParameters[] {
         return this.existingRooms;
     }
-    getGame(roomID: number): GameParameters|undefined {
-        return this.existingRooms.find((r) => r.gameRoom.idGame=== roomID);
+    getGame(roomID: number): GameParameters | undefined {
+        return this.currentGames.find((r) => r.gameRoom.idGame === roomID);
     }
-    getOtherPlayer(playerID:string, roomId: number): Player|undefined{
+    getOtherPlayer(playerID: string, roomId: number): Player | undefined {
         const game = this.getGame(roomId);
-        if(game){
-            return game.creatorPlayer.getSocketId() === playerID? game.opponentPlayer : game.creatorPlayer ;
+        if (game) {
+            return game.creatorPlayer.getSocketId() === playerID ? game.opponentPlayer : game.creatorPlayer;
         }
         return undefined;
     }
@@ -41,5 +43,4 @@ export class GameListManager {
             this.existingRooms.splice(index, 1);
         }
     }
-    
 }

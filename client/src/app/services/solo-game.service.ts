@@ -87,6 +87,7 @@ export class SoloGameService {
                 this.game.timerMs = 0;
                 this.secondsToMinutes();
                 this.changeActivePlayer();
+                this.resetTimer();
             }
             this.secondsToMinutes();
         }, TIMER_INTERVAL);
@@ -122,10 +123,10 @@ export class SoloGameService {
             }
             this.game.creatorPlayer.isActive = false;
             this.game.opponentPlayer.isActive = true;
-            this.game.timerMs = +this.game.totalCountDown;
-            this.secondsToMinutes();
-            clearInterval(this.intervalValue);
-            this.startCountdown();
+            //this.game.timerMs = +this.game.totalCountDown;
+            //this.secondsToMinutes();
+            // clearInterval(this.intervalValue);
+            // this.startCountdown();
         } else {
             // If the rack is empty, end game + player won
             if (this.game.opponentPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
@@ -135,12 +136,20 @@ export class SoloGameService {
             }
             this.game.opponentPlayer.isActive = false;
             this.game.creatorPlayer.isActive = true;
-            this.game.timerMs = +this.game.totalCountDown;
-            this.secondsToMinutes();
-            clearInterval(this.intervalValue);
-            this.startCountdown();
+            //this.game.timerMs = +this.game.totalCountDown;
+            //this.secondsToMinutes();
+            // clearInterval(this.intervalValue);
+            // this.startCountdown();
         }
     }
+
+    resetTimer() {
+        this.game.timerMs = +this.game.totalCountDown;
+        this.secondsToMinutes();
+        clearInterval(this.intervalValue);
+        this.startCountdown();
+    }
+
     passTurn(player: Player) {
         if (player.isActive) {
             this.game.turnPassed = true;
@@ -151,6 +160,7 @@ export class SoloGameService {
             this.game.timerMs = 0;
             this.secondsToMinutes();
             this.changeActivePlayer();
+            this.resetTimer();
             this.game.turnPassed = false;
             return ErrorType.NoError;
         }

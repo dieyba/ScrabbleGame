@@ -12,8 +12,7 @@ export class SidebarComponent {
     winnerName: string;
     isSolo: boolean;
     private dialogRef: MatDialogRef<EndGamePopupComponent>;
-    constructor(public router: Router, public dialog: MatDialog, private gameService: GameService, private gameList: GameListService) {
-        console.log(this.gameList.players);
+    constructor(public router: Router, public dialog: MatDialog, private gameService: GameService) {
         this.winnerName = '';
     }
     getPlayer1Name(): string {
@@ -49,7 +48,7 @@ export class SidebarComponent {
     }
 
     isPlayer2Active(): boolean {
-        return this.gameService.currentGameService.game.creatorPlayer.isActive;
+        return this.gameService.currentGameService.game.opponentPlayer.isActive;
     }
     getTimer(): string {
         return this.gameService.currentGameService.timer;
@@ -109,5 +108,10 @@ export class SidebarComponent {
         </div> `,
 })
 export class EndGamePopupComponent {
-    constructor(@Optional() public dialogReference: MatDialogRef<any>) {}
+    // private readonly server = 'http://' + window.location.hostname + ':3000';
+    // private socket: io.Socket;
+    constructor(@Optional() public dialogReference: MatDialogRef<any>, private gameList: GameListService) {}
+    disconnect() {
+        this.gameList.disconnectUser();
+    }
 }

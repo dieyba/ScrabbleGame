@@ -62,4 +62,7 @@ export class GameListService {
     initializeGame(roomId: number) {
         this.socket.emit('initializeGame', roomId);
     }
+    disconnectUser() {
+        this.socket.emit('disconnect');
+    }
 }

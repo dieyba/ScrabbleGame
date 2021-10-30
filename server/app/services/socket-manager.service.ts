@@ -20,6 +20,7 @@ export class SocketManager {
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
             socket.on('createRoom', (game: GameParameters) => {
                 this.createRoom(socket, game);
+                console.log('creatorplayer', socket.id);
                 this.getAllGames(socket);
             });
 
@@ -53,9 +54,22 @@ export class SocketManager {
             socket.on('getAllGames', (game: Array<GameParameters>) => {
                 this.getAllGames(socket);
             });
+            socket.on('reset timer', (timerMs: number) => {
+                this.resetTimer(socket);
+            });
         });
         setInterval(() => {}, 1000);
     }
+    private resetTimer(socket: io.Socket) {
+        let commandSender = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
+        const commandSenderId = this.playerMan.allPlayers[commandSender].roomId;
+        let room = this.gameListMan.currentGames.findIndex((r) => r.gameRoom.idGame === commandSenderId);
+        let roomGame = this.gameListMan.currentGames[room];
+        // console.log('multiplayer', socket);
+        // console.log(roomGame);
+        this.sio.to(commandSenderId.toString()).emit('timer reset', roomGame.totalCountDown);
+    }
+
     private createRoom(socket: io.Socket, game: any): void {
         let room = this.gameListMan.createRoom(game.name, game.timer);
         let index = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
@@ -75,7 +89,7 @@ export class SocketManager {
             this.gameListMan.deleteRoom(room);
         }
 
-        this.sio.emit('roomdeleted');
+        // this.sio.emit('roomdeleted');
     }
     private getAllGames(socket: io.Socket) {
         this.sio.emit('getAllGames', this.gameListMan.existingRooms);
@@ -92,6 +106,7 @@ export class SocketManager {
         let newPlayer = new Player(game.joinerName, socket.id);
         newPlayer.roomId = roomGame.gameRoom.idGame;
         roomGame.addPlayer(newPlayer);
+        this.gameListMan.currentGames.push(roomGame);
         socket.join(roomGame.gameRoom.idGame.toString());
         this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
     }
