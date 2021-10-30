@@ -3,10 +3,9 @@
         <div class="column">
             <mat-card class="card">
                 <canvas id="canvas" #gridCanvas [attr.width]="width" [attr.height]="height"></canvas>
+                <canvas id="overlayCanvas" #overlayCanvas [attr.width]="width" [attr.height]="height" (click)="onMouseDown($event)"></canvas>
             </mat-card>
-            <mat-card class="rack">
-                <canvas id="rack-canvas" #rackCanvas [attr.width]="rackWidth" [attr.height]="rackHeight"></canvas>
-            </mat-card>
+            <app-rack></app-rack>
         </div>
         <div class="column">
             <button class="size-btn" (click)="sizeUpLetters()">
@@ -18,6 +17,25 @@
             <div class="row">
                 <button class="btn" (click)="passTurn()" *ngIf="isLocalPlayerActive() && !isEndGame()">Passer mon tour</button>
                 <button class="btn" disabled="true" *ngIf="!isLocalPlayerActive() || isEndGame()" style="opacity: 1">Passer mon tour</button>
+            </div>
+            <div class="echange">
+                <button
+                    class="echanger"
+                    id="exchangeButton"
+                    (click)="exchange()"
+                    *ngIf="!isEndGame() && atLeastOneLetterSelected() && isLocalPlayerActive() && !lessThanSevenLettersInStock()"
+                >
+                    Echanger
+                </button>
+                <button
+                    class="echanger"
+                    disabled="true"
+                    *ngIf="!isEndGame() && atLeastOneLetterSelected() && (!isLocalPlayerActive() || lessThanSevenLettersInStock())"
+                    style="opacity: 1"
+                >
+                    Echanger
+                </button>
+                <button class="annuler" (click)="cancelExchange()" *ngIf="!isEndGame() && atLeastOneLetterSelected()">Annuler</button>
             </div>
         </div>
     </div>

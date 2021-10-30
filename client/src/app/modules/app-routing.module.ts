@@ -15,7 +15,7 @@ const routes: Routes = [
     { path: 'game', component: GamePageComponent },
     { path: 'wait', component: WaitingAreaComponent },
     { path: 'material', component: MaterialPageComponent },
-    { path: '**', redirectTo: '/home' },
+    { path: '**', redirectTo: '/start' },
 ];
 
 @NgModule({

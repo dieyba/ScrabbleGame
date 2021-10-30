@@ -5,14 +5,6 @@
     margin-top: 30px;
 }
 
-.rack {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 500px;
-    height: 60px;
-}
-
 .card {
     display: block;
     margin-left: auto;
@@ -36,12 +28,42 @@
 .btn {
     white-space: nowrap;
     position: relative;
-    margin-top: 690px;
+    margin-top: 580px;
     font-size: 20px;
     border-radius: 5px;
     background-color: #6aa0e0;
     border: 1px solid #6aa0e0;
     padding: 5px 10px;
+}
+
+.echanger {
+    white-space: nowrap;
+    position: relative;
+    margin-top: 30px;
+    font-size: 20px;
+    border-radius: 5px;
+    background-color: #6aa0e0;
+    border: 1px solid #6aa0e0;
+    padding: 5px 10px;
+}
+
+.annuler {
+    white-space: nowrap;
+    position: relative;
+    margin-top: 10px;
+    font-size: 20px;
+    border-radius: 5px;
+    background-color: #6aa0e0;
+    border: 1px solid #6aa0e0;
+    padding: 5px 10px;
+}
+
+.echanger:hover {
+    opacity: 0.6;
+}
+
+.annuler:hover {
+    opacity: 0.6;
 }
 
 .btn:hover {
@@ -59,4 +81,18 @@
 
 .size-btn:hover {
     opacity: 0.6;
+}
+
+#canvas {
+    position: absolute;
+    left: 13px;
+    top: 13px;
+    z-index: 1;
+}
+
+#overlayCanvas {
+    position: absolute;
+    left: 13px;
+    top: 13px;
+    z-index: 2;
 }

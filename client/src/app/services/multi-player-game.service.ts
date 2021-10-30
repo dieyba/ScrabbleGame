@@ -11,6 +11,7 @@ import * as io from 'socket.io-client';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { LetterStock } from './letter-stock.service';
+import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
 import { DEFAULT_LETTER_COUNT, SoloGameService, TIMER_INTERVAL } from './solo-game.service';
 import { ValidationService } from './validation.service';
@@ -29,9 +30,10 @@ export class MultiPlayerGameService extends SoloGameService {
         protected rackService: RackService,
         protected chatDisplayService: ChatDisplayService,
         protected validationService: ValidationService,
-        protected wordBuilder: WordBuilderService, // protected gameList: GameListService,
+        protected wordBuilder: WordBuilderService,
+        protected placeService: PlaceService, // protected gameList: GameListService,
     ) {
-        super(gridService, rackService, chatDisplayService, validationService, wordBuilder);
+        super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService);
         this.socket = SocketHandler.requestSocket(this.server);
         this.socket.on('timer reset', (timer: number) => {
             // Change active player and reset timer for new turn
@@ -157,7 +159,7 @@ export class MultiPlayerGameService extends SoloGameService {
     override place(player: Player, placeParams: PlaceParams): ErrorType {
         const tempCoord = new Vec2();
         // Checking if its player's turn
-        if (!this.canPlaceWord(player, placeParams)) {
+        if (!this.placeService.canPlaceWord(player, placeParams)) {
             return ErrorType.SyntaxError;
         }
         // Removing all the letters from my "word" that are already on the board
@@ -198,7 +200,7 @@ export class MultiPlayerGameService extends SoloGameService {
         for (const letter of placeParams.word) {
             if (!this.gridService.scrabbleBoard.squares[tempCoord.x][tempCoord.y].occupied) {
                 // Taking letter from player and placing it
-                this.placeLetter(player.letters, letter, tempCoord);
+                this.placeService.placeLetter(player.letters, letter, tempCoord);
             }
             if (placeParams.orientation === 'h') {
                 tempCoord.x++;

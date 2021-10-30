@@ -5,11 +5,8 @@ import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ErrorType } from '@app/classes/errors';
 import { GameParameters } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
-import { Column, Row, ScrabbleBoard } from '@app/classes/scrabble-board';
+import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { Axis } from '@app/classes/utilities';
-import { Vec2 } from '@app/classes/vec2';
 import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
@@ -25,10 +22,12 @@ const DEFAULT_HEIGHT = 600;
 describe('GameService', () => {
     let service: SoloGameService;
     let changeActivePlayerSpy: jasmine.Spy<any>;
+    let spyPlayer: LocalPlayer;
     let secondsToMinutesSpy: jasmine.Spy<any>;
     let startCountdownSpy: jasmine.Spy<any>;
     let gridServiceSpy: jasmine.SpyObj<GridService>;
     let addRackLettersSpy: jasmine.Spy<any>;
+    let addRackLetterSpy: jasmine.Spy<any>;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
     let ctxStub: CanvasRenderingContext2D;
     beforeEach(() => {
@@ -53,6 +52,8 @@ describe('GameService', () => {
         service.game.creatorPlayer = new LocalPlayer('Ariane');
         service.game.creatorPlayer.score = 73;
         service.game.creatorPlayer.letters = [letter];
+        addRackLetterSpy = spyOn<any>(service, 'addRackLetter').and.callThrough();
+        spyPlayer = new LocalPlayer('sara');
     });
 
     it('should be created', () => {
@@ -192,210 +193,209 @@ describe('GameService', () => {
         expect(service.exchangeLetters(service.game.creatorPlayer, 'a')).toEqual(error);
     });
 
-    it('canPlaceWord should be false when word is outside of scrabble board', () => {
-        service.game.creatorPlayer.isActive = true;
-        const placeParams = { position: new Vec2(Column.Fifteen, 0), orientation: 'h', word: 'myWord' };
+    //     it('canPlaceWord should be false when word is outside of scrabble board', () => {
+    //         service.game.creatorPlayer.isActive = true;
+    //         const placeParams = { position: new Vec2(Column.Fifteen, 0), orientation: 'h', word: 'myWord' };
 
-        expect(service.canPlaceWord(service.game.creatorPlayer, placeParams)).toEqual(false);
-    });
+    //         expect(service.canPlaceWord(service.game.creatorPlayer, placeParams)).toEqual(false);
+    //     });
 
-    it("'canPlaceWord' should be false if first the word is not in the middle or touching another word", () => {
-        service.game.creatorPlayer.isActive = true;
-        const placeParams = { position: new Vec2(Column.Seven, Row.G), orientation: 'h', word: 'myWord' };
-        expect(service.canPlaceWord(service.game.creatorPlayer, placeParams)).toEqual(false);
-    });
+    //     it("'canPlaceWord' should be false if first the word is not in the middle or touching another word", () => {
+    //         service.game.creatorPlayer.isActive = true;
+    //         const placeParams = { position: new Vec2(Column.Seven, Row.G), orientation: 'h', word: 'myWord' };
+    //         expect(service.canPlaceWord(service.game.creatorPlayer, placeParams)).toEqual(false);
+    //     });
 
-    it("'canPlaceWord' should be true if first the word is in the middle", () => {
-        service.game.creatorPlayer.isActive = true;
-        const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'myWord' };
+    //     it("'canPlaceWord' should be true if first the word is in the middle", () => {
+    //         service.game.creatorPlayer.isActive = true;
+    //         const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'myWord' };
 
-        expect(service.canPlaceWord(service.game.creatorPlayer, placeParams)).toEqual(true);
-    });
+    //         expect(service.canPlaceWord(service.game.creatorPlayer, placeParams)).toEqual(true);
+    //     });
 
-    it("'canPlaceWord' should be true if the word is touching another word", () => {
-        // Placing first word
-        const firstWord = 'maison';
-        for (let i = 0; i < firstWord.length; i++) {
-            // eslint-disable-next-line dot-notation
-            service['gridService'].scrabbleBoard.squares[Column.Eight][Row.H + i].letter = new ScrabbleLetter(firstWord[i], 1);
-            // eslint-disable-next-line dot-notation
-            service['gridService'].scrabbleBoard.squares[Column.Eight][Row.H + i].occupied = true;
-        }
+    //         const coord = new Vec2(placeParams.position.x, placeParams.position.y);
+    //         for (const letter of 'house') {
+    //             // eslint-disable-next-line dot-notation
+    //             const tempSquare = service['gridService'].scrabbleBoard.squares[coord.x][coord.y];
+    //             tempSquare.letter = new ScrabbleLetter(letter, 1);
+    //             tempSquare.occupied = true;
+    //             tempSquare.letter.tile = tempSquare;
+    //             coord.x++; // Because it's horizontal
+    //         }
 
-        service.game.creatorPlayer.isActive = true;
-        const placeParams = { position: new Vec2(Column.Nine, Row.G), orientation: 'v', word: 'maison' };
+    //         service.game.creatorPlayer.isActive = true;
+    //         const placeParams = { position: new Vec2(Column.Nine, Row.G), orientation: 'v', word: 'maison' };
 
-        expect(service.canPlaceWord(service.game.creatorPlayer, placeParams)).toEqual(true);
-    });
+    //         expect(service.canPlaceWord(service.game.creatorPlayer, placeParams)).toEqual(true);
+    //     });
 
-    it("'canPlaceWord' should be false if it's not the player's turn", () => {
-        service.game.creatorPlayer.isActive = false;
-        const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'myWord' };
+    //     it("'canPlaceWord' should be false if it's not the player's turn", () => {
+    //         service.game.creatorPlayer.isActive = false;
+    //         const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'myWord' };
 
-        expect(service.canPlaceWord(service.game.creatorPlayer, placeParams)).toEqual(false);
-    });
+    //         expect(service.canPlaceWord(service.game.creatorPlayer, placeParams)).toEqual(false);
+    //     });
 
-    it('"placeLetter" should remove letter from the rack and place it to the board', () => {
-        const playerLetters: ScrabbleLetter[] = [];
-        const letterA = new ScrabbleLetter('a', 1);
-        const letterStar = new ScrabbleLetter('*', 0);
-        playerLetters.push(letterA);
-        playerLetters.push(letterStar);
-        const letterToPlace = 'a';
-        const coord = new Vec2(Column.Eight, Row.H);
+    //     it('"placeLetter" should remove letter from the rack and place it to the board', () => {
+    //         const playerLetters: ScrabbleLetter[] = [];
+    //         const letterA = new ScrabbleLetter('a', 1);
+    //         const letterStar = new ScrabbleLetter('*', 0);
+    //         playerLetters.push(letterA);
+    //         playerLetters.push(letterStar);
+    //         const letterToPlace = 'a';
+    //         const coord = new Vec2(Column.Eight, Row.H);
 
-        service.placeLetter(playerLetters, letterToPlace, coord);
+    //         service.placeLetter(playerLetters, letterToPlace, coord);
 
-        // Searching letter in playerLetter
-        let playerLetter: ScrabbleLetter | undefined;
-        for (const letter of playerLetters) {
-            if (letter.character === letterToPlace) {
-                playerLetter = letter;
-            }
-        }
-        expect(gridServiceSpy.drawLetter).toHaveBeenCalled();
-        expect(rackServiceSpy.removeLetter).toHaveBeenCalled();
-        expect(playerLetter).toEqual(undefined);
-        // eslint-disable-next-line dot-notation
-        expect(letterA.tile).toEqual(service['gridService'].scrabbleBoard.squares[coord.x][coord.y]);
-    });
+    //         // Searching letter in playerLetter
+    //         let playerLetter: ScrabbleLetter | undefined;
+    //         for (const letter of playerLetters) {
+    //             if (letter.character === letterToPlace) {
+    //                 playerLetter = letter;
+    //             }
+    //         }
+    //         expect(gridServiceSpy.drawLetter).toHaveBeenCalled();
+    //         expect(rackServiceSpy.removeLetter).toHaveBeenCalled();
+    //         expect(playerLetter).toEqual(undefined);
+    //         // eslint-disable-next-line dot-notation
+    //         expect(letterA.tile).toEqual(service['gridService'].scrabbleBoard.squares[coord.x][coord.y]);
+    //     });
 
-    it('"placeLetter" should remove letter from the rack and place it to the board', () => {
-        const playerLetters: ScrabbleLetter[] = [];
-        const letterA = new ScrabbleLetter('a', 1);
-        const letterStar = new ScrabbleLetter('*', 0);
-        playerLetters.push(letterA);
-        playerLetters.push(letterStar);
-        const letterToPlace = 'A';
-        const coord = new Vec2(Column.Eight, Row.H);
+    //     it('"placeLetter" should remove letter from the rack and place it to the board', () => {
+    //         const playerLetters: ScrabbleLetter[] = [];
+    //         const letterA = new ScrabbleLetter('a', 1);
+    //         const letterStar = new ScrabbleLetter('*', 0);
+    //         playerLetters.push(letterA);
+    //         playerLetters.push(letterStar);
+    //         const letterToPlace = 'A';
+    //         const coord = new Vec2(Column.Eight, Row.H);
 
-        service.placeLetter(playerLetters, letterToPlace, coord);
+    //         service.placeLetter(playerLetters, letterToPlace, coord);
 
-        // Searching letter in playerLetter
-        let playerLetter: ScrabbleLetter | undefined;
-        for (const letter of playerLetters) {
-            if (letter.character === letterToPlace) {
-                playerLetter = letter;
-            }
-        }
-        expect(gridServiceSpy.drawLetter).toHaveBeenCalled();
-        expect(rackServiceSpy.removeLetter).toHaveBeenCalled();
-        expect(playerLetter).toEqual(undefined);
-        // eslint-disable-next-line dot-notation
-        expect(letterStar.tile).toEqual(service['gridService'].scrabbleBoard.squares[coord.x][coord.y]);
-    });
+    //         // Searching letter in playerLetter
+    //         let playerLetter: ScrabbleLetter | undefined;
+    //         for (const letter of playerLetters) {
+    //             if (letter.character === letterToPlace) {
+    //                 playerLetter = letter;
+    //             }
+    //         }
+    //         expect(gridServiceSpy.drawLetter).toHaveBeenCalled();
+    //         expect(rackServiceSpy.removeLetter).toHaveBeenCalled();
+    //         expect(playerLetter).toEqual(undefined);
+    //         // eslint-disable-next-line dot-notation
+    //         expect(letterStar.tile).toEqual(service['gridService'].scrabbleBoard.squares[coord.x][coord.y]);
+    //     });
 
-    it('"placeLetter" should not place letter if the is already a letter', () => {
-        const playerLetters: ScrabbleLetter[] = [];
-        const letterA = new ScrabbleLetter('a', 1);
-        const letterStar = new ScrabbleLetter('*', 0);
-        playerLetters.push(letterA);
-        playerLetters.push(letterStar);
-        const letterToPlace = 'a';
-        const coord = new Vec2(Column.Eight, Row.H);
+    //     it('"placeLetter" should not place letter if the is already a letter', () => {
+    //         const playerLetters: ScrabbleLetter[] = [];
+    //         const letterA = new ScrabbleLetter('a', 1);
+    //         const letterStar = new ScrabbleLetter('*', 0);
+    //         playerLetters.push(letterA);
+    //         playerLetters.push(letterStar);
+    //         const letterToPlace = 'a';
+    //         const coord = new Vec2(Column.Eight, Row.H);
 
-        // eslint-disable-next-line dot-notation
-        service['gridService'].scrabbleBoard.squares[coord.x][coord.y].occupied = true; // No need to place a real letter
-        service.placeLetter(playerLetters, letterToPlace, coord);
+    //         // eslint-disable-next-line dot-notation
+    //         service['gridService'].scrabbleBoard.squares[coord.x][coord.y].occupied = true; // No need to place a real letter
+    //         service.placeLetter(playerLetters, letterToPlace, coord);
 
-        // Searching letter in playerLetter
-        let playerLetter: ScrabbleLetter | undefined;
-        for (const letter of playerLetters) {
-            if (letter.character === letterToPlace) {
-                playerLetter = letter;
-            }
-        }
-        expect(gridServiceSpy.drawLetter).not.toHaveBeenCalled();
-        expect(rackServiceSpy.removeLetter).not.toHaveBeenCalled();
-        expect(playerLetter).toEqual(letterA);
-        // When coord are negative, it means that the letter is not placed
-        expect(letterA.tile.position.x).toEqual(-1);
-        expect(letterA.tile.position.y).toEqual(-1);
-    });
+    //         // Searching letter in playerLetter
+    //         let playerLetter: ScrabbleLetter | undefined;
+    //         for (const letter of playerLetters) {
+    //             if (letter.character === letterToPlace) {
+    //                 playerLetter = letter;
+    //             }
+    //         }
+    //         expect(gridServiceSpy.drawLetter).not.toHaveBeenCalled();
+    //         expect(rackServiceSpy.removeLetter).not.toHaveBeenCalled();
+    //         expect(playerLetter).toEqual(letterA);
+    //         // When coord are negative, it means that the letter is not placed
+    //         expect(letterA.tile.position.x).toEqual(-1);
+    //         expect(letterA.tile.position.y).toEqual(-1);
+    //     });
 
-    it('"place" should return a syntax error if it\'s not possible to place the word', () => {
-        spyOn(service, 'canPlaceWord').and.returnValue(false);
+    //     it('"place" should return a syntax error if it\'s not possible to place the word', () => {
+    //         spyOn(service, 'canPlaceWord').and.returnValue(false);
 
-        service.game.creatorPlayer.isActive = true;
-        const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'myWord' };
+    //         service.game.creatorPlayer.isActive = true;
+    //         const placeParams = { position: new Vec2(Column.Seven, Row.H), orientation: 'h', word: 'myWord' };
 
-        expect(service.place(service.game.creatorPlayer, placeParams)).toEqual(ErrorType.SyntaxError);
-    });
+    //         expect(service.place(service.game.creatorPlayer, placeParams)).toEqual(ErrorType.SyntaxError);
+    //     });
 
-    it('endGame should be called when changing players and rack + letterStock is empty (game.creatorPlayer)', () => {
-        const endGameSpy = spyOn<any>(service, 'endGame').and.callThrough();
-        service.game.creatorPlayer.letters = [new ScrabbleLetter('a', 1)];
-        service.game.creatorPlayer.isActive = true;
-        service.game.creatorPlayer.letters = [];
-        service.game.stock.letterStock.length = 0;
-        service.game.opponentPlayer = new VirtualPlayer('Ariane', Difficulty.Easy);
-        service.game.opponentPlayer.isActive = false;
-        service.changeActivePlayer();
-        expect(endGameSpy).toHaveBeenCalled();
-        expect(service.game.isEndGame).toEqual(true);
-    });
+    //     it('endGame should be called when changing players and rack + letterStock is empty (game.creatorPlayer)', () => {
+    //         const endGameSpy = spyOn<any>(service, 'endGame').and.callThrough();
+    //         service.game.creatorPlayer.letters = [new ScrabbleLetter('a', 1)];
+    //         service.game.creatorPlayer.isActive = true;
+    //         service.game.creatorPlayer.letters = [];
+    //         service.game.stock.letterStock.length = 0;
+    //         service.game.opponentPlayer = new VirtualPlayer('Ariane', Difficulty.Easy);
+    //         service.game.opponentPlayer.isActive = false;
+    //         service.changeActivePlayer();
+    //         expect(endGameSpy).toHaveBeenCalled();
+    //         expect(service.game.isEndGame).toEqual(true);
+    //     });
 
-    it('endGame should be called when changing players and rack + letterStock is empty (game.opponentPlayer)', () => {
-        const endGameSpy = spyOn<any>(service, 'endGame').and.callThrough();
-        service.game.creatorPlayer.letters = [new ScrabbleLetter('a', 1)];
-        service.game.opponentPlayer = new VirtualPlayer('Ariane', Difficulty.Easy);
-        service.game.opponentPlayer.isActive = true;
-        service.game.opponentPlayer.letters = [];
-        service.game.stock.letterStock.length = 0;
-        service.game.creatorPlayer.isActive = false;
-        service.changeActivePlayer();
-        expect(endGameSpy).toHaveBeenCalled();
-        expect(service.game.isEndGame).toEqual(true);
-    });
+    //     it('endGame should be called when changing players and rack + letterStock is empty (game.opponentPlayer)', () => {
+    //         const endGameSpy = spyOn<any>(service, 'endGame').and.callThrough();
+    //         service.game.creatorPlayer.letters = [new ScrabbleLetter('a', 1)];
+    //         service.game.opponentPlayer = new VirtualPlayer('Ariane', Difficulty.Easy);
+    //         service.game.opponentPlayer.isActive = true;
+    //         service.game.opponentPlayer.letters = [];
+    //         service.game.stock.letterStock.length = 0;
+    //         service.game.creatorPlayer.isActive = false;
+    //         service.changeActivePlayer();
+    //         expect(endGameSpy).toHaveBeenCalled();
+    //         expect(service.game.isEndGame).toEqual(true);
+    //     });
 
-    it('isTurnsPassedLimit should return true if turn has been passed 6 times', () => {
-        service.game.hasTurnsBeenPassed = [false, true, true, true, true, true, true];
-        service.game.turnPassed = true;
-        expect(service.isTurnsPassedLimit()).toEqual(true);
-    });
+    //     it('isTurnsPassedLimit should return true if turn has been passed 6 times', () => {
+    //         service.game.hasTurnsBeenPassed = [false, true, true, true, true, true, true];
+    //         service.game.turnPassed = true;
+    //         expect(service.isTurnsPassedLimit()).toEqual(true);
+    //     });
 
-    it('when passTurn is called 6 times in a row, endGame should be called', () => {
-        const endGameSpy = spyOn<any>(service, 'endGame').and.callThrough();
-        service.game.creatorPlayer.letters = [new ScrabbleLetter('a', 1)];
-        service.game.creatorPlayer.isActive = true;
-        service.game.stock.letterStock.length = 0;
-        service.game.opponentPlayer = new VirtualPlayer('Ariane', Difficulty.Easy);
-        service.game.opponentPlayer.letters = [new ScrabbleLetter('a', 1)];
-        service.game.opponentPlayer.isActive = false;
-        service.game.hasTurnsBeenPassed = [false, true, true, true, true, true];
-        service.game.turnPassed = true;
-        service.passTurn(service.game.creatorPlayer);
-        expect(endGameSpy).toHaveBeenCalled();
-        expect(service.game.isEndGame).toEqual(true);
-    });
+    //     it('when passTurn is called 6 times in a row, endGame should be called', () => {
+    //         const endGameSpy = spyOn<any>(service, 'endGame').and.callThrough();
+    //         service.game.creatorPlayer.letters = [new ScrabbleLetter('a', 1)];
+    //         service.game.creatorPlayer.isActive = true;
+    //         service.game.stock.letterStock.length = 0;
+    //         service.game.opponentPlayer = new VirtualPlayer('Ariane', Difficulty.Easy);
+    //         service.game.opponentPlayer.letters = [new ScrabbleLetter('a', 1)];
+    //         service.game.opponentPlayer.isActive = false;
+    //         service.game.hasTurnsBeenPassed = [false, true, true, true, true, true];
+    //         service.game.turnPassed = true;
+    //         service.passTurn(service.game.creatorPlayer);
+    //         expect(endGameSpy).toHaveBeenCalled();
+    //         expect(service.game.isEndGame).toEqual(true);
+    //     });
 
-    it('drawRack should call addRackLetter', () => {
-        const addRackLetterSpy = spyOn<any>(service, 'addRackLetter').and.callThrough();
-        const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
-        const letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
-        const letter3: ScrabbleLetter = new ScrabbleLetter('j', 4);
-        const word1: ScrabbleWord = new ScrabbleWord();
-        word1.content = [letter1, letter2, letter3];
-        word1.orientation = Axis.H;
-        const word2: ScrabbleWord = new ScrabbleWord();
-        word2.orientation = Axis.V;
-        word2.content = [letter1, letter2, letter3];
-        const words: ScrabbleWord[] = [word1, word2];
-        service.game.creatorPlayer = new LocalPlayer('Ariane');
-        service.game.creatorPlayer.letters = [letter1];
-        rackServiceSpy.rackLetters = [letter1];
-        service.drawRack(words);
-        expect(addRackLetterSpy).toHaveBeenCalled;
-    });
+    //     it('drawRack should call addRackLetter', () => {
+    //         const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
+    //         const letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
+    //         const letter3: ScrabbleLetter = new ScrabbleLetter('j', 4);
+    //         const word1: ScrabbleWord = new ScrabbleWord();
+    //         word1.content = [letter1, letter2, letter3];
+    //         word1.orientation = Axis.H;
+    //         const word2: ScrabbleWord = new ScrabbleWord();
+    //         word2.orientation = Axis.V;
+    //         word2.content = [letter1, letter2, letter3];
+    //         const words: ScrabbleWord[] = [word1, word2];
+    //         service.game.creatorPlayer = new LocalPlayer('Ariane');
+    //         service.game.creatorPlayer.letters = [letter1];
+    //         rackServiceSpy.rackLetters = [letter1];
+    //         service.drawRack(words);
+    //         expect(addRackLetterSpy).toHaveBeenCalled;
+    //     });
 
-    it('removeLetter should call rackService', () => {
-        const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
-        const letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
-        rackServiceSpy.rackLetters = [letter1, letter2];
-        service.game.creatorPlayer = new LocalPlayer('Ariane');
-        service.game.creatorPlayer.letters = [letter1, letter2];
-        service.removeRackLetter(letter2);
-        expect(rackServiceSpy.removeLetter).toHaveBeenCalled;
-        expect(service.game.creatorPlayer.letters.length).toEqual(1);
-    });
+    //     it('removeLetter should call rackService', () => {
+    //         const letter1: ScrabbleLetter = new ScrabbleLetter('D', 1);
+    //         const letter2: ScrabbleLetter = new ScrabbleLetter('é', 2);
+    //         rackServiceSpy.rackLetters = [letter1, letter2];
+    //         service.game.creatorPlayer = new LocalPlayer('Ariane');
+    //         service.game.creatorPlayer.letters = [letter1, letter2];
+    //         service.removeRackLetter(letter2);
+    //         expect(rackServiceSpy.removeLetter).toHaveBeenCalled;
+    //         expect(service.game.creatorPlayer.letters.length).toEqual(1);
+    //     });
 });

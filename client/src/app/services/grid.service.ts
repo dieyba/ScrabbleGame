@@ -16,8 +16,8 @@ export enum Colors {
 export const DEFAULT_WIDTH = 600;
 export const DEFAULT_HEIGHT = 600;
 export const BOARD_SIZE = 15;
-const SQUARE_SIZE = DEFAULT_WIDTH / BOARD_SIZE - 2;
-const BOARD_OFFSET = 20;
+export const SQUARE_SIZE = DEFAULT_WIDTH / BOARD_SIZE - 2;
+export const BOARD_OFFSET = 20;
 const SMALL_OFFSET_Y = 20;
 const BIG_OFFSET_Y = 35;
 const SMALL_OFFSET_X = 6;

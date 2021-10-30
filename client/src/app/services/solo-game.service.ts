@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { PlaceParams } from '@app/classes/commands';
@@ -10,11 +11,11 @@ import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis } from '@app/classes/utilities';
-import { Vec2 } from '@app/classes/vec2';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { LetterStock } from './letter-stock.service';
+import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
 import { ValidationService, WAIT_TIME } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
@@ -39,9 +40,9 @@ export class SoloGameService {
         protected rackService: RackService,
         protected chatDisplayService: ChatDisplayService,
         protected validationService: ValidationService,
-        protected wordBuilder: WordBuilderService, // protected gameList: GameListService,
+        protected wordBuilder: WordBuilderService,
+        protected placeService: PlaceService,
     ) {}
-
     initializeGame(gameInfo: FormGroup) {
         this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value);
         this.chatDisplayService.entries = [];
@@ -195,12 +196,11 @@ export class SoloGameService {
             const lettersToRemove: ScrabbleLetter[] = [];
             if (player.removeLetter(letters) === true) {
                 for (let i = 0; i < letters.length; i++) {
-                    lettersToRemove[i] = new ScrabbleLetter(letters[i], 1);
+                    lettersToRemove[i] = new ScrabbleLetter(letters[i]);
                 }
 
                 const lettersToAdd: ScrabbleLetter[] = this.game.stock.exchangeLetters(lettersToRemove);
                 for (let i = 0; i < lettersToAdd.length; i++) {
-                    player.addLetter(lettersToAdd[i]);
                     this.rackService.removeLetter(lettersToRemove[i]);
                     this.addRackLetter(lettersToAdd[i]);
                 }
@@ -210,6 +210,21 @@ export class SoloGameService {
         }
         return ErrorType.ImpossibleCommand;
     }
+
+    exchangeLettersSelected(player: Player) {
+        let letters = '';
+
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < this.rackService.exchangeSelected.length; i++) {
+            if (this.rackService.exchangeSelected[i] === true) {
+                letters += this.rackService.rackLetters[i].character;
+                this.rackService.exchangeSelected[i] = false;
+            }
+        }
+
+        this.exchangeLetters(player, letters);
+    }
+
     addRackLetters(letters: ScrabbleLetter[]): void {
         for (const letter of letters) {
             this.addRackLetter(letter);
@@ -218,6 +233,8 @@ export class SoloGameService {
     addRackLetter(letter: ScrabbleLetter): void {
         this.rackService.addLetter(letter);
         this.game.creatorPlayer.letters[this.game.creatorPlayer.letters.length] = letter;
+        // this.localPlayer.letters[this.localPlayer.letters.length] = letter;
+        // this.localPlayer.addLetter(letter);
     }
     removeRackLetter(scrabbleLetter: ScrabbleLetter): void {
         const i = this.rackService.removeLetter(scrabbleLetter);
@@ -253,123 +270,41 @@ export class SoloGameService {
         return totalValue;
     }
     place(player: Player, placeParams: PlaceParams): ErrorType {
-        const tempCoord = new Vec2();
-        // Checking if its player's turn
-        if (!this.canPlaceWord(player, placeParams)) {
-            return ErrorType.SyntaxError;
-        }
-        // Removing all the letters from my "word" that are already on the board
-        let wordCopy = placeParams.word;
-        const letterOnBoard = this.gridService.scrabbleBoard.getStringFromCoord(
-            placeParams.position,
-            placeParams.word.length,
-            placeParams.orientation,
-        );
-        for (const letter of letterOnBoard) {
-            wordCopy = wordCopy.replace(letter.toLowerCase(), '');
-        }
-        // All letter are already placed
-        if (wordCopy === '') {
-            return ErrorType.SyntaxError;
-        }
-        // Checking if the rest of the letters are on the rack
-        for (const letter of player.letters) {
-            // If there is an star, removing a upper letter from "word" string
-            if (letter.character === '*') {
-                let upperLetter = '';
-                for (const wordLetter of wordCopy) {
-                    if (wordLetter === wordLetter.toUpperCase()) {
-                        upperLetter = wordLetter;
+        const errorResult = this.placeService.place(player, placeParams);
+
+        if (errorResult === ErrorType.NoError) {
+            // Generate all words created
+            let tempScrabbleWords: ScrabbleWord[];
+            if (placeParams.orientation === 'h') {
+                tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
+            } else {
+                tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
+            }
+            // Call validation method and end turn
+            setTimeout(() => {
+                if (!this.validationService.validateWords(tempScrabbleWords)) {
+                    // Retake letters
+                    const removedLetters = this.gridService.removeInvalidLetters(
+                        placeParams.position,
+                        placeParams.word.length,
+                        placeParams.orientation,
+                    );
+                    this.addRackLetters(removedLetters);
+                } else {
+                    // Score
+                    this.validationService.updatePlayerScore(tempScrabbleWords, player);
+                    // Take new letters
+                    const newLetters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+                    for (const letter of newLetters) {
+                        this.rackService.addLetter(letter);
+                        player.letters.push(letter);
                     }
                 }
-                wordCopy = wordCopy.replace(upperLetter, '');
-            } else {
-                wordCopy = wordCopy.replace(letter.character, '');
-            }
-        }
-        // There should be no letters left, else there is not enough letter on the rack to place de "word"
-        if (wordCopy !== '') {
-            return ErrorType.SyntaxError;
-        }
-        // if the command has the right syntax but not the player's turn, should return impossible command error
-        if (!player.isActive) {
-            return ErrorType.ImpossibleCommand;
-        }
-        // Placing letters
-        tempCoord.clone(placeParams.position);
-        for (const letter of placeParams.word) {
-            if (!this.gridService.scrabbleBoard.squares[tempCoord.x][tempCoord.y].occupied) {
-                // Taking letter from player and placing it
-                this.placeLetter(player.letters, letter, tempCoord);
-            }
-            if (placeParams.orientation === 'h') {
-                tempCoord.x++;
-            } else {
-                tempCoord.y++;
-            }
-        }
-        // Generate all words created
-        let tempScrabbleWords: ScrabbleWord[];
-        if (placeParams.orientation === 'h') {
-            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
-        } else {
-            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
+
+                this.passTurn(player);
+            }, WAIT_TIME);
         }
 
-        // Call validation method and end turn
-        setTimeout(() => {
-            if (!this.validationService.validateWords(tempScrabbleWords)) {
-                // Retake letters
-                const removedLetters = this.gridService.removeInvalidLetters(placeParams.position, placeParams.word.length, placeParams.orientation);
-                this.addRackLetters(removedLetters);
-            } else {
-                // Score
-                this.validationService.updatePlayerScore(tempScrabbleWords, player);
-                // Take new letters
-                const newLetters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-                for (const letter of newLetters) {
-                    this.rackService.addLetter(letter);
-                    player.letters.push(letter);
-                }
-            }
-
-            this.passTurn(player);
-        }, WAIT_TIME);
-        return ErrorType.NoError;
-    }
-    placeLetter(playerLetters: ScrabbleLetter[], letter: string, position: Vec2) {
-        // Position already occupied
-        if (this.gridService.scrabbleBoard.squares[position.x][position.y].occupied) {
-            return;
-        }
-        // Making a temporary letter and checking if "*" is needed (for upper cases)
-        let tempLetter = letter;
-        if (tempLetter === tempLetter.toUpperCase()) {
-            tempLetter = '*';
-        }
-        for (let i = 0; i < playerLetters.length; i++) {
-            if (playerLetters[i].character === tempLetter) {
-                if (letter === letter.toUpperCase()) {
-                    playerLetters[i].character = letter;
-                }
-                playerLetters[i].tile = this.gridService.scrabbleBoard.squares[position.x][position.y];
-                this.gridService.drawLetter(playerLetters[i], position.x, position.y);
-                this.rackService.removeLetter(playerLetters[i]);
-                playerLetters.splice(i, 1);
-                break;
-            }
-        }
-    }
-    canPlaceWord(player: Player, placeParams: PlaceParams): boolean {
-        if (
-            !this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, placeParams.position, placeParams.orientation) ||
-            (!this.gridService.scrabbleBoard.isWordPassingInCenter(placeParams.word, placeParams.position, placeParams.orientation) &&
-                !this.gridService.scrabbleBoard.isWordPartOfAnotherWord(placeParams.word, placeParams.position, placeParams.orientation) &&
-                !this.gridService.scrabbleBoard.isWordTouchingOtherWord(placeParams.word, placeParams.position, placeParams.orientation)) ||
-            !player.isActive
-        ) {
-            return false;
-        }
-        return true;
+        return errorResult;
     }
 }
