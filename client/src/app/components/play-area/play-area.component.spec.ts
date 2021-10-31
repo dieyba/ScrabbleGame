@@ -179,7 +179,6 @@ describe('PlayAreaComponent', () => {
             new ScrabbleLetter('d'),
             new ScrabbleLetter('w'),
             new ScrabbleLetter('z'),
-            new ScrabbleLetter('*'),
         ];
         expect(component.lessThanSevenLettersInStock()).toBeFalse();
     });

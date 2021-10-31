@@ -1,8 +1,10 @@
 import { TestBed } from '@angular/core/testing';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ExchangeService } from './exchange.service';
 import { RackService } from './rack.service';
 import { SoloGameService } from './solo-game.service';
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('ExchangeService', () => {
     let service: ExchangeService;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
@@ -66,9 +68,25 @@ describe('ExchangeService', () => {
         expect(soloGameServiceSpy.exchangeLettersSelected).toHaveBeenCalled();
     });
 
-    // it('cancelExchange should call rackService deselect seven times', () => {
-    //     service.cancelExchange();
+    it('cancelExchange should call rackService deselect seven times', () => {
+        soloGameServiceSpy.localPlayer.letters = [
+            new ScrabbleLetter('j'),
+            new ScrabbleLetter('p'),
+            new ScrabbleLetter('b'),
+            new ScrabbleLetter('l'),
+            new ScrabbleLetter('d'),
+            new ScrabbleLetter('w'),
+            new ScrabbleLetter('z'),
+        ];
+        service.cancelExchange();
 
-    //     expect(rackServiceSpy.deselect).toHaveBeenCalledTimes(7);
-    // });
+        expect(rackServiceSpy.deselect).toHaveBeenCalledTimes(7);
+    });
+
+    it('atLeastOneLetterSelected should return true if there is at least one letter selected for exchange', () => {
+        expect(service.atLeastOneLetterSelected()).toBeFalse();
+
+        rackServiceSpy.exchangeSelected[3] = true;
+        expect(service.atLeastOneLetterSelected()).toBeTrue();
+    });
 });
