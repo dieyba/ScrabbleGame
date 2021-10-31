@@ -97,7 +97,9 @@ export class PlayAreaComponent implements AfterViewInit {
     onMouseDown(event: MouseEvent) {
         this.mouseWordPlacerService.onMouseClick(event);
     }
-
+    confirmWord() {
+        this.mouseWordPlacerService.confirmWord();
+    }
     atLeastOneLetterSelected(): boolean {
         return this.exchangeService.atLeastOneLetterSelected();
     }

@@ -271,7 +271,12 @@ export class MouseWordPlacerService {
             const nextSquare = this.findNextSquare(this.currentAxis, this.currentPosition);
             if (this.currentPosition.x <= ABSOLUTE_BOARD_SIZE || this.currentPosition.y <= ABSOLUTE_BOARD_SIZE) {
                 this.currentPosition = nextSquare;
-                this.drawArrow(this.currentPosition, this.currentAxis);
+                const pos = this.convertPositionToGridIndex(this.currentPosition);
+                let nextArrow = this.currentPosition;
+                if (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied === true)
+                    nextArrow = this.findNextSquare(this.currentAxis, this.currentPosition);
+                this.drawArrow(nextArrow, this.currentAxis);
+                // Arrow display bug is here, need to fix before final commit. Works for 1st skip but not further ones.
             }
         } else return;
     }
