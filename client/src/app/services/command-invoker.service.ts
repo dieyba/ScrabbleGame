@@ -19,7 +19,6 @@ export class CommandInvokerService {
         const isSendToServer = this.gameService.isMultiplayerGame && isToDisplayRemotely && commandResult.isExecuted;
         if (isSendToServer) {
             // extract command is the only situation where the message is different for the local/remove player
-            // TODO: fix extract messages
             if (isExchangeCmd) {
                 const messageLocalPlayer = commandResult.executionMessages[0].message;
                 const messageRemotePlayer = commandResult.executionMessages[1].message;
