@@ -38,9 +38,11 @@ export class GameListService {
             this.existingRooms = game;
         });
         this.socket.on('roomcreated', (game: GameParameters) => {
+            console.log('game ', game);
             this.roomInfo = game;
         });
         this.socket.on('roomJoined', (game: GameParameters) => {
+            console.log(game);
             this.roomInfo = game;
             this.roomInfo.gameRoom = game.gameRoom;
             this.players = game.players;
