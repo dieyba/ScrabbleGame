@@ -11,9 +11,11 @@ import { map } from 'rxjs/operators';
 })
 export class MainPageComponent {
     readonly title: string = 'LOG2990';
-    message: BehaviorSubject<string> = new BehaviorSubject<string>('');
+    message: BehaviorSubject<string>;
 
-    constructor(private readonly communicationService: CommunicationService) {}
+    constructor(private readonly communicationService: CommunicationService) {
+        this.message = new BehaviorSubject<string>('');
+    }
 
     sendTimeToServer(): void {
         const newTimeMessage: Message = {

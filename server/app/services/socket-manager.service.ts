@@ -9,6 +9,7 @@ export class SocketManager {
     private sio: io.Server;
     private gameListMan: GameListManager;
     playerMan: PlayerManagerService;
+
     constructor(server: http.Server /*, private readonly gameService: GameService*/) {
         this.gameListMan = new GameListManager();
         this.playerMan = new PlayerManagerService();
@@ -83,7 +84,7 @@ export class SocketManager {
         this.playerMan.allPlayers[index] = newPlayer;
 
         socket.join(room.gameRoom.idGame.toString());
-        this.sio.emit('roomcreated', game);
+        this.sio.emit('roomcreated', room);
     }
     private deleteRoom(socket: io.Socket): void {
         let player = this.playerMan.getPlayerBySocketID(socket.id);

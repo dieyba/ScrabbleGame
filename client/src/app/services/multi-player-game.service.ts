@@ -25,7 +25,7 @@ import { WordBuilderService } from './word-builder.service';
 export class MultiPlayerGameService extends SoloGameService {
     game: GameParameters;
     private socket: io.Socket;
-    private readonly server = 'http://' + window.location.hostname + ':3000';
+    private readonly server: string;
 
     constructor(
         protected gridService: GridService,
@@ -36,34 +36,11 @@ export class MultiPlayerGameService extends SoloGameService {
         protected placeService: PlaceService, // protected gameList: GameListService,
     ) {
         super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService);
+        this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
         this.socket.on('timer reset', (timer: number) => {
-            // Change active player and reset timer for new turn
-            const isLocalPlayerActive = this.game.creatorPlayer.isActive;
-            if (isLocalPlayerActive) {
-                // If the rack is empty, end game + player won
-                if (this.game.creatorPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
-                    this.game.creatorPlayer.isWinner = true;
-                    this.endGame();
-                    return;
-                }
-                this.game.creatorPlayer.isActive = false;
-                this.game.opponentPlayer.isActive = true;
-            } else {
-                // If the rack is empty, end game + player won
-                if (this.game.opponentPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
-                    this.game.opponentPlayer.isWinner = true;
-                    this.endGame();
-                    return;
-                }
-                this.game.opponentPlayer.isActive = false;
-                this.game.creatorPlayer.isActive = true;
-            }
-
-            this.game.timerMs = +timer;
-            this.secondsToMinutes();
-            clearInterval(this.intervalValue);
-            this.startCountdown();
+            this.changePlayerAfterEmit();
+            this.resetTimer();
         });
     }
 
@@ -138,6 +115,7 @@ export class MultiPlayerGameService extends SoloGameService {
             this.game.hasTurnsBeenPassed[this.game.hasTurnsBeenPassed.length] = false;
         }
 
+
         // Change active player and reset timer for new turn
         // const isLocalPlayerActive = this.game.creatorPlayer.isActive;
         // if (isLocalPlayerActive) {
@@ -160,6 +138,30 @@ export class MultiPlayerGameService extends SoloGameService {
         //     this.game.creatorPlayer.isActive = true;
         // }
         this.socket.emit('reset timer');
+    }
+
+    changePlayerAfterEmit() {
+        // Change active player and reset timer for new turn
+        const isLocalPlayerActive = this.game.creatorPlayer.isActive;
+        if (isLocalPlayerActive) {
+            // If the rack is empty, end game + player won
+            if (this.game.creatorPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+                this.game.creatorPlayer.isWinner = true;
+                this.endGame();
+                return;
+            }
+            this.game.creatorPlayer.isActive = false;
+            this.game.opponentPlayer.isActive = true;
+        } else {
+            // If the rack is empty, end game + player won
+            if (this.game.opponentPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+                this.game.opponentPlayer.isWinner = true;
+                this.endGame();
+                return;
+            }
+            this.game.opponentPlayer.isActive = false;
+            this.game.creatorPlayer.isActive = true;
+        }
     }
 
     exchangeLetters(player: Player, letters: string): ErrorType {

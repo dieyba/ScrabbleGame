@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { SquareColor } from '@app/classes/square';
-import { GridService } from './grid.service';
 import { Axis } from '@app/classes/utilities';
+import { GridService } from './grid.service';
 
 const PINK_FACTOR = 2;
 const RED_FACTOR = 3;
@@ -12,10 +12,13 @@ const RED_FACTOR = 3;
     providedIn: 'root',
 })
 export class BonusService {
-    pinkBonusCount: number = 0;
-    redBonusCount: number = 0;
+    pinkBonusCount: number;
+    redBonusCount: number;
 
-    constructor(private readonly gridService: GridService) {}
+    constructor(private readonly gridService: GridService) {
+        this.pinkBonusCount = 0;
+        this.redBonusCount = 0;
+    }
 
     totalValue(scrabbleWord: ScrabbleWord): number {
         this.pinkBonusCount = 0;

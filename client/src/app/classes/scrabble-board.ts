@@ -43,9 +43,10 @@ export enum Column {
 
 export class ScrabbleBoard {
     squares: Square[][];
-    actualBoardSize: number = BOARD_SIZE - 1;
+    actualBoardSize: number;
 
     constructor() {
+        this.actualBoardSize = BOARD_SIZE - 1;
         this.squares = [];
         for (let i = 0; i < BOARD_SIZE; i++) {
             this.squares[i] = [];

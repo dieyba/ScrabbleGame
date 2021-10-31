@@ -9,9 +9,11 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class CommunicationService {
-    private readonly baseUrl: string = environment.serverUrl;
+    private readonly baseUrl: string;
 
-    constructor(private readonly http: HttpClient) {}
+    constructor(private readonly http: HttpClient) {
+        this.baseUrl = environment.serverUrl;
+    }
 
     basicGet(): Observable<Message> {
         return this.http.get<Message>(`${this.baseUrl}/example`).pipe(catchError(this.handleError<Message>('basicGet')));
