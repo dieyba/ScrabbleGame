@@ -10,10 +10,13 @@ const RED_FACTOR = 3;
 
 @Service()
 export class BonusService {
-    pinkBonusCount: number = 0;
-    redBonusCount: number = 0;
+    pinkBonusCount: number;
+    redBonusCount: number;
 
-    constructor() {}
+    constructor() {
+        this.pinkBonusCount = 0;
+        this.redBonusCount = 0;
+    }
 
     totalValue(scrabbleWord: ScrabbleWord, scrabbleBoard: ScrabbleBoard): number {
         this.pinkBonusCount = 0;

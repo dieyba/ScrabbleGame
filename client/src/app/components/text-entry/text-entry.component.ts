@@ -10,9 +10,11 @@ import { TextEntryService } from '@app/services/text-entry.service';
     styleUrls: ['./text-entry.component.scss'],
 })
 export class TextEntryComponent {
-    inputText = '';
+    inputText: string;
 
-    constructor(private textEntryService: TextEntryService) {}
+    constructor(private textEntryService: TextEntryService) {
+        this.inputText = '';
+    }
 
     onKeyUpEnter() {
         this.textEntryService.handleInput(this.inputText);

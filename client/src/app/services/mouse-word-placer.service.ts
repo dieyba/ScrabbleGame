@@ -22,6 +22,7 @@ export class MouseWordPlacerService {
     currentWord: ScrabbleLetter[];
     wordString: string;
     overlayContext: CanvasRenderingContext2D;
+
     constructor(private gridService: GridService, private rackService: RackService, private gameService: GameService) {
         this.currentAxis = Axis.H;
         this.initialPosition = new Vec2();

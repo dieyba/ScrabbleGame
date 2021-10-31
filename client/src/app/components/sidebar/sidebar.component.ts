@@ -10,7 +10,6 @@ import { GameService } from '@app/services/game.service';
 })
 export class SidebarComponent {
     winnerName: string;
-    isSolo: boolean;
     private dialogRef: MatDialogRef<EndGamePopupComponent>;
     constructor(public router: Router, public dialog: MatDialog, private gameService: GameService) {
         this.winnerName = '';

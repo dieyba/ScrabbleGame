@@ -10,14 +10,15 @@ export enum SquareColor {
 }
 
 export class Square {
-    position: Vec2 = new Vec2(0, 0); // Where the square is on the board
+    position: Vec2; // Where the square is on the board
     color: SquareColor;
     occupied: boolean; // 0 if not occupied, 1 if it is
     isValidated: boolean;
     isBonusUsed: boolean;
     letter: ScrabbleLetter;
-    
+
     constructor(horizontalPosition: number, verticalPosition: number) {
+        this.position = new Vec2(0, 0);
         this.color = SquareColor.None;
         this.occupied = false;
         this.isValidated = false;

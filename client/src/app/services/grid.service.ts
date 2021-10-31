@@ -33,17 +33,20 @@ const ROW_MAIN_LETTERS = 'ABCDEFGHIJKLMNO';
 export class GridService {
     scrabbleBoard: ScrabbleBoard;
     gridContext: CanvasRenderingContext2D;
-    letterFonts: string[] = ['27px system-ui', '30px system-ui', '33px system-ui', '35px system-ui'];
-    valueFonts: string[] = ['9px system-ui', '11px system-ui', '13px system-ui', '15px system-ui'];
+    letterFonts: string[];
+    valueFonts: string[];
     currentLetterFont: string;
     currentValueFont: string;
-    private canvasSize: Vec2 = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    private canvasSize: Vec2;
 
     constructor() {
         this.scrabbleBoard = new ScrabbleBoard();
+        this.letterFonts = ['27px system-ui', '30px system-ui', '33px system-ui', '35px system-ui'];
+        this.valueFonts = ['9px system-ui', '11px system-ui', '13px system-ui', '15px system-ui'];
         this.scrabbleBoard.generateBoard();
         this.currentLetterFont = this.letterFonts[DEFAULT_LETTER_FONT_INDEX];
         this.currentValueFont = this.valueFonts[DEFAULT_VALUE_FONT_INDEX];
+        this.canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
     drawGrid() {

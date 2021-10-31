@@ -27,9 +27,9 @@ export class FormComponent implements OnInit {
     dictionary: string;
     singleGame: GameParameters;
 
-    defaultTimer = '60';
-    defaultDictionary = '0';
-    defaultBonus = false;
+    defaultTimer: string;
+    defaultDictionary: string;
+    defaultBonus: boolean;
 
     constructor(
         private dialog: MatDialog,
@@ -39,6 +39,9 @@ export class FormComponent implements OnInit {
         private gameList: GameListService,
         @Inject(MAT_DIALOG_DATA) public isSolo: boolean,
     ) {
+        this.defaultTimer = '60';
+        this.defaultDictionary = '0';
+        this.defaultBonus = false;
         if (this.isSolo === true) {
             this.level = new FormControl('', [Validators.required]);
         } else {

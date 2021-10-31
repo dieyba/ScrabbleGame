@@ -10,6 +10,7 @@ export enum CommandName {
     PassCmd = 'passer',
     PlaceCmd = 'placer',
     StockCmd = 'réserve',
+    HelpCmd = 'aide',
 }
 export interface DefaultCommandParams {
     player: Player;

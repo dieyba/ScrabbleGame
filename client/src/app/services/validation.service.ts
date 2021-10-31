@@ -61,6 +61,7 @@ export class ValidationService {
             totalScore += word.value;
         }
 
+        //console.log(this.newLettersCount());
         if (this.newLettersCount() === BONUS_LETTER_COUNT) {
             // Add 50 points to player's score
             totalScore += BONUS_POINTS;
@@ -80,6 +81,7 @@ export class ValidationService {
                 // Word was valid, set its letters as validated
                 newWords[i].content.forEach((letter) => {
                     letter.tile.isValidated = true;
+                    console.log(letter);
                 });
             }
         }
@@ -108,6 +110,7 @@ export class ValidationService {
                     this.gridService.scrabbleBoard.squares[i][j].occupied === true &&
                     this.gridService.scrabbleBoard.squares[i][j].isValidated === false
                 ) {
+                    //console.log(this.gridService.scrabbleBoard.squares[i][j]);
                     newLetters++;
                 }
             }

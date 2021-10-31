@@ -98,6 +98,15 @@ export class LetterStock {
         this.addLettersToStock(new ScrabbleLetter('*', LetterValue.Star), LetterQuantity.Star); // *
     }
 
+    takeLetter(letter: string): ScrabbleLetter {
+        for (const l of this.letterStock) {
+            if (l.character === letter) {
+                return l;
+            }
+        }
+        return new ScrabbleLetter(letter);
+    }
+
     isEmpty(): boolean {
         return this.letterStock.length === 0;
     }

@@ -17,11 +17,12 @@ const INACTIVE_DEBUG_MESSAGE = 'Affichages de débogage désactivés';
 export class ChatDisplayService {
     isActiveDebug: boolean;
     entries: ChatDisplayEntry[];
-    private readonly server = 'http://' + window.location.hostname + ':3000';
+    private readonly server: string;
     private localPlayerName: string;
     private socket?: io.Socket;
 
     constructor() {
+        this.server = 'http://' + window.location.hostname + ':3000';
         this.isActiveDebug = false;
         this.entries = [];
 

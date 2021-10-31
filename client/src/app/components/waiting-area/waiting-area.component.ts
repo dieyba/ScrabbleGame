@@ -3,9 +3,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GameParameters } from '@app/classes/game-parameters';
-import { LocalPlayer } from '@app/classes/local-player';
 import { FormComponent } from '@app/components/form/form.component';
-import { PlayerHandler } from '@app/modules/player-handler';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
@@ -18,17 +16,17 @@ import * as io from 'socket.io-client';
     styleUrls: ['./waiting-area.component.scss'],
 })
 export class WaitingAreaComponent {
-    private readonly server = 'http://' + window.location.hostname + ':3000';
+    // mettre server dans un ficher pour les constantes
+    private readonly server: string;
+    private timer: any;
+    private socket: io.Socket;
     selectedGame: GameParameters;
     playerName: FormControl;
-    playerList: string[] = [];
-    isStarting: boolean;
-    name = false;
-    private timer: any;
+    playerList: string[];
+    list: GameParameters[];
     nameErrorMessage: string;
-    player: LocalPlayer;
-    list: GameParameters[] = [];
-    private socket: io.Socket;
+    isStarting: boolean;
+    name: boolean;
     error: boolean;
     nameValid: boolean;
     joindre: boolean;
@@ -42,6 +40,10 @@ export class WaitingAreaComponent {
         public gameList: GameListService,
         @Inject(MAT_DIALOG_DATA) public gameSelected: boolean,
     ) {
+        this.server = 'http://' + window.location.hostname + ':3000';
+        this.playerList = [];
+        this.list = [];
+        this.name = false;
         if (gameSelected) {
             this.selectedGame = new GameParameters('', 0);
             this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
@@ -49,8 +51,6 @@ export class WaitingAreaComponent {
         this.socket = SocketHandler.requestSocket(this.server);
         this.list = this.gameList.getList();
         this.full = false;
-        this.player = PlayerHandler.requestPlayer();
-        this.player.roomId = this.gameList.player.roomId;
         this.nameErrorMessage = '';
         this.nameValid = false;
         this.timer = setInterval(() => {
@@ -93,9 +93,7 @@ export class WaitingAreaComponent {
         }
     }
     start(): void {
-        // if (this.gameList.roomInfo.gameRoom.playersName.length !== 2) {
-        console.log(this.gameList.roomInfo.gameRoom.playersName)
-        if (this.gameList.roomInfo.gameRoom.playersName.length === 1) {
+        if (this.selectedGame.gameRoom.playersName.length === 1) {
             this.nameValid = true;
             this.gameList.start(this.selectedGame, this.playerName.value);
         }

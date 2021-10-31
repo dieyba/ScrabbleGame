@@ -35,7 +35,6 @@ export class SoloGameService {
     localPlayer: Player;
     timer: string;
     intervalValue: NodeJS.Timeout;
-    id: number = 0;
 
     constructor(
         protected gridService: GridService,
@@ -64,7 +63,9 @@ export class SoloGameService {
         this.chatDisplayService.initialize(this.localPlayer.name);
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = new ScrabbleBoard();
-        this.addRackLetters(this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT));
+        //this.addRackLetters(this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT));
+        const tab = [this.game.stock.takeLetter('m'), this.game.stock.takeLetter('a'), this.game.stock.takeLetter('i'), this.game.stock.takeLetter('s'), this.game.stock.takeLetter('o'), this.game.stock.takeLetter('n'), this.game.stock.takeLetter('s')];
+        this.addRackLetters(tab);
         this.startCountdown();
         this.game.hasTurnsBeenPassed[0] = false;
     }

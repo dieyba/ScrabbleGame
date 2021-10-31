@@ -29,19 +29,22 @@ export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
     @ViewChild('overlayCanvas', { static: false }) private overlayCanvas!: ElementRef<HTMLCanvasElement>;
 
-    mousePosition: Vec2 = new Vec2(0, 0);
-    private canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    private rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
+    mousePosition: Vec2;
+    private canvasSize: Vec2;
+    private rackSize: Vec2;
     private rackContext: CanvasRenderingContext2D;
 
     constructor(
         private readonly gridService: GridService,
         private readonly rackService: RackService,
-        // private readonly gameService: GameService, // private readonly validationService: ValidationService,
-        private readonly gameService: GameService, // private readonly validationService: ValidationService,
+        private readonly gameService: GameService,
         private readonly mouseWordPlacerService: MouseWordPlacerService,
         private readonly exchangeService: ExchangeService,
-    ) {}
+    ) {
+        this.mousePosition = new Vec2(0, 0);
+        this.canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        this.rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
+    }
     @HostListener('keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
         this.mouseWordPlacerService.onKeyDown(event);

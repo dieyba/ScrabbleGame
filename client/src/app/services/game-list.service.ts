@@ -10,7 +10,7 @@ import { GameService } from './game.service';
     providedIn: 'root',
 })
 export class GameListService {
-    private readonly server = 'http://' + window.location.hostname + ':3000';
+    private readonly server: string;
     private socket: io.Socket;
     isStarting: boolean;
     player: LocalPlayer;
@@ -18,13 +18,10 @@ export class GameListService {
     players: LocalPlayer[];
     myRoom: GameRoom[];
     roomInfo: GameParameters;
-    full: boolean
-    // gameService: GameService;
-    // solo: SoloGameService
-    // multi: MultiPlayerGameService
-    roomInf = { idGame: -1, capacity: 0, playersName: new Array<string>() };
+    full: boolean;
 
     constructor(private gameService: GameService) {
+        this.server = 'http://' + window.location.hostname + ':3000';
         this.existingRooms = new Array<GameParameters>();
         this.myRoom = new Array<GameRoom>();
         this.socket = SocketHandler.requestSocket(this.server);
@@ -40,6 +37,7 @@ export class GameListService {
         this.socket.on('roomcreated', (game: GameParameters) => {
             console.log('game ', game);
             this.roomInfo = game;
+            this.roomInfo.gameRoom.playersName = game.gameRoom.playersName;
         });
         this.socket.on('roomJoined', (game: GameParameters) => {
             console.log(game);

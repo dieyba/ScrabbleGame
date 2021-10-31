@@ -4,6 +4,7 @@ import { Command, CommandName, CommandParams } from '@app/classes/commands';
 import { createDebugCmd } from '@app/classes/debug-command';
 import { ErrorType } from '@app/classes/errors';
 import { createExchangeCmd } from '@app/classes/exchange-command';
+import { createHelpCmd } from '@app/classes/help-command';
 import { createPassCmd } from '@app/classes/pass-command';
 import { createPlaceCmd } from '@app/classes/place-command';
 import { Player } from '@app/classes/player';
@@ -52,12 +53,14 @@ export class TextEntryService {
         this.commandsMap.set(CommandName.PassCmd, createPassCmd);
         this.commandsMap.set(CommandName.PlaceCmd, createPlaceCmd);
         this.commandsMap.set(CommandName.StockCmd, createStockCmd);
+        this.commandsMap.set(CommandName.HelpCmd, createHelpCmd);
 
-        this.paramsMap.set(CommandName.DebugCmd, this.extractDebugParams);
+        this.paramsMap.set(CommandName.DebugCmd, this.extractOnlyChatService);
         this.paramsMap.set(CommandName.ExchangeCmd, this.extractExchangeParams);
-        this.paramsMap.set(CommandName.PassCmd, this.extractPassParams);
+        this.paramsMap.set(CommandName.PassCmd, this.extractOnlyGameService);
         this.paramsMap.set(CommandName.PlaceCmd, this.extractPlaceParams);
         this.paramsMap.set(CommandName.StockCmd, this.extractStockParams);
+        this.paramsMap.set(CommandName.HelpCmd, this.extractOnlyChatService);
     }
 
     /**
@@ -126,9 +129,16 @@ export class TextEntryService {
         return undefined;
     }
 
-    extractDebugParams(player: Player, paramsInput: string[]): CommandParams {
+    extractOnlyChatService(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
             return { player, serviceCalled: this.chatDisplayService };
+        }
+        return undefined;
+    }
+
+    extractOnlyGameService(player: Player, paramsInput: string[]): CommandParams {
+        if (paramsInput.length === 0) {
+            return { player, serviceCalled: this.gameService };
         }
         return undefined;
     }
@@ -138,13 +148,6 @@ export class TextEntryService {
             const defaultParams = { player, serviceCalled: this.chatDisplayService };
             const stockLetters: string = scrabbleLetterstoString(this.gameService.currentGameService.game.stock.letterStock);
             return { defaultParams, specificParams: stockLetters };
-        }
-        return undefined;
-    }
-
-    extractPassParams(player: Player, paramsInput: string[]): CommandParams {
-        if (paramsInput.length === 0) {
-            return { player, serviceCalled: this.gameService };
         }
         return undefined;
     }

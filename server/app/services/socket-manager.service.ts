@@ -9,6 +9,7 @@ export class SocketManagerService {
     private sio: io.Server;
     private gameListMan: GameListManager;
     playerMan: PlayerManagerService;
+
     constructor(server: http.Server /*, private readonly gameService: GameService*/) {
         this.gameListMan = new GameListManager();
         this.playerMan = new PlayerManagerService();
