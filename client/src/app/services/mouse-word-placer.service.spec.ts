@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-
 import { MouseWordPlacerService } from './mouse-word-placer.service';
 
 describe('MouseWordPlacerService', () => {

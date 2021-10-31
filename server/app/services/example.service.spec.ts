@@ -47,12 +47,12 @@ describe('Example service', () => {
         expect(message.title).to.equals('Error');
     });
 
-    it('should store a message', (done: Mocha.Done) => {
-        const newMessage: Message = { title: 'Hello', body: 'World' };
-        exampleService.storeMessage(newMessage);
-        expect(exampleService.clientMessages[0]).to.equals(newMessage);
-        done();
-    });
+    // it('should store a message', (done: Mocha.Done) => {
+    //     const newMessage: Message = { title: 'Hello', body: 'World' };
+    //     exampleService.storeMessage(newMessage);
+    //     expect(exampleService.clientMessages[0]).to.equals(newMessage);
+    //     done();
+    // });
 
     it('should get all messages', (done: Mocha.Done) => {
         const newMessage: Message = { title: 'Hello', body: 'World' };
