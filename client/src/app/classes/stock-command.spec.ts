@@ -7,7 +7,7 @@ describe('StockCommand', () => {
     const playerchoice = new LocalPlayer('dieyna');
     const chat = new ChatDisplayService();
     const defaultParams: DefaultCommandParams = { player: playerchoice, serviceCalled: chat };
-    const specificParams: string = 'test';
+    const specificParams = 'test';
     const stockCommand = new StockCmd(defaultParams, specificParams);
 
     it('should create an instance', () => {

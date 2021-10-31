@@ -21,7 +21,7 @@ describe('ExchangeCmd', () => {
     const place = new PlaceService(grid, rack);
     const service = new SoloGameService(grid, rack, chat, validation, wordBuilder, place);
     const defaultParams: DefaultCommandParams = { player: playerchoice, serviceCalled: service };
-    const specificParams: string = 'test';
+    const specificParams = 'test';
     const exchange = new ExchangeCmd(defaultParams, 'amd');
 
     it('should create an instance', () => {
