@@ -28,11 +28,11 @@ export class SidebarComponent {
     }
 
     getPlayer1LetterCount(): number {
-        return this.gameService.currentGameService.game.creatorPlayer.letters.length;
+        return this.gameService.currentGameService.localPlayer.letters.length;
     }
 
     getPlayer2LetterCount(): number {
-        return this.gameService.currentGameService.game.opponentPlayer.letters.length;
+        return this.gameService.currentGameService.localPlayer.letters.length;
     }
 
     getPlayer1Score(): number {

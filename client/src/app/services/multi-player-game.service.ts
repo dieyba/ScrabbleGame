@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { PlaceParams } from '@app/classes/commands';
 import { Dictionary } from '@app/classes/dictionary';
 import { ErrorType } from '@app/classes/errors';
 import { GameParameters } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { Vec2 } from '@app/classes/vec2';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
@@ -65,38 +67,38 @@ export class MultiPlayerGameService extends SoloGameService {
         });
     }
 
-    // override initializeGame(gameInfo: FormGroup) {
-    //     this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value);
-    //     this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
-    //     this.game.creatorPlayer.isActive = true;
-    //     this.game.opponentPlayer = new LocalPlayer(gameInfo.controls.opponent.value);
-    //     this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-    //     this.game.opponentPlayer.isActive = false;
-    //     this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
-    //     this.game.totalCountDown = +gameInfo.controls.timer.value;
-    //     this.game.randomBonus = gameInfo.controls.bonus.value;
-    //     this.chatDisplayService.entries = [];
-    //     this.game.timerMs = +this.game.totalCountDown;
-    //     return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
-    // }
+    override initializeGame(gameInfo: FormGroup) {
+        this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value);
+        this.chatDisplayService.entries = [];
+        this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
+        this.game.creatorPlayer.isActive = true;
+        this.game.stock = new LetterStock();
+        //this.game.opponentPlayer = new LocalPlayer(gameInfo.controls.opponent.value);
+        //this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        //this.game.opponentPlayer.isActive = false;
+        this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
+        this.game.totalCountDown = +gameInfo.controls.timer.value;
+        this.game.randomBonus = gameInfo.controls.bonus.value;
+        this.game.timerMs = +this.game.totalCountDown;
+        return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
+    }
     initializeGame2(game: GameParameters) {
         this.game = game;
         this.game.stock = new LetterStock();
         this.game.creatorPlayer = new LocalPlayer(game.gameRoom.playersName[0]);
         this.game.creatorPlayer.isActive = true;
         this.game.opponentPlayer = new LocalPlayer(game.gameRoom.playersName[1]);
-        this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.opponentPlayer.isActive = false;
-        this.game.dictionary = new Dictionary(0);
+        this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.creatorPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        //this.game.dictionary = new Dictionary(0);
         this.game.totalCountDown = game.totalCountDown;
-        // this.game.randomBonus = gameInfo.controls.bonus.value;
+        //this.game.randomBonus = gameInfo.controls.bonus.value;
         this.game.timerMs = +this.game.totalCountDown;
         this.game.creatorPlayer.socketId = game.players[0].socketId;
         this.game.opponentPlayer.socketId = game.players[1].socketId;
         this.localPlayer = this.socket.id === this.game.creatorPlayer.socketId ? this.game.creatorPlayer : this.game.opponentPlayer;
-        console.log('initialize game multiplayer of client ' + this.game.creatorPlayer.name);
-        console.log('local player: ' + this.localPlayer.name);
-        return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
+        // return new GameParameters(this.game.creatorPlayer.name, this.game.timerMs);
     }
 
     override createNewGame() {
@@ -104,7 +106,9 @@ export class MultiPlayerGameService extends SoloGameService {
         // Empty board and stack
         this.rackService.rackLetters = [];
         // Add rack letters for localPlayer and remote player on their own screen
-        this.addRackLetters(this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT));
+        //this.game.creatorPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.addRackLetters(this.localPlayer.letters);
+        // this.addRackLetters(this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT));
         this.startCountdown();
         this.game.hasTurnsBeenPassed[0] = false;
     }
@@ -156,6 +160,53 @@ export class MultiPlayerGameService extends SoloGameService {
         //     this.game.creatorPlayer.isActive = true;
         // }
         this.socket.emit('reset timer');
+    }
+
+    exchangeLetters(player: Player, letters: string): ErrorType {
+        if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
+            const lettersToRemove: ScrabbleLetter[] = [];
+
+            if (player.removeLetter(letters) === true) {
+                for (let i = 0; i < letters.length; i++) {
+                    lettersToRemove[i] = new ScrabbleLetter(letters[i]);
+                }
+                const lettersToAdd: ScrabbleLetter[] = this.game.stock.exchangeLetters(lettersToRemove);
+                for (let i = 0; i < lettersToAdd.length; i++) {
+                    this.rackService.removeLetter(lettersToRemove[i]);
+                    this.addRackLetter(lettersToAdd[i]);
+                    player.addLetter(lettersToAdd[i]);
+                }
+                this.passTurn(player);
+                return ErrorType.NoError;
+            }
+        }
+        return ErrorType.ImpossibleCommand;
+    }
+
+    exchangeLettersSelected(player: Player) {
+        let letters = '';
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < this.rackService.exchangeSelected.length; i++) {
+            if (this.rackService.exchangeSelected[i] === true) {
+                letters += this.rackService.rackLetters[i].character;
+                this.rackService.exchangeSelected[i] = false;
+            }
+        }
+
+        this.exchangeLetters(player, letters);
+    }
+
+    addRackLetters(letters: ScrabbleLetter[]): void {
+        for (const letter of letters) {
+            this.addRackLetter(letter);
+        }
+    }
+
+    addRackLetter(letter: ScrabbleLetter): void {
+        this.rackService.addLetter(letter);
+        // this.game.creatorPlayer.letters[this.game.creatorPlayer.letters.length] = letter;
+        // this.localPlayer.letters[this.localPlayer.letters.length] = letter;
+        // this.localPlayer.addLetter(letter);
     }
 
     override place(player: Player, placeParams: PlaceParams): ErrorType {

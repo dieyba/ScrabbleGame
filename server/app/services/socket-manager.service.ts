@@ -83,7 +83,7 @@ export class SocketManager {
         this.playerMan.allPlayers[index] = newPlayer;
 
         socket.join(room.gameRoom.idGame.toString());
-        this.sio.emit('roomcreated', game.name);
+        this.sio.emit('roomcreated', game);
     }
     private deleteRoom(socket: io.Socket): void {
         let player = this.playerMan.getPlayerBySocketID(socket.id);
