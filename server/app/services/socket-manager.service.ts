@@ -5,7 +5,7 @@ import * as io from 'socket.io';
 import { GameListManager } from './game-list-manager.service';
 import { PlayerManagerService } from './player-manager.service';
 
-export class SocketManager {
+export class SocketManagerService {
     private sio: io.Server;
     private gameListMan: GameListManager;
     playerMan: PlayerManagerService;
@@ -83,7 +83,7 @@ export class SocketManager {
         this.playerMan.allPlayers[index] = newPlayer;
 
         socket.join(room.gameRoom.idGame.toString());
-        this.sio.emit('roomcreated', game);
+        this.sio.emit('roomcreated', room);
     }
     private deleteRoom(socket: io.Socket): void {
         let player = this.playerMan.getPlayerBySocketID(socket.id);

@@ -2,7 +2,7 @@ import { Application } from '@app/app';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
-import { SocketManager } from './services/socket-manager.service';
+import { SocketManagerService } from './services/socket-manager.service';
 
 @Service()
 export class Server {
@@ -31,7 +31,7 @@ export class Server {
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
         this.server.on('listening', () => this.onListening());
-        let socketManager = new SocketManager(this.server);
+        let socketManager = new SocketManagerService(this.server);
         socketManager.handleSockets();
     }
 
