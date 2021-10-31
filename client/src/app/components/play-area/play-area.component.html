@@ -3,6 +3,7 @@
         <div class="column">
             <mat-card class="card">
                 <canvas id="canvas" #gridCanvas [attr.width]="width" [attr.height]="height"></canvas>
+                <canvas id="overlayCanvas" #overlayCanvas [attr.width]="width" [attr.height]="height" (click)="onMouseDown($event)"></canvas>
             </mat-card>
             <app-rack></app-rack>
         </div>

@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { ExchangeService } from '@app/services/exchange.service';
 import { GridService } from '@app/services/grid.service';
+import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
 
@@ -19,7 +20,6 @@ export enum MouseButton {
     Back = 3,
     Forward = 4,
 }
-
 @Component({
     selector: 'app-play-area',
     templateUrl: './play-area.component.html',
@@ -27,6 +27,7 @@ export enum MouseButton {
 })
 export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
+    @ViewChild('overlayCanvas', { static: false }) private overlayCanvas!: ElementRef<HTMLCanvasElement>;
 
     mousePosition: Vec2 = new Vec2(0, 0);
     private canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -37,11 +38,20 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly gridService: GridService,
         private readonly rackService: RackService,
         private readonly soloGameService: SoloGameService, // private readonly validationService: ValidationService,
+        private readonly mouseWordPlacerService: MouseWordPlacerService,
         private readonly exchangeService: ExchangeService,
     ) {}
-
+    @HostListener('keydown', ['$event'])
+    onKeyDown(event: KeyboardEvent) {
+        this.mouseWordPlacerService.onKeyDown(event);
+    }
+    @HostListener('focusout', ['$event'])
+    onBlur() {
+        this.mouseWordPlacerService.onBlur();
+    }
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        this.mouseWordPlacerService.overlayContext = this.overlayCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.soloGameService.createNewGame();
         this.gridService.drawGrid();
         this.gridService.drawColors();
@@ -83,6 +93,9 @@ export class PlayAreaComponent implements AfterViewInit {
 
     sizeDownLetters(): void {
         this.gridService.sizeDownLetters();
+    }
+    onMouseDown(event: MouseEvent) {
+        this.mouseWordPlacerService.onMouseClick(event);
     }
 
     atLeastOneLetterSelected(): boolean {

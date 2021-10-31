@@ -21,9 +21,9 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { StartingPageComponent } from '@app/pages/starting-page/starting-page.component';
 import { ChatDisplayComponent } from './components/chat-display/chat-display.component';
 import { FormComponent } from './components/form/form.component';
+import { RackComponent } from './components/rack/rack.component';
 import { TextEntryComponent } from './components/text-entry/text-entry.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
-import { RackComponent } from './components/rack/rack.component';
 
 /**
  * Main module that is used in main.ts.
@@ -37,6 +37,7 @@ import { RackComponent } from './components/rack/rack.component';
         GamePageComponent,
         MainPageComponent,
         MaterialPageComponent,
+        RackComponent,
         PlayAreaComponent,
         SidebarComponent,
         ChatDisplayComponent,
