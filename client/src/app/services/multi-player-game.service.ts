@@ -163,6 +163,13 @@ export class MultiPlayerGameService extends SoloGameService {
         }
     }
 
+    override displayEndGameMessage() {
+        const endGameMessages = this.chatDisplayService.createEndGameMessages(this.game.stock.letterStock, this.game.creatorPlayer, this.game.opponentPlayer);
+        endGameMessages.forEach(chatEntry => {
+            this.chatDisplayService.sendSystemMessageToServer(chatEntry.message);
+        });
+    }
+
     exchangeLetters(player: Player, letters: string): ErrorType {
         if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
             const lettersToRemove: ScrabbleLetter[] = [];

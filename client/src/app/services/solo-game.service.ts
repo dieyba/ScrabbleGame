@@ -31,7 +31,8 @@ const MAX_TURNS_PASSED = 6;
 })
 export class SoloGameService {
     game: GameParameters;
-    // TODO: Addapt solo game service to local player instead of creator player (move attrib to gameParameters?)
+    // TODO: Addapt solo game service to local player instead of creator player.
+    // or tbh we should just rename creatorPlayer to localPlayer in the client version of gameParameters
     localPlayer: Player;
     timer: string;
     intervalValue: NodeJS.Timeout;
@@ -160,6 +161,7 @@ export class SoloGameService {
             this.changeActivePlayer();
             this.resetTimer();
             this.game.turnPassed = false;
+            this.endGame(); // TODO:test to remove
             return ErrorType.NoError;
         }
         return ErrorType.ImpossibleCommand;
@@ -237,21 +239,33 @@ export class SoloGameService {
         const i = this.rackService.removeLetter(scrabbleLetter);
         this.game.creatorPlayer.letters.splice(i, 1);
     }
+    displayEndGameMessage() {
+        const endGameMessages = this.chatDisplayService.createEndGameMessages(this.game.stock.letterStock, this.game.creatorPlayer, this.game.opponentPlayer);
+        endGameMessages.forEach(message => {
+            this.chatDisplayService.addEntry(message);
+        });
+    }
+
+    // TODO:just rename the creator player to local player and theres no need for this method
+    getOpponentPlayer(): Player {
+        return this.localPlayer === this.game.creatorPlayer ? this.game.creatorPlayer : this.game.opponentPlayer;
+    }
     endGame() {
-        this.chatDisplayService.addEndGameMessage(this.game.stock.letterStock, this.game.creatorPlayer, this.game.opponentPlayer);
+        this.displayEndGameMessage();
+        const localPlayerPoints = this.calculateRackPoints(this.localPlayer);
+        const virtualPlayerPoints = this.calculateRackPoints(this.getOpponentPlayer());
+        const opponent = this.getOpponentPlayer();
 
-        const localPlayerPoints = this.calculateRackPoints(this.game.creatorPlayer);
-        const virtualPlayerPoints = this.calculateRackPoints(this.game.opponentPlayer);
-
-        if (this.game.creatorPlayer.isWinner === true) {
-            this.game.creatorPlayer.score += virtualPlayerPoints;
-            this.game.opponentPlayer.score -= virtualPlayerPoints;
-        } else if (this.game.opponentPlayer.isWinner === true) {
-            this.game.opponentPlayer.score += localPlayerPoints;
-            this.game.creatorPlayer.score -= localPlayerPoints;
+        // are the right player's points added to the right player's score?
+        if (this.localPlayer.isWinner === true) {
+            this.localPlayer.score += virtualPlayerPoints;
+            opponent.score -= virtualPlayerPoints;
+        } else if (opponent.isWinner === true) {
+            opponent.score += localPlayerPoints;
+            this.localPlayer.score -= localPlayerPoints;
         } else {
-            this.game.creatorPlayer.score -= localPlayerPoints;
-            this.game.opponentPlayer.score -= virtualPlayerPoints;
+            this.localPlayer.score -= localPlayerPoints;
+            opponent.score -= virtualPlayerPoints;
         }
         clearInterval(this.intervalValue);
         this.game.timerMs = 0;

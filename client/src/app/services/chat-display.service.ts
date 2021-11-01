@@ -31,6 +31,9 @@ export class ChatDisplayService {
             const chatEntryColor = chatEntry.senderName === this.localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
             this.addEntry({ color: chatEntryColor, message: chatEntry.message });
         });
+        this.socket.on('addSystemChatEntry', (systemMessage: string) => {
+            this.addEntry({ color: ChatEntryColor.SystemColor, message: systemMessage });
+        });
     }
 
     initialize(localPlayerName: string): void {
@@ -48,6 +51,11 @@ export class ChatDisplayService {
             }
         }
     }
+    sendSystemMessageToServer(message: string) {
+        if (this.socket) {
+            this.socket.emit('sendSystemChatEntry', message);
+        }
+    }
 
     addEntry(entry: ChatDisplayEntry): void {
         this.entries.push(entry);
@@ -63,23 +71,24 @@ export class ChatDisplayService {
         }
     }
 
-    addEndGameMessage(remainingLetters: ScrabbleLetter[], firstPlayer: Player, secondPlayer: Player) {
+    createEndGameMessages(remainingLetters: ScrabbleLetter[], firstPlayer: Player, secondPlayer: Player): ChatDisplayEntry[] {
         const remainingLettersMessage = 'Fin de partie - ' + scrabbleLetterstoString(remainingLetters);
         const firstPlayerMessage = firstPlayer.name + ' : ' + scrabbleLetterstoString(firstPlayer.letters);
         const secondPlayerMessage = secondPlayer.name + ' : ' + scrabbleLetterstoString(secondPlayer.letters);
-
-        this.addEntry({
+        let endGameMessage: ChatDisplayEntry[] = [];
+        endGameMessage.push({
             color: ChatEntryColor.SystemColor,
             message: remainingLettersMessage,
         });
-        this.addEntry({
+        endGameMessage.push({
             color: ChatEntryColor.SystemColor,
             message: firstPlayerMessage,
         });
-        this.addEntry({
+        endGameMessage.push({
             color: ChatEntryColor.SystemColor,
             message: secondPlayerMessage,
         });
+        return endGameMessage;
     }
 
     invertDebugState(): string {

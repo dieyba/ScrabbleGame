@@ -44,12 +44,14 @@ export class SocketManagerService {
             //     // this.startGame(socket,)
             // });
             socket.on('sendChatEntry', (message: string, messageToOpponent?: string) => {
-                // TODO: fix sending different message if its command exchange
                 if (messageToOpponent !== undefined) {
                     this.displayDifferentChatEntry(socket, message, messageToOpponent);
                 } else {
                     this.displayChatEntry(socket, message);
                 }
+            });
+            socket.on('sendSystemChatEntry', (message: string) => {
+                this.displaySystemChatEntry(socket, message);
             });
             socket.on('getAllGames', (game: Array<GameParameters>) => {
                 this.getAllGames(socket);
@@ -112,7 +114,7 @@ export class SocketManagerService {
         }
     }
     private initializeGame(socket: io.Socket, roomId: number) {
-        let roomGame = this.gameListMan.getCurrentGame(roomId); // or should it come from existingRooms[]?
+        let roomGame = this.gameListMan.getCurrentGame(roomId);
         // this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
         if (roomGame) {
             this.sio.to(roomGame.gameRoom.idGame.toString()).emit('updateInfo', roomGame);
@@ -138,5 +140,9 @@ export class SocketManagerService {
             this.sio.to(senderId).emit('addChatEntry', chatEntrySender);
             this.sio.to(opponentId).emit('addChatEntry', chatEntryOpponent);
         }
+    }
+    private displaySystemChatEntry(socket: io.Socket, message: string) {
+        const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId.toString();
+        this.sio.in(roomId).emit('addSystemChatEntry', message);
     }
 }
