@@ -30,7 +30,7 @@ export class WaitingAreaComponent {
     error: boolean;
     nameValid: boolean;
     joindre: boolean;
-    full: boolean
+    full: boolean;
 
     constructor(
         private multiManService: MultiPlayerGameService,
@@ -96,9 +96,8 @@ export class WaitingAreaComponent {
         if (this.selectedGame.gameRoom.playersName.length === 1) {
             this.nameValid = true;
             this.gameList.start(this.selectedGame, this.playerName.value);
-        }
-        else {
-            this.full = true
+        } else {
+            this.full = true;
         }
     }
     confirmName(game: GameParameters) {

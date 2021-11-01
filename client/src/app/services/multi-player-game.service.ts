@@ -50,9 +50,9 @@ export class MultiPlayerGameService extends SoloGameService {
         this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
         this.game.creatorPlayer.isActive = true;
         this.game.stock = new LetterStock();
-        //this.game.opponentPlayer = new LocalPlayer(gameInfo.controls.opponent.value);
-        //this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        //this.game.opponentPlayer.isActive = false;
+        // this.game.opponentPlayer = new LocalPlayer(gameInfo.controls.opponent.value);
+        // this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        // this.game.opponentPlayer.isActive = false;
         this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.game.totalCountDown = +gameInfo.controls.timer.value;
         this.game.randomBonus = gameInfo.controls.bonus.value;
@@ -68,9 +68,9 @@ export class MultiPlayerGameService extends SoloGameService {
         this.game.opponentPlayer.isActive = false;
         this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.creatorPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        //this.game.dictionary = new Dictionary(0);
+        // this.game.dictionary = new Dictionary(0);
         this.game.totalCountDown = game.totalCountDown;
-        //this.game.randomBonus = gameInfo.controls.bonus.value;
+        // this.game.randomBonus = gameInfo.controls.bonus.value;
         this.game.timerMs = +this.game.totalCountDown;
         this.game.creatorPlayer.socketId = game.players[0].socketId;
         this.game.opponentPlayer.socketId = game.players[1].socketId;
@@ -83,7 +83,7 @@ export class MultiPlayerGameService extends SoloGameService {
         // Empty board and stack
         this.rackService.rackLetters = [];
         // Add rack letters for localPlayer and remote player on their own screen
-        //this.game.creatorPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        // this.game.creatorPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.addRackLetters(this.localPlayer.letters);
         // this.addRackLetters(this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT));
         this.startCountdown();
@@ -114,7 +114,6 @@ export class MultiPlayerGameService extends SoloGameService {
         } else {
             this.game.hasTurnsBeenPassed[this.game.hasTurnsBeenPassed.length] = false;
         }
-
 
         // Change active player and reset timer for new turn
         // const isLocalPlayerActive = this.game.creatorPlayer.isActive;

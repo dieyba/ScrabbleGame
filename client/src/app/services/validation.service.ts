@@ -61,7 +61,7 @@ export class ValidationService {
             totalScore += word.value;
         }
 
-        //console.log(this.newLettersCount());
+        // console.log(this.newLettersCount());
         if (this.newLettersCount() === BONUS_LETTER_COUNT) {
             // Add 50 points to player's score
             totalScore += BONUS_POINTS;
@@ -110,7 +110,7 @@ export class ValidationService {
                     this.gridService.scrabbleBoard.squares[i][j].occupied === true &&
                     this.gridService.scrabbleBoard.squares[i][j].isValidated === false
                 ) {
-                    //console.log(this.gridService.scrabbleBoard.squares[i][j]);
+                    // console.log(this.gridService.scrabbleBoard.squares[i][j]);
                     newLetters++;
                 }
             }

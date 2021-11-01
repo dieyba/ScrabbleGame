@@ -1,4 +1,7 @@
 import { Injectable } from '@angular/core';
+import { DefaultCommandParams } from '@app/classes/commands';
+import { ExchangeCmd } from '@app/classes/exchange-command';
+import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
 import { RackService } from './rack.service';
 
@@ -6,7 +9,11 @@ import { RackService } from './rack.service';
     providedIn: 'root',
 })
 export class ExchangeService {
-    constructor(private readonly rackService: RackService, private readonly gameService: GameService) {}
+    constructor(
+        private readonly rackService: RackService,
+        private readonly gameService: GameService,
+        private commandInvokerService: CommandInvokerService,
+    ) {}
 
     handleSelection(rackContext: CanvasRenderingContext2D, position: number) {
         if (this.rackService.handlingSelected[position - 1] === true) {
@@ -29,7 +36,10 @@ export class ExchangeService {
     }
 
     exchange() {
-        this.gameService.currentGameService.exchangeLettersSelected(this.gameService.currentGameService.localPlayer);
+        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.localPlayer, serviceCalled: this.gameService };
+        const letters = this.gameService.currentGameService.getLettersSelected();
+        const command = new ExchangeCmd(defaultParams, letters);
+        this.commandInvokerService.executeCommand(command);
     }
 
     cancelExchange(rackContext: CanvasRenderingContext2D) {

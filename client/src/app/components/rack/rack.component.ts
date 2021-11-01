@@ -24,7 +24,7 @@ export class RackComponent implements AfterViewInit {
         private manipulationRackService: ManipulationRackService,
         private exchangeService: ExchangeService,
     ) {
-        this.rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT)
+        this.rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
     }
 
     ngAfterViewInit(): void {

@@ -58,7 +58,6 @@ export class GameListService {
     start(game: GameParameters, name: string): void {
         this.gameService.initializeGameType(GameType.MultiPlayer);
         this.socket.emit('joinRoom', { gameId: game.gameRoom.idGame, joinerName: name });
-
     }
     initializeGame(roomId: number) {
         this.socket.emit('initializeGame', roomId);

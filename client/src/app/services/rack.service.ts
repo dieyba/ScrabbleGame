@@ -14,7 +14,7 @@ const SQUARE_WIDTH = 71;
 export class RackService {
     rackLetters: ScrabbleLetter[];
     exchangeSelected: boolean[];
-    handlingSelected: boolean[];;
+    handlingSelected: boolean[];
     gridContext: CanvasRenderingContext2D;
     squareWidth: number;
     squareHeight: number;

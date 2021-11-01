@@ -1,5 +1,8 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { DefaultCommandParams } from '@app/classes/commands';
+import { PassTurnCmd } from '@app/classes/pass-command';
 import { Vec2 } from '@app/classes/vec2';
+import { CommandInvokerService } from '@app/services/command-invoker.service';
 import { ExchangeService } from '@app/services/exchange.service';
 import { GameService } from '@app/services/game.service';
 import { GridService } from '@app/services/grid.service';
@@ -40,6 +43,7 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly gameService: GameService,
         private readonly mouseWordPlacerService: MouseWordPlacerService,
         private readonly exchangeService: ExchangeService,
+        private readonly commandInvokerService: CommandInvokerService,
     ) {
         this.mousePosition = new Vec2(0, 0);
         this.canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -64,7 +68,9 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     passTurn() {
-        this.gameService.currentGameService.passTurn(this.gameService.currentGameService.localPlayer);
+        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.localPlayer, serviceCalled: this.gameService };
+        const command = new PassTurnCmd(defaultParams);
+        this.commandInvokerService.executeCommand(command);
     }
 
     isLocalPlayerActive(): boolean {
