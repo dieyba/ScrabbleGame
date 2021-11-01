@@ -23,7 +23,7 @@ export class ExchangeCmd extends Command {
             executionMessages.push(createErrorEntry(executionResult, commandAndLetters));
         } else {
             this.isExecuted = true;
-            const localPlayerName = this.gameService.currentGameService.localPlayer.name;
+            const localPlayerName = this.gameService.currentGameService.game.localPlayer.name;
             const isFromLocalPLayer = this.player.name === localPlayerName;
             const colorFirstMessage = isFromLocalPLayer ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
             const colorSecondMessage = !isFromLocalPLayer ? ChatEntryColor.RemotePlayer : ChatEntryColor.LocalPlayer;

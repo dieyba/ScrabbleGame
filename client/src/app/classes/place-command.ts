@@ -36,7 +36,7 @@ export class PlaceCmd extends Command {
             executionMessages.push(createErrorEntry(executionResult, commandMessage));
         } else {
             this.isExecuted = true;
-            const localPlayerName = this.gameService.currentGameService.localPlayer.name;
+            const localPlayerName = this.gameService.currentGameService.game.localPlayer.name;
             const color = this.player.name === localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
             executionMessages.push({ color, message: localPlayerName + ' >> ' + commandMessage });
         }

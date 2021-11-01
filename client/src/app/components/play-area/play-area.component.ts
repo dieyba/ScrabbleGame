@@ -65,16 +65,18 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawColors();
         this.rackService.drawRack();
         this.rackContext = this.rackService.gridContext;
+        console.log("local:", this.gameService.currentGameService.game.localPlayer.name);
+        console.log("opponent:", this.gameService.currentGameService.game.opponentPlayer.name);
     }
 
     passTurn() {
-        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.localPlayer, serviceCalled: this.gameService };
+        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.game.localPlayer, serviceCalled: this.gameService };
         const command = new PassTurnCmd(defaultParams);
         this.commandInvokerService.executeCommand(command);
     }
 
     isLocalPlayerActive(): boolean {
-        return this.gameService.currentGameService.localPlayer.isActive;
+        return this.gameService.currentGameService.game.localPlayer.isActive;
     }
 
     isEndGame(): boolean {
@@ -118,7 +120,7 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     exchange() {
-        this.exchangeService.exchange(); // TODO Must send command text to chat. Create command instead here or in ExchangeService
+        this.exchangeService.exchange();
     }
 
     cancelExchange() {

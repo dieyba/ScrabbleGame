@@ -277,7 +277,7 @@ export class MouseWordPlacerService {
         // If the response is positive, draw the word on the board canvas and remove the overlay
         const posArray = this.convertPositionToGridIndex(this.initialPosition);
         const posVec = new Vec2(posArray[0], posArray[1]);
-        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.localPlayer, serviceCalled: this.gameService };
+        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.game.localPlayer, serviceCalled: this.gameService };
         const params: PlaceParams = { position: posVec, orientation: this.currentAxis, word: this.wordString };
         // Refund letters to rack before placing
         this.removeAllLetters();

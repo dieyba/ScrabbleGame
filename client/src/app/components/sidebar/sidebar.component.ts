@@ -15,7 +15,7 @@ export class SidebarComponent {
         this.winnerName = '';
     }
     getPlayer1Name(): string {
-        return this.gameService.currentGameService.game.creatorPlayer.name;
+        return this.gameService.currentGameService.game.localPlayer.name;
     }
 
     getPlayer2Name(): string {
@@ -27,15 +27,15 @@ export class SidebarComponent {
     }
 
     getPlayer1LetterCount(): number {
-        return this.gameService.currentGameService.localPlayer.letters.length;
+        return this.gameService.currentGameService.game.localPlayer.letters.length;
     }
 
     getPlayer2LetterCount(): number {
-        return this.gameService.currentGameService.localPlayer.letters.length;
+        return this.gameService.currentGameService.game.localPlayer.letters.length;
     }
 
     getPlayer1Score(): number {
-        return this.gameService.currentGameService.game.creatorPlayer.score;
+        return this.gameService.currentGameService.game.localPlayer.score;
     }
 
     getPlayer2Score(): number {
@@ -43,7 +43,7 @@ export class SidebarComponent {
     }
 
     isPlayer1Active(): boolean {
-        return this.gameService.currentGameService.game.creatorPlayer.isActive;
+        return this.gameService.currentGameService.game.localPlayer.isActive;
     }
 
     isPlayer2Active(): boolean {
@@ -59,11 +59,11 @@ export class SidebarComponent {
     }
 
     hasWinner(): boolean {
-        return this.gameService.currentGameService.game.creatorPlayer.isWinner || this.gameService.currentGameService.game.opponentPlayer.isWinner;
+        return this.gameService.currentGameService.game.localPlayer.isWinner || this.gameService.currentGameService.game.opponentPlayer.isWinner;
     }
 
     isDrawnGame(): boolean {
-        if (this.gameService.currentGameService.game.creatorPlayer.isWinner && this.gameService.currentGameService.game.opponentPlayer.isWinner) {
+        if (this.gameService.currentGameService.game.localPlayer.isWinner && this.gameService.currentGameService.game.opponentPlayer.isWinner) {
             return true;
         } else {
             return false;
@@ -73,10 +73,10 @@ export class SidebarComponent {
     getWinnerName() {
         if (this.isDrawnGame()) {
             this.winnerName =
-                this.gameService.currentGameService.game.creatorPlayer.name + ' et ' + this.gameService.currentGameService.game.opponentPlayer.name;
+                this.gameService.currentGameService.game.localPlayer.name + ' et ' + this.gameService.currentGameService.game.opponentPlayer.name;
         }
-        if (this.gameService.currentGameService.game.creatorPlayer.isWinner) {
-            this.winnerName = this.gameService.currentGameService.game.creatorPlayer.name;
+        if (this.gameService.currentGameService.game.localPlayer.isWinner) {
+            this.winnerName = this.gameService.currentGameService.game.localPlayer.name;
         }
         if (this.gameService.currentGameService.game.opponentPlayer.isWinner) {
             this.winnerName = this.gameService.currentGameService.game.opponentPlayer.name;

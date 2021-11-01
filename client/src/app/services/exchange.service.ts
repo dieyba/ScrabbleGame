@@ -36,14 +36,14 @@ export class ExchangeService {
     }
 
     exchange() {
-        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.localPlayer, serviceCalled: this.gameService };
+        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.game.localPlayer, serviceCalled: this.gameService };
         const letters = this.gameService.currentGameService.getLettersSelected();
         const command = new ExchangeCmd(defaultParams, letters);
         this.commandInvokerService.executeCommand(command);
     }
 
     cancelExchange(rackContext: CanvasRenderingContext2D) {
-        for (let i = 1; i <= this.gameService.currentGameService.localPlayer.letters.length; i++) {
+        for (let i = 1; i <= this.gameService.currentGameService.game.localPlayer.letters.length; i++) {
             this.rackService.deselect(i, rackContext, true);
         }
     }

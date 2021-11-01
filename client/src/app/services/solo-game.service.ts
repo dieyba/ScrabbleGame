@@ -25,15 +25,13 @@ export const DEFAULT_LETTER_COUNT = 7;
 const DOUBLE_DIGIT = 10;
 const MINUTE_IN_SEC = 60;
 const MAX_TURNS_PASSED = 6;
+const LOCAL_PLAYER_INDEX = 0;
 
 @Injectable({
     providedIn: 'root',
 })
 export class SoloGameService {
     game: GameParameters;
-    // TODO: Addapt solo game service to local player instead of creator player.
-    // or tbh we should just rename creatorPlayer to localPlayer in the client version of gameParameters
-    localPlayer: Player;
     timer: string;
     intervalValue: NodeJS.Timeout;
 
@@ -46,37 +44,36 @@ export class SoloGameService {
         protected placeService: PlaceService,
     ) {}
     initializeGame(gameInfo: FormGroup) {
-        this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value);
-        this.chatDisplayService.entries = [];
-        this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
-        this.game.creatorPlayer.isActive = true;
+        this.game = new GameParameters(gameInfo.controls.name.value, gameInfo.controls.timer.value);
         this.game.stock = new LetterStock();
+        this.game.localPlayer = new LocalPlayer(gameInfo.controls.name.value); // where does local player take his letters from stock?
+        this.game.creatorPlayer = this.game.localPlayer;
+
         this.game.opponentPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
+        this.game.localPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        this.game.totalCountDown = +gameInfo.controls.timer.value;
-        this.game.timerMs = +this.game.totalCountDown;
+
         this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.game.randomBonus = gameInfo.controls.bonus.value;
-        this.localPlayer = this.game.creatorPlayer;
+        this.game.totalCountDown = gameInfo.controls.timer.value;
+        this.game.timerMs = gameInfo.controls.timer.value;
+        return this.game;
     }
     createNewGame() {
-        // Empty board and stack
-        this.chatDisplayService.initialize(this.localPlayer.name);
+        // cant we just put these two in initialize game? see for multiplayer
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = new ScrabbleBoard();
-        // this.addRackLetters(this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT));
-        const tab = [
-            this.game.stock.takeLetter('m'),
-            this.game.stock.takeLetter('a'),
-            this.game.stock.takeLetter('i'),
-            this.game.stock.takeLetter('s'),
-            this.game.stock.takeLetter('o'),
-            this.game.stock.takeLetter('n'),
-            this.game.stock.takeLetter('s'),
-        ];
-        this.addRackLetters(tab);
+        this.chatDisplayService.initialize(this.game.localPlayer.name);
+        this.setStarterPlayer();
+        this.addRackLetters(this.game.localPlayer.letters);
         this.startCountdown();
         this.game.hasTurnsBeenPassed[0] = false;
+    }
+    resetTimer() {
+        this.game.timerMs = +this.game.totalCountDown;
+        this.secondsToMinutes();
+        clearInterval(this.intervalValue);
+        this.startCountdown();
     }
     startCountdown() {
         this.secondsToMinutes();
@@ -91,17 +88,13 @@ export class SoloGameService {
             this.secondsToMinutes();
         }, TIMER_INTERVAL);
     }
-    secondsToMinutes() {
-        const s = Math.floor(this.game.timerMs / MINUTE_IN_SEC);
-        const ms = this.game.timerMs % MINUTE_IN_SEC;
-        if (ms < DOUBLE_DIGIT) {
-            this.timer = s + ':' + 0 + ms;
-        } else {
-            this.timer = s + ':' + ms;
-        }
-    }
+
     // New Turn
     changeActivePlayer() {
+        this.updateLastTurnsPassed();
+        this.updateActivePlayer();
+    }
+    updateLastTurnsPassed() {
         // Check if last turn was passed by player
         if (this.game.turnPassed) {
             this.game.hasTurnsBeenPassed[this.game.hasTurnsBeenPassed.length] = false;
@@ -110,22 +103,18 @@ export class SoloGameService {
         } else {
             this.game.hasTurnsBeenPassed[this.game.hasTurnsBeenPassed.length] = false;
         }
-
+    }
+    updateActivePlayer() {
         // Change active player and reset timer for new turn
-        const isLocalPlayerActive = this.game.creatorPlayer.isActive;
-        if (isLocalPlayerActive) {
+        if (this.game.localPlayer.isActive) {
             // If the rack is empty, end game + player won
-            if (this.game.creatorPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
-                this.game.creatorPlayer.isWinner = true;
+            if (this.game.localPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+                this.game.localPlayer.isWinner = true;
                 this.endGame();
                 return;
             }
-            this.game.creatorPlayer.isActive = false;
+            this.game.localPlayer.isActive = false;
             this.game.opponentPlayer.isActive = true;
-            // this.game.timerMs = +this.game.totalCountDown;
-            // this.secondsToMinutes();
-            // clearInterval(this.intervalValue);
-            // this.startCountdown();
         } else {
             // If the rack is empty, end game + player won
             if (this.game.opponentPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
@@ -134,61 +123,23 @@ export class SoloGameService {
                 return;
             }
             this.game.opponentPlayer.isActive = false;
-            this.game.creatorPlayer.isActive = true;
-            // this.game.timerMs = +this.game.totalCountDown;
-            // this.secondsToMinutes();
-            // clearInterval(this.intervalValue);
-            // this.startCountdown();
+            this.game.localPlayer.isActive = true;
         }
     }
 
-    resetTimer() {
-        this.game.timerMs = +this.game.totalCountDown;
-        this.secondsToMinutes();
-        clearInterval(this.intervalValue);
-        this.startCountdown();
-    }
-
-    passTurn(player: Player) {
-        if (player.isActive) {
-            this.game.turnPassed = true;
-            if (this.isTurnsPassedLimit() && this.game.hasTurnsBeenPassed.length >= MAX_TURNS_PASSED) {
-                this.endGame();
-                return ErrorType.NoError;
-            }
-            this.game.timerMs = 0;
-            this.secondsToMinutes();
-            this.changeActivePlayer();
-            this.resetTimer();
-            this.game.turnPassed = false;
-            this.endGame(); // TODO:test to remove
-            return ErrorType.NoError;
+    addRackLetters(letters: ScrabbleLetter[]): void {
+        for (const letter of letters) {
+            this.addRackLetter(letter);
         }
-        return ErrorType.ImpossibleCommand;
     }
-    // Check if last 5 turns have been passed (current turn is the 6th)
-    isTurnsPassedLimit(): boolean {
-        let isLimit = true;
-        for (let i = this.game.hasTurnsBeenPassed.length - 1; i > this.game.hasTurnsBeenPassed.length - MAX_TURNS_PASSED; i--) {
-            isLimit = isLimit && this.game.hasTurnsBeenPassed[i];
-        }
-        return isLimit;
+    addRackLetter(letter: ScrabbleLetter): void {
+        this.rackService.addLetter(letter);
+        // TODO: fix adding letter to rack vs player in solo vs multi
+        // this.game.localPlayer.letters[this.game.creatorPlayer.letters.length] = letter;
     }
-    drawRack(newWords: ScrabbleWord[]): void {
-        newWords.forEach((newWord) => {
-            for (let j = 0; j < newWord.content.length; j++) {
-                if (newWord.orientation === Axis.V) {
-                    if (this.gridService.scrabbleBoard.squares[newWord.startPosition.x][newWord.startPosition.y + j].isValidated !== true) {
-                        this.addRackLetter(newWord.content[j]);
-                    }
-                }
-                if (newWord.orientation === Axis.H) {
-                    if (this.gridService.scrabbleBoard.squares[newWord.startPosition.x + j][newWord.startPosition.y].isValidated !== true) {
-                        this.addRackLetter(newWord.content[j]);
-                    }
-                }
-            }
-        });
+    addLetterToPlayer(letter: ScrabbleLetter) {
+        // this.game.localPlayer.letters[this.game.creatorPlayer.letters.length] = letter;
+        this.game.localPlayer.addLetter(letter);
     }
     exchangeLetters(player: Player, letters: string): ErrorType {
         if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
@@ -202,83 +153,13 @@ export class SoloGameService {
                 for (let i = 0; i < lettersToAdd.length; i++) {
                     this.rackService.removeLetter(lettersToRemove[i]);
                     this.addRackLetter(lettersToAdd[i]);
-                    // player.letters[this.game.creatorPlayer.letters.length] = lettersToAdd[i];
+                    this.addLetterToPlayer(lettersToAdd[i]);
                 }
-                this.passTurn(this.game.creatorPlayer);
+                this.passTurn(player);
                 return ErrorType.NoError;
             }
         }
         return ErrorType.ImpossibleCommand;
-    }
-
-    getLettersSelected(): string {
-        let letters = '';
-
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < this.rackService.exchangeSelected.length; i++) {
-            if (this.rackService.exchangeSelected[i] === true) {
-                letters += this.rackService.rackLetters[i].character;
-                this.rackService.exchangeSelected[i] = false;
-            }
-        }
-        return letters;
-    }
-
-    addRackLetters(letters: ScrabbleLetter[]): void {
-        for (const letter of letters) {
-            this.addRackLetter(letter);
-        }
-    }
-    addRackLetter(letter: ScrabbleLetter): void {
-        this.rackService.addLetter(letter);
-        this.game.creatorPlayer.letters[this.game.creatorPlayer.letters.length] = letter;
-        // this.localPlayer.letters[this.localPlayer.letters.length] = letter;
-        // this.localPlayer.addLetter(letter);
-    }
-    removeRackLetter(scrabbleLetter: ScrabbleLetter): void {
-        const i = this.rackService.removeLetter(scrabbleLetter);
-        this.game.creatorPlayer.letters.splice(i, 1);
-    }
-    displayEndGameMessage() {
-        const endGameMessages = this.chatDisplayService.createEndGameMessages(this.game.stock.letterStock, this.game.creatorPlayer, this.game.opponentPlayer);
-        endGameMessages.forEach(message => {
-            this.chatDisplayService.addEntry(message);
-        });
-    }
-
-    // TODO:just rename the creator player to local player and theres no need for this method
-    getOpponentPlayer(): Player {
-        return this.localPlayer === this.game.creatorPlayer ? this.game.creatorPlayer : this.game.opponentPlayer;
-    }
-    endGame() {
-        this.displayEndGameMessage();
-        const localPlayerPoints = this.calculateRackPoints(this.localPlayer);
-        const virtualPlayerPoints = this.calculateRackPoints(this.getOpponentPlayer());
-        const opponent = this.getOpponentPlayer();
-
-        // are the right player's points added to the right player's score?
-        if (this.localPlayer.isWinner === true) {
-            this.localPlayer.score += virtualPlayerPoints;
-            opponent.score -= virtualPlayerPoints;
-        } else if (opponent.isWinner === true) {
-            opponent.score += localPlayerPoints;
-            this.localPlayer.score -= localPlayerPoints;
-        } else {
-            this.localPlayer.score -= localPlayerPoints;
-            opponent.score -= virtualPlayerPoints;
-        }
-        clearInterval(this.intervalValue);
-        this.game.timerMs = 0;
-        this.secondsToMinutes();
-        // Show message in sidebar and end of game info in communication box
-        this.game.isEndGame = true;
-    }
-    calculateRackPoints(player: Player): number {
-        let totalValue = 0;
-        player.letters.forEach((letter) => {
-            totalValue += letter.value;
-        });
-        return totalValue;
     }
     place(player: Player, placeParams: PlaceParams): ErrorType {
         const errorResult = this.placeService.place(player, placeParams);
@@ -317,5 +198,109 @@ export class SoloGameService {
         }
 
         return errorResult;
+    }
+    displayEndGameMessage() {
+        const endGameMessages = this.chatDisplayService.createEndGameMessages(this.game.stock.letterStock, this.game.localPlayer, this.game.opponentPlayer);
+        endGameMessages.forEach(message => {
+            this.chatDisplayService.addEntry(message);
+        });
+    }
+    endGame() {
+        this.displayEndGameMessage();
+        const localPlayerPoints = this.calculateRackPoints(this.game.localPlayer);
+        const virtualPlayerPoints = this.calculateRackPoints(this.game.opponentPlayer);
+
+        // TODO: make sure, are the right player's points added to the right player's score?
+        if (this.game.localPlayer.isWinner === true) {
+            this.game.localPlayer.score += virtualPlayerPoints;
+            this.game.opponentPlayer.score -= virtualPlayerPoints;
+        } else if (this.game.opponentPlayer.isWinner === true) {
+            this.game.opponentPlayer.score += localPlayerPoints;
+            this.game.localPlayer.score -= localPlayerPoints;
+        } else {
+            this.game.localPlayer.score -= localPlayerPoints;
+            this.game.opponentPlayer.score -= virtualPlayerPoints;
+        }
+        clearInterval(this.intervalValue);
+        this.game.timerMs = 0;
+        this.secondsToMinutes();
+        this.game.isEndGame = true;
+    }
+    passTurn(player: Player) {
+        if (player.isActive) {
+            this.game.turnPassed = true;
+            if (this.isTurnsPassedLimit() && this.game.hasTurnsBeenPassed.length >= MAX_TURNS_PASSED) {
+                this.endGame();
+                return ErrorType.NoError;
+            }
+            this.game.timerMs = 0;
+            this.secondsToMinutes();
+            this.changeActivePlayer();
+            this.resetTimer();
+            this.game.turnPassed = false;
+            return ErrorType.NoError;
+        }
+        return ErrorType.ImpossibleCommand;
+    }
+    setStarterPlayer() {
+        const starterPlayerIndex = Math.round(Math.random()); // return 0 or 1
+        const starterPlayer = starterPlayerIndex === LOCAL_PLAYER_INDEX ? this.game.localPlayer : this.game.opponentPlayer;
+        starterPlayer.isActive = true;
+    }
+    secondsToMinutes() {
+        const s = Math.floor(this.game.timerMs / MINUTE_IN_SEC);
+        const ms = this.game.timerMs % MINUTE_IN_SEC;
+        if (ms < DOUBLE_DIGIT) {
+            this.timer = s + ':' + 0 + ms;
+        } else {
+            this.timer = s + ':' + ms;
+        }
+    }
+    // Check if last 5 turns have been passed (current turn is the 6th)
+    isTurnsPassedLimit(): boolean {
+        let isLimit = true;
+        for (let i = this.game.hasTurnsBeenPassed.length - 1; i > this.game.hasTurnsBeenPassed.length - MAX_TURNS_PASSED; i--) {
+            isLimit = isLimit && this.game.hasTurnsBeenPassed[i];
+        }
+        return isLimit;
+    }
+    removeRackLetter(scrabbleLetter: ScrabbleLetter): void {
+        const i = this.rackService.removeLetter(scrabbleLetter);
+        this.game.localPlayer.letters.splice(i, 1);
+    }
+    drawRack(newWords: ScrabbleWord[]): void {
+        newWords.forEach((newWord) => {
+            for (let j = 0; j < newWord.content.length; j++) {
+                if (newWord.orientation === Axis.V) {
+                    if (this.gridService.scrabbleBoard.squares[newWord.startPosition.x][newWord.startPosition.y + j].isValidated !== true) {
+                        this.addRackLetter(newWord.content[j]);
+                    }
+                }
+                if (newWord.orientation === Axis.H) {
+                    if (this.gridService.scrabbleBoard.squares[newWord.startPosition.x + j][newWord.startPosition.y].isValidated !== true) {
+                        this.addRackLetter(newWord.content[j]);
+                    }
+                }
+            }
+        });
+    }
+    getLettersSelected(): string {
+        let letters = '';
+
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < this.rackService.exchangeSelected.length; i++) {
+            if (this.rackService.exchangeSelected[i] === true) {
+                letters += this.rackService.rackLetters[i].character;
+                this.rackService.exchangeSelected[i] = false;
+            }
+        }
+        return letters;
+    }
+    calculateRackPoints(player: Player): number {
+        let totalValue = 0;
+        player.letters.forEach((letter) => {
+            totalValue += letter.value;
+        });
+        return totalValue;
     }
 }

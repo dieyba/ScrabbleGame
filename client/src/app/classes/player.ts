@@ -1,5 +1,6 @@
 import { ScrabbleLetter } from './scrabble-letter';
 
+// TODO: cant we make player non abstract, and virtual extends it?
 export abstract class Player {
     name: string;
     score: number;
@@ -7,6 +8,7 @@ export abstract class Player {
     isActive: boolean; // True is it is this players turn, false if not.
     isWinner: boolean;
     socketId: string;
+    roomId: number;
 
     constructor(name: string) {
         this.name = name;
