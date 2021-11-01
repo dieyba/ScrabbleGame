@@ -93,7 +93,7 @@ export class SocketManagerService {
         if (player) {
             this.gameListMan.deleteRoom(player.roomId);
         }
-        // this.sio.emit('roomdeleted');
+        this.sio.to(player.roomId.toString()).emit('roomdeleted');
     }
     private getAllGames(socket: io.Socket) {
         this.sio.emit('getAllGames', this.gameListMan.existingRooms);
