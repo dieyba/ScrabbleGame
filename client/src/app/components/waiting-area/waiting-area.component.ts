@@ -31,6 +31,7 @@ export class WaitingAreaComponent {
     nameValid: boolean;
     joindre: boolean;
     full: boolean;
+    gameCancelled: boolean;
 
     constructor(
         private multiManService: MultiPlayerGameService,
@@ -67,6 +68,11 @@ export class WaitingAreaComponent {
             // this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
             // this.socket.emit('startGame', this.gameList.roomInfo.gameRoom.idGame);
         });
+        this.socket.on('roomdeleted', (game: GameParameters) => {
+            this.joindre = false;
+            this.nameValid = false;
+            this.gameCancelled = true;
+        })
     }
     onSelect(game: GameParameters): GameParameters {
         if (this.gameSelected) {
@@ -84,12 +90,7 @@ export class WaitingAreaComponent {
         if (this.playerList.length == 2) {
             this.isStarting = true;
             clearInterval(this.timer);
-
-            // this.router.navigate(['/game']);
-            // this.dialogRef.close();
             this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
-            // setTimeout(() => {
-            // }, 5000);
         }
     }
     start(): void {

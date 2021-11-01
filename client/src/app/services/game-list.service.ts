@@ -43,7 +43,7 @@ export class GameListService {
             console.log(game);
             this.roomInfo = game;
             this.roomInfo.gameRoom = game.gameRoom;
-            this.players = game.players;
+            // this.players = game.players;
         });
     }
     getList(): GameParameters[] {

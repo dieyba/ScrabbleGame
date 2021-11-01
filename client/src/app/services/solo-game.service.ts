@@ -246,6 +246,8 @@ export class SoloGameService {
         const starterPlayerIndex = Math.round(Math.random()); // return 0 or 1
         const starterPlayer = starterPlayerIndex === LOCAL_PLAYER_INDEX ? this.game.localPlayer : this.game.opponentPlayer;
         starterPlayer.isActive = true;
+        // this.game.localPlayer.isActive = true;
+
     }
     secondsToMinutes() {
         const s = Math.floor(this.game.timerMs / MINUTE_IN_SEC);
