@@ -117,6 +117,8 @@ export class SocketManagerService {
         let roomGame = this.gameListMan.getCurrentGame(roomId);
         // this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
         if (roomGame) {
+            const starterPlayerIndex = Math.round(Math.random());
+            roomGame.players[starterPlayerIndex].isActive = true;
             this.sio.to(roomGame.gameRoom.idGame.toString()).emit('updateInfo', roomGame);
         }
     }
