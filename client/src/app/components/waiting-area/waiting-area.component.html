@@ -1,41 +1,39 @@
 <div class="waitingArea">
     <img class="image" src="https://bit.ly/3m206ss" width="600" height="100" alt="Logo Scrabble" />
     <div *ngIf="!gameSelected">
-        <h1>Vous etes en attente d'un autre joueur</h1>
-        <mat-spinner></mat-spinner>
+        <h1>Vous êtes en attente d'un autre joueur</h1>
+        <mat-spinner class="load"></mat-spinner>
         <div>
             <div *ngIf="playerList.length === 2">
-                Votre adversaire a rejoint la partie {{ playerList[1] }}
-                <button (click)="startIfFull()">Commencer</button>
+                <h3>Votre adversaire a rejoint la partie : {{ playerList[1] }}</h3>
+                <button class="small-btn" (click)="startIfFull()">Commencer</button>
             </div>
         </div>
-        <div *ngFor="let game of list">
-            <button>
-                <span>
-                    {{ game.gameRoom.idGame }}
-                </span>
-                <span> Createur:{{ game.creatorPlayer.name }} </span>
-                <span> Type de Dictionnaire: {{ game.dictionary.title }} </span>
-                <span> Temps:{{ game.totalCountDown }} </span>
-            </button>
-        </div>
-        <button (click)="convert(true); deleteRoom()">Convertir en Mode Solo</button>
-        <button (click)="closeDialog(); openForm(); deleteRoom()">Annuler</button>
+        <!--<div class="games" *ngFor="let game of list">
+             <button class="game-btn" (click)="openName(true); onSelect(game)">
+                    <span> Partie #{{ game.gameRoom.idGame }} - </span>
+                    <span> Créateur: {{ game.creatorPlayer.name }} - </span>
+                    <span> Dictionnaire: {{ game.dictionary.title }} - </span>
+                    <span> Temps: {{ game.totalCountDown }} secondes</span>
+                </button>
+        </div>-->
+        <button class="small-btn" (click)="convert(true); deleteRoom()">Convertir en Mode Solo</button>
+        <button class="small-btn" (click)="closeDialog(); openForm(); deleteRoom()">Annuler</button>
     </div>
     <div *ngIf="gameSelected">
-        <h3>Veuillez selectionner la partie que vous souhaitez rejoindre</h3>
-        <div *ngFor="let game of list">
-            <button (click)="openName(true); onSelect(game)">
-                <span>
-                    {{ game.gameRoom.idGame }}
-                </span>
-                <span> Createur:{{ game.creatorPlayer.name }} </span>
-                <span> Type de Dictionnaire: {{ game.dictionary.title }} </span>
-                <span> Temps:{{ game.totalCountDown }} </span>
-            </button>
-        </div>
+        <h1>Veuillez selectionner la partie que vous souhaitez rejoindre</h1>
+        <mat-card class="games">
+            <div *ngFor="let game of list">
+                <button class="game-btn" (click)="openName(true); onSelect(game)">
+                    <span> Partie #{{ game.gameRoom.idGame }} - </span>
+                    <span> Créateur: {{ game.creatorPlayer.name }} - </span>
+                    <span> Dictionnaire: {{ game.dictionary.title }} - </span>
+                    <span> Temps: {{ game.totalCountDown }} sec.</span>
+                </button>
+            </div>
+        </mat-card>
         <div *ngIf="name">
-            <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill">
+            <mat-form-field class="nameForm" hintLabel="characters min: 3 max: 10" appearance="fill">
                 <mat-label>Entrez votre nom</mat-label>
                 <input matInput #input maxlength="10" #input2 minlength="3" placeholder="Ex. Nougat" [formControl]="playerName" />
                 <mat-hint align="end">{{ input.value?.length || 0 }}/10</mat-hint>
@@ -43,19 +41,24 @@
                 <md-hint *ngIf="error" align="start">{{ nameErrorMessage }}</md-hint>
                 <md-hint *ngIf="!error" align="start">{{ nameErrorMessage }}</md-hint>
             </mat-form-field>
-            <button (click)="confirmName(selectedGame)">valider</button>
-            <div *ngIf="joindre">
-                <h4>veuillez cliquer ici pour joindre la partie</h4>
-                <button (click)="start()">Joindre</button>
+            <button class="small-btn" (click)="confirmName(selectedGame)">Valider</button>
+            <div *ngIf="gameCancelled">
+                <h3>Le Joueur a annulé la partie, veuillez selectionner une autre partie</h3>
+            </div>
+            <div class="row" *ngIf="joindre">
+                <h3 class="column">Veuillez cliquer ici pour joindre la partie :</h3>
+                <div class="column">
+                    <button class="small-btn" (click)="start()">Joindre</button>
+                </div>
             </div>
             <div *ngIf="full">
-                <h3>cette salle est remplie veuillez selectionner une autre salle</h3>
+                <h3>Cette salle est remplie, veuillez selectionner une autre salle</h3>
             </div>
             <div *ngIf="nameValid">
-                <h3>veuillez attendre que votre adversaire demarre la partie</h3>
-                <mat-spinner></mat-spinner>
+                <h3 class="wait-label">Veuillez attendre que votre adversaire démarre la partie</h3>
+                <mat-spinner class="load"></mat-spinner>
             </div>
         </div>
-        <button (click)="closeDialog(); openForm()">Retour</button>
+        <button class="small-btn" (click)="closeDialog(); openForm()">Retour</button>
     </div>
 </div>

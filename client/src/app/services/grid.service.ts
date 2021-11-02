@@ -40,10 +40,8 @@ export class GridService {
     private canvasSize: Vec2;
 
     constructor() {
-        this.scrabbleBoard = new ScrabbleBoard();
         this.letterFonts = ['27px system-ui', '30px system-ui', '33px system-ui', '35px system-ui'];
         this.valueFonts = ['9px system-ui', '11px system-ui', '13px system-ui', '15px system-ui'];
-        this.scrabbleBoard.generateBoard();
         this.currentLetterFont = this.letterFonts[DEFAULT_LETTER_FONT_INDEX];
         this.currentValueFont = this.valueFonts[DEFAULT_VALUE_FONT_INDEX];
         this.canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);

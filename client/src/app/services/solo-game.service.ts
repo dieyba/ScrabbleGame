@@ -7,7 +7,6 @@ import { ErrorType } from '@app/classes/errors';
 import { GameParameters } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
-import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis } from '@app/classes/utilities';
@@ -42,9 +41,13 @@ export class SoloGameService {
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
         protected placeService: PlaceService,
-    ) {}
+    ) {
+    }
     initializeGame(gameInfo: FormGroup) {
-        this.game = new GameParameters(gameInfo.controls.name.value, gameInfo.controls.timer.value);
+        this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value, gameInfo.controls.bonus.value);
+        this.chatDisplayService.entries = [];
+        this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
+        this.game.creatorPlayer.isActive = true;
         this.game.stock = new LetterStock();
         this.game.localPlayer = new LocalPlayer(gameInfo.controls.name.value); // where does local player take his letters from stock?
         this.game.creatorPlayer = this.game.localPlayer;
@@ -62,7 +65,7 @@ export class SoloGameService {
     }
     createNewGame() {
         this.rackService.rackLetters = [];
-        this.gridService.scrabbleBoard = new ScrabbleBoard();
+        this.gridService.scrabbleBoard = this.game.scrabbleBoard;
         this.chatDisplayService.initialize(this.game.localPlayer.name);
         this.addRackLetters(this.game.localPlayer.letters);
         this.startCountdown();
@@ -172,8 +175,9 @@ export class SoloGameService {
                 tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
             }
             // Call validation method and end turn
+            this.validationService.validateWords(tempScrabbleWords);
             setTimeout(() => {
-                if (!this.validationService.validateWords(tempScrabbleWords)) {
+                if (!this.validationService.areWordsValid) {
                     // Retake letters
                     const removedLetters = this.gridService.removeInvalidLetters(
                         placeParams.position,
@@ -186,10 +190,7 @@ export class SoloGameService {
                     this.validationService.updatePlayerScore(tempScrabbleWords, player);
                     // Take new letters
                     const newLetters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-                    for (const letter of newLetters) {
-                        this.rackService.addLetter(letter);
-                        player.letters.push(letter);
-                    }
+                    this.addRackLetters(newLetters)
                 }
 
                 this.passTurn(player);
@@ -240,6 +241,13 @@ export class SoloGameService {
             return ErrorType.NoError;
         }
         return ErrorType.ImpossibleCommand;
+    }
+    setStarterPlayer() {
+        const starterPlayerIndex = Math.round(Math.random()); // return 0 or 1
+        const starterPlayer = starterPlayerIndex === LOCAL_PLAYER_INDEX ? this.game.localPlayer : this.game.opponentPlayer;
+        starterPlayer.isActive = true;
+        // this.game.localPlayer.isActive = true;
+
     }
     secondsToMinutes() {
         const s = Math.floor(this.game.timerMs / MINUTE_IN_SEC);

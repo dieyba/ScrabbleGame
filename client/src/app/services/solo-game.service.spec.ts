@@ -22,17 +22,15 @@ const DEFAULT_HEIGHT = 600;
 describe('GameService', () => {
     let service: SoloGameService;
     let changeActivePlayerSpy: jasmine.Spy<any>;
-    let spyPlayer: LocalPlayer;
     let secondsToMinutesSpy: jasmine.Spy<any>;
     let startCountdownSpy: jasmine.Spy<any>;
     let gridServiceSpy: jasmine.SpyObj<GridService>;
     let addRackLettersSpy: jasmine.Spy<any>;
-    let addRackLetterSpy: jasmine.Spy<any>;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
     let ctxStub: CanvasRenderingContext2D;
     beforeEach(() => {
         ctxStub = CanvasTestHelper.createCanvas(DEFAULT_WIDTH, DEFAULT_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
-        gridServiceSpy = jasmine.createSpyObj('GridService', ['drawLetter', 'drawLetters'], { scrabbleBoard: new ScrabbleBoard() });
+        gridServiceSpy = jasmine.createSpyObj('GridService', ['drawLetter', 'drawLetters'], { scrabbleBoard: new ScrabbleBoard(false) });
         rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'drawLetter', 'removeLetter', 'addLetter', 'rackLetters'], {
             rackLetters: [] as ScrabbleLetter[],
         });
@@ -47,7 +45,7 @@ describe('GameService', () => {
         secondsToMinutesSpy = spyOn<any>(service, 'secondsToMinutes').and.callThrough();
         startCountdownSpy = spyOn<any>(service, 'startCountdown').and.callThrough();
         addRackLettersSpy = spyOn<any>(service, 'addRackLetters').and.callThrough();
-        service.game = new GameParameters('Ariane', 60);
+        service.game = new GameParameters('Ariane', 60, false);
         const letter: ScrabbleLetter = new ScrabbleLetter('a', 1);
         service.game.creatorPlayer = new LocalPlayer('Ariane');
         service.game.creatorPlayer.score = 73;

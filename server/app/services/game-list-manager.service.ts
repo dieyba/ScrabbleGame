@@ -1,13 +1,14 @@
 import { GameParameters } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import { Service } from 'typedi';
+import { ValidationService } from './validation.service';
 
 @Service()
 export class GameListManager {
     existingRooms: Array<GameParameters>;
     currentGames: Array<GameParameters>;
     private currentRoomID: number;
-    constructor() {
+    constructor(private validationService: ValidationService) {
         this.existingRooms = new Array<GameParameters>();
         this.currentGames = new Array<GameParameters>();
         this.currentRoomID = this.existingRooms.length;
@@ -29,13 +30,19 @@ export class GameListManager {
         }
         return undefined;
     }
-    public createRoom(creator: string, timer: number): GameParameters {
-        let room = this.addRoom(creator, timer);
-
+    public validateNewWords(newWords: string[]): boolean {
+        if (this.validationService.validateWords(newWords)) {
+            return true;
+        } else {
+            return false
+        }
+    }
+    public createRoom(creator: string, timer: number, isRandomBonus: boolean): GameParameters {
+        let room = this.addRoom(creator, timer, isRandomBonus);
         return room;
     }
-    public addRoom(creator: string, timer: number): GameParameters {
-        let newRoom = new GameParameters(creator, timer, this.currentRoomID++);
+    public addRoom(creator: string, timer: number, isRandomBonus: boolean): GameParameters {
+        let newRoom = new GameParameters(creator, timer, isRandomBonus, this.currentRoomID++);
         newRoom.creatorPlayer.roomId = this.currentRoomID;
         newRoom.setIdGame(this.currentRoomID);
         this.existingRooms.push(newRoom);

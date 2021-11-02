@@ -81,7 +81,7 @@
 //     });
 
 //     it('should add remaining letters and both players remaining letters', () => {
-//         // const toStringSpy = spyOn(service, 'scrabbleLetterstoString').and.callThrough(); this function was moved to utilities
+//         const toStringSpy = spyOn(service, 'scrabbleLetterstoString').and.callThrough(); this function was moved to utilities
 
 //         const remainingLetters: ScrabbleLetter[] = [new ScrabbleLetter('a', 1), new ScrabbleLetter('b', 1)];
 //         const firstPlayerLetters: ScrabbleLetter[] = [new ScrabbleLetter('c', 1), new ScrabbleLetter('d', 1)];
@@ -101,6 +101,17 @@
 //         expect(service.entries[0]).toEqual(remainingLettersEntry);
 //         expect(service.entries[1]).toEqual(firstPlayerEntry);
 //         expect(service.entries[2]).toEqual(secondPlayerEntry);
+//         expect(toStringSpy).toHaveBeenCalledTimes(3);
+//     });
+
+//     it('should be able to create Exchange Message when true ', () => {
+//         const exchangemsg = '!échanger bonjour';
+//         expect(service.createExchangeMessage(true, exchangemsg)).toEqual('!échanger bonjour');
+//     });
+
+//     it('should be able to create Exchange Message when false ', () => {
+//         const exchangemsg = '!échanger bonjour';
+//         expect(service.createExchangeMessage(false, exchangemsg)).toEqual('!échanger 7 lettre(s)');
 //         // expect(toStringSpy).toHaveBeenCalledTimes(3);
 //     });
 // });
