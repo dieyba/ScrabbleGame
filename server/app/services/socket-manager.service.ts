@@ -59,6 +59,11 @@ export class SocketManagerService {
             socket.on('reset timer', (timerMs: number) => {
                 this.resetTimer(socket);
             });
+            socket.on('disconnect', (roomId: any) => {
+                const playerArrayIndex = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
+                this.playerMan.allPlayers.splice(playerArrayIndex, 1);
+                socket.disconnect();
+            })
         });
         setInterval(() => {}, 1000);
     }
@@ -117,6 +122,8 @@ export class SocketManagerService {
         let roomGame = this.gameListMan.getCurrentGame(roomId);
         // this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
         if (roomGame) {
+            const starterPlayerIndex = Math.round(Math.random());
+            roomGame.players[starterPlayerIndex].isActive = true;
             this.sio.to(roomGame.gameRoom.idGame.toString()).emit('updateInfo', roomGame);
         }
     }

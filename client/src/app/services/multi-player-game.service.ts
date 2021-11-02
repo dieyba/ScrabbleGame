@@ -51,6 +51,8 @@ export class MultiPlayerGameService extends SoloGameService {
         this.game.opponentPlayer = new LocalPlayer(game.gameRoom.playersName[opponentPlayerIndex]);
         this.game.localPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.localPlayer.isActive = this.game.players[localPlayerIndex].isActive;
+        this.game.opponentPlayer.isActive = this.game.players[opponentPlayerIndex].isActive;
         this.game.dictionary = new Dictionary(0);
         this.game.totalCountDown = game.totalCountDown;
         this.game.timerMs = game.totalCountDown;

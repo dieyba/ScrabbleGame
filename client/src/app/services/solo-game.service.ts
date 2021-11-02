@@ -48,23 +48,22 @@ export class SoloGameService {
         this.game.stock = new LetterStock();
         this.game.localPlayer = new LocalPlayer(gameInfo.controls.name.value); // where does local player take his letters from stock?
         this.game.creatorPlayer = this.game.localPlayer;
-
         this.game.opponentPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
         this.game.localPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-
         this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.game.randomBonus = gameInfo.controls.bonus.value;
         this.game.totalCountDown = gameInfo.controls.timer.value;
         this.game.timerMs = gameInfo.controls.timer.value;
+        const starterPlayerIndex = Math.round(Math.random()); // return 0 or 1
+        const starterPlayer = starterPlayerIndex === LOCAL_PLAYER_INDEX ? this.game.localPlayer : this.game.opponentPlayer;
+        starterPlayer.isActive = true;
         return this.game;
     }
     createNewGame() {
-        // cant we just put these two in initialize game? see for multiplayer
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = new ScrabbleBoard();
         this.chatDisplayService.initialize(this.game.localPlayer.name);
-        this.setStarterPlayer();
         this.addRackLetters(this.game.localPlayer.letters);
         this.startCountdown();
         this.game.hasTurnsBeenPassed[0] = false;

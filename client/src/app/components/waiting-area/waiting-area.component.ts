@@ -33,6 +33,7 @@ export class WaitingAreaComponent {
     full: boolean;
     gameCancelled: boolean;
 
+
     constructor(
         private multiManService: MultiPlayerGameService,
         private router: Router,

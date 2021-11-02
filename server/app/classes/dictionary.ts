@@ -1,8 +1,5 @@
 // TODO : Integrate other dictionnaries and choices
-// import dict_path from '@client/src/assets/dictionnary.json';
 import * as dict_path from '@app/assets/dictionnary.json';
-// import { default as dict_path } from '@server/assets/dictionnary.json';
-// dict_path.primaryMain;
 export enum DictionaryType {
     Default = 0,
     English = 1,
@@ -21,7 +18,7 @@ export class Dictionary {
     selectDictionary(type: DictionaryType): void {
         switch (type) {
             case DictionaryType.Default:
-            this.initializeDictionary(dict_path as Dictionary);
+                this.initializeDictionary(dict_path as Dictionary);
         }
     }
 
