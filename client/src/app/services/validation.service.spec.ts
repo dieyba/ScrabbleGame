@@ -27,8 +27,9 @@
 //         isWordValidSpy = spyOn<any>(service, 'isWordValid').and.callThrough();
 //         convertScrabbleWordToStringSpy = spyOn<any>(service, 'convertScrabbleWordToString').and.callThrough();
 //         service.dictionary = new Dictionary(DictionaryType.Default);
-//         gridServiceSpy.scrabbleBoard = new ScrabbleBoard();
-//         gridServiceSpy.scrabbleBoard.generateBoard();
+
+//         gridServiceSpy.scrabbleBoard = new ScrabbleBoard(false);
+//         gridServiceSpy.scrabbleBoard.generateBoard(false);
 //     });
 
 //     it('should be created', () => {
@@ -125,7 +126,8 @@
 //         expect(service.validateWords(words)).toEqual(false);
 //     });
 
-//     it('if letters added total is 7, calculateScore should add 50 pts bonus', () => {
+//     it('if letters added total is 7, validateWordsAndCalculateScore should add 50 pts bonus', () => {
+//         gridServiceSpy.scrabbleBoard.generateBoard(false);
 //         const letter1: ScrabbleLetter = new ScrabbleLetter('a', 1);
 //         const letter2: ScrabbleLetter = new ScrabbleLetter('p', 1);
 //         const letter3: ScrabbleLetter = new ScrabbleLetter('e', 1);

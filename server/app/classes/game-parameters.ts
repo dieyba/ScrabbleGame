@@ -3,7 +3,6 @@ import { LetterStock } from '@app/services/letter-stock.service';
 import { Dictionary } from './dictionary';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
-import { ScrabbleWord } from './scrabble-word';
 
 export interface GameRoom {
     idGame: number;
@@ -24,20 +23,20 @@ export class GameParameters {
     turnPassed: boolean;
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
-    newWords: ScrabbleWord[];
     // multiplayerGame: MultiPlayerGameService;
 
-    constructor(creatorPlayerName: string, timer: number, id: number) {
+    constructor(creatorPlayerName: string, timer: number, isRandomBonus: boolean, id: number) {
         this.players = new Array<Player>();
-        // this.randomBonus = boni;
         this.creatorPlayer = new Player(creatorPlayerName, '');
         this.totalCountDown = timer;
         this.gameRoom.idGame = id;
         this.gameRoom.capacity = 2;
         this.dictionary = new Dictionary(0);
+        this.randomBonus = isRandomBonus;
         this.stock = new LetterStock();
         this.hasTurnsBeenPassed = [false, false, false];
         // this.multiplayerGame = new MultiPlayerGameService(this.players);
+        console.log(this.randomBonus);
     }
     addPlayer(player: Player) {
         if (this.gameRoom.playersName.length < this.gameRoom.capacity) {

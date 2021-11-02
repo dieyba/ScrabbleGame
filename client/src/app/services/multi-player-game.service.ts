@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-import { PlaceParams } from '@app/classes/commands';
 import { Dictionary } from '@app/classes/dictionary';
 import { ErrorType } from '@app/classes/errors';
 import { GameParameters } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
-import { Vec2 } from '@app/classes/vec2';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { ChatDisplayService } from './chat-display.service';
@@ -13,7 +12,7 @@ import { GridService } from './grid.service';
 import { LetterStock } from './letter-stock.service';
 import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
-import { DEFAULT_LETTER_COUNT, SoloGameService } from './solo-game.service';
+import { DEFAULT_LETTER_COUNT, SoloGameService, TIMER_INTERVAL } from './solo-game.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
@@ -23,6 +22,7 @@ import { WordBuilderService } from './word-builder.service';
 export class MultiPlayerGameService extends SoloGameService {
     game: GameParameters;
     private socket: io.Socket;
+    areNewWordsValid: boolean = false;
     private readonly server: string;
 
     constructor(
@@ -36,6 +36,7 @@ export class MultiPlayerGameService extends SoloGameService {
         super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService);
         this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
+        // Change active player and reset timer
         this.socket.on('timer reset', (timer: number) => {
             this.updateActivePlayer();
             this.resetTimer();
@@ -55,7 +56,8 @@ export class MultiPlayerGameService extends SoloGameService {
         this.game.opponentPlayer.isActive = this.game.players[opponentPlayerIndex].isActive;
         this.game.dictionary = new Dictionary(0);
         this.game.totalCountDown = game.totalCountDown;
-        this.game.timerMs = game.totalCountDown;
+        this.game.randomBonus = game.randomBonus;
+        this.game.timerMs = +this.game.totalCountDown;
     }
 
     override changeActivePlayer() {
@@ -63,72 +65,95 @@ export class MultiPlayerGameService extends SoloGameService {
         this.socket.emit('reset timer');
     }
 
-    override place(player: Player, placeParams: PlaceParams): ErrorType {
-        const tempCoord = new Vec2();
-        // Checking if its player's turn
-        if (!this.placeService.canPlaceWord(player, placeParams)) {
-            return ErrorType.SyntaxError;
-        }
-        // Removing all the letters from my "word" that are already on the board
-        let wordCopy = placeParams.word;
-        const letterOnBoard = this.gridService.scrabbleBoard.getStringFromCoord(
-            placeParams.position,
-            placeParams.word.length,
-            placeParams.orientation,
-        );
-        for (const letter of letterOnBoard) {
-            wordCopy = wordCopy.replace(letter.toLowerCase(), '');
-        }
-        // All letter are already placed
-        if (wordCopy === '') {
-            return ErrorType.SyntaxError;
-        }
-        // Checking if the rest of the letters are on the rack
-        for (const letter of player.letters) {
-            // If there is an star, removing a upper letter from "word" string
-            if (letter.character === '*') {
-                let upperLetter = '';
-                for (const wordLetter of wordCopy) {
-                    if (wordLetter === wordLetter.toUpperCase()) {
-                        upperLetter = wordLetter;
-                    }
-                }
-                wordCopy = wordCopy.replace(upperLetter, '');
-            } else {
-                wordCopy = wordCopy.replace(letter.character, '');
-            }
-        }
-        // There should be no letters left, else there is not enough letter on the rack to place de "word"
-        if (wordCopy !== '') {
-            return ErrorType.SyntaxError;
-        }
-        // Placing letters
-        tempCoord.clone(placeParams.position);
-        for (const letter of placeParams.word) {
-            if (!this.gridService.scrabbleBoard.squares[tempCoord.x][tempCoord.y].occupied) {
-                // Taking letter from player and placing it
-                this.placeService.placeLetter(player.letters, letter, tempCoord);
-            }
-            if (placeParams.orientation === 'h') {
-                tempCoord.x++;
-            } else {
-                tempCoord.y++;
-            }
-        }
-        const newLetters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-        for (const letter of newLetters) {
-            this.rackService.addLetter(letter);
-            player.letters.push(letter);
-        }
-        // call server to placeword
-        this.socket.emit('placeLetter', this.game, placeParams);
-        return ErrorType.NoError;
-    }
-
     override displayEndGameMessage() {
         const endGameMessages = this.chatDisplayService.createEndGameMessages(this.game.stock.letterStock, this.game.localPlayer, this.game.opponentPlayer);
         endGameMessages.forEach(chatEntry => {
             this.chatDisplayService.sendSystemMessageToServer(chatEntry.message);
         });
+    }
+
+    override startCountdown() {
+        this.secondsToMinutes();
+        this.intervalValue = setInterval(() => {
+            this.game.timerMs--;
+            if (this.game.timerMs < 0) {
+                this.game.timerMs = 0;
+                this.secondsToMinutes();
+                this.changeActivePlayer();
+                // this.resetTimer();
+            }
+            this.secondsToMinutes();
+        }, TIMER_INTERVAL);
+    }
+
+    changePlayerAfterEmit() {
+        // Change active player and reset timer for new turn
+        const isLocalPlayerActive = this.game.creatorPlayer.isActive;
+        if (isLocalPlayerActive) {
+            // If the rack is empty, end game + player won
+            if (this.game.creatorPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+                this.game.creatorPlayer.isWinner = true;
+                this.endGame();
+                return;
+            }
+            this.game.creatorPlayer.isActive = false;
+            this.game.opponentPlayer.isActive = true;
+        } else {
+            // If the rack is empty, end game + player won
+            if (this.game.opponentPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+                this.game.opponentPlayer.isWinner = true;
+                this.endGame();
+                return;
+            }
+            this.game.opponentPlayer.isActive = false;
+            this.game.creatorPlayer.isActive = true;
+        }
+    }
+
+    exchangeLetters(player: Player, letters: string): ErrorType {
+        if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
+            const lettersToRemove: ScrabbleLetter[] = [];
+
+            if (player.removeLetter(letters) === true) {
+                for (let i = 0; i < letters.length; i++) {
+                    lettersToRemove[i] = new ScrabbleLetter(letters[i]);
+                }
+                const lettersToAdd: ScrabbleLetter[] = this.game.stock.exchangeLetters(lettersToRemove);
+                for (let i = 0; i < lettersToAdd.length; i++) {
+                    this.rackService.removeLetter(lettersToRemove[i]);
+                    this.addRackLetter(lettersToAdd[i]);
+                    player.addLetter(lettersToAdd[i]);
+                }
+                this.passTurn(player);
+                return ErrorType.NoError;
+            }
+        }
+        return ErrorType.ImpossibleCommand;
+    }
+
+    exchangeLettersSelected(player: Player) {
+        let letters = '';
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < this.rackService.exchangeSelected.length; i++) {
+            if (this.rackService.exchangeSelected[i] === true) {
+                letters += this.rackService.rackLetters[i].character;
+                this.rackService.exchangeSelected[i] = false;
+            }
+        }
+
+        this.exchangeLetters(player, letters);
+    }
+
+    addRackLetters(letters: ScrabbleLetter[]): void {
+        for (const letter of letters) {
+            this.addRackLetter(letter);
+        }
+    }
+
+    addRackLetter(letter: ScrabbleLetter): void {
+        this.rackService.addLetter(letter);
+        // this.game.creatorPlayer.letters[this.game.creatorPlayer.letters.length] = letter;
+        // this.localPlayer.letters[this.localPlayer.letters.length] = letter;
+        // this.localPlayer.addLetter(letter);
     }
 }

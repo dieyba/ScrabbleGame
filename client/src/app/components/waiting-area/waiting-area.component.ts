@@ -39,7 +39,7 @@ export class WaitingAreaComponent {
         private router: Router,
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
         private dialog: MatDialog,
-        public gameList: GameListService,
+        public gameList: GameListService, 
         @Inject(MAT_DIALOG_DATA) public gameSelected: boolean,
     ) {
         this.server = 'http://' + window.location.hostname + ':3000';
@@ -47,7 +47,7 @@ export class WaitingAreaComponent {
         this.list = [];
         this.name = false;
         if (gameSelected) {
-            this.selectedGame = new GameParameters('', 0);
+            this.selectedGame = new GameParameters('', 0, false);
             this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
         }
         this.socket = SocketHandler.requestSocket(this.server);
@@ -66,8 +66,6 @@ export class WaitingAreaComponent {
             this.router.navigate(['/game']);
             this.multiManService.initializeGame2(game);
             this.socket.emit('deleteRoom');
-            // this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
-            // this.socket.emit('startGame', this.gameList.roomInfo.gameRoom.idGame);
         });
         this.socket.on('roomdeleted', (game: GameParameters) => {
             this.joindre = false;

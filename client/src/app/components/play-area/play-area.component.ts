@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { DefaultCommandParams } from '@app/classes/commands';
 import { PassTurnCmd } from '@app/classes/pass-command';
+import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { Vec2 } from '@app/classes/vec2';
 import { CommandInvokerService } from '@app/services/command-invoker.service';
 import { ExchangeService } from '@app/services/exchange.service';
@@ -61,6 +62,7 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.mouseWordPlacerService.overlayContext = this.overlayCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.gameService.currentGameService.createNewGame();
+        this.gridService.scrabbleBoard = new ScrabbleBoard(this.gameService.currentGameService.game.randomBonus);
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
