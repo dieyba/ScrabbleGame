@@ -28,7 +28,7 @@ export class MultiPlayerGameService extends SoloGameService {
         protected chatDisplayService: ChatDisplayService,
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
-        protected placeService: PlaceService, // protected gameList: GameListService,
+        protected placeService: PlaceService,
     ) {
         super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService);
         this.server = 'http://' + window.location.hostname + ':3000';
@@ -39,14 +39,19 @@ export class MultiPlayerGameService extends SoloGameService {
         });
         this.socket.on('increaseTurnsPassed', (hasTurnsBeenPassed: boolean[]) => {
             this.game.hasTurnsBeenPassed = hasTurnsBeenPassed;
-            if (this.isConsecutivePassedTurnsLimit()) {
-                super.endGame(); // TODO: see why this triggers end game twice
+            const isLocalPlayerEndingGame = this.isConsecutivePassedTurnsLimit() && this.game.localPlayer.isActive;
+            if (isLocalPlayerEndingGame) {
+                this.endGame(); // calling MultiPlayerGameService to end game on both clients
             }
             this.currentTurnId++;
         });
         this.socket.on('gameEnded', () => {
-            super.endGame(); // TODO: see why this triggers end game twice
+            this.displayEndGameMessage();
+            this.endLocalGame();
         });
+        // TODO: add a socket.on 'synchronize' for board and player or something
+        // Need to have the opponent player letters syncrhonized on both clients for the displayEndGameMessage(),
+        // or ill pass it when emitting end game ig but its simpler to just synchronize when exchange/place
     }
 
     initializeGame2(game: GameParameters) {
@@ -75,13 +80,8 @@ export class MultiPlayerGameService extends SoloGameService {
     override changeActivePlayer() {
         this.socket.emit('reset timer');
     }
+    // TODO: see if endGame multi (en solo ig) works for when triggered by empty racks
     override endGame() {
         this.socket.emit('endGame');
-    }
-    override displayEndGameMessage() {
-        const endGameMessages = this.chatDisplayService.createEndGameMessages(this.game.stock.letterStock, this.game.localPlayer, this.game.opponentPlayer);
-        endGameMessages.forEach(chatEntry => {
-            this.chatDisplayService.sendSystemMessageToServer(chatEntry.message);
-        });
     }
 }

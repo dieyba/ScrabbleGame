@@ -21,7 +21,6 @@ export class SocketManagerService {
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
             socket.on('createRoom', (game: GameParameters) => {
                 this.createRoom(socket, game);
-                console.log('creatorplayer:', socket.id);
                 this.getAllGames(socket);
             });
 
@@ -141,6 +140,7 @@ export class SocketManagerService {
         }
     }
 
+    // TODO:replace emit by promise and callback?
     private validateWords(socket: io.Socket, newWords: string[]) {
         const result = this.gameListMan.validateNewWords(newWords);
         console.log("Is word valid : " + result);
@@ -174,7 +174,6 @@ export class SocketManagerService {
             const message = sender.name + ' a quitté le jeu';
             this.sio.to(opponent.getSocketId()).emit('addSystemChatEntry', message);
         }
-
     }
     private displaySystemChatEntry(socket: io.Socket, message: string) {
         const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId.toString();

@@ -91,14 +91,19 @@ export class SoloGameService {
         }
     }
     startCountdown() {
-        this.secondsToMinutes();
-        this.intervalValue = setInterval(() => {
-            this.game.timerMs--;
-            if (this.game.timerMs < 0) {
-                this.changeTurn();
-            }
+        if (!this.game.isEndGame) {
             this.secondsToMinutes();
-        }, TIMER_INTERVAL);
+            this.intervalValue = setInterval(() => {
+                this.game.timerMs--;
+                if (this.game.timerMs < 0) {
+                    this.game.isTurnPassed = true;
+                    // TODO: is this also called when passing turn in place/exchange?
+                    this.changeTurn();
+                    this.game.isTurnPassed = false;
+                }
+                this.secondsToMinutes();
+            }, TIMER_INTERVAL);
+        }
     }
     passTurn(player: Player) {
         if (player.isActive) {
@@ -109,12 +114,12 @@ export class SoloGameService {
         }
         return ErrorType.ImpossibleCommand;
     }
+
     changeTurn() {
         this.updateHasTurnsBeenPassed(this.game.isTurnPassed);
         this.game.timerMs = 0;
         this.secondsToMinutes();
         this.changeActivePlayer();
-        this.resetTimer();
     }
     // If the turn was changed by a pass command, add passed turn as true in the turns history
     updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
@@ -141,6 +146,7 @@ export class SoloGameService {
     // New Turn
     changeActivePlayer() {
         this.updateActivePlayer();
+        this.resetTimer();
     }
     updateActivePlayer() {
         // Switch the active player
@@ -239,12 +245,11 @@ export class SoloGameService {
             this.chatDisplayService.addEntry(message);
         });
     }
-    endGame() {
-        this.displayEndGameMessage();
+    endLocalGame() {
         const localPlayerPoints = this.calculateRackPoints(this.game.localPlayer);
         const oppnentPlayerPoints = this.calculateRackPoints(this.game.opponentPlayer);
 
-        // TODO: check if the points are removed properly. rn doesn't show the same thing in both players' sidebar
+        // TODO: check if the points are removed properly. after we create the board/player letters synchronization mechanism
         if (this.game.localPlayer.isWinner === true) {
             this.game.localPlayer.score += oppnentPlayerPoints;
             this.game.opponentPlayer.score -= oppnentPlayerPoints;
@@ -259,6 +264,10 @@ export class SoloGameService {
         this.game.timerMs = 0;
         this.secondsToMinutes();
         this.game.isEndGame = true;
+    }
+    endGame() {
+        this.displayEndGameMessage();
+        this.endLocalGame();
     }
     calculateRackPoints(player: Player): number {
         let totalValue = 0;
