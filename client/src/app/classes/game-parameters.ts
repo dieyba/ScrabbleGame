@@ -32,7 +32,7 @@ export class GameParameters {
     timerMs: number;
     scrabbleBoard: ScrabbleBoard;
     stock: LetterStock;
-    turnPassed: boolean;
+    isTurnPassed: boolean;
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
     newWords: ScrabbleWord[];
@@ -45,7 +45,7 @@ export class GameParameters {
         this.stock = new LetterStock();
         this.hasTurnsBeenPassed = [];
         this.isEndGame = false;
-        this.turnPassed = false;
+        this.isTurnPassed = false;
         this.randomBonus = false;
         this.scrabbleBoard = new ScrabbleBoard(isRandom);
     }

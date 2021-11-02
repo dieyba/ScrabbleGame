@@ -1,8 +1,10 @@
 import { Component, Optional } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
+import * as io from 'socket.io-client';
 @Component({
     selector: 'app-sidebar',
     templateUrl: './sidebar.component.html',
@@ -11,7 +13,12 @@ import { GameService } from '@app/services/game.service';
 export class SidebarComponent {
     winnerName: string;
     private dialogRef: MatDialogRef<EndGamePopupComponent>;
+    private socket: io.Socket;
+    private readonly server: string;
+
     constructor(public router: Router, public dialog: MatDialog, private gameService: GameService) {
+        this.server = 'http://' + window.location.hostname + ':3000';
+        this.socket = SocketHandler.requestSocket(this.server);
         this.winnerName = '';
     }
     getPlayer1Name(): string {
@@ -83,6 +90,8 @@ export class SidebarComponent {
         }
     }
     quitGame(): void {
+        // calls server to display message in opponent's chat box 
+        this.socket.emit('playerQuit');
         // User confirmation popup
         this.dialogRef = this.dialog.open(EndGamePopupComponent);
 
@@ -98,7 +107,7 @@ export class SidebarComponent {
 @Component({
     template: `<h1 md-dialog-title>Fin de la partie</h1>
 
-        <div md-dialog-content>Êtes-vous sûr/sûre de vouloir abandonner la partie</div>
+        <div md-dialog-content>Êtes-vous sûr/sûre de vouloir partir?</div>
 
         <div md-dialog-actions align="center">
             <button md-raised-button color="warn" (click)="dialogReference.close(true)">OUI</button>

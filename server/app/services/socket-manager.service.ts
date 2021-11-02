@@ -63,6 +63,15 @@ export class SocketManagerService {
             socket.on('reset timer', (timerMs: number) => {
                 this.resetTimer(socket);
             });
+            socket.on('updateTurnsPassed', (isCurrentTurnedPassed: boolean, hasTurnsBeenPassed: boolean[]) => {
+                this.increaseHasTurnsPassed(socket, isCurrentTurnedPassed, hasTurnsBeenPassed);
+            });
+            socket.on('endGame', () => {
+                this.endGame(socket);
+            });
+            socket.on('playerQuit', () => {
+                this.displayPlayerQuitMessage(socket);
+            });
             socket.on('disconnect', (roomId: any) => {
                 const playerArrayIndex = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
                 this.playerMan.allPlayers.splice(playerArrayIndex, 1);
@@ -148,8 +157,7 @@ export class SocketManagerService {
     private displayDifferentChatEntry(socket: io.Socket, messageToSender: string, messageToOpponent: string) {
         const senderId = socket.id;
         const sender = this.playerMan.getPlayerBySocketID(senderId);
-        const roomId = sender.roomId;
-        const opponent = this.gameListMan.getOtherPlayer(senderId, roomId);
+        const opponent = this.gameListMan.getOtherPlayer(senderId, sender.roomId);
         if (opponent) {
             const opponentId = opponent.getSocketId();
             const chatEntrySender = { senderName: sender.name, message: messageToSender };
@@ -158,8 +166,27 @@ export class SocketManagerService {
             this.sio.to(opponentId).emit('addChatEntry', chatEntryOpponent);
         }
     }
+    private displayPlayerQuitMessage(socket: io.Socket) {
+        const senderId = socket.id;
+        const sender = this.playerMan.getPlayerBySocketID(senderId);
+        const opponent = this.gameListMan.getOtherPlayer(senderId, sender.roomId);
+        if (opponent) {
+            const message = sender.name + ' a quitté le jeu';
+            this.sio.to(opponent.getSocketId()).emit('addSystemChatEntry', message);
+        }
+
+    }
     private displaySystemChatEntry(socket: io.Socket, message: string) {
         const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId.toString();
         this.sio.in(roomId).emit('addSystemChatEntry', message);
+    }
+    private increaseHasTurnsPassed(socket: io.Socket, isCurrentTurnedPassed: boolean, hasTurnsBeenPassed: boolean[]) {
+        const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId.toString();
+        hasTurnsBeenPassed.push(isCurrentTurnedPassed);
+        this.sio.in(roomId).emit('increaseTurnsPassed', hasTurnsBeenPassed);
+    }
+    private endGame(socket: io.Socket) {
+        const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId.toString();
+        this.sio.in(roomId).emit('gameEnded');
     }
 }

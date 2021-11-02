@@ -32,6 +32,7 @@ const LOCAL_PLAYER_INDEX = 0;
 export class SoloGameService {
     game: GameParameters;
     timer: string;
+    currentTurnId: number;
     intervalValue: NodeJS.Timeout;
 
     constructor(
@@ -64,12 +65,15 @@ export class SoloGameService {
         return this.game;
     }
     createNewGame() {
+        this.currentTurnId = 0;
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
         this.chatDisplayService.initialize(this.game.localPlayer.name);
         this.addRackLetters(this.game.localPlayer.letters);
         this.startCountdown();
-        this.game.hasTurnsBeenPassed[0] = false;
+        this.game.isTurnPassed = false;
+        this.game.hasTurnsBeenPassed = [];
+
     }
     resetTimer() {
         this.game.timerMs = +this.game.totalCountDown;
@@ -77,37 +81,69 @@ export class SoloGameService {
         clearInterval(this.intervalValue);
         this.startCountdown();
     }
+    secondsToMinutes() {
+        const s = Math.floor(this.game.timerMs / MINUTE_IN_SEC);
+        const ms = this.game.timerMs % MINUTE_IN_SEC;
+        if (ms < DOUBLE_DIGIT) {
+            this.timer = s + ':' + 0 + ms;
+        } else {
+            this.timer = s + ':' + ms;
+        }
+    }
     startCountdown() {
         this.secondsToMinutes();
         this.intervalValue = setInterval(() => {
             this.game.timerMs--;
             if (this.game.timerMs < 0) {
-                this.game.timerMs = 0;
-                this.secondsToMinutes();
-                this.changeActivePlayer();
-                this.resetTimer();
+                this.changeTurn();
             }
             this.secondsToMinutes();
         }, TIMER_INTERVAL);
     }
-
+    passTurn(player: Player) {
+        if (player.isActive) {
+            this.game.isTurnPassed = true;
+            this.changeTurn();
+            this.game.isTurnPassed = false;
+            return ErrorType.NoError;
+        }
+        return ErrorType.ImpossibleCommand;
+    }
+    changeTurn() {
+        this.updateHasTurnsBeenPassed(this.game.isTurnPassed);
+        this.game.timerMs = 0;
+        this.secondsToMinutes();
+        this.changeActivePlayer();
+        this.resetTimer();
+    }
+    // If the turn was changed by a pass command, add passed turn as true in the turns history
+    updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
+        this.game.hasTurnsBeenPassed.push(isCurrentTurnedPassed);
+        if (this.isConsecutivePassedTurnsLimit()) {
+            this.endGame();
+        }
+        this.currentTurnId++;
+    }
+    // Check if last 5 turns have been passed (current turn is the 6th)
+    isConsecutivePassedTurnsLimit(): boolean {
+        let turnIndex = this.currentTurnId;
+        let consecutivePassedTurn = 0;
+        let wasTurnPassed = false;
+        do {
+            wasTurnPassed = this.game.hasTurnsBeenPassed[turnIndex];
+            if (wasTurnPassed) {
+                consecutivePassedTurn++;
+            }
+            turnIndex--;
+        } while (wasTurnPassed && turnIndex >= 0)
+        return consecutivePassedTurn === MAX_TURNS_PASSED;
+    }
     // New Turn
     changeActivePlayer() {
-        this.updateLastTurnsPassed();
         this.updateActivePlayer();
     }
-    updateLastTurnsPassed() {
-        // Check if last turn was passed by player
-        if (this.game.turnPassed) {
-            this.game.hasTurnsBeenPassed[this.game.hasTurnsBeenPassed.length] = false;
-            // Set last turn to hasBeenPassed = true
-            this.game.hasTurnsBeenPassed[this.game.hasTurnsBeenPassed.length - 1] = true;
-        } else {
-            this.game.hasTurnsBeenPassed[this.game.hasTurnsBeenPassed.length] = false;
-        }
-    }
     updateActivePlayer() {
-        // Change active player and reset timer for new turn
+        // Switch the active player
         if (this.game.localPlayer.isActive) {
             // If the rack is empty, end game + player won
             if (this.game.localPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
@@ -128,7 +164,6 @@ export class SoloGameService {
             this.game.localPlayer.isActive = true;
         }
     }
-
     addRackLetters(letters: ScrabbleLetter[]): void {
         for (const letter of letters) {
             this.addRackLetter(letter);
@@ -136,11 +171,8 @@ export class SoloGameService {
     }
     addRackLetter(letter: ScrabbleLetter): void {
         this.rackService.addLetter(letter);
-        // TODO: fix adding letter to rack vs player in solo vs multi
-        // this.game.localPlayer.letters[this.game.creatorPlayer.letters.length] = letter;
     }
     addLetterToPlayer(letter: ScrabbleLetter) {
-        // this.game.localPlayer.letters[this.game.creatorPlayer.letters.length] = letter;
         this.game.localPlayer.addLetter(letter);
     }
     exchangeLetters(player: Player, letters: string): ErrorType {
@@ -157,7 +189,7 @@ export class SoloGameService {
                     this.addRackLetter(lettersToAdd[i]);
                     this.addLetterToPlayer(lettersToAdd[i]);
                 }
-                this.passTurn(player);
+                this.changeTurn();
                 return ErrorType.NoError;
             }
         }
@@ -185,15 +217,17 @@ export class SoloGameService {
                         placeParams.orientation,
                     );
                     this.addRackLetters(removedLetters);
+                    removedLetters.forEach(letter => { this.addLetterToPlayer(letter) });
                 } else {
                     // Score
                     this.validationService.updatePlayerScore(tempScrabbleWords, player);
                     // Take new letters
                     const newLetters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
                     this.addRackLetters(newLetters)
+                    newLetters.forEach(letter => { this.addLetterToPlayer(letter) });
                 }
 
-                this.passTurn(player);
+                this.changeTurn();
             }, WAIT_TIME);
         }
 
@@ -208,63 +242,30 @@ export class SoloGameService {
     endGame() {
         this.displayEndGameMessage();
         const localPlayerPoints = this.calculateRackPoints(this.game.localPlayer);
-        const virtualPlayerPoints = this.calculateRackPoints(this.game.opponentPlayer);
+        const oppnentPlayerPoints = this.calculateRackPoints(this.game.opponentPlayer);
 
-        // TODO: make sure, are the right player's points added to the right player's score?
+        // TODO: check if the points are removed properly. rn doesn't show the same thing in both players' sidebar
         if (this.game.localPlayer.isWinner === true) {
-            this.game.localPlayer.score += virtualPlayerPoints;
-            this.game.opponentPlayer.score -= virtualPlayerPoints;
+            this.game.localPlayer.score += oppnentPlayerPoints;
+            this.game.opponentPlayer.score -= oppnentPlayerPoints;
         } else if (this.game.opponentPlayer.isWinner === true) {
             this.game.opponentPlayer.score += localPlayerPoints;
             this.game.localPlayer.score -= localPlayerPoints;
         } else {
             this.game.localPlayer.score -= localPlayerPoints;
-            this.game.opponentPlayer.score -= virtualPlayerPoints;
+            this.game.opponentPlayer.score -= oppnentPlayerPoints;
         }
         clearInterval(this.intervalValue);
         this.game.timerMs = 0;
         this.secondsToMinutes();
         this.game.isEndGame = true;
     }
-    passTurn(player: Player) {
-        if (player.isActive) {
-            this.game.turnPassed = true;
-            if (this.isTurnsPassedLimit() && this.game.hasTurnsBeenPassed.length >= MAX_TURNS_PASSED) {
-                this.endGame();
-                return ErrorType.NoError;
-            }
-            this.game.timerMs = 0;
-            this.secondsToMinutes();
-            this.changeActivePlayer();
-            this.resetTimer();
-            this.game.turnPassed = false;
-            return ErrorType.NoError;
-        }
-        return ErrorType.ImpossibleCommand;
-    }
-    setStarterPlayer() {
-        const starterPlayerIndex = Math.round(Math.random()); // return 0 or 1
-        const starterPlayer = starterPlayerIndex === LOCAL_PLAYER_INDEX ? this.game.localPlayer : this.game.opponentPlayer;
-        starterPlayer.isActive = true;
-        // this.game.localPlayer.isActive = true;
-
-    }
-    secondsToMinutes() {
-        const s = Math.floor(this.game.timerMs / MINUTE_IN_SEC);
-        const ms = this.game.timerMs % MINUTE_IN_SEC;
-        if (ms < DOUBLE_DIGIT) {
-            this.timer = s + ':' + 0 + ms;
-        } else {
-            this.timer = s + ':' + ms;
-        }
-    }
-    // Check if last 5 turns have been passed (current turn is the 6th)
-    isTurnsPassedLimit(): boolean {
-        let isLimit = true;
-        for (let i = this.game.hasTurnsBeenPassed.length - 1; i > this.game.hasTurnsBeenPassed.length - MAX_TURNS_PASSED; i--) {
-            isLimit = isLimit && this.game.hasTurnsBeenPassed[i];
-        }
-        return isLimit;
+    calculateRackPoints(player: Player): number {
+        let totalValue = 0;
+        player.letters.forEach((letter) => {
+            totalValue += letter.value;
+        });
+        return totalValue;
     }
     removeRackLetter(scrabbleLetter: ScrabbleLetter): void {
         const i = this.rackService.removeLetter(scrabbleLetter);
@@ -297,12 +298,5 @@ export class SoloGameService {
             }
         }
         return letters;
-    }
-    calculateRackPoints(player: Player): number {
-        let totalValue = 0;
-        player.letters.forEach((letter) => {
-            totalValue += letter.value;
-        });
-        return totalValue;
     }
 }
