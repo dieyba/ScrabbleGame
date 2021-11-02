@@ -9,7 +9,7 @@ describe('ScrabbleBoard', () => {
     let motAPlacer: string;
 
     beforeEach(() => {
-        board = new ScrabbleBoard();
+        board = new ScrabbleBoard(false);
         position = new Vec2(); // x = 0 et y = 0
         orientation = 'h';
         motAPlacer = 'maison';
@@ -17,6 +17,11 @@ describe('ScrabbleBoard', () => {
 
     it('should create an instance', () => {
         expect(board).toBeTruthy();
+    });
+
+    it('setSquareColor should decrease colorStock size by 1', () => {
+        board = new ScrabbleBoard(true);
+        expect(board.colorStock.length).toEqual(0);
     });
 
     it('isCoordInsideBoard should return true if the coordinates are inside the board', () => {

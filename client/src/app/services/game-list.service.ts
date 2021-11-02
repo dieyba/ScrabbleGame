@@ -26,21 +26,21 @@ export class GameListService {
         this.myRoom = new Array<GameRoom>();
         this.socket = SocketHandler.requestSocket(this.server);
         this.player = PlayerHandler.requestPlayer();
-        this.roomInfo = new GameParameters('', 0);
+        // this.roomInfo = new GameParameters('', 0, false);
         this.players = new Array<LocalPlayer>();
         this.full = false;
-        this.roomInfo.gameRoom = { idGame: -1, capacity: 0, playersName: new Array<string>() };
         this.socket.emit('addPlayer', { player: this.player });
         this.socket.on('getAllGames', (game: GameParameters[]) => {
             this.existingRooms = game;
         });
         this.socket.on('roomcreated', (game: GameParameters) => {
-            console.log('game ', game);
+            // this.roomInfo = new GameParameters('', 0, false);
+            // this.roomInfo.gameRoom = { idGame: -1, capacity: 0, playersName: new Array<string>() };
             this.roomInfo = game;
             this.roomInfo.gameRoom.playersName = game.gameRoom.playersName;
+            this.roomInfo.scrabbleBoard = game.scrabbleBoard;
         });
         this.socket.on('roomJoined', (game: GameParameters) => {
-            console.log(game);
             this.roomInfo = game;
             this.roomInfo.gameRoom = game.gameRoom;
             // this.players = game.players;
@@ -50,7 +50,7 @@ export class GameListService {
         return this.existingRooms;
     }
     createRoom(game: GameParameters): void {
-        this.socket.emit('createRoom', { name: game.creatorPlayer.name, timer: game.totalCountDown });
+        this.socket.emit('createRoom', { name: game.creatorPlayer.name, timer: game.totalCountDown, board: game.randomBonus });
     }
     deleteRoom(): void {
         this.socket.emit('deleteRoom');

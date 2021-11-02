@@ -37,16 +37,19 @@ export class GameParameters {
     isEndGame: boolean;
     newWords: ScrabbleWord[];
 
-    constructor(creatorPlayerName: string, timer: number) {
+    constructor(creatorPlayerName: string, timer: number, isRandom: boolean) {
         this.gameRoom = { idGame: 15, capacity: 2, playersName: new Array<string>() };
-        this.dictionary = new Dictionary(0);
+        // this.dictionary = new Dictionary(0);
         this.localPlayer = new LocalPlayer(creatorPlayerName);
-        this.timerMs = timer;
-        this.stock = new LetterStock();
+        this.totalCountDown = timer;
+        this.timerMs = +this.totalCountDown;
+        // this.stock = new LetterStock();
         this.hasTurnsBeenPassed = [];
         this.isEndGame = false;
         this.turnPassed = false;
-        this.randomBonus = false;
-        this.scrabbleBoard = new ScrabbleBoard();
+        this.randomBonus = isRandom;
+        this.scrabbleBoard = new ScrabbleBoard(this.randomBonus);
+        console.log('board sur le client', this.scrabbleBoard);
+        console.log('qui t a appelé : ', creatorPlayerName);
     }
 }

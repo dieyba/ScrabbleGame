@@ -21,8 +21,8 @@ describe('BonusService', () => {
             providers: [{ provide: GridService, useValue: gridServiceSpy }],
         });
         service = TestBed.inject(BonusService);
-        gridServiceSpy.scrabbleBoard = new ScrabbleBoard();
-        gridServiceSpy.scrabbleBoard.generateBoard();
+        gridServiceSpy.scrabbleBoard = new ScrabbleBoard(false);
+        gridServiceSpy.scrabbleBoard.generateBoard(false);
     });
 
     it('should be created', () => {

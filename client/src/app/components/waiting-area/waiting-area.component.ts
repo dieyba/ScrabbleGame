@@ -43,14 +43,14 @@ export class WaitingAreaComponent {
         @Inject(MAT_DIALOG_DATA) public gameSelected: boolean,
     ) {
         this.server = 'http://' + window.location.hostname + ':3000';
+        this.socket = SocketHandler.requestSocket(this.server);
         this.playerList = [];
         this.list = [];
         this.name = false;
         if (gameSelected) {
-            this.selectedGame = new GameParameters('', 0);
+            this.selectedGame = new GameParameters('', 0, false);
             this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
         }
-        this.socket = SocketHandler.requestSocket(this.server);
         this.list = this.gameList.getList();
         this.full = false;
         this.nameErrorMessage = '';
@@ -66,8 +66,6 @@ export class WaitingAreaComponent {
             this.router.navigate(['/game']);
             this.multiManService.initializeGame2(game);
             this.socket.emit('deleteRoom');
-            // this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
-            // this.socket.emit('startGame', this.gameList.roomInfo.gameRoom.idGame);
         });
         this.socket.on('roomdeleted', (game: GameParameters) => {
             this.joindre = false;

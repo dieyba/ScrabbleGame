@@ -7,7 +7,6 @@ import { ErrorType } from '@app/classes/errors';
 import { GameParameters } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
-import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis } from '@app/classes/utilities';
@@ -42,15 +41,19 @@ export class SoloGameService {
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
         protected placeService: PlaceService,
-    ) {}
+    ) {
+    }
     initializeGame(gameInfo: FormGroup) {
-        this.game = new GameParameters(gameInfo.controls.name.value, gameInfo.controls.timer.value);
+        this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value, gameInfo.controls.bonus.value);
+        this.chatDisplayService.entries = [];
+        this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
+        this.game.creatorPlayer.isActive = true;
         this.game.stock = new LetterStock();
         this.game.localPlayer = new LocalPlayer(gameInfo.controls.name.value); // where does local player take his letters from stock?
         this.game.creatorPlayer = this.game.localPlayer;
         this.game.opponentPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
-        this.game.localPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.localPlayer.letters = this.game.creatorPlayer.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.opponentPlayer.letters = this.game.creatorPlayer.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.game.randomBonus = gameInfo.controls.bonus.value;
         this.game.totalCountDown = gameInfo.controls.timer.value;
@@ -62,7 +65,7 @@ export class SoloGameService {
     }
     createNewGame() {
         this.rackService.rackLetters = [];
-        this.gridService.scrabbleBoard = new ScrabbleBoard();
+        this.gridService.scrabbleBoard = this.game.scrabbleBoard;
         this.chatDisplayService.initialize(this.game.localPlayer.name);
         this.addRackLetters(this.game.localPlayer.letters);
         this.startCountdown();
@@ -107,7 +110,7 @@ export class SoloGameService {
         // Change active player and reset timer for new turn
         if (this.game.localPlayer.isActive) {
             // If the rack is empty, end game + player won
-            if (this.game.localPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+            if (this.game.localPlayer.letters.length === 0 && this.game.creatorPlayer.stock.isEmpty()) {
                 this.game.localPlayer.isWinner = true;
                 this.endGame();
                 return;
@@ -116,7 +119,7 @@ export class SoloGameService {
             this.game.opponentPlayer.isActive = true;
         } else {
             // If the rack is empty, end game + player won
-            if (this.game.opponentPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+            if (this.game.opponentPlayer.letters.length === 0 && this.game.creatorPlayer.stock.isEmpty()) {
                 this.game.opponentPlayer.isWinner = true;
                 this.endGame();
                 return;
@@ -141,14 +144,14 @@ export class SoloGameService {
         this.game.localPlayer.addLetter(letter);
     }
     exchangeLetters(player: Player, letters: string): ErrorType {
-        if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
+        if (player.isActive && this.game.creatorPlayer.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
             const lettersToRemove: ScrabbleLetter[] = [];
             if (player.removeLetter(letters) === true) {
                 for (let i = 0; i < letters.length; i++) {
                     lettersToRemove[i] = new ScrabbleLetter(letters[i]);
                 }
 
-                const lettersToAdd: ScrabbleLetter[] = this.game.stock.exchangeLetters(lettersToRemove);
+                const lettersToAdd: ScrabbleLetter[] = this.game.creatorPlayer.stock.exchangeLetters(lettersToRemove);
                 for (let i = 0; i < lettersToAdd.length; i++) {
                     this.rackService.removeLetter(lettersToRemove[i]);
                     this.addRackLetter(lettersToAdd[i]);
@@ -172,8 +175,9 @@ export class SoloGameService {
                 tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
             }
             // Call validation method and end turn
+            this.validationService.validateWords(tempScrabbleWords);
             setTimeout(() => {
-                if (!this.validationService.validateWords(tempScrabbleWords)) {
+                if (!this.validationService.areWordsValid) {
                     // Retake letters
                     const removedLetters = this.gridService.removeInvalidLetters(
                         placeParams.position,
@@ -185,11 +189,8 @@ export class SoloGameService {
                     // Score
                     this.validationService.updatePlayerScore(tempScrabbleWords, player);
                     // Take new letters
-                    const newLetters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-                    for (const letter of newLetters) {
-                        this.rackService.addLetter(letter);
-                        player.letters.push(letter);
-                    }
+                    const newLetters = this.game.creatorPlayer.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+                    this.addRackLetters(newLetters)
                 }
 
                 this.passTurn(player);
@@ -199,7 +200,7 @@ export class SoloGameService {
         return errorResult;
     }
     displayEndGameMessage() {
-        const endGameMessages = this.chatDisplayService.createEndGameMessages(this.game.stock.letterStock, this.game.localPlayer, this.game.opponentPlayer);
+        const endGameMessages = this.chatDisplayService.createEndGameMessages(this.game.creatorPlayer.stock.letterStock, this.game.localPlayer, this.game.opponentPlayer);
         endGameMessages.forEach(message => {
             this.chatDisplayService.addEntry(message);
         });

@@ -45,6 +45,7 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly exchangeService: ExchangeService,
         private readonly commandInvokerService: CommandInvokerService,
     ) {
+        // this.gridService = new GridService();
         this.mousePosition = new Vec2(0, 0);
         this.canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         this.rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
@@ -61,6 +62,7 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.mouseWordPlacerService.overlayContext = this.overlayCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.gameService.currentGameService.createNewGame();
+        this.gridService.scrabbleBoard = this.gameService.currentGameService.game.scrabbleBoard;
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
@@ -116,7 +118,7 @@ export class PlayAreaComponent implements AfterViewInit {
 
     lessThanSevenLettersInStock(): boolean {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        return this.gameService.currentGameService.game.stock.letterStock.length < 7;
+        return this.gameService.currentGameService.game.creatorPlayer.stock.letterStock.length < 7;
     }
 
     exchange() {

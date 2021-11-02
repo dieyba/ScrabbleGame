@@ -44,7 +44,7 @@ describe('PlayAreaComponent', () => {
             ],
         }).compileComponents();
 
-        gridServiceSpy.scrabbleBoard = new ScrabbleBoard();
+        gridServiceSpy.scrabbleBoard = new ScrabbleBoard(false);
         const letter: ScrabbleLetter = new ScrabbleLetter('a', 1);
         soloGameServiceSpy.game.creatorPlayer = new LocalPlayer('Ariane');
         soloGameServiceSpy.game.creatorPlayer.score = 73;

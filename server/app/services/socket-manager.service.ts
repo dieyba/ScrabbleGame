@@ -4,14 +4,14 @@ import * as http from 'http';
 import * as io from 'socket.io';
 import { GameListManager } from './game-list-manager.service';
 import { PlayerManagerService } from './player-manager.service';
+import { ValidationService } from './validation.service';
 
 export class SocketManagerService {
     private sio: io.Server;
     private gameListMan: GameListManager;
     playerMan: PlayerManagerService;
-
-    constructor(server: http.Server /*, private readonly gameService: GameService*/) {
-        this.gameListMan = new GameListManager();
+    constructor(server: http.Server, private readonly validationService: ValidationService) {
+        this.gameListMan = new GameListManager(this.validationService);
         this.playerMan = new PlayerManagerService();
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
     }
@@ -23,6 +23,10 @@ export class SocketManagerService {
                 this.createRoom(socket, game);
                 console.log('creatorplayer:', socket.id);
                 this.getAllGames(socket);
+            });
+
+            socket.on('validateWords', (newWords: string[]) => {
+                this.validateWords(socket, newWords);
             });
 
             socket.on('deleteRoom', (game: any) => {
@@ -79,7 +83,7 @@ export class SocketManagerService {
     }
 
     private createRoom(socket: io.Socket, game: any): void {
-        let room = this.gameListMan.createRoom(game.name, game.timer);
+        let room = this.gameListMan.createRoom(game.name, game.timer, game.isRandomBonus);
         let newPlayer = new Player(game.name, socket.id);
         newPlayer.roomId = room.gameRoom.idGame;
         room.addPlayer(newPlayer);
@@ -126,6 +130,12 @@ export class SocketManagerService {
             roomGame.players[starterPlayerIndex].isActive = true;
             this.sio.to(roomGame.gameRoom.idGame.toString()).emit('updateInfo', roomGame);
         }
+    }
+
+    private validateWords(socket: io.Socket, newWords: string[]) {
+        const result = this.gameListMan.validateNewWords(newWords);
+        console.log("Is word valid : " + result);
+        this.sio.to(socket.id).emit('areWordsValid', result);
     }
 
     private displayChatEntry(socket: io.Socket, message: string) {

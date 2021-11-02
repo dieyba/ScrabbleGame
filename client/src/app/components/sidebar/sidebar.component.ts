@@ -23,7 +23,7 @@ export class SidebarComponent {
     }
 
     getLettersLeftCount(): number {
-        return this.gameService.currentGameService.game.stock.letterStock.length;
+        return this.gameService.currentGameService.game.creatorPlayer.stock.letterStock.length;
     }
 
     getPlayer1LetterCount(): number {
