@@ -1,4 +1,3 @@
-// import { MultiPlayerGameService } from './services/multi-player-game.service';
 import { LetterStock } from '@app/services/letter-stock.service';
 import { Dictionary } from './dictionary';
 import { Player } from './player';
@@ -12,31 +11,46 @@ export interface GameRoom {
 export class GameParameters {
     gameRoom: GameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
     players: Player[];
+
+    localPlayer: Player;
     creatorPlayer: Player;
     opponentPlayer: Player;
     dictionary: Dictionary;
     randomBonus: boolean;
     totalCountDown: number;
     creatorName: string;
+    timerMs: number;
     scrabbleBoard: ScrabbleBoard;
     stock: LetterStock;
     turnPassed: boolean;
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
-    // multiplayerGame: MultiPlayerGameService;
 
-    constructor(creatorPlayerName: string, timer: number, isRandomBonus: boolean, id: number) {
+    constructor(creatorPlayerName: string, timer: number, randBonus: boolean, id: number) {
         this.players = new Array<Player>();
-        this.creatorPlayer = new Player(creatorPlayerName, '');
-        this.totalCountDown = timer;
-        this.gameRoom.idGame = id;
-        this.gameRoom.capacity = 2;
+        // this.creatorPlayer = new Player(creatorPlayerName, '');
+        // this.totalCountDown = timer;
+        // this.gameRoom.idGame = id;
+        // this.gameRoom.capacity = 2;
         this.dictionary = new Dictionary(0);
-        this.randomBonus = isRandomBonus;
-        this.stock = new LetterStock();
+        // this.randomBonus = isRandomBonus;
+        // this.stock = new LetterStock();
         this.hasTurnsBeenPassed = [false, false, false];
-        // this.multiplayerGame = new MultiPlayerGameService(this.players);
-        console.log(this.randomBonus);
+        // console.log(this.randomBonus);
+        this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
+        this.gameRoom.idGame = id;
+        // this.dictionary = new Dictionary(0);
+        this.localPlayer = new Player(creatorPlayerName, '');
+        this.creatorPlayer = this.localPlayer;
+        this.totalCountDown = timer;
+        this.timerMs = +this.totalCountDown;
+        this.stock = new LetterStock();
+        // this.hasTurnsBeenPassed = [];
+        // this.isEndGame = false;
+        // this.turnPassed = false;
+        // this.randomBonus = isRandomBonus;
+        this.scrabbleBoard = new ScrabbleBoard(randBonus);
+        console.log('server Board', this.scrabbleBoard)
     }
     addPlayer(player: Player) {
         if (this.gameRoom.playersName.length < this.gameRoom.capacity) {

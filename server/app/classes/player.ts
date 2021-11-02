@@ -1,7 +1,7 @@
 import { ScrabbleLetter } from './scrabble-letter';
 
 export class Player {
-    private socketId: string;
+    socketId: string;
     roomId: number;
     name: string;
     score: number;
