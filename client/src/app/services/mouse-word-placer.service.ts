@@ -381,11 +381,15 @@ export class MouseWordPlacerService {
         const indexes = this.convertPositionToGridIndex(this.initialPosition);
         for (let i = 0; i < this.currentWord.length; i++) {
             if (this.currentAxis === Axis.H) {
-                if (indexes[0] + i < BOARD_SIZE || indexes[1] < BOARD_SIZE)
+                if (indexes[0] + i < BOARD_SIZE || indexes[1] < BOARD_SIZE) {
+                    if (this.gridService.scrabbleBoard.squares[indexes[0] + i][indexes[1]].occupied) indexes[0]++;
                     this.drawLetter(this.currentWord[i], new Vec2(indexes[0] + i, indexes[1]));
+                }
             } else {
-                if (indexes[0] < BOARD_SIZE || indexes[1] + i < BOARD_SIZE)
+                if (indexes[0] < BOARD_SIZE || indexes[1] + i < BOARD_SIZE) {
+                    if (this.gridService.scrabbleBoard.squares[indexes[0]][indexes[1] + i].occupied) indexes[1]++;
                     this.drawLetter(this.currentWord[i], new Vec2(indexes[0], indexes[1] + i));
+                }
             }
         }
     }
