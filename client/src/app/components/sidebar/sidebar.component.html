@@ -46,6 +46,6 @@
         <mat-card-title *ngIf="!isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br />tu as gagné!</mat-card-title>
         <mat-card-title *ngIf="isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br />vous avez gagné!</mat-card-title>
     </mat-card>
-    <button class="return" routerLink="/start">Quitter la partie</button>
-    <button class="return" (click)="quitGame()">Abandonner la partie</button>
+    <button *ngIf="isEndGame()" class="return" routerLink="/start">Quitter la partie</button>
+    <button *ngIf="!isEndGame()" class="return" (click)="quitGame()">Abandonner la partie</button>
 </div>
