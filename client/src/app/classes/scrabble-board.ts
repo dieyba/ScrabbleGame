@@ -1,4 +1,4 @@
-import { Square, SquareColor } from './square';
+import { ColorQuantity, Square, SquareColor } from './square';
 import { Vec2 } from './vec2';
 
 export const BOARD_SIZE = 15;
@@ -44,84 +44,108 @@ export enum Column {
 export class ScrabbleBoard {
     squares: Square[][];
     actualBoardSize: number = BOARD_SIZE - 1;
+    colorStock: SquareColor[];
 
-    constructor() {
+    constructor(isRandom: boolean) {
         this.squares = [];
+        this.colorStock = []
+        this.addColorToStock(SquareColor.DarkBlue, ColorQuantity.DarkBlue);
+        this.addColorToStock(SquareColor.Teal, ColorQuantity.Teal);
+        this.addColorToStock(SquareColor.Red, ColorQuantity.Red);
+        this.addColorToStock(SquareColor.Pink, ColorQuantity.Pink);
         for (let i = 0; i < BOARD_SIZE; i++) {
             this.squares[i] = [];
             for (let j = 0; j < BOARD_SIZE; j++) {
                 this.squares[i][j] = new Square(i, j);
             }
         }
-        this.generateBoard();
+        this.generateBoard(isRandom);
     }
 
-    generateBoard(): void {
+    addColorToStock(color: SquareColor, quantity: number): void {
+        for (let i = 0; i < quantity; i++) {
+            this.colorStock.push(color);
+        }
+    }
+
+    setSquareColor(i: number, j: number, color: SquareColor, isRandom: boolean) {
+        if (this.squares[i][j].color === SquareColor.None && this.colorStock.length !== 0) {
+            if (isRandom) {
+                let index = Math.floor(Math.random() * this.colorStock.length);
+                this.squares[i][j].color = this.colorStock[index];
+                this.colorStock.splice(index, 1);
+            } else {
+                this.squares[i][j].color = color;
+            }
+        }
+    }
+
+    generateBoard(isRandom: boolean): void {
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
-                this.generateCrossSquares(i, j);
-                this.generateRedSquares(i, j);
-                this.generateDarkBlueSquares(i, j);
-                this.generateTealSquares(i, j);
-                this.generateTealSquaresArrows(i, j);
+                this.generateCrossSquares(i, j, isRandom);
+                this.generateRedSquares(i, j, isRandom);
+                this.generateDarkBlueSquares(i, j, isRandom);
+                this.generateTealSquares(i, j, isRandom);
+                this.generateTealSquaresArrows(i, j, isRandom);
             }
         }
     }
 
-    generateCrossSquares(i: number, j: number) {
+    generateCrossSquares(i: number, j: number, isRandom: boolean) {
         if (i === j || i === this.actualBoardSize - j) {
             if (i === Column.One || i === this.actualBoardSize) {
-                this.squares[i][j].color = SquareColor.Red;
+                this.setSquareColor(i, j, SquareColor.Red, isRandom);
             }
             if ((i > Column.One && i < Column.Six) || (i > Column.Ten && i < Column.Fifteen) || i === Column.Eight) {
-                this.squares[i][j].color = SquareColor.Pink;
+                this.setSquareColor(i, j, SquareColor.Pink, isRandom);
             }
             if (i === Column.Seven || i === Column.Nine) {
-                this.squares[i][j].color = SquareColor.Teal;
+                this.setSquareColor(i, j, SquareColor.Teal, isRandom);
             }
         }
     }
 
-    generateRedSquares(i: number, j: number) {
+    generateRedSquares(i: number, j: number, isRandom: boolean) {
         if (Math.abs(i - j) === this.actualBoardSize / 2 && (i === Column.Eight || j === Row.H)) {
-            this.squares[i][j].color = SquareColor.Red;
+            this.setSquareColor(i, j, SquareColor.Red, isRandom);
         }
     }
 
-    generateDarkBlueSquares(i: number, j: number) {
+    generateDarkBlueSquares(i: number, j: number, isRandom: boolean) {
         if (i === Column.Six || i === Column.Ten) {
             if (j === Row.B || j === Row.F || j === Row.J || j === Row.N) {
-                this.squares[i][j].color = SquareColor.DarkBlue;
+                this.setSquareColor(i, j, SquareColor.DarkBlue, isRandom);
             }
         }
         if (j === Row.F || j === Row.J) {
             if (i === Column.Two || i === Column.Six || i === Column.Ten || i === Column.Fourteen) {
-                this.squares[i][j].color = SquareColor.DarkBlue;
+                this.setSquareColor(i, j, SquareColor.DarkBlue, isRandom);
             }
         }
     }
 
-    generateTealSquares(i: number, j: number) {
+    generateTealSquares(i: number, j: number, isRandom: boolean) {
         if ((i === Column.One || i === Column.Fifteen) && (j === Row.D || j === Row.L)) {
-            this.squares[i][j].color = SquareColor.Teal;
+            this.setSquareColor(i, j, SquareColor.Teal, isRandom);
         }
         if ((j === Row.A || j === Row.O) && (i === Column.Four || i === Column.Twelve)) {
-            this.squares[i][j].color = SquareColor.Teal;
+            this.setSquareColor(i, j, SquareColor.Teal, isRandom);
         }
     }
 
-    generateTealSquaresArrows(i: number, j: number) {
+    generateTealSquaresArrows(i: number, j: number, isRandom: boolean) {
         if ((i === Column.Seven || i === Column.Nine) && (j === Row.C || j === Row.M)) {
-            this.squares[i][j].color = SquareColor.Teal;
+            this.setSquareColor(i, j, SquareColor.Teal, isRandom);
         }
         if ((j === Row.G || j === Row.I) && (i === Column.Three || i === Column.Thirteen)) {
-            this.squares[i][j].color = SquareColor.Teal;
+            this.setSquareColor(i, j, SquareColor.Teal, isRandom);
         }
         if (i === Column.Eight && (j === Row.D || j === Row.L)) {
-            this.squares[i][j].color = SquareColor.Teal;
+            this.setSquareColor(i, j, SquareColor.Teal, isRandom);
         }
         if (j === Row.H && (i === Column.Four || i === Column.Twelve)) {
-            this.squares[i][j].color = SquareColor.Teal;
+            this.setSquareColor(i, j, SquareColor.Teal, isRandom);
         }
     }
 

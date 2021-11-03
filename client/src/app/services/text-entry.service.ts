@@ -1,30 +1,30 @@
 import { Injectable } from '@angular/core';
-import { Command, CommandParams } from '@app/classes/commands';
+import { createErrorEntry, createPlayerEntry } from '@app/classes/chat-display-entry';
+import { Command, CommandName, CommandParams } from '@app/classes/commands';
 import { createDebugCmd } from '@app/classes/debug-command';
 import { ErrorType } from '@app/classes/errors';
-import { createExchangeCmd, ExchangeCmd } from '@app/classes/exchange-command';
+import { createExchangeCmd } from '@app/classes/exchange-command';
+import { createHelpCmd } from '@app/classes/help-command';
 import { createPassCmd } from '@app/classes/pass-command';
 import { createPlaceCmd } from '@app/classes/place-command';
 import { Player } from '@app/classes/player';
-import { Column, Row } from '@app/classes/scrabble-board';
 import { createStockCmd } from '@app/classes/stock-command';
-import { scrabbleLetterstoString } from '@app/classes/utilities';
-import { Vec2 } from '@app/classes/vec2';
+import {
+    convertStringToCoord,
+    isAllLowerLetters,
+    isEmpty,
+    isValidLetter,
+    removeAccents,
+    scrabbleLetterstoString,
+    trimSpaces
+} from '@app/classes/utilities';
 import { ChatDisplayService } from './chat-display.service';
-import { SoloGameService } from './solo-game.service';
+import { CommandInvokerService } from './command-invoker.service';
+import { GameService } from './game.service';
 
-const DEBUG_CMD = 'debug';
-const EXCHANGE_CMD = 'échanger';
-const PASS_CMD = 'passer';
-const PLACE_CMD = 'placer';
-const STOCK_CMD = 'réserve';
-
-const PARSE_INT_BASE = 10;
 const MIN_EXCHANGE_LETTERS = 1;
 const MAX_EXCHANGE_LETTERS = 7;
 const LAST_CHAR_INDEX = -1;
-const ROW_OFFSET = 'a'.charCodeAt(0);
-const COLUMN_OFFSET = 1;
 const HORIZONTAL = 'h';
 const VERTICAL = 'v';
 
@@ -38,22 +38,29 @@ type CommandCreationResult = Command | ErrorType.SyntaxError | ErrorType.Invalid
 export class TextEntryService {
     commandsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
     paramsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
+    isSolo: boolean;
 
-    constructor(private chatDisplayService: ChatDisplayService, private gameService: SoloGameService) {
+    constructor(
+        private chatDisplayService: ChatDisplayService,
+        private gameService: GameService,
+        private commandInvokerService: CommandInvokerService,
+    ) {
         this.commandsMap = new Map();
         this.paramsMap = new Map();
 
-        this.commandsMap.set(DEBUG_CMD, createDebugCmd);
-        this.commandsMap.set(EXCHANGE_CMD, createExchangeCmd);
-        this.commandsMap.set(PASS_CMD, createPassCmd);
-        this.commandsMap.set(PLACE_CMD, createPlaceCmd);
-        this.commandsMap.set(STOCK_CMD, createStockCmd);
+        this.commandsMap.set(CommandName.DebugCmd, createDebugCmd);
+        this.commandsMap.set(CommandName.ExchangeCmd, createExchangeCmd);
+        this.commandsMap.set(CommandName.PassCmd, createPassCmd);
+        this.commandsMap.set(CommandName.PlaceCmd, createPlaceCmd);
+        this.commandsMap.set(CommandName.StockCmd, createStockCmd);
+        this.commandsMap.set(CommandName.HelpCmd, createHelpCmd);
 
-        this.paramsMap.set(DEBUG_CMD, this.extractDebugParams);
-        this.paramsMap.set(EXCHANGE_CMD, this.extractExchangeParams);
-        this.paramsMap.set(PLACE_CMD, this.extractPlaceParams);
-        this.paramsMap.set(PASS_CMD, this.extractPassParams);
-        this.paramsMap.set(STOCK_CMD, this.extractStockParams);
+        this.paramsMap.set(CommandName.DebugCmd, this.extractOnlyChatService);
+        this.paramsMap.set(CommandName.ExchangeCmd, this.extractExchangeParams);
+        this.paramsMap.set(CommandName.PassCmd, this.extractOnlyGameService);
+        this.paramsMap.set(CommandName.PlaceCmd, this.extractPlaceParams);
+        this.paramsMap.set(CommandName.StockCmd, this.extractStockParams);
+        this.paramsMap.set(CommandName.HelpCmd, this.extractOnlyChatService);
     }
 
     /**
@@ -62,35 +69,25 @@ export class TextEntryService {
      *
      * @param text Text input from user
      */
-    handleInput(userInput: string, isLocalPlayer: boolean) {
-        const player: Player = isLocalPlayer ? this.gameService.localPlayer : this.gameService.virtualPlayer;
-        userInput = this.trimSpaces(userInput);
-        if (!this.isEmpty(userInput)) {
-            // After the end game, messages starting with ! can't call commands and are considered normal chat messages
-            if (userInput.startsWith('!') && !this.gameService.isEndGame) {
-                let commandCreationResult = this.createCommand(userInput, player);
-                const isCreated = commandCreationResult !== ErrorType.SyntaxError && commandCreationResult !== ErrorType.InvalidCommand;
-                if (isCreated) {
-                    commandCreationResult = commandCreationResult as Command;
-
-                    // TODO: put this in a command invoker service
-                    const commandExecutionResult = commandCreationResult.execute();
-                    if (commandExecutionResult === ErrorType.NoError) {
-                        // In this sprint, only exchange command success message depends on who called the command
-                        if (commandCreationResult instanceof ExchangeCmd) {
-                            userInput = this.chatDisplayService.createExchangeMessage(isLocalPlayer, userInput);
-                        }
-                        this.chatDisplayService.addPlayerEntry(isLocalPlayer, player.name, userInput);
-                    } else {
-                        this.chatDisplayService.addErrorMessage(commandExecutionResult, userInput);
-                    }
-                    //
+    handleInput(userInput: string) {
+        userInput = trimSpaces(userInput);
+        if (!isEmpty(userInput)) {
+            const isACommand = userInput.startsWith('!') && !this.gameService.currentGameService.game.isEndGame;
+            if (!isACommand) {
+                if (this.gameService.isMultiplayerGame) {
+                    this.chatDisplayService.sendMessageToServer(this.gameService.currentGameService.game.localPlayer.name + ' >> ' + userInput);
                 } else {
-                    this.chatDisplayService.addErrorMessage(commandCreationResult as ErrorType, userInput);
+                    this.chatDisplayService.addEntry(createPlayerEntry(true, this.gameService.currentGameService.game.localPlayer.name, userInput));
                 }
             } else {
-                // Not a command input. Send normal chat message
-                this.chatDisplayService.addPlayerEntry(isLocalPlayer, player.name, userInput);
+                const commandCreationResult = this.createCommand(userInput, this.gameService.currentGameService.game.localPlayer);
+                const isCreated = commandCreationResult instanceof Command;
+                if (isCreated) {
+                    // execute command takes care of sending and displaying messages after execution
+                    this.commandInvokerService.executeCommand(commandCreationResult as Command);
+                } else {
+                    this.chatDisplayService.addEntry(createErrorEntry(commandCreationResult as ErrorType, userInput));
+                }
             }
         }
     }
@@ -132,9 +129,16 @@ export class TextEntryService {
         return undefined;
     }
 
-    extractDebugParams(player: Player, paramsInput: string[]): CommandParams {
+    extractOnlyChatService(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
             return { player, serviceCalled: this.chatDisplayService };
+        }
+        return undefined;
+    }
+
+    extractOnlyGameService(player: Player, paramsInput: string[]): CommandParams {
+        if (paramsInput.length === 0) {
+            return { player, serviceCalled: this.gameService };
         }
         return undefined;
     }
@@ -142,15 +146,8 @@ export class TextEntryService {
     extractStockParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
             const defaultParams = { player, serviceCalled: this.chatDisplayService };
-            const stockLetters: string = scrabbleLetterstoString(this.gameService.stock.letterStock);
+            const stockLetters: string = scrabbleLetterstoString(this.gameService.currentGameService.game.stock.letterStock);
             return { defaultParams, specificParams: stockLetters };
-        }
-        return undefined;
-    }
-
-    extractPassParams(player: Player, paramsInput: string[]): CommandParams {
-        if (paramsInput.length === 0) {
-            return { player, serviceCalled: this.gameService };
         }
         return undefined;
     }
@@ -165,13 +162,13 @@ export class TextEntryService {
      */
     extractPlaceParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 2) {
-            const word = this.removeAccents(paramsInput[1]);
+            const word = removeAccents(paramsInput[1]);
             const positionOrientation = paramsInput[0];
 
-            if (this.isValidWordInput(word) && this.isAllLowerLetters(positionOrientation)) {
+            if (this.isValidWordInput(word) && isAllLowerLetters(positionOrientation)) {
                 const row = positionOrientation.slice(0, 1);
                 const column = positionOrientation.slice(1, LAST_CHAR_INDEX);
-                const coordinates = this.convertToCoordinates(row, column);
+                const coordinates = convertStringToCoord(row, column);
                 if (coordinates) {
                     const orientation = positionOrientation.slice(LAST_CHAR_INDEX).toLowerCase();
                     if (orientation === HORIZONTAL || orientation === VERTICAL) {
@@ -197,8 +194,8 @@ export class TextEntryService {
     extractExchangeParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 1) {
             const letters = paramsInput[0];
-            const hasAccents = letters !== this.removeAccents(letters);
-            if (!hasAccents && this.isAllLowerLetters(letters)) {
+            const hasAccents = letters !== removeAccents(letters);
+            if (!hasAccents && isAllLowerLetters(letters)) {
                 const isValidLetterAmount = letters.length >= MIN_EXCHANGE_LETTERS && letters.length <= MAX_EXCHANGE_LETTERS;
                 if (isValidLetterAmount) {
                     if (this.isValidExchangeWord(letters)) {
@@ -216,9 +213,9 @@ export class TextEntryService {
      */
     isValidWordInput(word: string): boolean {
         let isValid = false;
-        if (!this.isEmpty(word)) {
+        if (!isEmpty(word)) {
             for (const letter of word) {
-                isValid = this.isValidLetter(letter);
+                isValid = isValidLetter(letter);
                 if (!isValid) {
                     break;
                 }
@@ -232,10 +229,10 @@ export class TextEntryService {
      */
     isValidExchangeWord(letters: string): boolean {
         let isValid = false;
-        if (!this.isEmpty(letters)) {
-            if (this.isAllLowerLetters(letters)) {
+        if (!isEmpty(letters)) {
+            if (isAllLowerLetters(letters)) {
                 for (const letter of letters) {
-                    isValid = this.isValidLetter(letter) || letter.charCodeAt(0) === '*'.charCodeAt(0);
+                    isValid = isValidLetter(letter) || letter.charCodeAt(0) === '*'.charCodeAt(0);
                     if (!isValid) {
                         break;
                     }
@@ -243,45 +240,6 @@ export class TextEntryService {
             }
         }
         return isValid;
-    }
-
-    // TODO: move the necessary methods in utilities
-    removeAccents(letters: string): string {
-        return letters.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    }
-
-    /**
-     * Returns true if it is  a letter. False if it is not or has an accent or ç
-     */
-    isValidLetter(letter: string): boolean {
-        if (!this.isEmpty(letter) && letter.length === 1) {
-            const charCode = letter.toLowerCase().charCodeAt(0);
-            const isALetter = charCode >= 'a'.charCodeAt(0) && charCode <= 'z'.charCodeAt(0);
-            return isALetter;
-        }
-        return false;
-    }
-
-    /**
-     * Converts the string row and columns to coordinates with x and y between 0 to 14.
-     *
-     * @param row String of the row number in letters
-     * @param column string of the column number
-     * @returns Vec2 of numbers x and y
-     */
-    convertToCoordinates(row: string, column: string): Vec2 | undefined {
-        let columnNumber = parseInt(column, PARSE_INT_BASE);
-        if (columnNumber !== null) {
-            columnNumber = columnNumber - COLUMN_OFFSET;
-            // For place command, row input is not accepted if its a capital letters
-            const rowNumber = row.charCodeAt(0) - ROW_OFFSET;
-            const isValidRow = rowNumber >= Row.A && rowNumber <= Row.O;
-            const isValidColumn = columnNumber >= Column.One && columnNumber <= Column.Fifteen;
-            if (isValidRow && isValidColumn) {
-                return new Vec2(columnNumber, rowNumber);
-            }
-        }
-        return undefined;
     }
 
     /**
@@ -295,37 +253,5 @@ export class TextEntryService {
             return commandInput.substring(1).split(' ');
         }
         return [];
-    }
-
-    /**
-     * Removes white spaces at the beginning and end of a string.
-     *
-     * @param userInput string Input from the user
-     * @returns String without beginning and ending spaces. Returns empty string if it only had white spaces
-     */
-    trimSpaces(userInput: string): string {
-        while (userInput.startsWith(' ')) {
-            userInput = userInput.substring(1);
-        }
-        while (userInput.endsWith(' ')) {
-            userInput = userInput.substring(0, userInput.length - 1);
-        }
-
-        return userInput;
-    }
-
-    /**
-     * Checks if a string is empty or filled only with white spaces.
-     *
-     * @param userInput string Input from the user
-     * @returns True if empty string or white space only string
-     */
-    isEmpty(userInput: string) {
-        userInput = this.trimSpaces(userInput);
-        return userInput === '';
-    }
-
-    isAllLowerLetters(letters: string): boolean {
-        return letters.toLowerCase() === letters;
     }
 }

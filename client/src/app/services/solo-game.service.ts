@@ -4,157 +4,289 @@ import { FormGroup } from '@angular/forms';
 import { PlaceParams } from '@app/classes/commands';
 import { Dictionary } from '@app/classes/dictionary';
 import { ErrorType } from '@app/classes/errors';
+import { GameParameters } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
-import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis } from '@app/classes/utilities';
 import { VirtualPlayer } from '@app/classes/virtual-player';
-import { LetterStock } from '@app/services/letter-stock.service';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
+import { LetterStock } from './letter-stock.service';
 import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
-import { ValidationService, WAIT_TIME } from './validation.service';
+import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
+
 export const TIMER_INTERVAL = 1000;
-const DEFAULT_LETTER_COUNT = 7;
+export const DEFAULT_LETTER_COUNT = 7;
 const DOUBLE_DIGIT = 10;
 const MINUTE_IN_SEC = 60;
 const MAX_TURNS_PASSED = 6;
+const LOCAL_PLAYER_INDEX = 0;
 
 @Injectable({
     providedIn: 'root',
 })
 export class SoloGameService {
-    localPlayer: LocalPlayer;
-    virtualPlayer: VirtualPlayer;
-    totalCountDown: number;
-    dictionary: Dictionary;
-    randomBonus: boolean;
+    game: GameParameters;
     timer: string;
-    timerMs: number;
-    stock: LetterStock = new LetterStock();
+    currentTurnId: number;
     intervalValue: NodeJS.Timeout;
-    turnPassed: boolean;
-    hasTurnsBeenPassed: boolean[];
-    isEndGame: boolean;
+
     constructor(
-        private gridService: GridService,
-        private rackService: RackService,
-        private chatDisplayService: ChatDisplayService,
-        private validationService: ValidationService,
-        private wordBuilder: WordBuilderService,
-        private placeService: PlaceService,
+        protected gridService: GridService,
+        protected rackService: RackService,
+        protected chatDisplayService: ChatDisplayService,
+        protected validationService: ValidationService,
+        protected wordBuilder: WordBuilderService,
+        protected placeService: PlaceService,
     ) {
-        this.hasTurnsBeenPassed = [];
-        this.turnPassed = false;
-        this.isEndGame = false;
     }
     initializeGame(gameInfo: FormGroup) {
+        this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value, gameInfo.controls.bonus.value);
         this.chatDisplayService.entries = [];
-        this.localPlayer = new LocalPlayer(gameInfo.controls.name.value);
-        this.localPlayer.isActive = true;
-        this.virtualPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
-        this.virtualPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        this.totalCountDown = +gameInfo.controls.timer.value;
-        this.timerMs = +this.totalCountDown;
-        this.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
-        this.randomBonus = gameInfo.controls.bonus.value;
+        this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
+        this.game.creatorPlayer.isActive = true;
+        this.game.stock = new LetterStock();
+        this.game.localPlayer = new LocalPlayer(gameInfo.controls.name.value); // where does local player take his letters from stock?
+        this.game.creatorPlayer = this.game.localPlayer;
+        this.game.opponentPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
+        this.game.localPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
+        this.game.randomBonus = gameInfo.controls.bonus.value;
+        this.game.totalCountDown = gameInfo.controls.timer.value;
+        this.game.timerMs = gameInfo.controls.timer.value;
+        const starterPlayerIndex = Math.round(Math.random()); // return 0 or 1
+        const starterPlayer = starterPlayerIndex === LOCAL_PLAYER_INDEX ? this.game.localPlayer : this.game.opponentPlayer;
+        starterPlayer.isActive = true;
+        return this.game;
     }
     createNewGame() {
-        // Empty board and stack
+        this.currentTurnId = 0;
         this.rackService.rackLetters = [];
-        this.gridService.scrabbleBoard = new ScrabbleBoard();
-        this.addRackLetters(this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT));
+        this.gridService.scrabbleBoard = this.game.scrabbleBoard;
+        this.chatDisplayService.initialize(this.game.localPlayer.name);
+        this.addRackLetters(this.game.localPlayer.letters);
         this.startCountdown();
-        this.hasTurnsBeenPassed[0] = false;
+        this.game.isTurnPassed = false;
+        this.game.hasTurnsBeenPassed = [];
+
     }
-    startCountdown() {
+    resetTimer() {
+        this.game.timerMs = +this.game.totalCountDown;
         this.secondsToMinutes();
-        this.intervalValue = setInterval(() => {
-            this.timerMs--;
-            if (this.timerMs < 0) {
-                this.timerMs = 0;
-                this.secondsToMinutes();
-                this.changeActivePlayer();
-            }
-            this.secondsToMinutes();
-        }, TIMER_INTERVAL);
+        clearInterval(this.intervalValue);
+        this.startCountdown();
     }
     secondsToMinutes() {
-        const s = Math.floor(this.timerMs / MINUTE_IN_SEC);
-        const ms = this.timerMs % MINUTE_IN_SEC;
+        const s = Math.floor(this.game.timerMs / MINUTE_IN_SEC);
+        const ms = this.game.timerMs % MINUTE_IN_SEC;
         if (ms < DOUBLE_DIGIT) {
             this.timer = s + ':' + 0 + ms;
         } else {
             this.timer = s + ':' + ms;
         }
     }
-    // New Turn
-    changeActivePlayer() {
-        // Check if last turn was passed by player
-        if (this.turnPassed) {
-            this.hasTurnsBeenPassed[this.hasTurnsBeenPassed.length] = false;
-            // Set last turn to hasBeenPassed = true
-            this.hasTurnsBeenPassed[this.hasTurnsBeenPassed.length - 1] = true;
-        } else {
-            this.hasTurnsBeenPassed[this.hasTurnsBeenPassed.length] = false;
-        }
-
-        // Change active player and reset timer for new turn
-        const isLocalPlayerActive = this.localPlayer.isActive;
-        if (isLocalPlayerActive) {
-            // If the rack is empty, end game + player won
-            if (this.localPlayer.letters.length === 0 && this.stock.isEmpty()) {
-                this.localPlayer.isWinner = true;
-                this.endGame();
-                return;
-            }
-            this.localPlayer.isActive = false;
-            this.virtualPlayer.isActive = true;
-            this.timerMs = +this.totalCountDown;
+    startCountdown() {
+        if (!this.game.isEndGame) {
             this.secondsToMinutes();
-            clearInterval(this.intervalValue);
-            this.startCountdown();
-        } else {
-            // If the rack is empty, end game + player won
-            if (this.virtualPlayer.letters.length === 0 && this.stock.isEmpty()) {
-                this.virtualPlayer.isWinner = true;
-                this.endGame();
-                return;
-            }
-            this.virtualPlayer.isActive = false;
-            this.localPlayer.isActive = true;
-            this.timerMs = +this.totalCountDown;
-            this.secondsToMinutes();
-            clearInterval(this.intervalValue);
-            this.startCountdown();
+            this.intervalValue = setInterval(() => {
+                this.game.timerMs--;
+                if (this.game.timerMs < 0) {
+                    // this.game.isTurnPassed = true;
+                    this.changeTurn();
+                    // this.game.isTurnPassed = false;
+                }
+                this.secondsToMinutes();
+            }, TIMER_INTERVAL);
         }
     }
     passTurn(player: Player) {
         if (player.isActive) {
-            this.turnPassed = true;
-            if (this.isTurnsPassedLimit() && this.hasTurnsBeenPassed.length >= MAX_TURNS_PASSED) {
-                this.endGame();
-                return ErrorType.NoError;
-            }
-            this.timerMs = 0;
-            this.secondsToMinutes();
-            this.changeActivePlayer();
-            this.turnPassed = false;
+            this.game.isTurnPassed = true;
+            this.changeTurn();
+            this.game.isTurnPassed = false;
             return ErrorType.NoError;
         }
         return ErrorType.ImpossibleCommand;
     }
-    // Check if last 5 turns have been passed (current turn is the 6th)
-    isTurnsPassedLimit(): boolean {
-        let isLimit = true;
-        for (let i = this.hasTurnsBeenPassed.length - 1; i > this.hasTurnsBeenPassed.length - MAX_TURNS_PASSED; i--) {
-            isLimit = isLimit && this.hasTurnsBeenPassed[i];
+
+    changeTurn() {
+        this.updateHasTurnsBeenPassed(this.game.isTurnPassed);
+        this.game.timerMs = 0;
+        this.secondsToMinutes();
+        this.changeActivePlayer();
+    }
+    // If the turn was changed by a pass command, add passed turn as true in the turns history
+    updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
+        this.game.hasTurnsBeenPassed.push(isCurrentTurnedPassed);
+        if (this.isConsecutivePassedTurnsLimit()) {
+            this.endGame();
         }
-        return isLimit;
+        this.currentTurnId++;
+    }
+    // Check if last 5 turns have been passed (current turn is the 6th)
+    isConsecutivePassedTurnsLimit(): boolean {
+        let turnIndex = this.currentTurnId;
+        let consecutivePassedTurn = 0;
+        let wasTurnPassed = false;
+        do {
+            wasTurnPassed = this.game.hasTurnsBeenPassed[turnIndex];
+            if (wasTurnPassed) {
+                consecutivePassedTurn++;
+            }
+            turnIndex--;
+        } while (wasTurnPassed && turnIndex >= 0)
+        return consecutivePassedTurn === MAX_TURNS_PASSED;
+    }
+    // New Turn
+    changeActivePlayer() {
+        this.updateActivePlayer();
+        this.resetTimer();
+    }
+    updateActivePlayer() {
+        // Switch the active player
+        if (this.game.localPlayer.isActive) {
+            // If the rack is empty, end game + player won
+            if (this.game.localPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+                this.game.localPlayer.isWinner = true;
+                this.endGame();
+                return;
+            }
+            this.game.localPlayer.isActive = false;
+            this.game.opponentPlayer.isActive = true;
+        } else {
+            // If the rack is empty, end game + player won
+            if (this.game.opponentPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+                this.game.opponentPlayer.isWinner = true;
+                this.endGame();
+                return;
+            }
+            this.game.opponentPlayer.isActive = false;
+            this.game.localPlayer.isActive = true;
+        }
+    }
+    addRackLetters(letters: ScrabbleLetter[]): void {
+        for (const letter of letters) {
+            this.addRackLetter(letter);
+        }
+    }
+    addRackLetter(letter: ScrabbleLetter): void {
+        this.rackService.addLetter(letter);
+    }
+    addLetterToPlayer(letter: ScrabbleLetter) {
+        this.game.localPlayer.addLetter(letter);
+    }
+    exchangeLetters(player: Player, letters: string): ErrorType {
+        if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
+            const lettersToRemove: ScrabbleLetter[] = [];
+            if (player.removeLetter(letters) === true) {
+                for (let i = 0; i < letters.length; i++) {
+                    lettersToRemove[i] = new ScrabbleLetter(letters[i]);
+                }
+
+                const lettersToAdd: ScrabbleLetter[] = this.game.stock.exchangeLetters(lettersToRemove);
+                for (let i = 0; i < lettersToAdd.length; i++) {
+                    this.rackService.removeLetter(lettersToRemove[i]);
+                    this.addRackLetter(lettersToAdd[i]);
+                    this.addLetterToPlayer(lettersToAdd[i]);
+                }
+                this.changeTurn();
+                return ErrorType.NoError;
+            }
+        }
+        return ErrorType.ImpossibleCommand;
+    }
+
+    async place(player: Player, placeParams: PlaceParams): Promise<ErrorType /* Promise<ErrorType> */>/* Promise<ErrorType> */ {
+        if (!player.isActive) {
+            return ErrorType.ImpossibleCommand;
+        }
+        let errorResult = this.placeService.place(player, placeParams);
+        if (errorResult === ErrorType.NoError) {
+
+            // Generate all words created
+            let tempScrabbleWords: ScrabbleWord[];
+            if (placeParams.orientation === 'h') {
+                tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
+            } else {
+                tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
+            }
+            let strWords: string[] = [];
+            tempScrabbleWords.forEach(scrabbleWord => {
+                strWords.push(scrabbleWord.stringify().toLowerCase());
+            });
+            // validate words waits 3sec if the words are invalid or the server doesn't answer.
+            await this.validationService.validateWords(tempScrabbleWords).then((isValidWordsResult: boolean) => {
+                errorResult = isValidWordsResult ? ErrorType.NoError : ErrorType.ImpossibleCommand;
+                if (!this.validationService.areWordsValid) {
+                    // Retake letters
+                    const removedLetters = this.gridService.removeInvalidLetters(
+                        placeParams.position,
+                        placeParams.word.length,
+                        placeParams.orientation,
+                    );
+                    this.addRackLetters(removedLetters);
+                    removedLetters.forEach(letter => { this.addLetterToPlayer(letter) });
+                } else {
+                    // Score
+                    this.validationService.updatePlayerScore(tempScrabbleWords, player);
+                    // Take new letters
+                    const newLetters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+                    this.addRackLetters(newLetters)
+                    newLetters.forEach(letter => { this.addLetterToPlayer(letter) });
+                }
+                this.changeTurn();
+            });
+            console.log("place result after await:", errorResult);
+            console.log("localplayer shouldnt be active:", this.game.localPlayer.isActive, ', timer should reset:', this.game.timerMs);
+            return errorResult;
+        }
+        console.log("return place result:", errorResult);
+        return errorResult;
+    }
+    displayEndGameMessage() {
+        const endGameMessages = this.chatDisplayService.createEndGameMessages(this.game.stock.letterStock, this.game.localPlayer, this.game.opponentPlayer);
+        endGameMessages.forEach(message => {
+            this.chatDisplayService.addEntry(message);
+        });
+    }
+    endLocalGame() {
+        const localPlayerPoints = this.calculateRackPoints(this.game.localPlayer);
+        const oppnentPlayerPoints = this.calculateRackPoints(this.game.opponentPlayer);
+
+        if (this.game.localPlayer.isWinner === true) {
+            this.game.localPlayer.score += oppnentPlayerPoints;
+            this.game.opponentPlayer.score -= oppnentPlayerPoints;
+        } else if (this.game.opponentPlayer.isWinner === true) {
+            this.game.opponentPlayer.score += localPlayerPoints;
+            this.game.localPlayer.score -= localPlayerPoints;
+        } else {
+            this.game.localPlayer.score -= localPlayerPoints;
+            this.game.opponentPlayer.score -= oppnentPlayerPoints;
+        }
+        clearInterval(this.intervalValue);
+        this.game.timerMs = 0;
+        this.secondsToMinutes();
+        this.game.isEndGame = true;
+    }
+    endGame() {
+        this.displayEndGameMessage();
+        this.endLocalGame();
+    }
+    calculateRackPoints(player: Player): number {
+        let totalValue = 0;
+        player.letters.forEach((letter) => {
+            totalValue += letter.value;
+        });
+        return totalValue;
+    }
+    removeRackLetter(scrabbleLetter: ScrabbleLetter): void {
+        const i = this.rackService.removeLetter(scrabbleLetter);
+        this.game.localPlayer.letters.splice(i, 1);
     }
     drawRack(newWords: ScrabbleWord[]): void {
         newWords.forEach((newWord) => {
@@ -172,27 +304,7 @@ export class SoloGameService {
             }
         });
     }
-    exchangeLetters(player: Player, letters: string): ErrorType {
-        if (player.isActive && this.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
-            const lettersToRemove: ScrabbleLetter[] = [];
-            if (player.removeLetter(letters) === true) {
-                for (let i = 0; i < letters.length; i++) {
-                    lettersToRemove[i] = new ScrabbleLetter(letters[i]);
-                }
-
-                const lettersToAdd: ScrabbleLetter[] = this.stock.exchangeLetters(lettersToRemove);
-                for (let i = 0; i < lettersToAdd.length; i++) {
-                    this.rackService.removeLetter(lettersToRemove[i]);
-                    this.addRackLetter(lettersToAdd[i]);
-                }
-                this.passTurn(this.localPlayer);
-                return ErrorType.NoError;
-            }
-        }
-        return ErrorType.ImpossibleCommand;
-    }
-
-    exchangeLettersSelected(player: LocalPlayer) {
+    getLettersSelected(): string {
         let letters = '';
 
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
@@ -202,89 +314,7 @@ export class SoloGameService {
                 this.rackService.exchangeSelected[i] = false;
             }
         }
-
-        this.exchangeLetters(player, letters);
-    }
-
-    addRackLetters(letters: ScrabbleLetter[]): void {
-        for (const letter of letters) {
-            this.addRackLetter(letter);
-        }
-    }
-    addRackLetter(letter: ScrabbleLetter): void {
-        this.rackService.addLetter(letter);
-        // this.localPlayer.letters[this.localPlayer.letters.length] = letter;
-        this.localPlayer.addLetter(letter);
-    }
-    removeRackLetter(scrabbleLetter: ScrabbleLetter): void {
-        const i = this.rackService.removeLetter(scrabbleLetter);
-        this.localPlayer.letters.splice(i, 1);
-    }
-    endGame() {
-        this.chatDisplayService.addEndGameMessage(this.stock.letterStock, this.localPlayer, this.virtualPlayer);
-
-        const localPlayerPoints = this.calculateRackPoints(this.localPlayer);
-        const virtualPlayerPoints = this.calculateRackPoints(this.virtualPlayer);
-
-        if (this.localPlayer.isWinner === true) {
-            this.localPlayer.score += virtualPlayerPoints;
-            this.virtualPlayer.score -= virtualPlayerPoints;
-        } else if (this.virtualPlayer.isWinner === true) {
-            this.virtualPlayer.score += localPlayerPoints;
-            this.localPlayer.score -= localPlayerPoints;
-        } else {
-            this.localPlayer.score -= localPlayerPoints;
-            this.virtualPlayer.score -= virtualPlayerPoints;
-        }
-        clearInterval(this.intervalValue);
-        this.timerMs = 0;
-        this.secondsToMinutes();
-        // Show message in sidebar and end of game info in communication box
-        this.isEndGame = true;
-    }
-    calculateRackPoints(player: Player): number {
-        let totalValue = 0;
-        player.letters.forEach((letter) => {
-            totalValue += letter.value;
-        });
-        return totalValue;
-    }
-    place(player: Player, placeParams: PlaceParams): ErrorType {
-        const errorResult = this.placeService.place(player, placeParams);
-
-        if (errorResult === ErrorType.NoError) {
-            // Generate all words created
-            let tempScrabbleWords: ScrabbleWord[];
-            if (placeParams.orientation === 'h') {
-                tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
-            } else {
-                tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
-            }
-            // Call validation method and end turn
-            setTimeout(() => {
-                if (!this.validationService.validateWords(tempScrabbleWords)) {
-                    // Retake letters
-                    const removedLetters = this.gridService.removeInvalidLetters(
-                        placeParams.position,
-                        placeParams.word.length,
-                        placeParams.orientation,
-                    );
-                    this.addRackLetters(removedLetters);
-                } else {
-                    // Score
-                    this.validationService.updatePlayerScore(tempScrabbleWords, player);
-                    // Take new letters
-                    const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-                    for (const letter of newLetters) {
-                        this.rackService.addLetter(letter);
-                        player.letters.push(letter);
-                    }
-                }
-
-                this.passTurn(player);
-            }, WAIT_TIME);
-        }
-
-        return errorResult;
+        return letters;
     }
 }
+

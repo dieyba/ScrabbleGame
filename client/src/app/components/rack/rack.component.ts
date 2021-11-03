@@ -16,14 +16,16 @@ const NUMBER_OF_LETTERS = 7;
 export class RackComponent implements AfterViewInit {
     @ViewChild('rackCanvas', { static: false }) private rackCanvas!: ElementRef<HTMLCanvasElement>;
 
-    private rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
+    private rackSize: Vec2;
     private rackContext: CanvasRenderingContext2D;
 
     constructor(
         private rackService: RackService,
         private manipulationRackService: ManipulationRackService,
         private exchangeService: ExchangeService,
-    ) {}
+    ) {
+        this.rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
+    }
 
     ngAfterViewInit(): void {
         this.rackService.gridContext = this.rackCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;

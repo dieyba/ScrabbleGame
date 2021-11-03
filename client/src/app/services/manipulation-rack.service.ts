@@ -7,10 +7,13 @@ const ERROR_NUMBER = -1;
     providedIn: 'root',
 })
 export class ManipulationRackService {
-    private letterSelectedPosition = ERROR_NUMBER;
-    private firstOccurencePosition = ERROR_NUMBER;
+    private letterSelectedPosition: number;
+    private firstOccurencePosition: number;
 
-    constructor(private readonly rackService: RackService) {}
+    constructor(private readonly rackService: RackService) {
+        this.letterSelectedPosition = ERROR_NUMBER;
+        this.firstOccurencePosition = ERROR_NUMBER;
+    }
 
     handleSelection(rackContext: CanvasRenderingContext2D, position: number) {
         if (this.rackService.handlingSelected[position - 1] === false) {

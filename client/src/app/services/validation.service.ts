@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { Player } from '@app/classes/player';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { Axis } from '@app/classes/utilities';
-import { Vec2 } from '@app/classes/vec2';
+import { SocketHandler } from '@app/modules/socket-handler';
+import * as io from 'socket.io-client';
 import { BonusService } from './bonus.service';
 import { BOARD_SIZE, GridService } from './grid.service';
 
@@ -19,37 +18,42 @@ export class ValidationService {
     dictionary: Dictionary;
     words: string[];
     isTimerElapsed: boolean;
+    areWordsValid: boolean;
+    private socket: io.Socket;
+    private readonly server: string;
 
     constructor(private readonly gridService: GridService, private bonusService: BonusService) {
         this.dictionary = new Dictionary(DictionaryType.Default);
         this.words = [];
         this.isTimerElapsed = false;
+        this.server = 'http://' + window.location.hostname + ':3000';
+        this.socket = SocketHandler.requestSocket(this.server);
+        this.areWordsValid = false;
+        this.socket.on('areWordsValid', (result: boolean) => {
+            this.areWordsValid = result;
+        });
     }
-    /* eslint-disable no-unused-vars */
-    isPlacable(arg0: ScrabbleWord, arg1: Vec2, axis: Axis): boolean {
-        throw new Error('Method not implemented.');
-    }
-    /* eslint-enable no-unused-vars */
-
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
         const wordsValue = this.calculateScore(newWords);
         player.score += wordsValue;
         // Retirer lettres du board
         setTimeout(() => {
-            if (this.validateWords(newWords)) {
+            if (this.areWordsValid) {
                 newWords.forEach((newWord) => {
-                    // actually what was this method supposed to do? seemmed to do a few things at the same time
                     for (const letter of newWord.content) {
                         if (wordsValue === 0) {
                             this.gridService.removeSquare(letter.tile.position.x, letter.tile.position.y);
                         } else {
+                            newWord.content.forEach((letter) => {
+                                letter.tile.isValidated = true;
+                            });
                             // if change the isvalidated = true here, change how its used in solo game service
                             this.bonusService.useBonus(newWord);
                         }
                     }
                 });
             }
-            this.isTimerElapsed = true; // TODO: ca va ou ca?
+            this.isTimerElapsed = true;
         }, WAIT_TIME);
     }
 
@@ -62,6 +66,7 @@ export class ValidationService {
             totalScore += word.value;
         }
 
+        // console.log(this.newLettersCount());
         if (this.newLettersCount() === BONUS_LETTER_COUNT) {
             // Add 50 points to player's score
             totalScore += BONUS_POINTS;
@@ -69,36 +74,6 @@ export class ValidationService {
             return 0;
         }
         return totalScore;
-    }
-
-    validateWords(newWords: ScrabbleWord[]): boolean {
-        for (let i = 0; i < newWords.length; i++) {
-            this.words[i] = this.convertScrabbleWordToString(newWords[i].content);
-            // Word not valid, validation fails3
-            if (!this.isWordValid(this.words[i])) {
-                return false;
-            } else {
-                // Word was valid, set its letters as validated
-                newWords[i].content.forEach((letter) => {
-                    letter.tile.isValidated = true;
-                });
-            }
-        }
-        return true;
-    }
-
-    // Total value ne consume pas les bonus
-    // TODO: duplicate method with stringify in ScrabbleWord. Which one is to remove?
-    convertScrabbleWordToString(scrabbleLetter: ScrabbleLetter[]): string {
-        let word = '';
-        scrabbleLetter.forEach((letter) => {
-            word += letter.character;
-        });
-        return word.toLowerCase();
-    }
-
-    isWordValid(word: string): boolean {
-        return this.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
     }
 
     newLettersCount(): number {
@@ -109,10 +84,42 @@ export class ValidationService {
                     this.gridService.scrabbleBoard.squares[i][j].occupied === true &&
                     this.gridService.scrabbleBoard.squares[i][j].isValidated === false
                 ) {
+                    // console.log(this.gridService.scrabbleBoard.squares[i][j]);
                     newLetters++;
                 }
             }
         }
         return newLetters;
+    }
+
+    // Calls the server to validate the words passed in.
+    // If the words were not valid, wait 3 seconds before returning result.
+    // If the server doesnt answer after 3 sec, validation result is false by default
+    async validateWords(newWords: ScrabbleWord[]) {
+        const strWords: string[] = [];
+        newWords?.forEach((newWord) => {
+            strWords.push(newWord.stringify().toLowerCase());
+        });
+        this.areWordsValid = false;
+        let wordsHaveBeenValidated = false;
+        let validationTimer: NodeJS.Timeout;
+        return new Promise<boolean>((resolve, reject) => {
+            this.socket.emit('validateWords', strWords);
+
+            this.socket.once('areWordsValid', (areWordsValid) => {
+                console.log('response validation from server:', areWordsValid);
+                this.areWordsValid = areWordsValid;
+                wordsHaveBeenValidated = true;
+                if (areWordsValid) {
+                    resolve(areWordsValid);
+                    clearTimeout(validationTimer);
+                }
+            });
+            validationTimer = setTimeout(() => {
+                if (!wordsHaveBeenValidated || !this.areWordsValid) {
+                    resolve(false);
+                }
+            }, WAIT_TIME);
+        });
     }
 }

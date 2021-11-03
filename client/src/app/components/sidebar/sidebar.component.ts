@@ -1,65 +1,76 @@
-import { Component } from '@angular/core';
-import { SoloGameService } from '@app/services/solo-game.service';
-
+import { Component, Optional } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { SocketHandler } from '@app/modules/socket-handler';
+import { GameListService } from '@app/services/game-list.service';
+import { GameService } from '@app/services/game.service';
+import * as io from 'socket.io-client';
 @Component({
     selector: 'app-sidebar',
     templateUrl: './sidebar.component.html',
     styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent {
-    player1Name: string;
-    player2Name: string;
     winnerName: string;
+    private dialogRef: MatDialogRef<EndGamePopupComponent>;
+    private socket: io.Socket;
+    private readonly server: string;
 
-    constructor(public sologameService: SoloGameService) {
-        this.player1Name = this.sologameService.localPlayer.name;
-        this.player2Name = this.sologameService.virtualPlayer.name;
+    constructor(public router: Router, public dialog: MatDialog, private gameService: GameService) {
+        this.server = 'http://' + window.location.hostname + ':3000';
+        this.socket = SocketHandler.requestSocket(this.server);
         this.winnerName = '';
+    }
+    getPlayer1Name(): string {
+        return this.gameService.currentGameService.game.localPlayer.name;
+    }
+
+    getPlayer2Name(): string {
+        return this.gameService.currentGameService.game.opponentPlayer.name;
     }
 
     getLettersLeftCount(): number {
-        return this.sologameService.stock.letterStock.length;
+        return this.gameService.currentGameService.game.stock.letterStock.length;
     }
 
     getPlayer1LetterCount(): number {
-        return this.sologameService.localPlayer.letters.length;
+        return this.gameService.currentGameService.game.localPlayer.letters.length;
     }
 
     getPlayer2LetterCount(): number {
-        return this.sologameService.virtualPlayer.letters.length;
+        return this.gameService.currentGameService.game.localPlayer.letters.length;
     }
 
     getPlayer1Score(): number {
-        return this.sologameService.localPlayer.score;
+        return this.gameService.currentGameService.game.localPlayer.score;
     }
 
     getPlayer2Score(): number {
-        return this.sologameService.virtualPlayer.score;
-    }
-
-    getTimer(): string {
-        return this.sologameService.timer;
+        return this.gameService.currentGameService.game.opponentPlayer.score;
     }
 
     isPlayer1Active(): boolean {
-        return this.sologameService.localPlayer.isActive;
+        return this.gameService.currentGameService.game.localPlayer.isActive;
     }
 
     isPlayer2Active(): boolean {
-        return this.sologameService.virtualPlayer.isActive;
+        return this.gameService.currentGameService.game.opponentPlayer.isActive;
+    }
+    getTimer(): string {
+        return this.gameService.currentGameService.timer;
     }
 
     isEndGame(): boolean {
         this.getWinnerName();
-        return this.sologameService.isEndGame;
+        return this.gameService.currentGameService.game.isEndGame;
     }
 
     hasWinner(): boolean {
-        return this.sologameService.localPlayer.isWinner || this.sologameService.virtualPlayer.isWinner;
+        return this.gameService.currentGameService.game.localPlayer.isWinner || this.gameService.currentGameService.game.opponentPlayer.isWinner;
     }
 
     isDrawnGame(): boolean {
-        if (this.sologameService.localPlayer.isWinner && this.sologameService.virtualPlayer.isWinner) {
+        if (this.gameService.currentGameService.game.localPlayer.isWinner && this.gameService.currentGameService.game.opponentPlayer.isWinner) {
             return true;
         } else {
             return false;
@@ -68,13 +79,47 @@ export class SidebarComponent {
 
     getWinnerName() {
         if (this.isDrawnGame()) {
-            this.winnerName = this.sologameService.localPlayer.name + ' et ' + this.sologameService.virtualPlayer.name;
+            this.winnerName =
+                this.gameService.currentGameService.game.localPlayer.name + ' et ' + this.gameService.currentGameService.game.opponentPlayer.name;
         }
-        if (this.sologameService.localPlayer.isWinner) {
-            this.winnerName = this.sologameService.localPlayer.name;
+        if (this.gameService.currentGameService.game.localPlayer.isWinner) {
+            this.winnerName = this.gameService.currentGameService.game.localPlayer.name;
         }
-        if (this.sologameService.virtualPlayer.isWinner) {
-            this.winnerName = this.sologameService.virtualPlayer.name;
+        if (this.gameService.currentGameService.game.opponentPlayer.isWinner) {
+            this.winnerName = this.gameService.currentGameService.game.opponentPlayer.name;
         }
+    }
+    quitGame(): void {
+        // calls server to display message in opponent's chat box 
+        this.socket.emit('playerQuit');
+        // User confirmation popup
+        this.dialogRef = this.dialog.open(EndGamePopupComponent);
+
+        // User confirmation response
+        this.dialogRef.afterClosed().subscribe((confirmQuit) => {
+            if (confirmQuit) {
+                this.router.navigate(['/start']);
+            }
+        });
+    }
+}
+
+@Component({
+    template: `<h1 md-dialog-title>Fin de la partie</h1>
+
+        <div md-dialog-content>Êtes-vous sûr/sûre de vouloir partir?</div>
+
+        <div md-dialog-actions align="center">
+            <button md-raised-button color="warn" (click)="dialogReference.close(true)">OUI</button>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
+            <button id="cancelQuitButton" md-raised-button color="primary" (click)="dialogReference.close(false)">NON</button>
+        </div> `,
+})
+export class EndGamePopupComponent {
+    // private readonly server = 'http://' + window.location.hostname + ':3000';
+    // private socket: io.Socket;
+    constructor(@Optional() public dialogReference: MatDialogRef<unknown>, private gameList: GameListService) {}
+    disconnect() {
+        this.gameList.disconnectUser();
     }
 }

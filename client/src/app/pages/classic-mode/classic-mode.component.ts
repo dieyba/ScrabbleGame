@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { FormComponent } from '@app/components/form/form.component';
+import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
+// import { JoinRoomComponent } from '@app/components/join-room/join-room.component';
 
 @Component({
     selector: 'app-classic-mode',
@@ -10,7 +12,10 @@ import { FormComponent } from '@app/components/form/form.component';
 export class ClassicModeComponent {
     constructor(private dialog: MatDialog) {}
 
-    openDialog(): void {
-        this.dialog.open(FormComponent, {});
+    openDialog(isSolo: boolean): void {
+        this.dialog.open(FormComponent, { data: isSolo });
+    }
+    openJoinRoom(gameSelection: boolean) {
+        this.dialog.open(WaitingAreaComponent, { data: gameSelection });
     }
 }

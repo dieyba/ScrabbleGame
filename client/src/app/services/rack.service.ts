@@ -13,14 +13,18 @@ const SQUARE_WIDTH = 71;
 })
 export class RackService {
     rackLetters: ScrabbleLetter[];
-    exchangeSelected: boolean[] = [false, false, false, false, false, false, false];
-    handlingSelected: boolean[] = [false, false, false, false, false, false, false];
+    exchangeSelected: boolean[];
+    handlingSelected: boolean[];
     gridContext: CanvasRenderingContext2D;
-    squareWidth = RACK_WIDTH / MAX_LETTER_COUNT;
-    squareHeight = RACK_WIDTH;
+    squareWidth: number;
+    squareHeight: number;
 
     constructor() {
         this.rackLetters = [];
+        this.exchangeSelected = [false, false, false, false, false, false, false];
+        this.handlingSelected = [false, false, false, false, false, false, false];
+        this.squareWidth = RACK_WIDTH / MAX_LETTER_COUNT;
+        this.squareHeight = RACK_HEIGHT;
     }
 
     drawRack() {

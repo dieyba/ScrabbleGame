@@ -7,6 +7,7 @@ import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { BonusService } from './bonus.service';
 import { GridService } from './grid.service';
+import { PlaceService } from './place.service';
 import { SoloGameService } from './solo-game.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
@@ -41,6 +42,7 @@ export class VirtualPlayerService {
         private wordBuilderService: WordBuilderService,
         private bonusService: BonusService,
         private soloGameService: SoloGameService,
+        private placeService: PlaceService,
     ) {
         // TODO Implement timer (3s and 20s limit)
         this.rack = new ScrabbleRack();
@@ -116,7 +118,7 @@ export class VirtualPlayerService {
                 charArray[index] = char.character;
                 index++;
             }
-            if (this.validationService.isWordValid(charArray.join(''))) {
+            if (this.isWordValid(charArray.join(''))) {
                 possibleMoves[movesFound] = this.wordify(j);
                 movesFound++;
             }
@@ -170,7 +172,13 @@ export class VirtualPlayerService {
                     }
                     for (let l = 0; l < list.length; l++) {
                         // Remove elements of the list which aren't valid with the points constraint
-                        if (this.validationService.isPlacable(list[l], this.findPosition(list[l], axis), axis)) {
+                        const pos = this.findPosition(list[l], axis);
+                        const placeParams: PlaceParams = {
+                            word: list[l].stringify(),
+                            position: pos,
+                            orientation: axis,
+                        };
+                        if (this.placeService.canPlaceWord(this.soloGameService.game.opponentPlayer, placeParams)) {
                             if (this.bonusService.totalValue(list[l]) > points || this.bonusService.totalValue(list[l]) < points - POINTS_INTERVAL) {
                                 list.splice(l);
                             } else {
@@ -299,5 +307,11 @@ export class VirtualPlayerService {
             if (currentLetter === this.rack.letters.length) currentLetter = 0;
         }
         return listOfTiles;
+    }
+    // Other function to validate words locally.
+    isWordValid(word: string): boolean {
+        return this.validationService.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'")
+            ? true
+            : false;
     }
 }

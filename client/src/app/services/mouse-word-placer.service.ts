@@ -1,14 +1,16 @@
 /* eslint-disable max-lines */
 import { Injectable } from '@angular/core';
-import { PlaceParams } from '@app/classes/commands';
+import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
+import { PlaceCmd } from '@app/classes/place-command';
 import { BOARD_SIZE } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { SquareColor } from '@app/classes/square';
 import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
+import { CommandInvokerService } from './command-invoker.service';
+import { GameService } from './game.service';
 import { BOARD_OFFSET, GridService, SQUARE_SIZE } from './grid.service';
 import { RackService, RACK_HEIGHT, RACK_WIDTH } from './rack.service';
-import { SoloGameService } from './solo-game.service';
 const ABSOLUTE_BOARD_SIZE = 580;
 const ACTUAL_SQUARE_SIZE = SQUARE_SIZE + 2;
 @Injectable({
@@ -23,7 +25,13 @@ export class MouseWordPlacerService {
     currentWord: ScrabbleLetter[];
     wordString: string;
     overlayContext: CanvasRenderingContext2D;
-    constructor(private gridService: GridService, private rackService: RackService, private soloGameService: SoloGameService) {
+
+    constructor(
+        private gridService: GridService,
+        private rackService: RackService,
+        private gameService: GameService,
+        private commandInvokerService: CommandInvokerService,
+    ) {
         this.currentAxis = Axis.H;
         this.initialPosition = new Vec2();
         this.latestPosition = new Vec2();
@@ -33,7 +41,7 @@ export class MouseWordPlacerService {
         this.wordString = '';
     }
     onMouseClick(e: MouseEvent) {
-        if (this.soloGameService.localPlayer.isActive === false || this.currentWord.length > 0) return;
+        if (this.gameService.currentGameService.game.localPlayer.isActive === false || this.currentWord.length > 0) return;
         this.clearOverlay();
         if (this.initialPosition.x !== 0 && this.initialPosition.y !== 0) {
             this.drawArrow(this.initialPosition, this.currentAxis);
@@ -81,7 +89,7 @@ export class MouseWordPlacerService {
         }
     }
     onKeyDown(e: KeyboardEvent) {
-        if (this.soloGameService.localPlayer.isActive === false) return;
+        if (this.gameService.currentGameService.game.localPlayer.isActive === false) return;
         if (this.initialPosition.x === 0 && this.initialPosition.y === 0) return;
         const keyPressed = e.key;
         const alphabet = 'abcdefghijklmnopqrstuvwxyzàâçéèêëïîöôùûü*ABCDEFGHIJLKMNOPQRSTUVWXYZÀÂÇÉÈÊËÏÎÖÔÙÛÜ';
@@ -292,10 +300,14 @@ export class MouseWordPlacerService {
         // If the response is positive, draw the word on the board canvas and remove the overlay
         const posArray = this.convertPositionToGridIndex(this.initialPosition);
         const posVec = new Vec2(posArray[0], posArray[1]);
+        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.game.localPlayer, serviceCalled: this.gameService };
         const params: PlaceParams = { position: posVec, orientation: this.currentAxis, word: this.wordString };
         // Refund letters to rack before placing
         this.removeAllLetters();
-        this.soloGameService.place(this.soloGameService.localPlayer, params);
+        this.gameService.currentGameService.place(this.gameService.currentGameService.game.localPlayer, params);
+        const command = new PlaceCmd(defaultParams, params);
+        this.commandInvokerService.executeCommand(command);
+        // TODO: Wait 3s before clearing overlay
         this.clearOverlay();
     }
     // Removes the latest drawn arrow indicator

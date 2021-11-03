@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { SoloGameService } from '@app/services/solo-game.service';
+import { GameParameters, GameType } from '@app/classes/game-parameters';
+import { GameListService } from '@app/services/game-list.service';
+import { GameService } from '@app/services/game.service';
+import { WaitingAreaComponent } from '../waiting-area/waiting-area.component';
 
 @Component({
     selector: 'app-form',
@@ -10,6 +13,7 @@ import { SoloGameService } from '@app/services/solo-game.service';
     styleUrls: ['./form.component.scss'],
 })
 export class FormComponent implements OnInit {
+    // mode: ClassicModeComponent;
     myForm: FormGroup;
     name: FormControl;
     timer: FormControl;
@@ -21,10 +25,28 @@ export class FormComponent implements OnInit {
     selectedPlayer: string;
     random: number;
     dictionary: string;
-    defaultTimer = '60';
-    defaultDictionary = '0';
+    singleGame: GameParameters;
 
-    constructor(private dialog: MatDialogRef<FormComponent>, private router: Router, private soloGameService: SoloGameService) {
+    defaultTimer: string;
+    defaultDictionary: string;
+    defaultBonus: boolean;
+
+    constructor(
+        private dialog: MatDialog,
+        private dialogRef: MatDialogRef<FormComponent>,
+        private router: Router,
+        private gameService: GameService,
+        private gameList: GameListService,
+        @Inject(MAT_DIALOG_DATA) public isSolo: boolean,
+    ) {
+        this.defaultTimer = '60';
+        this.defaultDictionary = '0';
+        this.defaultBonus = false;
+        if (this.isSolo === true) {
+            this.level = new FormControl('', [Validators.required]);
+        } else {
+            this.level = new FormControl('');
+        }
         this.dictionary = 'Français';
         this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
     }
@@ -35,7 +57,6 @@ export class FormComponent implements OnInit {
     }
 
     createFormControl() {
-        this.level = new FormControl('', [Validators.required]);
         this.name = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
         this.timer = new FormControl('', [Validators.required]);
         this.bonus = new FormControl('');
@@ -55,7 +76,7 @@ export class FormComponent implements OnInit {
     }
 
     closeDialog() {
-        this.dialog.close();
+        this.dialogRef.close();
     }
 
     randomNumber(minimum: number, maximum: number): number {
@@ -75,6 +96,9 @@ export class FormComponent implements OnInit {
         this.selectedPlayer = list[this.random];
         this.myForm.controls.opponent.setValue(this.selectedPlayer);
     }
+    convert() {
+        this.dialog.open(FormComponent, { data: this.isSolo === true });
+    }
 
     changeName(list: string[]): void {
         if (this.name.value === this.selectedPlayer) {
@@ -85,9 +109,19 @@ export class FormComponent implements OnInit {
 
     submit(): void {
         if (this.myForm.valid) {
-            this.closeDialog();
-            this.router.navigate(['/game']);
-            this.soloGameService.initializeGame(this.myForm);
+            if (this.isSolo === true) {
+                this.closeDialog();
+                this.router.navigate(['/game']);
+                this.gameService.initializeGameType(GameType.Solo);
+                this.gameService.currentGameService.initializeGame(this.myForm);
+            } else {
+                this.closeDialog();
+                this.gameService.initializeGameType(GameType.MultiPlayer);
+                this.gameService.currentGameService.initializeGame(this.myForm);
+                const single = this.gameService.currentGameService.game;
+                this.gameList.createRoom(single);
+                this.dialog.open(WaitingAreaComponent, {});
+            }
         }
     }
 }

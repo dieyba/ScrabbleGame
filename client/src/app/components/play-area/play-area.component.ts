@@ -1,10 +1,14 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { DefaultCommandParams } from '@app/classes/commands';
+import { PassTurnCmd } from '@app/classes/pass-command';
+import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { Vec2 } from '@app/classes/vec2';
+import { CommandInvokerService } from '@app/services/command-invoker.service';
 import { ExchangeService } from '@app/services/exchange.service';
+import { GameService } from '@app/services/game.service';
 import { GridService } from '@app/services/grid.service';
 import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service';
 import { RackService } from '@app/services/rack.service';
-import { SoloGameService } from '@app/services/solo-game.service';
 
 // TODO : Avoir un fichier séparé pour les constantes!
 export const DEFAULT_WIDTH = 640;
@@ -29,18 +33,23 @@ export class PlayAreaComponent implements AfterViewInit {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
     @ViewChild('overlayCanvas', { static: false }) private overlayCanvas!: ElementRef<HTMLCanvasElement>;
 
-    mousePosition: Vec2 = new Vec2(0, 0);
-    private canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    private rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
+    mousePosition: Vec2;
+    private canvasSize: Vec2;
+    private rackSize: Vec2;
     private rackContext: CanvasRenderingContext2D;
 
     constructor(
         private readonly gridService: GridService,
         private readonly rackService: RackService,
-        private readonly soloGameService: SoloGameService, // private readonly validationService: ValidationService,
+        private readonly gameService: GameService,
         private readonly mouseWordPlacerService: MouseWordPlacerService,
         private readonly exchangeService: ExchangeService,
-    ) {}
+        private readonly commandInvokerService: CommandInvokerService,
+    ) {
+        this.mousePosition = new Vec2(0, 0);
+        this.canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        this.rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
+    }
     @HostListener('keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
         this.mouseWordPlacerService.onKeyDown(event);
@@ -60,7 +69,8 @@ export class PlayAreaComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.mouseWordPlacerService.overlayContext = this.overlayCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        this.soloGameService.createNewGame();
+        this.gameService.currentGameService.createNewGame();
+        this.gridService.scrabbleBoard = new ScrabbleBoard(this.gameService.currentGameService.game.randomBonus);
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
@@ -68,15 +78,17 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     passTurn() {
-        this.soloGameService.passTurn(this.soloGameService.localPlayer);
+        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.game.localPlayer, serviceCalled: this.gameService };
+        const command = new PassTurnCmd(defaultParams);
+        this.commandInvokerService.executeCommand(command);
     }
 
     isLocalPlayerActive(): boolean {
-        return this.soloGameService.localPlayer.isActive;
+        return this.gameService.currentGameService.game.localPlayer.isActive;
     }
 
     isEndGame(): boolean {
-        return this.soloGameService.isEndGame;
+        return this.gameService.currentGameService.game.isEndGame;
     }
 
     get width(): number {
@@ -114,11 +126,11 @@ export class PlayAreaComponent implements AfterViewInit {
 
     lessThanSevenLettersInStock(): boolean {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        return this.soloGameService.stock.letterStock.length < 7;
+        return this.gameService.currentGameService.game.stock.letterStock.length < 7;
     }
 
     exchange() {
-        this.exchangeService.exchange(); // TODO Must send command text to chat. Create command instead here or in ExchangeService
+        this.exchangeService.exchange();
     }
 
     cancelExchange() {

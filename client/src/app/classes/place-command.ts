@@ -1,17 +1,19 @@
-import { Command, DefaultCommandParams, PlaceParams } from './commands';
-import { SoloGameService } from '@app/services/solo-game.service';
+import { GameService } from '@app/services/game.service';
+import { ChatDisplayEntry, ChatEntryColor, createErrorEntry } from './chat-display-entry';
+import { Command, CommandName, CommandResult, DefaultCommandParams, PlaceParams } from './commands';
 import { ErrorType } from './errors';
+import { convertCoordToString } from './utilities';
 import { Vec2 } from './vec2';
 
 export class PlaceCmd extends Command {
-    private gameService: SoloGameService;
+    private gameService: GameService;
     private position: Vec2;
     private orientation: string;
     private word: string;
 
     constructor(defaultParams: DefaultCommandParams, params: PlaceParams) {
         super(defaultParams.player);
-        this.gameService = defaultParams.serviceCalled as SoloGameService;
+        this.gameService = defaultParams.serviceCalled as GameService;
         this.position = new Vec2();
         this.position.x = params.position.x;
         this.position.y = params.position.y;
@@ -19,9 +21,24 @@ export class PlaceCmd extends Command {
         this.word = params.word;
     }
 
-    execute(): ErrorType {
+    async execute(): Promise<CommandResult> {
+        const executionMessages: ChatDisplayEntry[] = [];
+        const stringCoord = convertCoordToString(this.position);
+        const commandMessage = '!' + CommandName.PlaceCmd + ' ' + stringCoord + this.orientation + ' ' + this.word;
+
         const placeParams = { position: this.position, orientation: this.orientation, word: this.word };
-        return this.gameService.place(this.player, placeParams);
+
+        return await this.gameService.currentGameService.place(this.player, placeParams).then((executionResult: ErrorType) => {
+            if (executionResult !== ErrorType.NoError) {
+                executionMessages.push(createErrorEntry(executionResult, commandMessage));
+            } else {
+                this.isExecuted = true;
+                const localPlayerName = this.gameService.currentGameService.game.localPlayer.name;
+                const color = this.player.name === localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
+                executionMessages.push({ color, message: localPlayerName + ' >> ' + commandMessage });
+            }
+            return { isExecuted: this.isExecuted, executionMessages };
+        });
     }
 }
 

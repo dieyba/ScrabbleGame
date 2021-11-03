@@ -19,8 +19,8 @@ describe('GridService', () => {
         ctxStub = CanvasTestHelper.createCanvas(DEFAULT_WIDTH, DEFAULT_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
         service.gridContext = ctxStub;
 
-        service.scrabbleBoard = new ScrabbleBoard();
-        service.scrabbleBoard.generateBoard();
+        service.scrabbleBoard = new ScrabbleBoard(false);
+        service.scrabbleBoard.generateBoard(false);
     });
 
     it('should be created', () => {
