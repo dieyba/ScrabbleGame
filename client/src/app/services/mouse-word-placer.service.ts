@@ -304,7 +304,6 @@ export class MouseWordPlacerService {
         const params: PlaceParams = { position: posVec, orientation: this.currentAxis, word: this.wordString };
         // Refund letters to rack before placing
         this.removeAllLetters();
-        this.gameService.currentGameService.place(this.gameService.currentGameService.game.localPlayer, params);
         const command = new PlaceCmd(defaultParams, params);
         this.commandInvokerService.executeCommand(command);
         // TODO: Wait 3s before clearing overlay

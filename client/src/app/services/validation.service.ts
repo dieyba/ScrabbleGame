@@ -103,7 +103,7 @@ export class ValidationService {
         this.areWordsValid = false;
         let wordsHaveBeenValidated = false;
         let validationTimer: NodeJS.Timeout;
-        return new Promise<boolean>((resolve, reject) => {
+        return new Promise<boolean>((resolve) => {
             this.socket.emit('validateWords', strWords);
 
             this.socket.once('areWordsValid', (areWordsValid) => {

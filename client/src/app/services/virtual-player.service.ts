@@ -1,14 +1,19 @@
 import { Injectable } from '@angular/core';
-import { PlaceParams } from '@app/classes/commands';
+import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
+import { ExchangeCmd } from '@app/classes/exchange-command';
+import { PassTurnCmd } from '@app/classes/pass-command';
+import { PlaceCmd } from '@app/classes/place-command';
+import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { BonusService } from './bonus.service';
+import { CommandInvokerService } from './command-invoker.service';
+import { GameService } from './game.service';
 import { GridService } from './grid.service';
 import { PlaceService } from './place.service';
-import { SoloGameService } from './solo-game.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
@@ -35,29 +40,40 @@ const POSITION_ERROR = -1;
 export class VirtualPlayerService {
     rack: ScrabbleRack;
     orientation: Axis;
+    player: Player;
 
     constructor(
         private validationService: ValidationService,
         private gridService: GridService,
         private wordBuilderService: WordBuilderService,
         private bonusService: BonusService,
-        private soloGameService: SoloGameService,
         private placeService: PlaceService,
+        private gameService: GameService,
+        private commandInvoker: CommandInvokerService,
     ) {
         // TODO Implement timer (3s and 20s limit)
         this.rack = new ScrabbleRack();
     }
-    playTurn() {
+    playTurn(): void {
         // Next sprint: implement difficult player type logic by separating here and in virtualPlayerService.makeMoves().
+        // this.player = gameService.game.opponentPlayer;
+        const defaultParams: DefaultCommandParams = {
+            player: this.player,
+            serviceCalled: this.gameService,
+        };
         const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
         if (currentMove <= Probability.EndTurn) {
             // 10% chance to end turn
-            this.soloGameService.passTurn(this.soloGameService.game.opponentPlayer);
+            const command = new PassTurnCmd(defaultParams);
+            this.commandInvoker.executeCommand(command);
+            // this.textEntryService.handleInput('!passer');
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
             const chosenTiles = this.chooseTilesFromRack(); // 10% chance to exchange tiles
             // Converts chosen word to string
             const chosenTilesString = chosenTiles.map((tile) => tile.character).join(''); // TEST THIS, may not work.
-            this.soloGameService.exchangeLetters(this.soloGameService.game.opponentPlayer, chosenTilesString);
+            const command = new ExchangeCmd(defaultParams, chosenTilesString);
+            this.commandInvoker.executeCommand(command);
+            // this.textEntryService.handleInput('!échanger ' + chosenTilesString);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
             // = 100
             const moveMade = this.makeMoves(); // 80% chance to make a move
@@ -68,7 +84,9 @@ export class VirtualPlayerService {
                     orientation: this.orientation,
                     word: moveMade.stringify(),
                 };
-                this.soloGameService.place(this.soloGameService.game.opponentPlayer, params);
+                const command = new PlaceCmd(defaultParams, params);
+                this.commandInvoker.executeCommand(command);
+                // this.textEntryService.handleInput('!placer h8h ' + moveMade.stringify());
             }
         }
     }
@@ -178,7 +196,7 @@ export class VirtualPlayerService {
                             position: pos,
                             orientation: axis,
                         };
-                        if (this.placeService.canPlaceWord(this.soloGameService.game.opponentPlayer, placeParams)) {
+                        if (this.placeService.canPlaceWord(placeParams)) {
                             if (this.bonusService.totalValue(list[l]) > points || this.bonusService.totalValue(list[l]) < points - POINTS_INTERVAL) {
                                 list.splice(l);
                             } else {
