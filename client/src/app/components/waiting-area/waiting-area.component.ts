@@ -49,7 +49,7 @@ export class WaitingAreaComponent {
         this.name = false;
         if (gameSelected) {
             this.selectedGame = new GameParameters('', 0, false);
-            this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
+            this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(12), Validators.minLength(3)]);
         }
         this.list = this.gameList.getList();
         this.full = false;
@@ -101,7 +101,9 @@ export class WaitingAreaComponent {
         }
     }
     confirmName(game: GameParameters) {
-        if (this.playerName.value === game.creatorPlayer.name) {
+        console.log(this.playerName.value);
+        console.log(game.creatorPlayer.name)
+        if (this.playerName.value === game.creatorPlayer.name || !this.playerName.valid) {
             this.error = true;
             this.nameErrorMessage = 'Vous ne pouvez pas avoir le meme nom que votre adversaire';
         } else {

@@ -62,11 +62,36 @@ export class SocketManagerService {
             socket.on('reset timer', (timerMs: number) => {
                 this.resetTimer(socket);
             });
+            socket.on('updateTurnsPassed', (isCurrentTurnedPassed: boolean, hasTurnsBeenPassed: boolean[]) => {
+                this.increaseHasTurnsPassed(socket, isCurrentTurnedPassed, hasTurnsBeenPassed);
+            });
+            socket.on('endGame', () => {
+                this.endGame(socket);
+            });
+            socket.on('playerQuit', () => {
+                this.displayPlayerQuitMessage(socket);
+            });
             socket.on('disconnect', (roomId: any) => {
                 const playerArrayIndex = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
                 this.playerMan.allPlayers.splice(playerArrayIndex, 1);
                 socket.disconnect();
-            })
+            });
+            socket.on('word placed', (word: any) => {
+                let sender = this.playerMan.getPlayerBySocketID(socket.id);
+                const opponent = this.gameListMan.getOtherPlayer(sender.getSocketId(), sender.roomId) as Player;
+
+                this.sio.to(opponent?.getSocketId()).emit('update board', word);
+            });
+            socket.on('exchange letters', (update: any) => {
+                let sender = this.playerMan.getPlayerBySocketID(socket.id);
+                const opponent = this.gameListMan.getOtherPlayer(sender.getSocketId(), sender.roomId) as Player;
+                this.sio.to(opponent?.getSocketId()).emit('letters exchange', update);
+            });
+            socket.on('place word', (update: any) => {
+                let sender = this.playerMan.getPlayerBySocketID(socket.id);
+                const opponent = this.gameListMan.getOtherPlayer(sender.getSocketId(), sender.roomId) as Player;
+                this.sio.to(opponent?.getSocketId()).emit('update place', update);
+            });
         });
         setInterval(() => {}, 1000);
     }
@@ -95,18 +120,14 @@ export class SocketManagerService {
         let index = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
         this.playerMan.allPlayers.splice(index, 1);
         this.playerMan.allPlayers[index] = newPlayer;
-        console.log(this.playerMan.allPlayers)
         socket.join(room.gameRoom.idGame.toString());
         this.sio.emit('roomcreated', room);
     }
     private deleteRoom(socket: io.Socket): void {
         let player = this.playerMan.getPlayerBySocketID(socket.id);
-        console.log(this.playerMan.allPlayers)
         if (player) {
-            console.log(player)
             this.gameListMan.deleteRoom(player.roomId);
         }
-        console.log(this.playerMan);
         this.sio.to(player.roomId.toString()).emit('roomdeleted');
     }
     private getAllGames(socket: io.Socket) {
@@ -126,7 +147,6 @@ export class SocketManagerService {
             socket.join(roomGame.gameRoom.idGame.toString());
             this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
         }
-        console.log(this.playerMan);
     }
     private initializeGame(socket: io.Socket, roomId: number) {
         let roomGame = this.gameListMan.getCurrentGame(roomId);
@@ -134,12 +154,11 @@ export class SocketManagerService {
         if (roomGame) {
             const starterPlayerIndex = Math.round(Math.random());
             roomGame.players[starterPlayerIndex].isActive = true;
-            // console.log(roomGame)
             this.sio.to(roomGame.gameRoom.idGame.toString()).emit('updateInfo', roomGame);
         }
-        console.log(this.playerMan);
     }
 
+    // TODO:replace emit by promise and callback?
     private validateWords(socket: io.Socket, newWords: string[]) {
         const result = this.gameListMan.validateNewWords(newWords);
         console.log("Is word valid : " + result);
@@ -156,8 +175,7 @@ export class SocketManagerService {
     private displayDifferentChatEntry(socket: io.Socket, messageToSender: string, messageToOpponent: string) {
         const senderId = socket.id;
         const sender = this.playerMan.getPlayerBySocketID(senderId);
-        const roomId = sender.roomId;
-        const opponent = this.gameListMan.getOtherPlayer(senderId, roomId);
+        const opponent = this.gameListMan.getOtherPlayer(senderId, sender.roomId);
         if (opponent) {
             const opponentId = opponent.getSocketId();
             const chatEntrySender = { senderName: sender.name, message: messageToSender };
@@ -166,8 +184,26 @@ export class SocketManagerService {
             this.sio.to(opponentId).emit('addChatEntry', chatEntryOpponent);
         }
     }
+    private displayPlayerQuitMessage(socket: io.Socket) {
+        const senderId = socket.id;
+        const sender = this.playerMan.getPlayerBySocketID(senderId);
+        const opponent = this.gameListMan.getOtherPlayer(senderId, sender.roomId);
+        if (opponent) {
+            const message = sender.name + ' a quitté le jeu';
+            this.sio.to(opponent.getSocketId()).emit('addSystemChatEntry', message);
+        }
+    }
     private displaySystemChatEntry(socket: io.Socket, message: string) {
         const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId.toString();
         this.sio.in(roomId).emit('addSystemChatEntry', message);
+    }
+    private increaseHasTurnsPassed(socket: io.Socket, isCurrentTurnedPassed: boolean, hasTurnsBeenPassed: boolean[]) {
+        const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId.toString();
+        hasTurnsBeenPassed.push(isCurrentTurnedPassed);
+        this.sio.in(roomId).emit('increaseTurnsPassed', hasTurnsBeenPassed);
+    }
+    private endGame(socket: io.Socket) {
+        const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId.toString();
+        this.sio.in(roomId).emit('gameEnded');
     }
 }

@@ -41,7 +41,7 @@
                 <md-hint *ngIf="error" align="start">{{ nameErrorMessage }}</md-hint>
                 <md-hint *ngIf="!error" align="start">{{ nameErrorMessage }}</md-hint>
             </mat-form-field>
-            <button class="small-btn" (click)="confirmName(selectedGame)">Valider</button>
+            <button class="small-btn" *ngIf="playerName.valid" (click)="confirmName(selectedGame)">Valider</button>
             <div *ngIf="gameCancelled">
                 <h3>Le Joueur a annulé la partie, veuillez selectionner une autre partie</h3>
             </div>

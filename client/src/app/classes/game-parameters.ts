@@ -32,24 +32,25 @@ export class GameParameters {
     timerMs: number;
     scrabbleBoard: ScrabbleBoard;
     stock: LetterStock;
-    turnPassed: boolean;
+    isTurnPassed: boolean;
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
     newWords: ScrabbleWord[];
 
     constructor(creatorPlayerName: string, timer: number, isRandom: boolean) {
-        this.gameRoom = { idGame: 15, capacity: 2, playersName: new Array<string>() };
+        this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
         // this.dictionary = new Dictionary(0);
+        this.creatorPlayer = new LocalPlayer(creatorPlayerName)
+        this.creatorPlayer.isActive = true
         this.localPlayer = new LocalPlayer(creatorPlayerName);
         this.totalCountDown = timer;
         this.timerMs = +this.totalCountDown;
+        this.opponentPlayer = new LocalPlayer('')
         // this.stock = new LetterStock();
         this.hasTurnsBeenPassed = [];
         this.isEndGame = false;
-        this.turnPassed = false;
+        this.isTurnPassed = false;
         this.randomBonus = isRandom;
         this.scrabbleBoard = new ScrabbleBoard(this.randomBonus);
-        console.log('board sur le client', this.scrabbleBoard);
-        console.log('qui t a appelé : ', creatorPlayerName);
     }
 }

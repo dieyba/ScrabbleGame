@@ -36,7 +36,6 @@ export class GameParameters {
         // this.randomBonus = isRandomBonus;
         // this.stock = new LetterStock();
         this.hasTurnsBeenPassed = [false, false, false];
-        // console.log(this.randomBonus);
         this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
         this.gameRoom.idGame = id;
         // this.dictionary = new Dictionary(0);
@@ -50,7 +49,6 @@ export class GameParameters {
         // this.turnPassed = false;
         // this.randomBonus = isRandomBonus;
         this.scrabbleBoard = new ScrabbleBoard(randBonus);
-        console.log('server Board', this.scrabbleBoard)
     }
     addPlayer(player: Player) {
         if (this.gameRoom.playersName.length < this.gameRoom.capacity) {
