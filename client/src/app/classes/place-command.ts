@@ -21,26 +21,24 @@ export class PlaceCmd extends Command {
         this.word = params.word;
     }
 
-    execute(): CommandResult {
+    async execute(): Promise<CommandResult> {
         const executionMessages: ChatDisplayEntry[] = [];
         const stringCoord = convertCoordToString(this.position);
         const commandMessage = '!' + CommandName.PlaceCmd + ' ' + stringCoord + this.orientation + ' ' + this.word;
 
         const placeParams = { position: this.position, orientation: this.orientation, word: this.word };
-        const executionResult = this.gameService.currentGameService.place(this.player, placeParams);
 
-        // TODO: wait after the 3 seconds before displaying the execution result message,
-        // here also seems to cause bugs with waiting after the validation is done
-
-        if (executionResult !== ErrorType.NoError) {
-            executionMessages.push(createErrorEntry(executionResult, commandMessage));
-        } else {
-            this.isExecuted = true;
-            const localPlayerName = this.gameService.currentGameService.game.localPlayer.name;
-            const color = this.player.name === localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
-            executionMessages.push({ color, message: localPlayerName + ' >> ' + commandMessage });
-        }
-        return { isExecuted: this.isExecuted, executionMessages };
+        return await this.gameService.currentGameService.place(this.player, placeParams).then((executionResult: ErrorType) => {
+            if (executionResult !== ErrorType.NoError) {
+                executionMessages.push(createErrorEntry(executionResult, commandMessage));
+            } else {
+                this.isExecuted = true;
+                const localPlayerName = this.gameService.currentGameService.game.localPlayer.name;
+                const color = this.player.name === localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
+                executionMessages.push({ color, message: localPlayerName + ' >> ' + commandMessage });
+            }
+            return { isExecuted: this.isExecuted, executionMessages };
+        });
     }
 }
 

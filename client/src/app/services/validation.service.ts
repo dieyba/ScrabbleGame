@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { Player } from '@app/classes/player';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
@@ -76,22 +75,6 @@ export class ValidationService {
         return totalScore;
     }
 
-    validateWords(newWords: ScrabbleWord[]): void {
-        let strWord = [];
-        for (let i = 0; i < newWords.length; i++) {
-            strWord[i] = this.convertScrabbleWordToString(newWords[i].content);
-        }
-        this.socket.emit('validateWords', strWord);
-    }
-
-    convertScrabbleWordToString(scrabbleLetter: ScrabbleLetter[]): string {
-        let word = '';
-        scrabbleLetter.forEach((letter) => {
-            word += letter.character;
-        });
-        return word.toLowerCase();
-    }
-
     newLettersCount(): number {
         let newLetters = 0;
         for (let i = 0; i < BOARD_SIZE; i++) {
@@ -105,5 +88,36 @@ export class ValidationService {
             }
         }
         return newLetters;
+    }
+
+    // Calls the server to validate the words passed in.
+    // If the words were not valid, wait 3 seconds before returning result.
+    // If the server doesnt answer after 3 sec, validation result is false by default
+    async validateWords(newWords: ScrabbleWord[]) {
+        let strWords: string[] = [];
+        newWords?.forEach(newWord => {
+            strWords.push(newWord.stringify().toLowerCase());
+        });
+        this.areWordsValid = false;
+        let wordsHaveBeenValidated = false;
+        let validationTimer: NodeJS.Timeout;
+        return new Promise<boolean>((resolve, reject) => {
+            this.socket.emit('validateWords', strWords);
+
+            this.socket.once('areWordsValid', areWordsValid => {
+                console.log("response validation from server:", areWordsValid);
+                this.areWordsValid = areWordsValid;
+                wordsHaveBeenValidated = true;
+                if (areWordsValid) {
+                    resolve(areWordsValid);
+                    clearTimeout(validationTimer);
+                }
+            });
+            validationTimer = setTimeout(() => {
+                if (!wordsHaveBeenValidated || !this.areWordsValid) {
+                    resolve(false);
+                }
+            }, WAIT_TIME);
+        });
     }
 }

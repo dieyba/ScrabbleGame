@@ -40,5 +40,5 @@ export abstract class Command {
         this.isExecuted = false;
     }
 
-    abstract execute(): CommandResult;
+    abstract execute(): CommandResult | Promise<CommandResult>;
 }

@@ -23,11 +23,9 @@ export class SocketManagerService {
                 this.createRoom(socket, game);
                 this.getAllGames(socket);
             });
-
             socket.on('validateWords', (newWords: string[]) => {
                 this.validateWords(socket, newWords);
             });
-
             socket.on('deleteRoom', (game: any) => {
                 this.deleteRoom(socket);
                 this.getAllGames(socket);
@@ -43,9 +41,6 @@ export class SocketManagerService {
             socket.on('initializeGame', (roomId: number) => {
                 this.initializeGame(socket, roomId);
             });
-            // socket.on('startGame', (roomId: number) => {
-            //     // this.startGame(socket,)
-            // });
             socket.on('sendChatEntry', (message: string, messageToOpponent?: string) => {
                 if (messageToOpponent !== undefined) {
                     this.displayDifferentChatEntry(socket, message, messageToOpponent);
@@ -114,9 +109,6 @@ export class SocketManagerService {
         let newPlayer = new Player(game.name, socket.id);
         newPlayer.roomId = room.gameRoom.idGame;
         room.addPlayer(newPlayer);
-
-        // TODO: see if we can directly update info of player corresponding to socket id in playerMan
-        // does room.addPlayer also add the player to playerMan?
         let index = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
         this.playerMan.allPlayers.splice(index, 1);
         this.playerMan.allPlayers[index] = newPlayer;
@@ -158,10 +150,9 @@ export class SocketManagerService {
         }
     }
 
-    // TODO:replace emit by promise and callback?
     private validateWords(socket: io.Socket, newWords: string[]) {
         const result = this.gameListMan.validateNewWords(newWords);
-        console.log("Is word valid : " + result);
+        console.log(newWords + " is valid : " + result);
         this.sio.to(socket.id).emit('areWordsValid', result);
     }
 
