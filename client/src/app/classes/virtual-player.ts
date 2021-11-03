@@ -14,6 +14,6 @@ export class VirtualPlayer extends Player {
     }
 
     playTurn() {
-        // TODO : implement play turn
+        // What do we do with this?
     }
 }
