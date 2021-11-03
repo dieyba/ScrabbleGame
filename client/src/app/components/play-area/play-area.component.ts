@@ -67,8 +67,6 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawColors();
         this.rackService.drawRack();
         this.rackContext = this.rackService.gridContext;
-        console.log("local:", this.gameService.currentGameService.game.localPlayer.name);
-        console.log("opponent:", this.gameService.currentGameService.game.opponentPlayer.name);
     }
 
     passTurn() {

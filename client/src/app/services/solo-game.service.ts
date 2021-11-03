@@ -16,7 +16,7 @@ import { GridService } from './grid.service';
 import { LetterStock } from './letter-stock.service';
 import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
-import { ValidationService, WAIT_TIME } from './validation.service';
+import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
 export const TIMER_INTERVAL = 1000;
@@ -96,10 +96,9 @@ export class SoloGameService {
             this.intervalValue = setInterval(() => {
                 this.game.timerMs--;
                 if (this.game.timerMs < 0) {
-                    this.game.isTurnPassed = true;
-                    // TODO: is this also called when passing turn in place/exchange?
+                    // this.game.isTurnPassed = true;
                     this.changeTurn();
-                    this.game.isTurnPassed = false;
+                    // this.game.isTurnPassed = false;
                 }
                 this.secondsToMinutes();
             }, TIMER_INTERVAL);
@@ -201,10 +200,14 @@ export class SoloGameService {
         }
         return ErrorType.ImpossibleCommand;
     }
-    place(player: Player, placeParams: PlaceParams): ErrorType {
-        const errorResult = this.placeService.place(player, placeParams);
 
+    async place(player: Player, placeParams: PlaceParams): Promise<ErrorType /* Promise<ErrorType> */>/* Promise<ErrorType> */ {
+        if (!player.isActive) {
+            return ErrorType.ImpossibleCommand;
+        }
+        let errorResult = this.placeService.place(player, placeParams);
         if (errorResult === ErrorType.NoError) {
+
             // Generate all words created
             let tempScrabbleWords: ScrabbleWord[];
             if (placeParams.orientation === 'h') {
@@ -212,9 +215,13 @@ export class SoloGameService {
             } else {
                 tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
             }
-            // Call validation method and end turn
-            this.validationService.validateWords(tempScrabbleWords);
-            setTimeout(() => {
+            let strWords: string[] = [];
+            tempScrabbleWords.forEach(scrabbleWord => {
+                strWords.push(scrabbleWord.stringify().toLowerCase());
+            });
+            // validate words waits 3sec if the words are invalid or the server doesn't answer.
+            await this.validationService.validateWords(tempScrabbleWords).then((isValidWordsResult: boolean) => {
+                errorResult = isValidWordsResult ? ErrorType.NoError : ErrorType.ImpossibleCommand;
                 if (!this.validationService.areWordsValid) {
                     // Retake letters
                     const removedLetters = this.gridService.removeInvalidLetters(
@@ -232,11 +239,13 @@ export class SoloGameService {
                     this.addRackLetters(newLetters)
                     newLetters.forEach(letter => { this.addLetterToPlayer(letter) });
                 }
-
                 this.changeTurn();
-            }, WAIT_TIME);
+            });
+            console.log("place result after await:", errorResult);
+            console.log("localplayer shouldnt be active:", this.game.localPlayer.isActive, ', timer should reset:', this.game.timerMs);
+            return errorResult;
         }
-
+        console.log("return place result:", errorResult);
         return errorResult;
     }
     displayEndGameMessage() {
@@ -249,7 +258,6 @@ export class SoloGameService {
         const localPlayerPoints = this.calculateRackPoints(this.game.localPlayer);
         const oppnentPlayerPoints = this.calculateRackPoints(this.game.opponentPlayer);
 
-        // TODO: check if the points are removed properly. after we create the board/player letters synchronization mechanism
         if (this.game.localPlayer.isWinner === true) {
             this.game.localPlayer.score += oppnentPlayerPoints;
             this.game.opponentPlayer.score -= oppnentPlayerPoints;
@@ -309,3 +317,4 @@ export class SoloGameService {
         return letters;
     }
 }
+

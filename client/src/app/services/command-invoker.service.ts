@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Command } from '@app/classes/commands';
+import { Command, CommandResult } from '@app/classes/commands';
 import { ExchangeCmd } from '@app/classes/exchange-command';
 import { PassTurnCmd } from '@app/classes/pass-command';
 import { PlaceCmd } from '@app/classes/place-command';
@@ -12,10 +12,21 @@ import { GameService } from './game.service';
 export class CommandInvokerService {
     constructor(private chatDisplayService: ChatDisplayService, private gameService: GameService) {}
 
-    executeCommand(command: Command): void {
+    async executeCommand(command: Command): Promise<void> {
         const commandResult = command.execute();
         const isExchangeCmd = command instanceof ExchangeCmd;
         const isToDisplayRemotely = isExchangeCmd || command instanceof PassTurnCmd || command instanceof PlaceCmd;
+        if (commandResult instanceof Promise) {
+            await commandResult.then((executionResult: CommandResult) => {
+                console.log("await place result and then display");
+                this.displayExecutionResultMessages(executionResult, isExchangeCmd, isToDisplayRemotely);
+            });
+        } else {
+            this.displayExecutionResultMessages(commandResult, isExchangeCmd, isToDisplayRemotely);
+        }
+    }
+
+    displayExecutionResultMessages(commandResult: CommandResult, isExchangeCmd: boolean, isToDisplayRemotely: boolean) {
         const isSendToServer = this.gameService.isMultiplayerGame && isToDisplayRemotely && commandResult.isExecuted;
         if (isSendToServer) {
             // extract command is the only situation where the message is different for the local/remove player
