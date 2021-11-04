@@ -42,11 +42,9 @@ export class CommandInvokerService {
             }
         } else {
             if (isFromVirtualPlayer) {
-                // TODO: fix virtual player message (duplicate 'name >>')
-                const virtualPlayerName = this.gameService.currentGameService.game.opponentPlayer.name;
                 const commandMessage = commandResult.executionMessages[0].message;
                 const debugMessages = ['some debug message', 'some other debug message'];
-                this.chatDisplayService.addVirtalPlayerEntry(virtualPlayerName, commandMessage, debugMessages);
+                this.chatDisplayService.addVirtalPlayerEntry(commandMessage, debugMessages);
             }
             // extract command returns both players message, but solo game only displays the local message
             else if (isExchangeCmd) {

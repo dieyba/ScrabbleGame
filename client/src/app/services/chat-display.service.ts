@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ChatDisplayEntry, ChatEntryColor, createDebugEntry, createPlayerEntry, ServerChatEntry } from '@app/classes/chat-display-entry';
+import { ChatDisplayEntry, ChatEntryColor, createDebugEntry, ServerChatEntry } from '@app/classes/chat-display-entry';
 import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { scrabbleLetterstoString } from '@app/classes/utilities';
@@ -61,9 +61,8 @@ export class ChatDisplayService {
         this.entries.push(entry);
     }
 
-    addVirtalPlayerEntry(playername: string, commandInput: string, debugMessages?: string[]) {
-        const isFromLocalPlayer = playername === this.localPlayerName;
-        this.addEntry(createPlayerEntry(isFromLocalPlayer, playername, commandInput)); // display command entered
+    addVirtalPlayerEntry(commandInput: string, debugMessages?: string[]) {
+        this.addEntry({ color: ChatEntryColor.RemotePlayer, message: commandInput }); // display command entered
         if (this.isActiveDebug && debugMessages) {
             for (const message of debugMessages) {
                 this.addEntry(createDebugEntry(message));

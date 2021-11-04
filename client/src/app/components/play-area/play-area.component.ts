@@ -80,7 +80,7 @@ export class PlayAreaComponent implements AfterViewInit {
 
         if (!this.gameService.isMultiplayerGame) {
             this.gameService.currentGameService.isVirtualPlayerObservable.subscribe((isActive: boolean) => {
-                if (isActive) {
+                if (isActive && !this.gameService.currentGameService.game.isEndGame) {
                     this.virtualPlayerService.playTurn();
                 }
             });

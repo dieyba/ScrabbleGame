@@ -124,7 +124,6 @@ export class SoloGameService {
         this.changeActivePlayer();
 
         // If called from multiplayer game service, this shouldn't trigger virtual player service in play area component
-        console.log("turn changed: localPlayerisActive:", this.game.localPlayer.isActive, ", opponentisActive:", this.game.opponentPlayer.isActive);
         if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
     }
     // If the turn was changed by a pass command, add passed turn as true in the turns history
@@ -135,6 +134,8 @@ export class SoloGameService {
         }
         this.currentTurnId++;
     }
+
+    // TODO: change this for a counter and fix consecutive pass turn count in solo mode
     // Check if last 5 turns have been passed (current turn is the 6th)
     isConsecutivePassedTurnsLimit(): boolean {
         let turnIndex = this.currentTurnId;

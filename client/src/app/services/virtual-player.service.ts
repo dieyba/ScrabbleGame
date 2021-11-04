@@ -19,8 +19,8 @@ import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
     EndTurn = 10,
-    ExchangeTile = 80, // TODO: change back the right probability settings
-    MakeAMove = 10,
+    ExchangeTile = 10,
+    MakeAMove = 80,
     MaxValue1 = 40,
     MaxValue2 = 30,
     MaxValue3 = 30,
@@ -30,6 +30,9 @@ export enum Points {
     MaxValue2 = 12,
     MaxValue3 = 18,
 }
+
+const DEFAULT_VIRTUAL_PLAYER_WAIT_TIME = 3000;
+const NO_MOVE_TOTAL_WAIT_TIME = 20000;
 const POINTS_INTERVAL = 5;
 const PERCENTAGE = 100;
 const POSITION_ERROR = -1;
@@ -54,7 +57,6 @@ export class VirtualPlayerService {
         // TODO Implement timer (3s and 20s limit)
         this.rack = new ScrabbleRack();
     }
-    // TODO: make playTurn() asynchrone so the previous human player doesnt have to wait for the end of vp turn to display messages in chat box
     playTurn(): void {
         // Next sprint: implement difficult player type logic by separating here and in virtualPlayerService.makeMoves().
         this.player = this.gameService.currentGameService.game.opponentPlayer;
@@ -64,21 +66,26 @@ export class VirtualPlayerService {
         };
         const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
         if (currentMove <= Probability.EndTurn) {
-            // 10% chance to end turn
-            const command = new PassTurnCmd(defaultParams);
-            this.commandInvoker.executeCommand(command);
-            console.log('vp:!passer');
+            setTimeout(() => {
+                // 10% chance to end turn
+                const command = new PassTurnCmd(defaultParams);
+                this.commandInvoker.executeCommand(command);
+                console.log('vp:!passer');
+            }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
-            const chosenTiles = this.chooseTilesFromRack(); // 10% chance to exchange tiles
-            // Converts chosen word to string
-            const chosenTilesString = chosenTiles.map((tile) => tile.character).join(''); // TEST THIS, may not work.
-            const command = new ExchangeCmd(defaultParams, chosenTilesString);
-            this.commandInvoker.executeCommand(command);
-            console.log('vp:!échanger ' + chosenTilesString);
+            setTimeout(() => {
+                const chosenTiles = this.chooseTilesFromRack(); // 10% chance to exchange tiles
+                // Converts chosen word to string
+                const chosenTilesString = chosenTiles.map((tile) => tile.character).join(''); // TEST THIS, may not work.
+                const command = new ExchangeCmd(defaultParams, chosenTilesString);
+                this.commandInvoker.executeCommand(command);
+                console.log('vp:!échanger ' + chosenTilesString);
+            }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
-            // = 100
-            const moveMade = this.makeMoves(); // 80% chance to make a move
-            if (moveMade) {
+            let moveMade = new ScrabbleWord();
+            moveMade = this.makeMoves(); // 80% chance to make a move
+            setTimeout(() => {
+                // waits 3 second to try and find a word to place
                 if (moveMade.value !== 0) {
                     const movePosition = this.findPosition(moveMade, this.orientation);
                     const params: PlaceParams = {
@@ -89,8 +96,16 @@ export class VirtualPlayerService {
                     const command = new PlaceCmd(defaultParams, params);
                     this.commandInvoker.executeCommand(command);
                     console.log('vp:!placer somePosition ' + moveMade.stringify());
-                } else { console.log('vp: when placing, no move to make. letting turn pass without doing anything'); }
-            } else { console.log('vp: when placing, move made undefined. letting turn pass without doing anything'); }
+                } else {
+                    // if no word to place was found, pass turn after 20 seconds
+                    console.log('vp: found no move to make when placing. will pass turn after 20 seconds');
+                    setTimeout(() => {
+                        const command = new PassTurnCmd(defaultParams);
+                        this.commandInvoker.executeCommand(command);
+                        console.log('vp:!passer');
+                    }, NO_MOVE_TOTAL_WAIT_TIME - DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+                }
+            }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         }
 
     }
@@ -241,7 +256,11 @@ export class VirtualPlayerService {
             // 30% chance to go for moves that score 13-18 points
             movesList = this.possibleMoves(Points.MaxValue3, this.orientation);
         }
-        return movesList[this.getRandomIntInclusive(0, movesList.length - 1)]; // randomize move to make
+        const moveToMake = movesList[this.getRandomIntInclusive(0, movesList.length - 1)];
+        if (moveToMake) {
+            return moveToMake;
+        }
+        return new ScrabbleWord(); // randomize move to make
     }
     // Displays a message based on an array of moves.
     displayMoves(moves: ScrabbleWord[]): string {
