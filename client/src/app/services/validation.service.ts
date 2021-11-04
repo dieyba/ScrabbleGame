@@ -107,7 +107,6 @@ export class ValidationService {
             this.socket.emit('validateWords', strWords);
 
             this.socket.once('areWordsValid', (areWordsValid) => {
-                console.log('response validation from server:', areWordsValid);
                 this.areWordsValid = areWordsValid;
                 wordsHaveBeenValidated = true;
                 if (areWordsValid) {
