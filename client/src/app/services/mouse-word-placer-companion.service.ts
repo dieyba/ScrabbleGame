@@ -45,10 +45,6 @@ export class MouseWordPlacerCompanionService {
     samePosition(pos: Vec2, otherPos: Vec2): boolean {
         return pos.x === otherPos.x && pos.y === otherPos.y;
     }
-    normalizeLetter(keyPressed: string): string {
-        const letter = keyPressed.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        return letter;
-    }
     convertColorToString(color: SquareColor) {
         let stringColor = '';
         switch (color) {

@@ -3,7 +3,7 @@ import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
 import { PlaceCmd } from '@app/classes/place-command';
 import { BOARD_SIZE } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Axis } from '@app/classes/utilities';
+import { Axis, removeAccents, isValidLetter } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
@@ -92,7 +92,6 @@ export class MouseWordPlacerService {
         if (this.gameService.currentGameService.game.localPlayer.isActive === false) return;
         if (this.initialPosition.x === 0 && this.initialPosition.y === 0) return;
         const keyPressed = e.key;
-        const alphabet = 'abcdefghijklmnopqrstuvwxyzàâçéèêëïîöôùûüABCDEFGHIJLKMNOPQRSTUVWXYZÀÂÇÉÈÊËÏÎÖÔÙÛÜ';
         switch (keyPressed) {
             case 'Backspace':
                 this.removeLetter();
@@ -105,7 +104,11 @@ export class MouseWordPlacerService {
                 this.onBlur();
                 break;
             default:
-                if (alphabet.includes(keyPressed) && this.currentPosition.x <= ABSOLUTE_BOARD_SIZE && this.currentPosition.y <= ABSOLUTE_BOARD_SIZE) {
+                if (
+                    isValidLetter(removeAccents(keyPressed)) &&
+                    this.currentPosition.x <= ABSOLUTE_BOARD_SIZE &&
+                    this.currentPosition.y <= ABSOLUTE_BOARD_SIZE
+                ) {
                     this.findPlaceForLetter(keyPressed);
                 }
                 break;
@@ -136,7 +139,7 @@ export class MouseWordPlacerService {
             i++;
         }
         if (pos[0] >= BOARD_SIZE || pos[1] >= BOARD_SIZE) return;
-        this.placeLetter(this.companionService.normalizeLetter(keyPressed));
+        this.placeLetter(removeAccents(keyPressed));
     }
     // Draws an arrow on the canvas in the square specified by the position
     drawArrow(position: Vec2, axis: Axis) {
