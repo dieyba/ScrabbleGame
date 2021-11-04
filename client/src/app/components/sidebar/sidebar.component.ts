@@ -89,14 +89,14 @@ export class SidebarComponent {
     }
 
     quitGame(): void {
-        // calls server to display message in opponent's chat box
-        this.socket.emit('playerQuit');
         // User confirmation popup
         this.dialogRef = this.dialog.open(EndGamePopupComponent);
 
         // User confirmation response
         this.dialogRef.afterClosed().subscribe((confirmQuit) => {
             if (confirmQuit) {
+                // calls server to display message in opponent's chat box
+                this.socket.emit('playerQuit');
                 this.router.navigate(['/start']);
             }
         });
