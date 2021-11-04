@@ -1,8 +1,8 @@
 import { Component, Optional } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { GameParameters } from '@app/classes/game-parameters';
 import { SocketHandler } from '@app/modules/socket-handler';
-import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
 @Component({
@@ -20,6 +20,12 @@ export class SidebarComponent {
         this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
         this.winnerName = '';
+        this.socket.on('roomLeft', (game: GameParameters) => {
+            console.log('left')
+            // let playerWinner = ;
+            this.gameService.currentGameService.game.localPlayer.isWinner = true;
+            this.gameService.currentGameService.game.isEndGame = true;
+        })
     }
     getPlayer1Name(): string {
         return this.gameService.currentGameService.game.localPlayer.name;
@@ -30,7 +36,7 @@ export class SidebarComponent {
     }
 
     getLettersLeftCount(): number {
-        return this.gameService.currentGameService.game.creatorPlayer.stock.letterStock.length;
+        return this.gameService.currentGameService.stock.letterStock.length;
     }
 
     getPlayer1LetterCount(): number {
@@ -90,14 +96,16 @@ export class SidebarComponent {
         }
     }
     quitGame(): void {
+        console.log('quitGame')
         // calls server to display message in opponent's chat box 
-        this.socket.emit('playerQuit');
+        // this.socket.emit('playerQuit');
         // User confirmation popup
         this.dialogRef = this.dialog.open(EndGamePopupComponent);
 
         // User confirmation response
         this.dialogRef.afterClosed().subscribe((confirmQuit) => {
             if (confirmQuit) {
+                this.socket.emit('leaveRoom')
                 this.router.navigate(['/start']);
             }
         });
@@ -118,8 +126,9 @@ export class SidebarComponent {
 export class EndGamePopupComponent {
     // private readonly server = 'http://' + window.location.hostname + ':3000';
     // private socket: io.Socket;
-    constructor(@Optional() public dialogReference: MatDialogRef<unknown>, private gameList: GameListService) {}
-    disconnect() {
-        this.gameList.disconnectUser();
-    }
+    constructor(@Optional() public dialogReference: MatDialogRef<unknown>,) {}
+    //     disconnect() {
+    //         console.log('disconnect');
+    //         this.gameList.disconnectUser();
+    //     }
 }

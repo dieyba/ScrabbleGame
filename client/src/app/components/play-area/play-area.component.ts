@@ -119,7 +119,7 @@ export class PlayAreaComponent implements AfterViewInit {
 
     lessThanSevenLettersInStock(): boolean {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        return this.gameService.currentGameService.game.creatorPlayer.stock.letterStock.length < 7;
+        return this.gameService.currentGameService.stock.letterStock.length < 7;
     }
 
     exchange() {

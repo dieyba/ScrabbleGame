@@ -120,7 +120,7 @@ export class FormComponent implements OnInit {
                 this.gameService.currentGameService.initializeGame(this.myForm);
                 let single = this.gameService.currentGameService.game;
                 this.gameList.createRoom(single);
-                this.dialog.open(WaitingAreaComponent, {});
+                this.dialog.open(WaitingAreaComponent, { disableClose: true });
             }
         }
     }

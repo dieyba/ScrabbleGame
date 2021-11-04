@@ -23,6 +23,7 @@ const LOCAL_PLAYER_INDEX = 0;
 })
 export class MultiPlayerGameService extends SoloGameService {
     game: GameParameters;
+    stock: LetterStock;
     private socket: io.Socket;
     areNewWordsValid: boolean = false;
     private readonly server: string;
@@ -59,13 +60,12 @@ export class MultiPlayerGameService extends SoloGameService {
             this.updateBoard(board.word, board.orientation, new Vec2(board.positionX, board.positionY));
         });
         this.socket.on('letters exchange', (update: any) => {
-            this.game.creatorPlayer.stock.letterStock = update.stock;
+            this.stock.letterStock = update.stock;
             this.game.opponentPlayer.letters = update.newLetters;
             this.game.opponentPlayer.score = update.newScore;
-            console.log()
         });
         this.socket.on('update place', (update: any) => {
-            this.game.creatorPlayer.stock.letterStock = update.stock;
+            this.stock.letterStock = update.stock;
             this.game.opponentPlayer.letters = update.newLetters;
             this.game.opponentPlayer.score = update.newScore;
         });
@@ -79,40 +79,47 @@ export class MultiPlayerGameService extends SoloGameService {
         this.game.creatorPlayer = this.game.localPlayer;
         const starterPlayerIndex = Math.round(Math.random()); // return 0 or 1
         const starterPlayer = starterPlayerIndex === LOCAL_PLAYER_INDEX ? this.game.localPlayer : this.game.opponentPlayer;
+        this.game.opponentPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.creatorPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.stock = this.stock.letterStock;
         starterPlayer.isActive = true;
         return this.game;
     }
 
     initializeGame2(game: GameParameters) {
         this.game = game;
+        this.stock.letterStock = game.stock;
         const localPlayerIndex = this.socket.id === this.game.players[0].socketId ? 0 : 1;
         const opponentPlayerIndex = this.socket.id === this.game.players[0].socketId ? 1 : 0;
-        if (localPlayerIndex === 0) {
-            this.game.creatorPlayer.stock = new LetterStock();
-        }
-        else {
 
-            this.game.creatorPlayer.stock = new LetterStock();
-            this.game.opponentPlayer.stock = this.game.creatorPlayer.stock;
-        }
-        // this.game.creatorPlayer.stock = new LetterStock();
+        let tempOpponentPlayer = new LocalPlayer(game.gameRoom.playersName[opponentPlayerIndex]);
+        tempOpponentPlayer.letters = game.opponentPlayer.letters;
+        this.game.creatorPlayer = game.creatorPlayer;
+        this.game.opponentPlayer = tempOpponentPlayer;
+
         this.game.localPlayer = new LocalPlayer(game.gameRoom.playersName[localPlayerIndex]);
-        this.game.opponentPlayer = new LocalPlayer(game.gameRoom.playersName[opponentPlayerIndex]);
-        this.game.creatorPlayer.letters = this.game.creatorPlayer.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        this.game.localPlayer.letters = this.game.creatorPlayer.letters;
-        this.game.opponentPlayer.letters = this.game.creatorPlayer.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.localPlayer.letters = this.socket.id === this.game.players[0].socketId ? this.game.creatorPlayer.letters : this.game.opponentPlayer.letters;
+        // this.game.opponentPlayer = new LocalPlayer(game.gameRoom.playersName[opponentPlayerIndex]);
+
+        // this.game.opponentPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        // this.game.localPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+
         this.game.localPlayer.isActive = this.game.players[localPlayerIndex].isActive;
         this.game.opponentPlayer.isActive = this.game.players[opponentPlayerIndex].isActive;
         // this.game.localPlayer = this.socket.id === this.game.creatorPlayer.socketId ? this.game.creatorPlayer : this.game.opponentPlayer;
         /// todo c'est ici que le 2e rejoint pour randomize qui joue en 1er
+        console.log('les joueurs dans le initialize2 : ', this.game);
     }
 
-    override place(player: Player, placeParams: PlaceParams): ErrorType {
+    override async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
         const errorResult = super.place(player, placeParams);
         // la fonction peut retourner NoError mais le mot n'appartient pas au dictionnaire, a regler
-        if (errorResult === ErrorType.NoError) {
+        if (await errorResult === ErrorType.NoError) {
+            console.log('avant les emits');
             this.socket.emit('word placed', { word: placeParams.word, orientation: placeParams.orientation, positionX: placeParams.position.x, positionY: placeParams.position.y });
-            this.socket.emit('place word', { stock: this.game.creatorPlayer.stock.letterStock, newLetters: player.letters, newScore: player.score });
+            console.log('avant le emit');
+            this.socket.emit('place word', { stock: this.stock.letterStock, newLetters: player.letters, newScore: player.score });
+            console.log('apres les emits');
         }
         return errorResult;
     }
@@ -120,7 +127,7 @@ export class MultiPlayerGameService extends SoloGameService {
     override exchangeLetters(player: Player, letters: string): ErrorType {
         const errorResult = super.exchangeLetters(player, letters);
         if (errorResult === ErrorType.NoError) {
-            this.socket.emit('exchange letters', { stock: this.game.creatorPlayer.stock.letterStock, newLetters: player.letters, newScore: player.score });
+            this.socket.emit('exchange letters', { stock: this.stock.letterStock, newLetters: player.letters, newScore: player.score });
         }
         return errorResult;
     }

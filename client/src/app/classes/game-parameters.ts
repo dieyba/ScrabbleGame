@@ -1,8 +1,8 @@
-import { LetterStock } from '@app/services/letter-stock.service';
 import { Dictionary } from './dictionary';
 import { LocalPlayer } from './local-player';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
+import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
 
 export enum GameType {
@@ -31,7 +31,7 @@ export class GameParameters {
     totalCountDown: number;
     timerMs: number;
     scrabbleBoard: ScrabbleBoard;
-    stock: LetterStock;
+    stock: ScrabbleLetter[];
     isTurnPassed: boolean;
     hasTurnsBeenPassed: boolean[];
     isEndGame: boolean;
@@ -46,7 +46,7 @@ export class GameParameters {
         this.totalCountDown = timer;
         this.timerMs = +this.totalCountDown;
         this.opponentPlayer = new LocalPlayer('')
-        // this.stock = new LetterStock();
+        this.stock = [];
         this.hasTurnsBeenPassed = [];
         this.isEndGame = false;
         this.isTurnPassed = false;

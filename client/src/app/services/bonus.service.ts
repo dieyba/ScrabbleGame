@@ -27,6 +27,7 @@ export class BonusService {
         for (let i = 0; i < scrabbleWord.content.length; i++) {
             // Account for letter pale/dark blue bonuses
             if (scrabbleWord.orientation === Axis.H) {
+                // console.log('position x : ', this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y]);
                 if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed) {
                     total += this.calculateValue(
                         scrabbleWord.content[i],
@@ -60,6 +61,9 @@ export class BonusService {
     }
 
     calculateValue(letter: ScrabbleLetter, color: SquareColor): number {
+        let newLetter = new ScrabbleLetter(letter.character);
+        newLetter = letter;
+        letter = newLetter;
         let total = 0;
         switch (color) {
             case SquareColor.Teal:

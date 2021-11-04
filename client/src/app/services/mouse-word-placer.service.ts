@@ -230,6 +230,7 @@ export class MouseWordPlacerService {
         if (indexes[0] >= BOARD_SIZE || indexes[1] >= BOARD_SIZE) return;
         let foundLetter: ScrabbleLetter = new ScrabbleLetter('', 0);
         if (letter === letter.toUpperCase()) {
+            console.log('dans le 2e if');
             // Look for a blank piece on the rack
             for (const rackLetter of this.rackService.rackLetters) {
                 if (rackLetter.character === '*') {

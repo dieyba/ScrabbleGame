@@ -15,6 +15,7 @@ export class Player {
         this.roomId = -1;
         this.isActive = false;
         this.score = 0;
+        this.letters = [];
     }
 
     public getSocketId(): string {
