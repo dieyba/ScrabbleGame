@@ -11,7 +11,6 @@ import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
 import { DEFAULT_LETTER_COUNT, SoloGameService } from './solo-game.service';
 import { ValidationService } from './validation.service';
-import { VirtualPlayerService } from './virtual-player.service';
 import { WordBuilderService } from './word-builder.service';
 
 @Injectable({
@@ -29,9 +28,8 @@ export class MultiPlayerGameService extends SoloGameService {
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
         protected placeService: PlaceService,
-        protected virtualPlayerService: VirtualPlayerService,
     ) {
-        super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService, virtualPlayerService);
+        super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService);
         this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
         this.socket.on('timer reset', (timer: number) => {

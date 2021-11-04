@@ -11,13 +11,13 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis } from '@app/classes/utilities';
 import { VirtualPlayer } from '@app/classes/virtual-player';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { LetterStock } from './letter-stock.service';
 import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
 import { ValidationService } from './validation.service';
-import { VirtualPlayerService } from './virtual-player.service';
 import { WordBuilderService } from './word-builder.service';
 
 export const TIMER_INTERVAL = 1000;
@@ -32,6 +32,8 @@ const LOCAL_PLAYER_INDEX = 0;
 })
 export class SoloGameService {
     game: GameParameters;
+    isVirtualPlayerObservable: Observable<boolean>;
+    virtualPlayerSubject: BehaviorSubject<boolean>;
     timer: string;
     currentTurnId: number;
     intervalValue: NodeJS.Timeout;
@@ -43,7 +45,6 @@ export class SoloGameService {
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
         protected placeService: PlaceService,
-        protected virtualPlayerService: VirtualPlayerService,
     ) {}
     initializeGame(gameInfo: FormGroup) {
         this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value, gameInfo.controls.bonus.value);
@@ -66,6 +67,8 @@ export class SoloGameService {
         return this.game;
     }
     createNewGame() {
+        this.virtualPlayerSubject = new BehaviorSubject<boolean>(this.game.opponentPlayer.isActive);
+        this.isVirtualPlayerObservable = this.virtualPlayerSubject.asObservable();
         this.currentTurnId = 0;
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
@@ -119,6 +122,8 @@ export class SoloGameService {
         this.game.timerMs = 0;
         this.secondsToMinutes();
         this.changeActivePlayer();
+        console.log("turn changed: localPlayerisActive:", this.game.localPlayer.isActive, ", vp isActive:", this.game.opponentPlayer.isActive);
+        if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
     }
     // If the turn was changed by a pass command, add passed turn as true in the turns history
     updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
@@ -146,9 +151,6 @@ export class SoloGameService {
     changeActivePlayer() {
         this.updateActivePlayer();
         this.resetTimer();
-        if (this.game.opponentPlayer.isActive) {
-            this.virtualPlayerService.playTurn();
-        }
     }
     updateActivePlayer() {
         // Switch the active player
@@ -247,11 +249,8 @@ export class SoloGameService {
                 }
                 this.changeTurn();
             });
-            console.log('place result after await:', errorResult);
-            console.log('localplayer shouldnt be active:', this.game.localPlayer.isActive, ', timer should reset:', this.game.timerMs);
             return errorResult;
         }
-        console.log('return place result:', errorResult);
         return errorResult;
     }
     displayEndGameMessage() {

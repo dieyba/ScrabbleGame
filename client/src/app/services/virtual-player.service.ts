@@ -19,8 +19,8 @@ import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
     EndTurn = 10,
-    ExchangeTile = 10,
-    MakeAMove = 80,
+    ExchangeTile = 80, // TODO: change back the right probability settings
+    MakeAMove = 10,
     MaxValue1 = 40,
     MaxValue2 = 30,
     MaxValue3 = 30,
@@ -54,9 +54,10 @@ export class VirtualPlayerService {
         // TODO Implement timer (3s and 20s limit)
         this.rack = new ScrabbleRack();
     }
+    // TODO: make playTurn() asynchrone so the previous human player doesnt have to wait for the end of vp turn to display messages in chat box
     playTurn(): void {
         // Next sprint: implement difficult player type logic by separating here and in virtualPlayerService.makeMoves().
-        // this.player = gameService.game.opponentPlayer;
+        this.player = this.gameService.currentGameService.game.opponentPlayer;
         const defaultParams: DefaultCommandParams = {
             player: this.player,
             serviceCalled: this.gameService,
@@ -66,29 +67,32 @@ export class VirtualPlayerService {
             // 10% chance to end turn
             const command = new PassTurnCmd(defaultParams);
             this.commandInvoker.executeCommand(command);
-            // this.textEntryService.handleInput('!passer');
+            console.log('vp:!passer');
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
             const chosenTiles = this.chooseTilesFromRack(); // 10% chance to exchange tiles
             // Converts chosen word to string
             const chosenTilesString = chosenTiles.map((tile) => tile.character).join(''); // TEST THIS, may not work.
             const command = new ExchangeCmd(defaultParams, chosenTilesString);
             this.commandInvoker.executeCommand(command);
-            // this.textEntryService.handleInput('!échanger ' + chosenTilesString);
+            console.log('vp:!échanger ' + chosenTilesString);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
             // = 100
             const moveMade = this.makeMoves(); // 80% chance to make a move
-            if (moveMade.value !== 0) {
-                const movePosition = this.findPosition(moveMade, this.orientation);
-                const params: PlaceParams = {
-                    position: movePosition,
-                    orientation: this.orientation,
-                    word: moveMade.stringify(),
-                };
-                const command = new PlaceCmd(defaultParams, params);
-                this.commandInvoker.executeCommand(command);
-                // this.textEntryService.handleInput('!placer h8h ' + moveMade.stringify());
-            }
+            if (moveMade) {
+                if (moveMade.value !== 0) {
+                    const movePosition = this.findPosition(moveMade, this.orientation);
+                    const params: PlaceParams = {
+                        position: movePosition,
+                        orientation: this.orientation,
+                        word: moveMade.stringify(),
+                    };
+                    const command = new PlaceCmd(defaultParams, params);
+                    this.commandInvoker.executeCommand(command);
+                    console.log('vp:!placer somePosition ' + moveMade.stringify());
+                } else { console.log('vp: when placing, no move to make. letting turn pass without doing anything'); }
+            } else { console.log('vp: when placing, move made undefined. letting turn pass without doing anything'); }
         }
+
     }
     permutationsOfLetters(letters: ScrabbleLetter[]): ScrabbleLetter[][] {
         // Adapted from medium.com/weekly-webtips/step-by-step-guide-to-array-permutation-using-recursion-in-javascript-4e76188b88ff
