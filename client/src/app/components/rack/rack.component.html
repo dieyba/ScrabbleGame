@@ -1,0 +1,14 @@
+<mat-card class="rack">
+    <canvas
+        id="rack-canvas"
+        #rackCanvas
+        (click)="onLeftClick($event)"
+        (contextmenu)="onRightClick($event)"
+        tabindex="0"
+        (focusout)="onFocusOut($event)"
+        (keydown)="onKeyDown($event)"
+        (wheel)="onWheel($event)"
+        [attr.width]="rackWidth"
+        [attr.height]="rackHeight"
+    ></canvas>
+</mat-card>
