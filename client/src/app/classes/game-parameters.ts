@@ -12,7 +12,7 @@ export enum GameType {
 }
 
 // TODO: vrm besoin de ça? players name peut appeler player attributs directement et capacité toujours 2
-// unless we plan to make a game with more than 2 players, 
+// unless we plan to make a game with more than 2 players,
 // then having players instead of localPlayer/opponentPlayer would be better
 export interface GameRoom {
     idGame: number;
