@@ -18,9 +18,9 @@ import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
-    EndTurn = 10,
-    ExchangeTile = 10,
-    MakeAMove = 80,
+    EndTurn = 30,
+    ExchangeTile = 40,
+    MakeAMove = 30,
     MaxValue1 = 40,
     MaxValue2 = 30,
     MaxValue3 = 30,

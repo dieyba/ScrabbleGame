@@ -46,6 +46,18 @@ describe('LetterStock', () => {
         expect(stock.isEmpty()).toBeTrue();
     });
 
+    it('takeLetter should return the right letter', () => {
+        const letter: ScrabbleLetter = stock.takeLetter('a');
+        expect(letter.character).toEqual('a');
+    });
+
+    it('takeLetter should return empty letter when none is left', () => {
+        stock.takeLetter('b');
+        stock.takeLetter('b');
+        const letter: ScrabbleLetter = stock.takeLetter('b');
+        expect(letter.character).toEqual('');
+    });
+
     it('takeLettersFromStock should stop if there is no more letters', () => {
         stock.takeLettersFromStock(NUMBER_OF_LETTERS - 2);
 

@@ -70,10 +70,10 @@ export class MouseWordPlacerService {
         if (!this.companionService.samePosition(clickedSquare, this.latestPosition)) {
             this.removeAllLetters();
             this.clearOverlay();
-            this.drawArrow(clickedSquare, this.currentAxis);
             if (this.currentAxis !== Axis.H) {
                 this.currentAxis = Axis.H;
             }
+            this.drawArrow(clickedSquare, this.currentAxis);
             this.latestPosition = clickedSquare;
         } else if (this.companionService.samePosition(clickedSquare, this.latestPosition)) {
             switch (this.currentAxis) {

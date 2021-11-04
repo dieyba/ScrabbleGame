@@ -22,9 +22,9 @@ import { WordBuilderService } from './word-builder.service';
 
 export const TIMER_INTERVAL = 1000;
 export const DEFAULT_LETTER_COUNT = 7;
+export const MAX_TURNS_PASSED = 6;
 const DOUBLE_DIGIT = 10;
 const MINUTE_IN_SEC = 60;
-const MAX_TURNS_PASSED = 6;
 const LOCAL_PLAYER_INDEX = 0;
 
 @Injectable({
@@ -35,7 +35,6 @@ export class SoloGameService {
     isVirtualPlayerObservable: Observable<boolean>;
     virtualPlayerSubject: BehaviorSubject<boolean>;
     timer: string;
-    currentTurnId: number;
     intervalValue: NodeJS.Timeout;
 
     constructor(
@@ -59,8 +58,8 @@ export class SoloGameService {
         this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.game.randomBonus = gameInfo.controls.bonus.value;
-        this.game.totalCountDown = gameInfo.controls.timer.value;
-        this.game.timerMs = gameInfo.controls.timer.value;
+        this.game.totalCountDown = +gameInfo.controls.timer.value;
+        this.game.timerMs = +gameInfo.controls.timer.value;
         const starterPlayerIndex = Math.round(Math.random()); // return 0 or 1
         const starterPlayer = starterPlayerIndex === LOCAL_PLAYER_INDEX ? this.game.localPlayer : this.game.opponentPlayer;
         starterPlayer.isActive = true;
@@ -69,14 +68,13 @@ export class SoloGameService {
     createNewGame() {
         this.virtualPlayerSubject = new BehaviorSubject<boolean>(this.game.opponentPlayer.isActive);
         this.isVirtualPlayerObservable = this.virtualPlayerSubject.asObservable();
-        this.currentTurnId = 0;
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
         this.chatDisplayService.initialize(this.game.localPlayer.name);
         this.addRackLetters(this.game.localPlayer.letters);
         this.startCountdown();
         this.game.isTurnPassed = false;
-        this.game.hasTurnsBeenPassed = [];
+        this.game.consecutivePassedTurns = 0;
     }
     resetTimer() {
         this.game.timerMs = +this.game.totalCountDown;
@@ -99,9 +97,11 @@ export class SoloGameService {
             this.intervalValue = setInterval(() => {
                 this.game.timerMs--;
                 if (this.game.timerMs < 0) {
-                    // this.game.isTurnPassed = true;
+                    this.game.isTurnPassed = true;
+                    const activePlayer = this.game.localPlayer.isActive ? this.game.localPlayer : this.game.opponentPlayer;
                     this.changeTurn();
-                    // this.game.isTurnPassed = false;
+                    console.log("End of timer:", activePlayer.name, " should have turned pass");
+                    // TODO: send 'activePlayerName >> !passer' message to chat via observer?
                 }
                 this.secondsToMinutes();
             }, TIMER_INTERVAL);
@@ -111,49 +111,27 @@ export class SoloGameService {
         if (player.isActive) {
             this.game.isTurnPassed = true;
             this.changeTurn();
-            this.game.isTurnPassed = false;
             return ErrorType.NoError;
         }
         return ErrorType.ImpossibleCommand;
     }
-
     changeTurn() {
-        this.updateHasTurnsBeenPassed(this.game.isTurnPassed);
-        this.game.timerMs = 0;
-        this.secondsToMinutes();
-        this.changeActivePlayer();
-
-        // If called from multiplayer game service, this shouldn't trigger virtual player service in play area component
-        if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
-    }
-    // If the turn was changed by a pass command, add passed turn as true in the turns history
-    updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
-        this.game.hasTurnsBeenPassed.push(isCurrentTurnedPassed);
-        if (this.isConsecutivePassedTurnsLimit()) {
-            this.endGame();
-        }
-        this.currentTurnId++;
-    }
-
-    // TODO: change this for a counter and fix consecutive pass turn count in solo mode
-    // Check if last 5 turns have been passed (current turn is the 6th)
-    isConsecutivePassedTurnsLimit(): boolean {
-        let turnIndex = this.currentTurnId;
-        let consecutivePassedTurn = 0;
-        let wasTurnPassed = false;
-        do {
-            wasTurnPassed = this.game.hasTurnsBeenPassed[turnIndex];
-            if (wasTurnPassed) {
-                consecutivePassedTurn++;
-            }
-            turnIndex--;
-        } while (wasTurnPassed && turnIndex >= 0);
-        return consecutivePassedTurn === MAX_TURNS_PASSED;
-    }
-    // New Turn
-    changeActivePlayer() {
+        this.updateConsecutivePassedTurns();
         this.updateActivePlayer();
         this.resetTimer();
+        if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
+        this.game.isTurnPassed = false; // reset isTurnedPassed when new turn starts
+    }
+    // Check if last 5 turns have been passed (by the command or the timer running out) (current turn is the 6th)
+    updateConsecutivePassedTurns() {
+        if (this.game.isTurnPassed) {
+            this.game.consecutivePassedTurns++;
+        } else {
+            this.game.consecutivePassedTurns = 0;
+        }
+        if (this.game.consecutivePassedTurns >= MAX_TURNS_PASSED) {
+            this.endGame();
+        }
     }
     updateActivePlayer() {
         // Switch the active player
@@ -202,6 +180,7 @@ export class SoloGameService {
                     this.addRackLetter(lettersToAdd[i]);
                     this.addLetterToPlayer(lettersToAdd[i]);
                 }
+                this.game.isTurnPassed = false;
                 this.changeTurn();
                 return ErrorType.NoError;
             }
@@ -217,7 +196,7 @@ export class SoloGameService {
         if (errorResult === ErrorType.NoError) {
             // Generate all words created
             let tempScrabbleWords: ScrabbleWord[];
-            if (placeParams.orientation === 'h') {
+            if (placeParams.orientation === Axis.H) {
                 tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
             } else {
                 tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
@@ -250,6 +229,7 @@ export class SoloGameService {
                         this.addLetterToPlayer(letter);
                     });
                 }
+                this.game.isTurnPassed = false;
                 this.changeTurn();
             });
             return errorResult;
@@ -279,6 +259,14 @@ export class SoloGameService {
         } else {
             this.game.localPlayer.score -= localPlayerPoints;
             this.game.opponentPlayer.score -= oppnentPlayerPoints;
+            if (this.game.localPlayer.score > this.game.opponentPlayer.score) {
+                this.game.localPlayer.isWinner = true;
+            } else if (this.game.localPlayer.score < this.game.opponentPlayer.score) {
+                this.game.opponentPlayer.isWinner = true;
+            } else {
+                this.game.localPlayer.isWinner = true;
+                this.game.opponentPlayer.isWinner = true;
+            }
         }
         clearInterval(this.intervalValue);
         this.game.timerMs = 0;

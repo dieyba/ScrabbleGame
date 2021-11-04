@@ -1,4 +1,5 @@
 import { Square, SquareColor } from './square';
+import { removeAccents } from './utilities';
 
 export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;
@@ -12,7 +13,7 @@ export class ScrabbleLetter {
     tile: Square;
 
     constructor(letter: string, value?: number) {
-        const unplaced = -1;
+        const unplaced = UNPLACED;
         this.setLetter(letter);
         this.color = SquareColor.None;
         this.tile = new Square(unplaced, unplaced); // -1, -1 means it is not placed yet
@@ -50,6 +51,6 @@ export class ScrabbleLetter {
         this.value = DARK_BLUE_FACTOR * this.value;
     }
     setLetter(character: string): void {
-        this.character = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        this.character = removeAccents(character);
     }
 }

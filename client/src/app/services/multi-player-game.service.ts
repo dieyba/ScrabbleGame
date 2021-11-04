@@ -9,7 +9,7 @@ import { GridService } from './grid.service';
 import { LetterStock } from './letter-stock.service';
 import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
-import { DEFAULT_LETTER_COUNT, SoloGameService } from './solo-game.service';
+import { DEFAULT_LETTER_COUNT, MAX_TURNS_PASSED, SoloGameService } from './solo-game.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
@@ -32,17 +32,16 @@ export class MultiPlayerGameService extends SoloGameService {
         super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService);
         this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
-        this.socket.on('timer reset', (timer: number) => {
+        this.socket.on('turn changed', (isTurnPassed: boolean, consecutivePassedTurns: number) => {
+            this.game.isTurnPassed = isTurnPassed
+            this.game.consecutivePassedTurns = consecutivePassedTurns;
+            const isLocalPlayerEndingGame = this.game.consecutivePassedTurns >= MAX_TURNS_PASSED && this.game.localPlayer.isActive;
+            if (isLocalPlayerEndingGame) {
+                this.endGame();
+            }
             this.updateActivePlayer();
             this.resetTimer();
-        });
-        this.socket.on('increaseTurnsPassed', (hasTurnsBeenPassed: boolean[]) => {
-            this.game.hasTurnsBeenPassed = hasTurnsBeenPassed;
-            const isLocalPlayerEndingGame = this.isConsecutivePassedTurnsLimit() && this.game.localPlayer.isActive;
-            if (isLocalPlayerEndingGame) {
-                this.endGame(); // calling MultiPlayerGameService to end game on both clients
-            }
-            this.currentTurnId++;
+            this.game.isTurnPassed = false;
         });
         this.socket.on('gameEnded', () => {
             this.displayEndGameMessage();
@@ -66,14 +65,11 @@ export class MultiPlayerGameService extends SoloGameService {
         this.game.timerMs = +this.game.totalCountDown;
         this.game.randomBonus = game.randomBonus;
     }
+    override changeTurn() {
+        this.socket.emit('change turn', this.game.isTurnPassed, this.game.consecutivePassedTurns);
+    }
 
-    override updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
-        this.socket.emit('updateTurnsPassed', isCurrentTurnedPassed, this.game.hasTurnsBeenPassed);
-    }
-    override changeActivePlayer() {
-        this.socket.emit('reset timer');
-    }
-    // TODO: see if endGame multi (en solo ig) works for when triggered by empty racks
+    // TODO: see if endGame multi (and solo) works for when triggered by empty racks
     override endGame() {
         this.socket.emit('endGame');
     }

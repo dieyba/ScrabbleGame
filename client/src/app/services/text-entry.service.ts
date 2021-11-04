@@ -10,13 +10,14 @@ import { createPlaceCmd } from '@app/classes/place-command';
 import { Player } from '@app/classes/player';
 import { createStockCmd } from '@app/classes/stock-command';
 import {
+    Axis,
     convertStringToCoord,
     isAllLowerLetters,
     isEmpty,
     isValidLetter,
     removeAccents,
     scrabbleLetterstoString,
-    trimSpaces
+    trimSpaces,
 } from '@app/classes/utilities';
 import { ChatDisplayService } from './chat-display.service';
 import { CommandInvokerService } from './command-invoker.service';
@@ -25,8 +26,6 @@ import { GameService } from './game.service';
 const MIN_EXCHANGE_LETTERS = 1;
 const MAX_EXCHANGE_LETTERS = 7;
 const LAST_CHAR_INDEX = -1;
-const HORIZONTAL = 'h';
-const VERTICAL = 'v';
 
 type CommandCreationResult = Command | ErrorType.SyntaxError | ErrorType.InvalidCommand;
 
@@ -171,7 +170,7 @@ export class TextEntryService {
                 const coordinates = convertStringToCoord(row, column);
                 if (coordinates) {
                     const orientation = positionOrientation.slice(LAST_CHAR_INDEX).toLowerCase();
-                    if (orientation === HORIZONTAL || orientation === VERTICAL) {
+                    if (orientation === Axis.H || orientation === Axis.V) {
                         const placeParams = { position: coordinates, orientation, word };
                         const defaultParams = { player, serviceCalled: this.gameService };
                         const commandParams = { defaultParams, specificParams: placeParams };
