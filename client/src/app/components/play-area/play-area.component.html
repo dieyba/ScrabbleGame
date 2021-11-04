@@ -15,8 +15,14 @@
                 <img src="https://img.icons8.com/ios-glyphs/30/000000/expand-arrow--v1.png" />
             </button>
             <div class="row">
-                <button class="btn" (click)="passTurn()" *ngIf="isLocalPlayerActive() && !isEndGame()">Passer mon tour</button>
-                <button class="btn" disabled="true" *ngIf="!isLocalPlayerActive() || isEndGame()" style="opacity: 1">Passer mon tour</button>
+                <div>
+                    <button class="btn" (click)="passTurn()" *ngIf="isLocalPlayerActive() && !isEndGame()">Passer mon tour</button>
+                    <button class="btn" disabled="true" *ngIf="!isLocalPlayerActive() || isEndGame()" style="opacity: 1">Passer mon tour</button>
+                    <button class="btn" id="confirm" (click)="confirmWord()" *ngIf="isLocalPlayerActive() && !isEndGame()">Jouer le mot</button>
+                    <button class="btn" id="confirm" disabled="true" *ngIf="!isLocalPlayerActive() || isEndGame()" style="opacity: 1">
+                        Jouer le mot
+                    </button>
+                </div>
             </div>
             <div class="echange">
                 <button

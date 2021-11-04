@@ -18,9 +18,9 @@ export class ValidationService {
     dictionary: Dictionary;
     words: string[];
     isTimerElapsed: boolean;
+    areWordsValid: boolean;
     private socket: io.Socket;
     private readonly server: string;
-    areWordsValid: boolean;
 
     constructor(private readonly gridService: GridService, private bonusService: BonusService) {
         this.dictionary = new Dictionary(DictionaryType.Default);
@@ -94,18 +94,17 @@ export class ValidationService {
     // If the words were not valid, wait 3 seconds before returning result.
     // If the server doesnt answer after 3 sec, validation result is false by default
     async validateWords(newWords: ScrabbleWord[]) {
-        let strWords: string[] = [];
-        newWords?.forEach(newWord => {
+        const strWords: string[] = [];
+        newWords?.forEach((newWord) => {
             strWords.push(newWord.stringify().toLowerCase());
         });
         this.areWordsValid = false;
         let wordsHaveBeenValidated = false;
         let validationTimer: NodeJS.Timeout;
-        return new Promise<boolean>((resolve, reject) => {
+        return new Promise<boolean>((resolve) => {
             this.socket.emit('validateWords', strWords);
 
-            this.socket.once('areWordsValid', areWordsValid => {
-                console.log("response validation from server:", areWordsValid);
+            this.socket.once('areWordsValid', (areWordsValid) => {
                 this.areWordsValid = areWordsValid;
                 wordsHaveBeenValidated = true;
                 if (areWordsValid) {

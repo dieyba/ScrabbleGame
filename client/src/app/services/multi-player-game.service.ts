@@ -151,9 +151,6 @@ export class MultiPlayerGameService extends SoloGameService {
         }
     }
 
-    // TODO: add override function to emit to server to syncrhonize board and player letters
-    // or do that emit in exchange service and place service
-
     override updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
         this.socket.emit('updateTurnsPassed', isCurrentTurnedPassed, this.game.hasTurnsBeenPassed);
     }
