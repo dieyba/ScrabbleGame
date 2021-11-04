@@ -25,7 +25,6 @@ export class MultiPlayerGameService extends SoloGameService {
     game: GameParameters;
     stock: LetterStock;
     private socket: io.Socket;
-    areNewWordsValid: boolean = false;
     private readonly server: string;
     // localPlayer: LocalPlayer;
 
@@ -161,7 +160,7 @@ export class MultiPlayerGameService extends SoloGameService {
     override changeActivePlayer() {
         this.socket.emit('reset timer');
     }
-    // TODO: see if endGame multi (en solo ig) works for when triggered by empty racks
+    // TODO: see if endGame multi (and solo ig) works for when triggered by empty racks
     override endGame() {
         this.socket.emit('endGame');
     }

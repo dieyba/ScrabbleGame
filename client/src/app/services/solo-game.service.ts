@@ -115,11 +115,16 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
+    // TODO: override dans multiplayer
     changeTurn() {
         this.updateHasTurnsBeenPassed(this.game.isTurnPassed);
         this.game.timerMs = 0;
         this.secondsToMinutes();
         this.changeActivePlayer();
+
+        // if (this.game.opponentPlayer.isActive) {
+        //     this.playVirtualPlayerturn(); // this method woud be observed in the vp service which then executes its playTurn()?
+        // }
     }
     // If the turn was changed by a pass command, add passed turn as true in the turns history
     updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
@@ -241,6 +246,8 @@ export class SoloGameService {
                     newLetters.forEach(letter => { this.addLetterToPlayer(letter) });
 
                 }
+            }).then(() => {
+                console.log("place result after await:", errorResult);
                 this.changeTurn();
             });
             console.log("place result after await:", errorResult);
