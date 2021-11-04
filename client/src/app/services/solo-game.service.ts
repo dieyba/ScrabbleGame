@@ -122,7 +122,9 @@ export class SoloGameService {
         this.game.timerMs = 0;
         this.secondsToMinutes();
         this.changeActivePlayer();
-        console.log("turn changed: localPlayerisActive:", this.game.localPlayer.isActive, ", vp isActive:", this.game.opponentPlayer.isActive);
+
+        // If called from multiplayer game service, this shouldn't trigger virtual player service in play area component
+        console.log("turn changed: localPlayerisActive:", this.game.localPlayer.isActive, ", opponentisActive:", this.game.opponentPlayer.isActive);
         if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
     }
     // If the turn was changed by a pass command, add passed turn as true in the turns history
