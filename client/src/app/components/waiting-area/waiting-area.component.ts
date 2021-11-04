@@ -82,7 +82,7 @@ export class WaitingAreaComponent {
             this.gameList.roomInfo = game;
             this.gameList.roomInfo.gameRoom = game.gameRoom;
             this.playerList = this.gameList.roomInfo.gameRoom.playersName;
-            this.selectedGame.gameRoom.playersName = this.gameList.roomInfo.gameRoom.playersName;
+            // this.selectedGame.gameRoom.playersName = this.gameList.roomInfo.gameRoom.playersName;
         });
         this.socket.on('roomcreated', (game: GameParameters) => {
             this.gameList.roomInfo = game;
@@ -96,7 +96,7 @@ export class WaitingAreaComponent {
             console.log(game)
             this.gameList.roomInfo = game;
             this.playerList = this.gameList.roomInfo.gameRoom.playersName;
-            this.selectedGame.gameRoom.playersName = this.gameList.roomInfo.gameRoom.playersName;
+            // this.selectedGame.gameRoom.playersName = this.gameList.roomInfo.gameRoom.playersName;
             //  console.log(player)
         });
     }

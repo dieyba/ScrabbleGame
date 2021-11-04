@@ -106,6 +106,7 @@ export class SidebarComponent {
         this.dialogRef.afterClosed().subscribe((confirmQuit) => {
             if (confirmQuit) {
                 this.socket.emit('leaveRoom')
+                this.socket = SocketHandler.disconnectSocket();
                 this.router.navigate(['/start']);
             }
         });

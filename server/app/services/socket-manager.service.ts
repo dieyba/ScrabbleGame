@@ -72,9 +72,10 @@ export class SocketManagerService {
                 this.displayPlayerQuitMessage(socket);
             });
             socket.on('disconnect', (reason) => {
-                setTimeout(() => {
-                    this.disconnect(socket)
-                }, 5000);
+                // setTimeout(() => {
+                console.log(`Deconnexion par l'utilisateur avec id : ${socket.id}`);
+                this.disconnect(socket)
+                // }, 5000);
             });
             socket.on('word placed', (word: any) => {
                 // console.log('emit word placed catched');
@@ -156,7 +157,9 @@ export class SocketManagerService {
         }
     }
     private disconnect(socket: io.Socket) {
-        this.leaveRoom(socket);
+        setTimeout(() => {
+            this.leaveRoom(socket);
+        }, 5000);
     }
     private getAllGames(socket: io.Socket) {
         this.sio.emit('getAllGames', this.gameListMan.existingRooms);

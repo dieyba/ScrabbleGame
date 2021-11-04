@@ -151,7 +151,7 @@ export class SoloGameService {
     // New Turn
     changeActivePlayer() {
         this.updateActivePlayer();
-        this.resetTimer();
+        // this.resetTimer();
     }
     updateActivePlayer() {
         // Switch the active player
