@@ -7,7 +7,7 @@ import { ValidationService } from './validation.service';
 export class GameListManager {
     existingRooms: Array<GameParameters>;
     currentGames: Array<GameParameters>;
-    private currentRoomID: number;
+    currentRoomID: number;
     constructor(private validationService: ValidationService) {
         this.existingRooms = new Array<GameParameters>();
         this.currentGames = new Array<GameParameters>();
@@ -37,16 +37,17 @@ export class GameListManager {
             return false
         }
     }
-    public createRoom(creator: string, timer: number, isRandomBonus: boolean): GameParameters {
-        let room = this.addRoom(creator, timer, isRandomBonus);
+    public createRoom(game: GameParameters): GameParameters {
+        let room = this.addRoom(game);
         return room;
     }
-    public addRoom(creator: string, timer: number, isRandomBonus: boolean): GameParameters {
-        let newRoom = new GameParameters(creator, timer, isRandomBonus, this.currentRoomID++);
-        newRoom.creatorPlayer.roomId = this.currentRoomID;
-        newRoom.setIdGame(this.currentRoomID);
-        this.existingRooms.push(newRoom);
-        return newRoom;
+    public addRoom(game: GameParameters): GameParameters {
+        // let newRoom = new GameParameters(game.creatorPlayer.name, game.totalCountDown, game.randomBonus, this.currentRoomID++, game.scrabbleBoard);
+        // newRoom = game;
+        game.creatorPlayer.roomId = game.gameRoom.idGame;
+        game.setIdGame(game.gameRoom.idGame);
+        this.existingRooms.push(game);
+        return game;
     }
     public deleteRoom(roomId: number): void {
         const index = this.existingRooms.findIndex((r) => r.gameRoom.idGame === roomId)

@@ -1,6 +1,6 @@
 import { ScrabbleLetter } from './scrabble-letter';
-import { Vec2 } from './vec2';
 import { Axis } from './utilities';
+import { Vec2 } from './vec2';
 export class ScrabbleWord {
     content: ScrabbleLetter[]; // Array of ScrabbleLetters continually growing to represent the word
     value: number;

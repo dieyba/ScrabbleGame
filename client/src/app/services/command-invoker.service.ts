@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { ChatEntryColor } from '@app/classes/chat-display-entry';
 import { Command, CommandResult } from '@app/classes/commands';
 import { ExchangeCmd } from '@app/classes/exchange-command';
 import { PassTurnCmd } from '@app/classes/pass-command';
@@ -18,7 +19,6 @@ export class CommandInvokerService {
         const isToDisplayRemotely = isExchangeCmd || command instanceof PassTurnCmd || command instanceof PlaceCmd;
         if (commandResult instanceof Promise) {
             await commandResult.then((executionResult: CommandResult) => {
-                console.log("await place result and then display");
                 this.displayExecutionResultMessages(executionResult, isExchangeCmd, isToDisplayRemotely);
             });
         } else {
@@ -28,6 +28,7 @@ export class CommandInvokerService {
 
     displayExecutionResultMessages(commandResult: CommandResult, isExchangeCmd: boolean, isToDisplayRemotely: boolean) {
         const isSendToServer = this.gameService.isMultiplayerGame && isToDisplayRemotely && commandResult.isExecuted;
+        const isFromVirtualPlayer = !this.gameService.isMultiplayerGame && commandResult.executionMessages[0].color === ChatEntryColor.RemotePlayer;
         if (isSendToServer) {
             // extract command is the only situation where the message is different for the local/remove player
             if (isExchangeCmd) {
@@ -40,8 +41,13 @@ export class CommandInvokerService {
                 });
             }
         } else {
+            if (isFromVirtualPlayer) {
+                const commandMessage = commandResult.executionMessages[0].message;
+                const debugMessages = ['some debug message', 'some other debug message'];
+                this.chatDisplayService.addVirtalPlayerEntry(commandMessage, debugMessages);
+            }
             // extract command returns both players message, but solo game only displays the local message
-            if (isExchangeCmd) {
+            else if (isExchangeCmd) {
                 this.chatDisplayService.addEntry(commandResult.executionMessages[0]);
             } else {
                 commandResult.executionMessages.forEach((chatEntry) => {

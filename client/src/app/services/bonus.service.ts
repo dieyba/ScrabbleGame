@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { DARK_BLUE_FACTOR, PALE_BLUE_FACTOR, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { SquareColor } from '@app/classes/square';
 import { Axis } from '@app/classes/utilities';
@@ -24,9 +24,11 @@ export class BonusService {
         this.pinkBonusCount = 0;
         this.redBonusCount = 0;
         let total = 0;
+        console.log('ey');
         for (let i = 0; i < scrabbleWord.content.length; i++) {
             // Account for letter pale/dark blue bonuses
             if (scrabbleWord.orientation === Axis.H) {
+                console.log('position : ', this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y]);
                 if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed) {
                     total += this.calculateValue(
                         scrabbleWord.content[i],
@@ -60,13 +62,16 @@ export class BonusService {
     }
 
     calculateValue(letter: ScrabbleLetter, color: SquareColor): number {
+        let newLetter = new ScrabbleLetter(letter.character);
+        newLetter = letter;
+        letter = newLetter;
         let total = 0;
         switch (color) {
             case SquareColor.Teal:
-                total += letter.getTealBonus();
+                total += this.getTealBonus(letter);
                 break;
             case SquareColor.DarkBlue:
-                total += letter.getDarkBlueBonus();
+                total += this.getDarkBlueBonus(letter);
                 break;
             case SquareColor.Pink:
                 this.pinkBonusCount++;
@@ -81,6 +86,14 @@ export class BonusService {
                 break;
         }
         return total;
+    }
+
+    getTealBonus(scrabbleLetter: ScrabbleLetter): number {
+        return PALE_BLUE_FACTOR * scrabbleLetter.value;
+    }
+
+    getDarkBlueBonus(scrabbleLetter: ScrabbleLetter): number {
+        return DARK_BLUE_FACTOR * scrabbleLetter.value;
     }
 
     useBonus(scrabbleWord: ScrabbleWord) {

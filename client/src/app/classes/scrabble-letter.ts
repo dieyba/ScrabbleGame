@@ -37,18 +37,6 @@ export class ScrabbleLetter {
             this.value = value;
         }
     }
-    getTealBonus(): number {
-        return PALE_BLUE_FACTOR * this.value;
-    }
-    setTealBonus(): void {
-        this.value = PALE_BLUE_FACTOR * this.value;
-    }
-    getDarkBlueBonus(): number {
-        return DARK_BLUE_FACTOR * this.value;
-    }
-    setDarkBlueBonus(): void {
-        this.value = DARK_BLUE_FACTOR * this.value;
-    }
     setLetter(character: string): void {
         this.character = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }

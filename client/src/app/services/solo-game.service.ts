@@ -11,6 +11,7 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis } from '@app/classes/utilities';
 import { VirtualPlayer } from '@app/classes/virtual-player';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { LetterStock } from './letter-stock.service';
@@ -31,6 +32,9 @@ const LOCAL_PLAYER_INDEX = 0;
 })
 export class SoloGameService {
     game: GameParameters;
+    stock: LetterStock;
+    isVirtualPlayerObservable: Observable<boolean>;
+    virtualPlayerSubject: BehaviorSubject<boolean>;
     timer: string;
     currentTurnId: number;
     intervalValue: NodeJS.Timeout;
@@ -43,18 +47,18 @@ export class SoloGameService {
         protected wordBuilder: WordBuilderService,
         protected placeService: PlaceService,
     ) {
+        this.stock = new LetterStock();
     }
     initializeGame(gameInfo: FormGroup) {
         this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value, gameInfo.controls.bonus.value);
         this.chatDisplayService.entries = [];
         this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
         this.game.creatorPlayer.isActive = true;
-        this.game.stock = new LetterStock();
         this.game.localPlayer = new LocalPlayer(gameInfo.controls.name.value); // where does local player take his letters from stock?
         this.game.creatorPlayer = this.game.localPlayer;
         this.game.opponentPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
-        this.game.localPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.localPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.opponentPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.game.randomBonus = gameInfo.controls.bonus.value;
         this.game.totalCountDown = gameInfo.controls.timer.value;
@@ -65,6 +69,8 @@ export class SoloGameService {
         return this.game;
     }
     createNewGame() {
+        this.virtualPlayerSubject = new BehaviorSubject<boolean>(this.game.opponentPlayer.isActive);
+        this.isVirtualPlayerObservable = this.virtualPlayerSubject.asObservable();
         this.currentTurnId = 0;
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
@@ -73,7 +79,6 @@ export class SoloGameService {
         this.startCountdown();
         this.game.isTurnPassed = false;
         this.game.hasTurnsBeenPassed = [];
-
     }
     resetTimer() {
         this.game.timerMs = +this.game.totalCountDown;
@@ -114,11 +119,15 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
+    // TODO: override dans multiplayer
     changeTurn() {
         this.updateHasTurnsBeenPassed(this.game.isTurnPassed);
         this.game.timerMs = 0;
         this.secondsToMinutes();
         this.changeActivePlayer();
+
+        // If called from multiplayer game service, this shouldn't trigger virtual player service in play area component
+        if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
     }
     // If the turn was changed by a pass command, add passed turn as true in the turns history
     updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
@@ -128,6 +137,8 @@ export class SoloGameService {
         }
         this.currentTurnId++;
     }
+
+    // TODO: change this for a counter and fix consecutive pass turn count in solo mode
     // Check if last 5 turns have been passed (current turn is the 6th)
     isConsecutivePassedTurnsLimit(): boolean {
         let turnIndex = this.currentTurnId;
@@ -139,19 +150,19 @@ export class SoloGameService {
                 consecutivePassedTurn++;
             }
             turnIndex--;
-        } while (wasTurnPassed && turnIndex >= 0)
+        } while (wasTurnPassed && turnIndex >= 0);
         return consecutivePassedTurn === MAX_TURNS_PASSED;
     }
     // New Turn
     changeActivePlayer() {
         this.updateActivePlayer();
-        this.resetTimer();
+        // this.resetTimer();
     }
     updateActivePlayer() {
         // Switch the active player
         if (this.game.localPlayer.isActive) {
             // If the rack is empty, end game + player won
-            if (this.game.localPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+            if (this.game.localPlayer.letters.length === 0 && this.stock.isEmpty()) {
                 this.game.localPlayer.isWinner = true;
                 this.endGame();
                 return;
@@ -160,7 +171,7 @@ export class SoloGameService {
             this.game.opponentPlayer.isActive = true;
         } else {
             // If the rack is empty, end game + player won
-            if (this.game.opponentPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+            if (this.game.opponentPlayer.letters.length === 0 && this.stock.isEmpty()) {
                 this.game.opponentPlayer.isWinner = true;
                 this.endGame();
                 return;
@@ -181,14 +192,14 @@ export class SoloGameService {
         this.game.localPlayer.addLetter(letter);
     }
     exchangeLetters(player: Player, letters: string): ErrorType {
-        if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
+        if (player.isActive && this.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
             const lettersToRemove: ScrabbleLetter[] = [];
             if (player.removeLetter(letters) === true) {
                 for (let i = 0; i < letters.length; i++) {
                     lettersToRemove[i] = new ScrabbleLetter(letters[i]);
                 }
 
-                const lettersToAdd: ScrabbleLetter[] = this.game.stock.exchangeLetters(lettersToRemove);
+                const lettersToAdd: ScrabbleLetter[] = this.stock.exchangeLetters(lettersToRemove);
                 for (let i = 0; i < lettersToAdd.length; i++) {
                     this.rackService.removeLetter(lettersToRemove[i]);
                     this.addRackLetter(lettersToAdd[i]);
@@ -201,13 +212,12 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
-    async place(player: Player, placeParams: PlaceParams): Promise<ErrorType /* Promise<ErrorType> */>/* Promise<ErrorType> */ {
+    async place(player: Player, placeParams: PlaceParams): Promise<ErrorType /* Promise<ErrorType> */> /* Promise<ErrorType> */ {
         if (!player.isActive) {
             return ErrorType.ImpossibleCommand;
         }
         let errorResult = this.placeService.place(player, placeParams);
         if (errorResult === ErrorType.NoError) {
-
             // Generate all words created
             let tempScrabbleWords: ScrabbleWord[];
             if (placeParams.orientation === 'h') {
@@ -215,8 +225,8 @@ export class SoloGameService {
             } else {
                 tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
             }
-            let strWords: string[] = [];
-            tempScrabbleWords.forEach(scrabbleWord => {
+            const strWords: string[] = [];
+            tempScrabbleWords.forEach((scrabbleWord) => {
                 strWords.push(scrabbleWord.stringify().toLowerCase());
             });
             // validate words waits 3sec if the words are invalid or the server doesn't answer.
@@ -230,27 +240,35 @@ export class SoloGameService {
                         placeParams.orientation,
                     );
                     this.addRackLetters(removedLetters);
-                    removedLetters.forEach(letter => { this.addLetterToPlayer(letter) });
+                    removedLetters.forEach((letter) => {
+                        this.addLetterToPlayer(letter);
+                    });
                 } else {
                     // Score
                     this.validationService.updatePlayerScore(tempScrabbleWords, player);
                     // Take new letters
-                    const newLetters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-                    this.addRackLetters(newLetters)
-                    newLetters.forEach(letter => { this.addLetterToPlayer(letter) });
+                    const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+                    this.addRackLetters(newLetters);
+                    newLetters.forEach((letter) => {
+                        this.addLetterToPlayer(letter);
+                    });
                 }
+            }).then(() => {
+                console.log("place result after await:", errorResult);
                 this.changeTurn();
             });
-            console.log("place result after await:", errorResult);
-            console.log("localplayer shouldnt be active:", this.game.localPlayer.isActive, ', timer should reset:', this.game.timerMs);
             return errorResult;
         }
-        console.log("return place result:", errorResult);
         return errorResult;
     }
+
     displayEndGameMessage() {
-        const endGameMessages = this.chatDisplayService.createEndGameMessages(this.game.stock.letterStock, this.game.localPlayer, this.game.opponentPlayer);
-        endGameMessages.forEach(message => {
+        const endGameMessages = this.chatDisplayService.createEndGameMessages(
+            this.stock.letterStock,
+            this.game.localPlayer,
+            this.game.opponentPlayer,
+        );
+        endGameMessages.forEach((message) => {
             this.chatDisplayService.addEntry(message);
         });
     }
@@ -317,4 +335,3 @@ export class SoloGameService {
         return letters;
     }
 }
-

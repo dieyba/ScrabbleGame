@@ -1,3 +1,4 @@
+import { LetterStock } from '@app/services/letter-stock.service';
 import { ScrabbleLetter } from './scrabble-letter';
 
 // TODO: cant we make player non abstract, and virtual extends it?
@@ -9,6 +10,7 @@ export abstract class Player {
     isActive: boolean; // True is it is this players turn, false if not.
     isWinner: boolean;
     roomId: number;
+    stock: LetterStock;
 
     constructor(name: string) {
         this.name = name;
@@ -17,6 +19,7 @@ export abstract class Player {
         this.isActive = false;
         this.isWinner = false;
         this.socketId = '';
+        this.stock = new LetterStock();
     }
 
     addLetter(letterToAdd: ScrabbleLetter): void {

@@ -39,52 +39,87 @@ export class WaitingAreaComponent {
         private router: Router,
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
         private dialog: MatDialog,
-        public gameList: GameListService, 
+        public gameList: GameListService,
         @Inject(MAT_DIALOG_DATA) public gameSelected: boolean,
     ) {
         this.server = 'http://' + window.location.hostname + ':3000';
+        this.socket = SocketHandler.requestSocket(this.server);
         this.playerList = [];
         this.list = [];
         this.name = false;
         if (gameSelected) {
             this.selectedGame = new GameParameters('', 0, false);
-            this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
+            this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(12), Validators.minLength(3)]);
         }
-        this.socket = SocketHandler.requestSocket(this.server);
-        this.list = this.gameList.getList();
         this.full = false;
         this.nameErrorMessage = '';
         this.nameValid = false;
         this.timer = setInterval(() => {
             this.list = this.gameList.getList();
-            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
-            // this.startIfFull();
         }, 500);
+
         this.socket.on('updateInfo', (game: GameParameters) => {
-            // this.players = players;
             this.dialogRef.close();
             this.router.navigate(['/game']);
             this.multiManService.initializeGame2(game);
             this.socket.emit('deleteRoom');
         });
+        // this.socket.on('getAllGames', (game: GameParameters[]) => {
+        //     this.list = game;
+        // });
         this.socket.on('roomdeleted', (game: GameParameters) => {
             this.joindre = false;
             this.nameValid = false;
             this.gameCancelled = true;
         })
+        // this.socket.on('roomLeft', (game: GameParameters) => {
+        //     console.log('left')
+        //     this.joindre = false;
+        //     this.nameValid = false;
+        //     this.gameCancelled = true;
+        // })
+        this.socket.on('roomJoined', (game: GameParameters) => {
+            this.gameList.roomInfo = game;
+            this.gameList.roomInfo.gameRoom = game.gameRoom;
+            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
+            // this.selectedGame.gameRoom.playersName = this.gameList.roomInfo.gameRoom.playersName;
+        });
+        this.socket.on('roomcreated', (game: GameParameters) => {
+            this.gameList.roomInfo = game;
+            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
+            // this.roomInfo.gameRoom.playersName = game.gameRoom.playersName;
+            // this.roomInfo.scrabbleBoard = game.scrabbleBoard;
+            // this.roomInfo.creatorPlayer.letters = game.creatorPlayer.letters;
+            // this.roomInfo.opponentPlayer.letters = game.opponentPlayer.letters;
+        });
+        this.socket.on('roomLeft', (game: GameParameters) => {
+            console.log(game)
+            this.gameList.roomInfo = game;
+            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
+            // this.selectedGame.gameRoom.playersName = this.gameList.roomInfo.gameRoom.playersName;
+            //  console.log(player)
+        });
     }
+
     onSelect(game: GameParameters): GameParameters {
         if (this.gameSelected) {
             this.selectedGame = game;
         }
         return this.selectedGame;
     }
+    someoneLeftRoom() {
+        if (!this.isStarting) {
+            this.gameList.someoneLeftRoom();
+        }
+    }
+
     openName(selected: boolean): boolean {
         if (this.gameSelected) {
             return (this.name = selected);
         }
         return false;
     }
+
     startIfFull(): void {
         if (this.playerList.length == 2) {
             this.isStarting = true;
@@ -92,16 +127,20 @@ export class WaitingAreaComponent {
             this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
         }
     }
+
     start(): void {
-        if (this.selectedGame.gameRoom.playersName.length === 1) {
+        if (this.playerList.length !== 2) {
             this.nameValid = true;
             this.gameList.start(this.selectedGame, this.playerName.value);
         } else {
             this.full = true;
         }
     }
+
     confirmName(game: GameParameters) {
-        if (this.playerName.value === game.creatorPlayer.name) {
+        console.log(this.playerName.value);
+        console.log(game.creatorPlayer.name)
+        if (this.playerName.value === game.creatorPlayer.name || !this.playerName.valid) {
             this.error = true;
             this.nameErrorMessage = 'Vous ne pouvez pas avoir le meme nom que votre adversaire';
         } else {
@@ -110,6 +149,7 @@ export class WaitingAreaComponent {
             this.nameErrorMessage = 'Votre nom est valide ;) ';
         }
     }
+
     deleteRoom() {
         this.gameList.deleteRoom();
     }

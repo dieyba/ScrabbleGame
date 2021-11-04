@@ -16,6 +16,6 @@ export class ClassicModeComponent {
         this.dialog.open(FormComponent, { data: isSolo });
     }
     openJoinRoom(gameSelection: boolean) {
-        this.dialog.open(WaitingAreaComponent, { data: gameSelection });
+        this.dialog.open(WaitingAreaComponent, { data: gameSelection, disableClose: true });
     }
 }
