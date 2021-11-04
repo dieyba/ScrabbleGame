@@ -11,7 +11,7 @@ import { GameService } from '@app/services/game.service';
 import { LetterStock } from '@app/services/letter-stock.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
 describe('GamePageComponent', () => {
@@ -54,8 +54,11 @@ describe('GamePageComponent', () => {
         gameServiceSpy.currentGameService.game.stock = new LetterStock();
         gameServiceSpy.currentGameService.game.opponentPlayer.isActive = false;        
         gameServiceSpy.currentGameService.game.localPlayer.isActive = true;
+        soloGameServiceSpy.virtualPlayerSubject = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
+        soloGameServiceSpy.isVirtualPlayerObservable = soloGameServiceSpy.virtualPlayerSubject.asObservable();
+        soloGameServiceSpy.virtualPlayerSubject.next(true);
     });
-
+    
     beforeEach(() => {
         TestBed.createComponent(SidebarComponent);
         fixture = TestBed.createComponent(GamePageComponent);

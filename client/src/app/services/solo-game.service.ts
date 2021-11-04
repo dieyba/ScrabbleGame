@@ -11,6 +11,7 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis } from '@app/classes/utilities';
 import { VirtualPlayer } from '@app/classes/virtual-player';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { LetterStock } from './letter-stock.service';
@@ -31,6 +32,8 @@ const LOCAL_PLAYER_INDEX = 0;
 })
 export class SoloGameService {
     game: GameParameters;
+    isVirtualPlayerObservable: Observable<boolean>;
+    virtualPlayerSubject: BehaviorSubject<boolean>;
     timer: string;
     currentTurnId: number;
     intervalValue: NodeJS.Timeout;
@@ -64,6 +67,8 @@ export class SoloGameService {
         return this.game;
     }
     createNewGame() {
+        this.virtualPlayerSubject = new BehaviorSubject<boolean>(this.game.opponentPlayer.isActive);
+        this.isVirtualPlayerObservable = this.virtualPlayerSubject.asObservable();
         this.currentTurnId = 0;
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
@@ -119,9 +124,8 @@ export class SoloGameService {
         this.secondsToMinutes();
         this.changeActivePlayer();
 
-        // if (this.game.opponentPlayer.isActive) {
-        //     this.playVirtualPlayerturn(); // this method woud be observed in the vp service which then executes its playTurn()?
-        // }
+        // If called from multiplayer game service, this shouldn't trigger virtual player service in play area component
+        if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
     }
     // If the turn was changed by a pass command, add passed turn as true in the turns history
     updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
@@ -131,6 +135,8 @@ export class SoloGameService {
         }
         this.currentTurnId++;
     }
+
+    // TODO: change this for a counter and fix consecutive pass turn count in solo mode
     // Check if last 5 turns have been passed (current turn is the 6th)
     isConsecutivePassedTurnsLimit(): boolean {
         let turnIndex = this.currentTurnId;

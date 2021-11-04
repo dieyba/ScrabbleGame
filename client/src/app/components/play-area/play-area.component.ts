@@ -9,6 +9,7 @@ import { GameService } from '@app/services/game.service';
 import { GridService } from '@app/services/grid.service';
 import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service';
 import { RackService } from '@app/services/rack.service';
+import { VirtualPlayerService } from '@app/services/virtual-player.service';
 
 // TODO : Avoir un fichier séparé pour les constantes!
 export const DEFAULT_WIDTH = 640;
@@ -45,6 +46,7 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly mouseWordPlacerService: MouseWordPlacerService,
         private readonly exchangeService: ExchangeService,
         private readonly commandInvokerService: CommandInvokerService,
+        private readonly virtualPlayerService: VirtualPlayerService,
     ) {
         this.mousePosition = new Vec2(0, 0);
         this.canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -55,8 +57,16 @@ export class PlayAreaComponent implements AfterViewInit {
         this.mouseWordPlacerService.onKeyDown(event);
     }
     @HostListener('focusout', ['$event'])
-    onBlur() {
-        this.mouseWordPlacerService.onBlur();
+    onBlur(evt: FocusEvent) {
+        if (document.hasFocus()) {
+            let newFocus: string;
+            if (evt.relatedTarget !== null) {
+                newFocus = (evt.relatedTarget as HTMLElement).id;
+                if (newFocus !== 'confirm') {
+                    this.mouseWordPlacerService.onBlur();
+                }
+            }
+        }
     }
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
@@ -67,6 +77,14 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawColors();
         this.rackService.drawRack();
         this.rackContext = this.rackService.gridContext;
+
+        if (!this.gameService.isMultiplayerGame) {
+            this.gameService.currentGameService.isVirtualPlayerObservable.subscribe((isActive: boolean) => {
+                if (isActive && !this.gameService.currentGameService.game.isEndGame) {
+                    this.virtualPlayerService.playTurn();
+                }
+            });
+        }
     }
 
     passTurn() {
@@ -109,7 +127,9 @@ export class PlayAreaComponent implements AfterViewInit {
     onMouseDown(event: MouseEvent) {
         this.mouseWordPlacerService.onMouseClick(event);
     }
-
+    confirmWord() {
+        this.mouseWordPlacerService.confirmWord();
+    }
     atLeastOneLetterSelected(): boolean {
         return this.exchangeService.atLeastOneLetterSelected();
     }

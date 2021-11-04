@@ -1,11 +1,19 @@
 import { Injectable } from '@angular/core';
+import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
+import { ExchangeCmd } from '@app/classes/exchange-command';
+import { PassTurnCmd } from '@app/classes/pass-command';
+import { PlaceCmd } from '@app/classes/place-command';
+import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Axis } from '@app/classes/utilities';
 import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
+import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { BonusService } from './bonus.service';
+import { CommandInvokerService } from './command-invoker.service';
+import { GameService } from './game.service';
 import { GridService } from './grid.service';
+import { PlaceService } from './place.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
@@ -22,6 +30,9 @@ export enum Points {
     MaxValue2 = 12,
     MaxValue3 = 18,
 }
+
+const DEFAULT_VIRTUAL_PLAYER_WAIT_TIME = 3000;
+const NO_MOVE_TOTAL_WAIT_TIME = 20000;
 const POINTS_INTERVAL = 5;
 const PERCENTAGE = 100;
 const POSITION_ERROR = -1;
@@ -31,25 +42,72 @@ const POSITION_ERROR = -1;
 })
 export class VirtualPlayerService {
     rack: ScrabbleRack;
+    orientation: Axis;
+    player: Player;
 
     constructor(
         private validationService: ValidationService,
         private gridService: GridService,
         private wordBuilderService: WordBuilderService,
         private bonusService: BonusService,
+        private placeService: PlaceService,
+        private gameService: GameService,
+        private commandInvoker: CommandInvokerService,
     ) {
-        // TODO: MOVE ALL THIS TO GAMELOOP
         // TODO Implement timer (3s and 20s limit)
         this.rack = new ScrabbleRack();
-        // const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
-        // if (currentMove <= Probability.EndTurn) {
-        //     // 10% chance to end turn
-        // } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
-        //     this.chooseTilesFromRack(); // 10% chance to exchange tiles
-        // } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
-        //     // = 100
-        //     this.makeMoves(); // 80% chance to make a move
-        // }
+    }
+    playTurn(): void {
+        // Next sprint: implement difficult player type logic by separating here and in virtualPlayerService.makeMoves().
+        this.player = this.gameService.currentGameService.game.opponentPlayer;
+        const defaultParams: DefaultCommandParams = {
+            player: this.player,
+            serviceCalled: this.gameService,
+        };
+        const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
+        if (currentMove <= Probability.EndTurn) {
+            setTimeout(() => {
+                // 10% chance to end turn
+                const command = new PassTurnCmd(defaultParams);
+                this.commandInvoker.executeCommand(command);
+                console.log('vp:!passer');
+            }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+        } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
+            setTimeout(() => {
+                const chosenTiles = this.chooseTilesFromRack(); // 10% chance to exchange tiles
+                // Converts chosen word to string
+                const chosenTilesString = chosenTiles.map((tile) => tile.character).join(''); // TEST THIS, may not work.
+                const command = new ExchangeCmd(defaultParams, chosenTilesString);
+                this.commandInvoker.executeCommand(command);
+                console.log('vp:!échanger ' + chosenTilesString);
+            }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+        } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
+            let moveMade = new ScrabbleWord();
+            moveMade = this.makeMoves(); // 80% chance to make a move
+            setTimeout(() => {
+                // waits 3 second to try and find a word to place
+                if (moveMade.value !== 0) {
+                    const movePosition = this.findPosition(moveMade, this.orientation);
+                    const params: PlaceParams = {
+                        position: movePosition,
+                        orientation: this.orientation,
+                        word: moveMade.stringify(),
+                    };
+                    const command = new PlaceCmd(defaultParams, params);
+                    this.commandInvoker.executeCommand(command);
+                    console.log('vp:!placer somePosition ' + moveMade.stringify());
+                } else {
+                    // if no word to place was found, pass turn after 20 seconds
+                    console.log('vp: found no move to make when placing. will pass turn after 20 seconds');
+                    setTimeout(() => {
+                        const command = new PassTurnCmd(defaultParams);
+                        this.commandInvoker.executeCommand(command);
+                        console.log('vp:!passer');
+                    }, NO_MOVE_TOTAL_WAIT_TIME - DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+                }
+            }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+        }
+
     }
     permutationsOfLetters(letters: ScrabbleLetter[]): ScrabbleLetter[][] {
         // Adapted from medium.com/weekly-webtips/step-by-step-guide-to-array-permutation-using-recursion-in-javascript-4e76188b88ff
@@ -97,7 +155,7 @@ export class VirtualPlayerService {
                 charArray[index] = char.character;
                 index++;
             }
-            if (this.validationService.isWordValid(charArray.join(''))) {
+            if (this.isWordValid(charArray.join(''))) {
                 possibleMoves[movesFound] = this.wordify(j);
                 movesFound++;
             }
@@ -151,7 +209,13 @@ export class VirtualPlayerService {
                     }
                     for (let l = 0; l < list.length; l++) {
                         // Remove elements of the list which aren't valid with the points constraint
-                        if (this.validationService.isPlacable(list[l], this.findPosition(list[l], axis), axis)) {
+                        const pos = this.findPosition(list[l], axis);
+                        const placeParams: PlaceParams = {
+                            word: list[l].stringify(),
+                            position: pos,
+                            orientation: axis,
+                        };
+                        if (this.placeService.canPlaceWord(placeParams)) {
                             if (this.bonusService.totalValue(list[l]) > points || this.bonusService.totalValue(list[l]) < points - POINTS_INTERVAL) {
                                 list.splice(l);
                             } else {
@@ -175,24 +239,28 @@ export class VirtualPlayerService {
         return list; // list contains movesFound elements
     }
     makeMoves(): ScrabbleWord {
-        let startAxis = Axis.V;
+        this.orientation = Axis.V;
         if (this.getRandomIntInclusive(0, 1) === 1) {
             // coin flip to determine starting axis
-            startAxis = Axis.H;
+            this.orientation = Axis.H;
         }
         const pointTarget = this.getRandomIntInclusive(1, PERCENTAGE);
         let movesList = [];
         if (pointTarget <= Probability.MaxValue1) {
             // 40% chance to go for moves that earn 6 points or less
-            movesList = this.possibleMoves(Points.MaxValue1, startAxis);
+            movesList = this.possibleMoves(Points.MaxValue1, this.orientation);
         } else if (pointTarget <= Probability.MaxValue1 + Probability.MaxValue2) {
             // 30% chance to go for moves that score 7-12 points
-            movesList = this.possibleMoves(Points.MaxValue2, startAxis);
+            movesList = this.possibleMoves(Points.MaxValue2, this.orientation);
         } else {
             // 30% chance to go for moves that score 13-18 points
-            movesList = this.possibleMoves(Points.MaxValue3, startAxis);
+            movesList = this.possibleMoves(Points.MaxValue3, this.orientation);
         }
-        return movesList[this.getRandomIntInclusive(0, movesList.length - 1)]; // randomize move to make
+        const moveToMake = movesList[this.getRandomIntInclusive(0, movesList.length - 1)];
+        if (moveToMake) {
+            return moveToMake;
+        }
+        return new ScrabbleWord(); // randomize move to make
     }
     // Displays a message based on an array of moves.
     displayMoves(moves: ScrabbleWord[]): string {
@@ -280,5 +348,11 @@ export class VirtualPlayerService {
             if (currentLetter === this.rack.letters.length) currentLetter = 0;
         }
         return listOfTiles;
+    }
+    // Other function to validate words locally.
+    isWordValid(word: string): boolean {
+        return this.validationService.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'")
+            ? true
+            : false;
     }
 }

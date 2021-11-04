@@ -16,7 +16,7 @@ import { LetterStock } from '@app/services/letter-stock.service';
 import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service';
 import { RackService, RACK_HEIGHT, RACK_WIDTH } from '@app/services/rack.service';
 import { DEFAULT_LETTER_COUNT, SoloGameService } from '@app/services/solo-game.service';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
 /* eslint-disable  no-unused-expressions */
@@ -50,7 +50,8 @@ describe('PlayAreaComponent', () => {
             declarations: [PlayAreaComponent],
             providers: [
                 { provide: GridService, useValue: gridServiceSpy },
-                { provide: GameService, useValue: gameServiceSpy },
+                { provide: GameService, useValue: gameServiceSpy },                
+                { provide: SoloGameService, useValue: soloGameServiceSpy },
                 { provide: RackService, useValue: rackServiceSpy },
                 { provide: CommandInvokerService, useValue: commandInvokerServiceSpy },
                 { provide: MouseWordPlacerService, useValue: mouseWordPlacerServiceSpy },
@@ -86,6 +87,9 @@ describe('PlayAreaComponent', () => {
         gameServiceSpy.currentGameService.game.totalCountDown = form.controls.timer.value;
         gameServiceSpy.currentGameService.game.timerMs = form.controls.timer.value;
         gameServiceSpy.currentGameService.game.localPlayer = gameServiceSpy.currentGameService.game.creatorPlayer;
+        soloGameServiceSpy.virtualPlayerSubject = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
+        soloGameServiceSpy.isVirtualPlayerObservable = soloGameServiceSpy.virtualPlayerSubject.asObservable();
+        soloGameServiceSpy.virtualPlayerSubject.next(true);
     });
 
     beforeEach(() => {
@@ -136,11 +140,6 @@ describe('PlayAreaComponent', () => {
         } as MouseEvent;
         component.onMouseDown(mouseEvent);
         expect(mouseWordPlacerServiceSpy.onMouseClick).toHaveBeenCalled();
-    });
-
-    it('onBlur should call mouseWordPlacerService onBlur method', () => {
-        component.onBlur();
-        expect(mouseWordPlacerServiceSpy.onBlur).toHaveBeenCalled();
     });
 
     it('rackHeight should return play area rack height', () => {

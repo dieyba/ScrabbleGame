@@ -8,6 +8,7 @@ import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
+import { BehaviorSubject } from 'rxjs';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 import { SoloGameService } from './solo-game.service';
@@ -78,11 +79,14 @@ describe('SoloGameService', () => {
     });
 
     it('createNewGame should clear scrabble board and fill rack', () => {
-        service.game.creatorPlayer = new LocalPlayer('Ariane');
+        service.game.localPlayer = new LocalPlayer('Ariane');
+        service.game.opponentPlayer = new VirtualPlayer('Sara', Difficulty.Easy);
         const firstLetter: ScrabbleLetter = new ScrabbleLetter('D', 1);
         const secondLetter: ScrabbleLetter = new ScrabbleLetter('e', 2);
         const thirdLetter: ScrabbleLetter = new ScrabbleLetter('j', 3);
-        service.game.creatorPlayer.letters = [firstLetter, secondLetter, thirdLetter];
+        service.game.localPlayer.letters = [firstLetter, secondLetter, thirdLetter];
+        service.game.opponentPlayer.isActive = true;
+        service.game.localPlayer.isActive = false;
         rackServiceSpy.gridContext = ctxStub;
         service.createNewGame();
         expect(addRackLettersSpy).toHaveBeenCalled();
@@ -131,6 +135,9 @@ describe('SoloGameService', () => {
         service.game.localPlayer.letters = [new ScrabbleLetter('D', 1)];
         service.game.localPlayer.isActive = true;
         service.game.opponentPlayer.isActive = false;
+        service.virtualPlayerSubject = new BehaviorSubject<boolean>(service.game.localPlayer.isActive);
+        service.isVirtualPlayerObservable = service.virtualPlayerSubject.asObservable();
+        service.virtualPlayerSubject.next(true);
         service.passTurn(service.game.localPlayer);
         expect(changeActivePlayerSpy).toHaveBeenCalled();
         expect(secondsToMinutesSpy).toHaveBeenCalled();
@@ -170,12 +177,12 @@ describe('SoloGameService', () => {
         const addLetterToPlayerSpy = spyOn(service, 'addLetterToPlayer').and.callThrough();
         service.exchangeLetters(service.game.creatorPlayer, 'b');
         expect(rackServiceSpy.removeLetter).not.toHaveBeenCalled();
-        expect(addRackLetterSpy).not.toHaveBeenCalled();        
+        expect(addRackLetterSpy).not.toHaveBeenCalled();
         expect(addLetterToPlayerSpy).not.toHaveBeenCalled();
 
         service.exchangeLetters(service.game.creatorPlayer, 'a');
         expect(rackServiceSpy.removeLetter).toHaveBeenCalled();
-        expect(addRackLetterSpy).toHaveBeenCalled();     
+        expect(addRackLetterSpy).toHaveBeenCalled();
         expect(addLetterToPlayerSpy).toHaveBeenCalled();
     });
 

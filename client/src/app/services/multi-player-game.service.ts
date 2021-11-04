@@ -48,9 +48,6 @@ export class MultiPlayerGameService extends SoloGameService {
             this.displayEndGameMessage();
             this.endLocalGame();
         });
-        // TODO: add a socket.on 'synchronize' for board and player or something
-        // Need to have the opponent player letters syncrhonized on both clients for the displayEndGameMessage(),
-        // or ill pass it when emitting end game ig but its simpler to just synchronize when exchange/place
     }
 
     initializeGame2(game: GameParameters) {
@@ -69,9 +66,6 @@ export class MultiPlayerGameService extends SoloGameService {
         this.game.timerMs = +this.game.totalCountDown;
         this.game.randomBonus = game.randomBonus;
     }
-
-    // TODO: add override function to emit to server to syncrhonize board and player letters
-    // or do that emit in exchange service and place service
 
     override updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
         this.socket.emit('updateTurnsPassed', isCurrentTurnedPassed, this.game.hasTurnsBeenPassed);
