@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { RackService } from './rack.service';
+import { MAX_LETTER_COUNT, RackService } from './rack.service';
 
 export const RACK_WIDTH = 500;
 export const RACK_HEIGHT = 60;
@@ -78,5 +78,107 @@ describe('RackService', () => {
         service.addLetter(letter7);
         expect(service.rackLetters.length).toEqual(7);
         expect(drawLetterSpy).not.toHaveBeenCalled();
+    });
+
+    it('clearRack should call "gridContext.clearRack()", "drawRack" and "drawExistingLetters"', () => {
+        const clearRectSpy = spyOn<any>(ctxStub, 'clearRect').and.stub();
+        const drawRackSpy = spyOn<any>(service, 'drawRack').and.stub();
+        const drawExistingLettersSpy = spyOn<any>(service, 'drawExistingLetters').and.stub();
+
+        service.clearRack();
+
+        expect(clearRectSpy).toHaveBeenCalled();
+        expect(drawRackSpy).toHaveBeenCalled();
+        expect(drawExistingLettersSpy).toHaveBeenCalled();
+    });
+
+    it('findSquareOrigin should return the right coordinates of the upper left corner of a letter position', () => {
+        for (let i = 1; i <= MAX_LETTER_COUNT; i++) {
+            const coordX = service.findSquareOrigin(i);
+            expect(coordX).toEqual((RACK_WIDTH * (i - 1)) / MAX_LETTER_COUNT);
+        }
+    });
+
+    it('select should accumulate "selection" on multiple call for "exchange selection"', () => {
+        const drawSelectionSpy = spyOn<any>(service, 'drawSelection').and.stub();
+        const drawRackSpy = spyOn<any>(service, 'drawRack').and.stub();
+
+        service.select(1, ctxStub, true);
+
+        expect(ctxStub.fillStyle).toEqual('#ffa07a'); // lightsalmon
+        expect(service.exchangeSelected[0]).toEqual(true);
+        expect(service.exchangeSelected[MAX_LETTER_COUNT - 1]).toEqual(false);
+        expect(drawSelectionSpy).toHaveBeenCalled();
+        expect(drawRackSpy).toHaveBeenCalled();
+
+        service.select(MAX_LETTER_COUNT, ctxStub, true);
+
+        expect(service.exchangeSelected[0]).toEqual(true);
+        expect(service.exchangeSelected[MAX_LETTER_COUNT - 1]).toEqual(true);
+    });
+
+    it('select should color letters for handling one at a time', () => {
+        const drawSelectionSpy = spyOn<any>(service, 'drawSelection').and.stub();
+        const drawRackSpy = spyOn<any>(service, 'drawRack').and.stub();
+
+        service.select(1, ctxStub, false);
+
+        expect(ctxStub.fillStyle).toEqual('#add8e6'); // lightblue
+        expect(service.handlingSelected[0]).toEqual(true);
+        expect(service.handlingSelected[MAX_LETTER_COUNT - 1]).toEqual(false);
+        expect(drawSelectionSpy).toHaveBeenCalled();
+        expect(drawRackSpy).toHaveBeenCalled();
+
+        service.select(MAX_LETTER_COUNT, ctxStub, false);
+
+        expect(service.handlingSelected[0]).toEqual(false);
+        expect(service.handlingSelected[MAX_LETTER_COUNT - 1]).toEqual(true);
+    });
+
+    it('deselect should recolor the letter as normal', () => {
+        const drawSelectionSpy = spyOn<any>(service, 'drawSelection').and.stub();
+        const drawRackSpy = spyOn<any>(service, 'drawRack').and.stub();
+
+        // initial conditions
+        ctxStub.fillStyle = 'notWhite';
+        service.exchangeSelected[0] = true;
+
+        service.deselect(1, ctxStub, true);
+
+        expect(service.exchangeSelected[0]).toEqual(false);
+        expect(drawSelectionSpy).toHaveBeenCalled();
+        expect(drawRackSpy).toHaveBeenCalled();
+        expect(ctxStub.fillStyle).toEqual('#ffffff'); // White
+
+        // initial conditions
+        ctxStub.fillStyle = 'notWhite';
+        service.handlingSelected[0] = true;
+
+        service.deselect(1, ctxStub, false);
+
+        expect(service.handlingSelected[0]).toEqual(false);
+        expect(drawSelectionSpy).toHaveBeenCalled();
+        expect(drawRackSpy).toHaveBeenCalled();
+        expect(ctxStub.fillStyle).toEqual('#ffffff'); // White
+    });
+
+    it('deselectAll should call "deselect" 7×2 times (for 7 handling selections and 7 exchange selections', () => {
+        const deselectSpy = spyOn(service, 'deselect');
+
+        service.deselectAll(ctxStub);
+
+        expect(deselectSpy).toHaveBeenCalledTimes(MAX_LETTER_COUNT * 2);
+    });
+
+    it('drawSelection should draw the "selection" square and rewrite the letters', () => {
+        const findSquareOriginSpy = spyOn(service, 'findSquareOrigin');
+        const drawExistingLetters = spyOn(service, 'drawExistingLetters');
+        const ctxStubSpy = spyOn(ctxStub, 'fillRect');
+
+        service.drawSelection(1, ctxStub);
+
+        expect(findSquareOriginSpy).toHaveBeenCalled();
+        expect(drawExistingLetters).toHaveBeenCalled();
+        expect(ctxStubSpy).toHaveBeenCalled();
     });
 });

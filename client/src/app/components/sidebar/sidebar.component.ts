@@ -69,11 +69,9 @@ export class SidebarComponent {
     getWinnerName() {
         if (this.isDrawnGame()) {
             this.winnerName = this.sologameService.localPlayer.name + ' et ' + this.sologameService.virtualPlayer.name;
-        }
-        if (this.sologameService.localPlayer.isWinner) {
+        } else if (this.sologameService.localPlayer.isWinner) {
             this.winnerName = this.sologameService.localPlayer.name;
-        }
-        if (this.sologameService.virtualPlayer.isWinner) {
+        } else if (this.sologameService.virtualPlayer.isWinner) {
             this.winnerName = this.sologameService.virtualPlayer.name;
         }
     }

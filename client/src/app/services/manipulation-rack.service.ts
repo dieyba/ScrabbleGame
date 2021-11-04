@@ -1,27 +1,39 @@
 import { Injectable } from '@angular/core';
 import { RackService } from './rack.service';
 
-const ERROR_NUMBER = -1;
+export const ERROR_NUMBER = -1;
 
 @Injectable({
     providedIn: 'root',
 })
 export class ManipulationRackService {
-    private letterSelectedPosition = ERROR_NUMBER;
-    private firstOccurencePosition = ERROR_NUMBER;
+    letterSelectedPosition = ERROR_NUMBER;
+    firstOccurencePosition = ERROR_NUMBER;
 
     constructor(private readonly rackService: RackService) {}
 
-    handleSelection(rackContext: CanvasRenderingContext2D, position: number) {
+    // set selectedPosition(newValue: number) {
+    //     this.letterSelectedPosition = newValue;
+    // }
+
+    // set firstOccurence(newValue: number) {
+    //     this.firstOccurencePosition = newValue;
+    // }
+
+    // get getSelectedPosition() {
+    //     return this.letterSelectedPosition;
+    // }
+
+    // get getFirstOccurence() {
+    //     return this.firstOccurencePosition;
+    // }
+
+    handleSelection(position: number) {
         if (this.rackService.handlingSelected[position - 1] === false) {
             if (this.rackService.exchangeSelected[position - 1] === true) {
                 this.rackService.exchangeSelected[position - 1] = false;
             }
-
-            // for (let i = 0; i < this.rackService.handlingSelected.length; i++) {
-            //     this.rackService.deselect(i + 1, rackContext, false);
-            // }
-            this.rackService.select(position, rackContext, false);
+            this.rackService.select(position, this.rackService.gridContext, false);
             this.letterSelectedPosition = position - 1;
         }
     }

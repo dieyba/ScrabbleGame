@@ -33,14 +33,14 @@ export class RackComponent implements AfterViewInit {
 
     onLeftClick(event: Event) {
         const position = this.selectedLetterPosition(event as MouseEvent);
-        this.manipulationRackService.handleSelection(this.rackContext, position);
+        this.manipulationRackService.handleSelection(position);
     }
 
     onRightClick(event: Event) {
         event.preventDefault();
         const position = this.selectedLetterPosition(event as MouseEvent);
         this.manipulationRackService.clearManipValues();
-        this.exchangeService.handleSelection(this.rackContext, position);
+        this.exchangeService.handleSelection(position);
     }
 
     onFocusOut(event: Event) {

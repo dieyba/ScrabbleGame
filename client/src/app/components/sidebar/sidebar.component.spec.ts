@@ -8,13 +8,14 @@ import { LetterStock } from '@app/services/letter-stock.service';
 import { SoloGameService } from '@app/services/solo-game.service';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 describe('SidebarComponent', () => {
     let component: SidebarComponent;
     let fixture: ComponentFixture<SidebarComponent>;
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
 
     beforeEach(async () => {
-        soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['localPlayer', 'virtualPlayer', 'stock']);
+        soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['localPlayer', 'virtualPlayer', 'stock', 'isEndGame']);
         await TestBed.configureTestingModule({
             declarations: [SidebarComponent],
             imports: [MatCardModule],
@@ -54,5 +55,64 @@ describe('SidebarComponent', () => {
     it('getPlayer1Score should return the right score', () => {
         component.getPlayer1Score();
         expect(component.getPlayer1Score()).toEqual(73);
+    });
+
+    it('isEndGame should return the right boolean representing the end of the game', () => {
+        expect(component.isEndGame()).toEqual(soloGameServiceSpy.isEndGame);
+    });
+
+    it('isEndGame should call getWinnerName', () => {
+        const spy = spyOn(component, 'getWinnerName');
+        component.isEndGame();
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('hasWinner should return true if at least one player is a winner', () => {
+        soloGameServiceSpy.localPlayer.isWinner = false;
+        soloGameServiceSpy.virtualPlayer.isWinner = false;
+        expect(component.hasWinner()).toBeFalse();
+
+        soloGameServiceSpy.localPlayer.isWinner = true;
+        expect(component.hasWinner()).toBeTrue();
+
+        soloGameServiceSpy.virtualPlayer.isWinner = true;
+        expect(component.hasWinner()).toBeTrue();
+    });
+
+    it('isDrawnGame should return true if both players are winners', () => {
+        soloGameServiceSpy.localPlayer.isWinner = false;
+        soloGameServiceSpy.virtualPlayer.isWinner = false;
+        expect(component.isDrawnGame()).toBeFalse();
+
+        soloGameServiceSpy.localPlayer.isWinner = true;
+        expect(component.isDrawnGame()).toBeFalse();
+
+        soloGameServiceSpy.virtualPlayer.isWinner = true;
+        expect(component.isDrawnGame()).toBeTrue();
+    });
+
+    it('getWinnerName should call isDrawnGame', () => {
+        const spy = spyOn(component, 'isDrawnGame');
+        component.getWinnerName();
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('getWinnerName should return the name of the winner', () => {
+        soloGameServiceSpy.localPlayer.isWinner = true;
+        soloGameServiceSpy.virtualPlayer.isWinner = false;
+        component.getWinnerName();
+        expect(component.winnerName).toEqual(soloGameServiceSpy.localPlayer.name);
+
+        soloGameServiceSpy.localPlayer.isWinner = false;
+        soloGameServiceSpy.virtualPlayer.isWinner = true;
+        component.getWinnerName();
+        expect(component.winnerName).toEqual(soloGameServiceSpy.virtualPlayer.name);
+    });
+
+    it('getWinnerName should return names of both players if isDrawnGame', () => {
+        soloGameServiceSpy.localPlayer.isWinner = true;
+        soloGameServiceSpy.virtualPlayer.isWinner = true;
+        component.getWinnerName();
+        expect(component.winnerName).toEqual(soloGameServiceSpy.localPlayer.name + ' et ' + soloGameServiceSpy.virtualPlayer.name);
     });
 });
