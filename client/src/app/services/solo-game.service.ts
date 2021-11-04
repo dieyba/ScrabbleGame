@@ -42,8 +42,7 @@ export class SoloGameService {
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
         protected placeService: PlaceService,
-    ) {
-    }
+    ) {}
     initializeGame(gameInfo: FormGroup) {
         this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value, gameInfo.controls.bonus.value);
         this.chatDisplayService.entries = [];
@@ -73,7 +72,6 @@ export class SoloGameService {
         this.startCountdown();
         this.game.isTurnPassed = false;
         this.game.hasTurnsBeenPassed = [];
-
     }
     resetTimer() {
         this.game.timerMs = +this.game.totalCountDown;
@@ -139,7 +137,7 @@ export class SoloGameService {
                 consecutivePassedTurn++;
             }
             turnIndex--;
-        } while (wasTurnPassed && turnIndex >= 0)
+        } while (wasTurnPassed && turnIndex >= 0);
         return consecutivePassedTurn === MAX_TURNS_PASSED;
     }
     // New Turn
@@ -201,22 +199,21 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
-    async place(player: Player, placeParams: PlaceParams): Promise<ErrorType /* Promise<ErrorType> */>/* Promise<ErrorType> */ {
+    async place(player: Player, placeParams: PlaceParams): Promise<ErrorType /* Promise<ErrorType> */> /* Promise<ErrorType> */ {
         if (!player.isActive) {
             return ErrorType.ImpossibleCommand;
         }
         let errorResult = this.placeService.place(player, placeParams);
         if (errorResult === ErrorType.NoError) {
-
             // Generate all words created
             let tempScrabbleWords: ScrabbleWord[];
-            if (placeParams.orientation === 'h') {
+            if (placeParams.orientation === Axis.H) {
                 tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
             } else {
                 tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
             }
-            let strWords: string[] = [];
-            tempScrabbleWords.forEach(scrabbleWord => {
+            const strWords: string[] = [];
+            tempScrabbleWords.forEach((scrabbleWord) => {
                 strWords.push(scrabbleWord.stringify().toLowerCase());
             });
             // validate words waits 3sec if the words are invalid or the server doesn't answer.
@@ -230,27 +227,32 @@ export class SoloGameService {
                         placeParams.orientation,
                     );
                     this.addRackLetters(removedLetters);
-                    removedLetters.forEach(letter => { this.addLetterToPlayer(letter) });
+                    removedLetters.forEach((letter) => {
+                        this.addLetterToPlayer(letter);
+                    });
                 } else {
                     // Score
                     this.validationService.updatePlayerScore(tempScrabbleWords, player);
                     // Take new letters
                     const newLetters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-                    this.addRackLetters(newLetters)
-                    newLetters.forEach(letter => { this.addLetterToPlayer(letter) });
+                    this.addRackLetters(newLetters);
+                    newLetters.forEach((letter) => {
+                        this.addLetterToPlayer(letter);
+                    });
                 }
                 this.changeTurn();
             });
-            console.log("place result after await:", errorResult);
-            console.log("localplayer shouldnt be active:", this.game.localPlayer.isActive, ', timer should reset:', this.game.timerMs);
             return errorResult;
         }
-        console.log("return place result:", errorResult);
         return errorResult;
     }
     displayEndGameMessage() {
-        const endGameMessages = this.chatDisplayService.createEndGameMessages(this.game.stock.letterStock, this.game.localPlayer, this.game.opponentPlayer);
-        endGameMessages.forEach(message => {
+        const endGameMessages = this.chatDisplayService.createEndGameMessages(
+            this.game.stock.letterStock,
+            this.game.localPlayer,
+            this.game.opponentPlayer,
+        );
+        endGameMessages.forEach((message) => {
             this.chatDisplayService.addEntry(message);
         });
     }
@@ -267,6 +269,14 @@ export class SoloGameService {
         } else {
             this.game.localPlayer.score -= localPlayerPoints;
             this.game.opponentPlayer.score -= oppnentPlayerPoints;
+            if (this.game.localPlayer.score > this.game.opponentPlayer.score) {
+                this.game.localPlayer.isWinner = true;
+            } else if (this.game.localPlayer.score < this.game.opponentPlayer.score) {
+                this.game.opponentPlayer.isWinner = true;
+            } else {
+                this.game.localPlayer.isWinner = true;
+                this.game.opponentPlayer.isWinner = true;
+            }
         }
         clearInterval(this.intervalValue);
         this.game.timerMs = 0;
@@ -317,4 +327,3 @@ export class SoloGameService {
         return letters;
     }
 }
-

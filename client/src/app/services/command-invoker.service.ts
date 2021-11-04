@@ -18,7 +18,6 @@ export class CommandInvokerService {
         const isToDisplayRemotely = isExchangeCmd || command instanceof PassTurnCmd || command instanceof PlaceCmd;
         if (commandResult instanceof Promise) {
             await commandResult.then((executionResult: CommandResult) => {
-                console.log("await place result and then display");
                 this.displayExecutionResultMessages(executionResult, isExchangeCmd, isToDisplayRemotely);
             });
         } else {

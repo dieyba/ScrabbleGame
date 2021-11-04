@@ -12,10 +12,10 @@ export class GamePageComponent {
     private readonly server: string;
     constructor() {
         this.server = 'http://' + window.location.hostname + ':3000';
-        this.socket = SocketHandler.requestSocket(this.server)
+        this.socket = SocketHandler.requestSocket(this.server);
     }
     @HostListener('window:beforeunload', ['$event'])
-    public onBeforeUnload(event: any): any {
+    onBeforeUnload() {
         this.socket.emit('disconnect');
     }
 }

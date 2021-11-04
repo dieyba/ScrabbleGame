@@ -48,7 +48,7 @@ export class ScrabbleBoard {
 
     constructor(isRandom: boolean) {
         this.squares = [];
-        this.colorStock = []
+        this.colorStock = [];
         this.addColorToStock(SquareColor.DarkBlue, ColorQuantity.DarkBlue);
         this.addColorToStock(SquareColor.Teal, ColorQuantity.Teal);
         this.addColorToStock(SquareColor.Red, ColorQuantity.Red);
@@ -71,7 +71,7 @@ export class ScrabbleBoard {
     setSquareColor(i: number, j: number, color: SquareColor, isRandom: boolean) {
         if (this.squares[i][j].color === SquareColor.None && this.colorStock.length !== 0) {
             if (isRandom) {
-                let index = Math.floor(Math.random() * this.colorStock.length);
+                const index = Math.floor(Math.random() * this.colorStock.length);
                 this.squares[i][j].color = this.colorStock[index];
                 this.colorStock.splice(index, 1);
             } else {

@@ -75,7 +75,7 @@ export class ChatDisplayService {
         const remainingLettersMessage = 'Fin de partie - ' + scrabbleLetterstoString(remainingLetters);
         const firstPlayerMessage = firstPlayer.name + ' : ' + scrabbleLetterstoString(firstPlayer.letters);
         const secondPlayerMessage = secondPlayer.name + ' : ' + scrabbleLetterstoString(secondPlayer.letters);
-        let endGameMessage: ChatDisplayEntry[] = [];
+        const endGameMessage: ChatDisplayEntry[] = [];
         endGameMessage.push({
             color: ChatEntryColor.SystemColor,
             message: remainingLettersMessage,

@@ -18,8 +18,8 @@ import { WordBuilderService } from './word-builder.service';
 })
 export class MultiPlayerGameService extends SoloGameService {
     game: GameParameters;
-    private socket: io.Socket;
     areNewWordsValid: boolean = false;
+    private socket: io.Socket;
     private readonly server: string;
 
     constructor(
@@ -33,7 +33,7 @@ export class MultiPlayerGameService extends SoloGameService {
         super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService);
         this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
-        this.socket.on('timer reset', (timer: number) => {
+        this.socket.on('timer reset', () => {
             this.updateActivePlayer();
             this.resetTimer();
         });
@@ -56,7 +56,7 @@ export class MultiPlayerGameService extends SoloGameService {
 
     initializeGame2(game: GameParameters) {
         this.game = game;
-        this.game.stock = new LetterStock()
+        this.game.stock = new LetterStock();
         const localPlayerIndex = this.socket.id === this.game.players[0].socketId ? 0 : 1;
         const opponentPlayerIndex = this.socket.id === this.game.players[0].socketId ? 1 : 0;
         this.game.localPlayer = new LocalPlayer(game.gameRoom.playersName[localPlayerIndex]);

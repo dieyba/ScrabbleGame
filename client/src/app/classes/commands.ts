@@ -2,6 +2,7 @@ import { Player } from '@app/classes/player';
 import { ChatDisplayService } from '@app/services/chat-display.service';
 import { GameService } from '@app/services/game.service';
 import { ChatDisplayEntry } from './chat-display-entry';
+import { Axis } from './utilities';
 import { Vec2 } from './vec2';
 
 export enum CommandName {
@@ -19,7 +20,7 @@ export interface DefaultCommandParams {
 
 export interface PlaceParams {
     position: Vec2;
-    orientation: string;
+    orientation: Axis;
     word: string;
 }
 

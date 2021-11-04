@@ -19,7 +19,7 @@ const DEFAULT_HEIGHT = 600;
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
 /* eslint-disable  no-unused-expressions */
-describe('GameService', () => {
+describe('SoloGameService', () => {
     let service: SoloGameService;
     let changeActivePlayerSpy: jasmine.Spy<any>;
     let secondsToMinutesSpy: jasmine.Spy<any>;

@@ -17,9 +17,6 @@ import * as io from 'socket.io-client';
 })
 export class WaitingAreaComponent {
     // mettre server dans un ficher pour les constantes
-    private readonly server: string;
-    private timer: any;
-    private socket: io.Socket;
     selectedGame: GameParameters;
     playerName: FormControl;
     playerList: string[];
@@ -32,14 +29,16 @@ export class WaitingAreaComponent {
     joindre: boolean;
     full: boolean;
     gameCancelled: boolean;
-
+    private readonly server: string;
+    private timer: any;
+    private socket: io.Socket;
 
     constructor(
         private multiManService: MultiPlayerGameService,
         private router: Router,
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
         private dialog: MatDialog,
-        public gameList: GameListService, 
+        public gameList: GameListService,
         @Inject(MAT_DIALOG_DATA) public gameSelected: boolean,
     ) {
         this.server = 'http://' + window.location.hostname + ':3000';
@@ -67,11 +66,11 @@ export class WaitingAreaComponent {
             this.multiManService.initializeGame2(game);
             this.socket.emit('deleteRoom');
         });
-        this.socket.on('roomdeleted', (game: GameParameters) => {
+        this.socket.on('roomdeleted', () => {
             this.joindre = false;
             this.nameValid = false;
             this.gameCancelled = true;
-        })
+        });
     }
     onSelect(game: GameParameters): GameParameters {
         if (this.gameSelected) {
@@ -86,7 +85,7 @@ export class WaitingAreaComponent {
         return false;
     }
     startIfFull(): void {
-        if (this.playerList.length == 2) {
+        if (this.playerList.length === 2) {
             this.isStarting = true;
             clearInterval(this.timer);
             this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
