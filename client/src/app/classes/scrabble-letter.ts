@@ -1,4 +1,5 @@
 import { Square, SquareColor } from './square';
+import { removeAccents } from './utilities';
 
 export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;
@@ -50,6 +51,6 @@ export class ScrabbleLetter {
         this.value = DARK_BLUE_FACTOR * this.value;
     }
     setLetter(character: string): void {
-        this.character = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        this.character = removeAccents(character);
     }
 }
