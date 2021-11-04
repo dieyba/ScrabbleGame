@@ -32,8 +32,9 @@ const LOCAL_PLAYER_INDEX = 0;
 })
 export class SoloGameService {
     game: GameParameters;
-    isVirtualPlayerObservable: Observable<boolean>;
-    virtualPlayerSubject: BehaviorSubject<boolean>;
+    opponentPlayerObservable: Observable<boolean>;
+    opponentPlayerSubject: BehaviorSubject<boolean>;
+    timeoutObservable: Observable<boolean>;
     timer: string;
     intervalValue: NodeJS.Timeout;
 
@@ -66,8 +67,8 @@ export class SoloGameService {
         return this.game;
     }
     createNewGame() {
-        this.virtualPlayerSubject = new BehaviorSubject<boolean>(this.game.opponentPlayer.isActive);
-        this.isVirtualPlayerObservable = this.virtualPlayerSubject.asObservable();
+        this.opponentPlayerSubject = new BehaviorSubject<boolean>(this.game.opponentPlayer.isActive);
+        this.opponentPlayerObservable = this.opponentPlayerSubject.asObservable();
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
         this.chatDisplayService.initialize(this.game.localPlayer.name);
@@ -119,7 +120,7 @@ export class SoloGameService {
         this.updateConsecutivePassedTurns();
         this.updateActivePlayer();
         this.resetTimer();
-        if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
+        if (this.game.opponentPlayer.isActive) this.opponentPlayerSubject.next(this.game.opponentPlayer.isActive);
         this.game.isTurnPassed = false; // reset isTurnedPassed when new turn starts
     }
     // Check if last 5 turns have been passed (by the command or the timer running out) (current turn is the 6th)

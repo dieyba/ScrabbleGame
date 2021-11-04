@@ -78,13 +78,14 @@ export class PlayAreaComponent implements AfterViewInit {
         this.rackService.drawRack();
         this.rackContext = this.rackService.gridContext;
 
-        if (!this.gameService.isMultiplayerGame) {
-            this.gameService.currentGameService.isVirtualPlayerObservable.subscribe((isActive: boolean) => {
-                if (isActive && !this.gameService.currentGameService.game.isEndGame) {
+        this.gameService.currentGameService.opponentPlayerObservable.subscribe((isActive: boolean) => {
+            if (isActive && !this.gameService.currentGameService.game.isEndGame) {
+                if (!this.gameService.isMultiplayerGame) {
                     this.virtualPlayerService.playTurn();
                 }
-            });
-        }
+                this.mouseWordPlacerService.onBlur();
+            }
+        });
     }
 
     passTurn() {
