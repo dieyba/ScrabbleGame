@@ -56,8 +56,8 @@ export class SoloGameService {
         this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.game.randomBonus = gameInfo.controls.bonus.value;
-        this.game.totalCountDown = gameInfo.controls.timer.value;
-        this.game.timerMs = gameInfo.controls.timer.value;
+        this.game.totalCountDown = +gameInfo.controls.timer.value;
+        this.game.timerMs = +gameInfo.controls.timer.value;
         const starterPlayerIndex = Math.round(Math.random()); // return 0 or 1
         const starterPlayer = starterPlayerIndex === LOCAL_PLAYER_INDEX ? this.game.localPlayer : this.game.opponentPlayer;
         starterPlayer.isActive = true;
@@ -112,11 +112,16 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
+    // TODO: override dans multiplayer
     changeTurn() {
         this.updateHasTurnsBeenPassed(this.game.isTurnPassed);
         this.game.timerMs = 0;
         this.secondsToMinutes();
         this.changeActivePlayer();
+
+        // if (this.game.opponentPlayer.isActive) {
+        //     this.playVirtualPlayerturn(); // this method woud be observed in the vp service which then executes its playTurn()?
+        // }
     }
     // If the turn was changed by a pass command, add passed turn as true in the turns history
     updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
@@ -240,6 +245,8 @@ export class SoloGameService {
                         this.addLetterToPlayer(letter);
                     });
                 }
+            }).then(() => {
+                console.log("place result after await:", errorResult);
                 this.changeTurn();
             });
             return errorResult;

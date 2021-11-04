@@ -45,6 +45,7 @@ export class WaitingAreaComponent {
         this.playerList = [];
         this.list = [];
         this.name = false;
+        this.isStarting = false;
         if (gameSelected) {
             this.selectedGame = new GameParameters('', 0, false);
             this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
@@ -72,18 +73,21 @@ export class WaitingAreaComponent {
             this.gameCancelled = true;
         });
     }
+
     onSelect(game: GameParameters): GameParameters {
         if (this.gameSelected) {
             this.selectedGame = game;
         }
         return this.selectedGame;
     }
+
     openName(selected: boolean): boolean {
         if (this.gameSelected) {
             return (this.name = selected);
         }
         return false;
     }
+
     startIfFull(): void {
         if (this.playerList.length === 2) {
             this.isStarting = true;
@@ -91,6 +95,7 @@ export class WaitingAreaComponent {
             this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
         }
     }
+
     start(): void {
         if (this.selectedGame.gameRoom.playersName.length === 1) {
             this.nameValid = true;
@@ -99,6 +104,7 @@ export class WaitingAreaComponent {
             this.full = true;
         }
     }
+
     confirmName(game: GameParameters) {
         if (this.playerName.value === game.creatorPlayer.name) {
             this.error = true;
@@ -109,6 +115,7 @@ export class WaitingAreaComponent {
             this.nameErrorMessage = 'Votre nom est valide ;) ';
         }
     }
+
     deleteRoom() {
         this.gameList.deleteRoom();
     }
@@ -116,11 +123,13 @@ export class WaitingAreaComponent {
     openForm() {
         this.dialog.open(FormComponent, {});
     }
+
     convert(isSolo: boolean) {
         this.name = false;
         this.closeDialog();
         this.dialog.open(FormComponent, { data: isSolo });
     }
+    
     closeDialog() {
         this.name = false;
         this.dialogRef.close();
