@@ -25,6 +25,7 @@ import { RackComponent } from './components/rack/rack.component';
 import { TextEntryComponent } from './components/text-entry/text-entry.component';
 import { WaitingAreaComponent } from './components/waiting-area/waiting-area.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
+import { EndGamePopupComponent } from './components/end-game-popup/end-game-popup.component';
 
 /**
  * Main module that is used in main.ts.
@@ -51,6 +52,7 @@ import { AutofocusDirective } from './directives/autofocus.directive';
         FormComponent,
         WaitingAreaComponent,
         RackComponent,
+        EndGamePopupComponent,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     imports: [

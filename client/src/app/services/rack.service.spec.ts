@@ -79,4 +79,12 @@ describe('RackService', () => {
         expect(service.rackLetters.length).toEqual(7);
         expect(drawLetterSpy).not.toHaveBeenCalled();
     });
+
+    it('clearRack should clear rack and redraw letters', () => {
+        const drawRackSpy = spyOn<any>(service, 'drawRack').and.callThrough();
+        const drawExistingLettersSpy = spyOn<any>(service, 'drawExistingLetters').and.callThrough();
+        service.clearRack();
+        expect(drawRackSpy).toHaveBeenCalled();
+        expect(drawExistingLettersSpy).toHaveBeenCalled();
+    });
 });

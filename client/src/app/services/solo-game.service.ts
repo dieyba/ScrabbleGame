@@ -58,8 +58,8 @@ export class SoloGameService {
         this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.game.randomBonus = gameInfo.controls.bonus.value;
-        this.game.totalCountDown = gameInfo.controls.timer.value;
-        this.game.timerMs = gameInfo.controls.timer.value;
+        this.game.totalCountDown = +gameInfo.controls.timer.value;
+        this.game.timerMs = +gameInfo.controls.timer.value;
         const starterPlayerIndex = Math.round(Math.random()); // return 0 or 1
         const starterPlayer = starterPlayerIndex === LOCAL_PLAYER_INDEX ? this.game.localPlayer : this.game.opponentPlayer;
         starterPlayer.isActive = true;
@@ -196,7 +196,7 @@ export class SoloGameService {
         if (errorResult === ErrorType.NoError) {
             // Generate all words created
             let tempScrabbleWords: ScrabbleWord[];
-            if (placeParams.orientation === 'h') {
+            if (placeParams.orientation === Axis.H) {
                 tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
             } else {
                 tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
@@ -259,6 +259,14 @@ export class SoloGameService {
         } else {
             this.game.localPlayer.score -= localPlayerPoints;
             this.game.opponentPlayer.score -= oppnentPlayerPoints;
+            if (this.game.localPlayer.score > this.game.opponentPlayer.score) {
+                this.game.localPlayer.isWinner = true;
+            } else if (this.game.localPlayer.score < this.game.opponentPlayer.score) {
+                this.game.opponentPlayer.isWinner = true;
+            } else {
+                this.game.localPlayer.isWinner = true;
+                this.game.opponentPlayer.isWinner = true;
+            }
         }
         clearInterval(this.intervalValue);
         this.game.timerMs = 0;

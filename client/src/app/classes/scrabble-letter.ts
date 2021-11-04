@@ -13,7 +13,7 @@ export class ScrabbleLetter {
     tile: Square;
 
     constructor(letter: string, value?: number) {
-        const unplaced = -1;
+        const unplaced = UNPLACED;
         this.setLetter(letter);
         this.color = SquareColor.None;
         this.tile = new Square(unplaced, unplaced); // -1, -1 means it is not placed yet
