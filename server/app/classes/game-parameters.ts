@@ -28,24 +28,14 @@ export class GameParameters {
 
     constructor(creatorPlayerName: string, timer: number, randBonus: boolean, id: number) {
         this.players = new Array<Player>();
-        // this.creatorPlayer = new Player(creatorPlayerName, '');
-        // this.totalCountDown = timer;
-        this.dictionary = new Dictionary(0);
-        // this.randomBonus = isRandomBonus;
-        // this.stock = new LetterStock();
         this.hasTurnsBeenPassed = [false, false, false];
         this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
         this.gameRoom.idGame = id;
-        // this.dictionary = new Dictionary(0);
         this.localPlayer = new Player(creatorPlayerName, '');
         this.creatorPlayer = this.localPlayer;
         this.totalCountDown = timer;
         this.timerMs = +this.totalCountDown;
         this.stock = [];
-        // this.hasTurnsBeenPassed = [];
-        // this.isEndGame = false;
-        // this.turnPassed = false;
-        // this.randomBonus = isRandomBonus;
         this.scrabbleBoard = new ScrabbleBoard(randBonus);
     }
     addPlayer(player: Player) {

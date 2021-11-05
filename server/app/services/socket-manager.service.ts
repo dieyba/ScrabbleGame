@@ -27,11 +27,10 @@ export class SocketManagerService {
                 this.validateWords(socket, newWords);
             });
             socket.on('deleteRoom', (game: any) => {
-                // console.log('delete')
                 this.deleteRoom(socket);
                 this.getAllGames(socket);
             });
-            socket.on('addPlayer', (player: any, game: any) => {
+            socket.on('addPlayer', (player: Player) => {
                 this.addPlayer(socket, player);
                 this.getAllGames(socket);
             });
@@ -49,8 +48,7 @@ export class SocketManagerService {
                     this.displayChatEntry(socket, message);
                 }
             });
-            socket.on('leaveRoom', (player: any) => {
-                // console.log('catch')
+            socket.on('leaveRoom', () => {
                 this.leaveRoom(socket)
             });
             socket.on('sendSystemChatEntry', (message: string) => {
@@ -71,14 +69,11 @@ export class SocketManagerService {
             socket.on('playerQuit', () => {
                 this.displayPlayerQuitMessage(socket);
             });
-            socket.on('disconnect', (reason) => {
-                // setTimeout(() => {
+            socket.on('disconnect', () => {
                 console.log(`Deconnexion par l'utilisateur avec id : ${socket.id}`);
                 this.disconnect(socket)
-                // }, 5000);
             });
             socket.on('word placed', (word: any) => {
-                // console.log('emit word placed catched');
                 let sender = this.playerMan.getPlayerBySocketID(socket.id);
                 const opponent = this.gameListMan.getOtherPlayer(sender.getSocketId(), sender.roomId) as Player;
 
@@ -90,7 +85,6 @@ export class SocketManagerService {
                 this.sio.to(opponent?.getSocketId()).emit('letters exchange', update);
             });
             socket.on('place word', (update: any) => {
-                // console.log('emit place word catched');
                 let sender = this.playerMan.getPlayerBySocketID(socket.id);
                 const opponent = this.gameListMan.getOtherPlayer(sender.getSocketId(), sender.roomId) as Player;
                 this.sio.to(opponent?.getSocketId()).emit('update place', update);
@@ -131,14 +125,13 @@ export class SocketManagerService {
     }
     private deleteRoom(socket: io.Socket): void {
         let player = this.playerMan.getPlayerBySocketID(socket.id);
-        if (player) {
+        let roomGame = this.gameListMan.getGameFromExistingRooms(player.roomId) as GameParameters;
+        if (player !== undefined) {
             this.gameListMan.deleteRoom(player.roomId);
+            this.sio.emit('roomdeleted', roomGame);
         }
-        this.sio.emit('roomdeleted');
-
     }
     private leaveRoom(socket: io.Socket) {
-        console.log('leaveRoom')
         let player = this.playerMan.getPlayerBySocketID(socket.id);
         if (player !== undefined) {
             let roomGame = this.gameListMan.getCurrentGame(player.roomId) as GameParameters;
@@ -146,12 +139,17 @@ export class SocketManagerService {
                 roomGame.gameRoom.playersName.splice(roomGame.gameRoom.playersName.indexOf(player.name), 1);
                 roomGame.players.splice(roomGame.players.indexOf(player), 1);
                 if (roomGame.gameRoom.playersName.length === 0) {
-                    this.gameListMan.deleteRoom(player.roomId);
+                    this.gameListMan.currentGames.splice(this.gameListMan.currentGames.indexOf(roomGame), 1);
                 }
                 else {
                     this.displayPlayerQuitMessage(socket);
                     this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomLeft', roomGame);
                 }
+            }
+            else {
+                this.deleteRoom(socket);
+                this.getAllGames(socket)
+
             }
             socket.leave(player.roomId.toString());
         }
@@ -164,8 +162,8 @@ export class SocketManagerService {
     private getAllGames(socket: io.Socket) {
         this.sio.emit('getAllGames', this.gameListMan.existingRooms);
     }
-    private addPlayer(socket: io.Socket, player: any) {
-        this.playerMan.addPlayer(player.player.name, socket.id);
+    private addPlayer(socket: io.Socket, player: Player) {
+        this.playerMan.addPlayer(player.name, socket.id);
     }
     private joinRoom(socket: io.Socket, game: any) {
         let joiner = this.playerMan.getPlayerBySocketID(socket.id);

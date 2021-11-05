@@ -130,34 +130,6 @@ export class RackService {
         this.drawRack();
     }
 
-    // selectForHandling(position: number, ctx: CanvasRenderingContext2D) {
-    //     ctx.fillStyle = 'red';
-    //     this.handlingSelected[position - 1] = true;
-    //     this.handleExchangeSelection(position, ctx);
-    // }
-
-    // deselectForHandling(position: number, ctx: CanvasRenderingContext2D) {
-    //     ctx.fillStyle = 'white';
-    //     this.handlingSelected[position - 1] = false;
-    //     this.handleExchangeSelection(position, ctx);
-    //     this.drawRack();
-    // }
-
-    // selectForExchange(position: number, ctx: CanvasRenderingContext2D) {
-    //     // const squareOrigin = this.findSquareOrigin(position);
-    //     ctx.fillStyle = 'orange';
-    //     this.exchangeSelected[position - 1] = true;
-    //     this.handleExchangeSelection(position, ctx);
-    // }
-
-    // deselectForExchange(position: number, ctx: CanvasRenderingContext2D) {
-    //     // const squareOrigin = this.findSquareOrigin(position);
-    //     ctx.fillStyle = 'white';
-    //     this.exchangeSelected[position - 1] = false;
-    //     this.handleExchangeSelection(position, ctx);
-    //     this.drawRack();
-    // }
-
     deselectAll(ctx: CanvasRenderingContext2D) {
         for (let i = 0; i < this.exchangeSelected.length; i++) {
             this.deselect(i + 1, ctx, true);

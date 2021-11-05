@@ -156,7 +156,7 @@ export class SoloGameService {
     // New Turn
     changeActivePlayer() {
         this.updateActivePlayer();
-        // this.resetTimer();
+        this.resetTimer();
     }
     updateActivePlayer() {
         // Switch the active player
@@ -261,7 +261,6 @@ export class SoloGameService {
         }
         return errorResult;
     }
-
     displayEndGameMessage() {
         const endGameMessages = this.chatDisplayService.createEndGameMessages(
             this.stock.letterStock,

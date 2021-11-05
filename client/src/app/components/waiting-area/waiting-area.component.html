@@ -43,7 +43,7 @@
             </mat-form-field>
             <button class="small-btn" *ngIf="playerName.valid" (click)="confirmName(selectedGame)">Valider</button>
             <div *ngIf="gameCancelled">
-                <h3>Le Joueur a annulé la partie, veuillez selectionner une autre partie</h3>
+                <h3>La partie #{{ roomDeletedId }} a été supprimé, veuillez selectionner une autre partie si vous souhaitiez la joindre</h3>
             </div>
             <div class="row" *ngIf="joindre">
                 <h3 class="column">Veuillez cliquer ici pour joindre la partie :</h3>

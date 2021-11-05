@@ -10,8 +10,8 @@ export namespace SocketHandler {
         return activeSocket;
     }
 
-    export function disconnectSocket(): any {
-        activeSocket.disconnect();
-        return activeSocket === undefined;
-    }
+    // export function disconnectSocket(): any {
+    //     activeSocket.disconnect();
+    //     return activeSocket === undefined;
+    // }
 }

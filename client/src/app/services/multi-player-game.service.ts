@@ -68,9 +68,6 @@ export class MultiPlayerGameService extends SoloGameService {
             this.game.opponentPlayer.letters = update.newLetters;
             this.game.opponentPlayer.score = update.newScore;
         });
-        // TODO: add a socket.on 'synchronize' for board and player or something
-        // Need to have the opponent player letters syncrhonized on both clients for the displayEndGameMessage(),
-        // or ill pass it when emitting end game ig but its simpler to just synchronize when exchange/place
     }
     override initializeGame(gameInfo: FormGroup): GameParameters {
         this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value, gameInfo.controls.bonus.value);
@@ -98,27 +95,17 @@ export class MultiPlayerGameService extends SoloGameService {
 
         this.game.localPlayer = new LocalPlayer(game.gameRoom.playersName[localPlayerIndex]);
         this.game.localPlayer.letters = this.socket.id === this.game.players[0].socketId ? this.game.creatorPlayer.letters : this.game.opponentPlayer.letters;
-        // this.game.opponentPlayer = new LocalPlayer(game.gameRoom.playersName[opponentPlayerIndex]);
-
-        // this.game.opponentPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        // this.game.localPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
 
         this.game.localPlayer.isActive = this.game.players[localPlayerIndex].isActive;
         this.game.opponentPlayer.isActive = this.game.players[opponentPlayerIndex].isActive;
-        // this.game.localPlayer = this.socket.id === this.game.creatorPlayer.socketId ? this.game.creatorPlayer : this.game.opponentPlayer;
-        /// todo c'est ici que le 2e rejoint pour randomize qui joue en 1er
-        console.log('les joueurs dans le initialize2 : ', this.game);
     }
 
     override async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
         const errorResult = super.place(player, placeParams);
-        // la fonction peut retourner NoError mais le mot n'appartient pas au dictionnaire, a regler
+        // la fonction peut retourner NoError mais le mot n'appartient pas au dictionnaire ?
         if (await errorResult === ErrorType.NoError) {
-            console.log('avant les emits');
             this.socket.emit('word placed', { word: placeParams.word, orientation: placeParams.orientation, positionX: placeParams.position.x, positionY: placeParams.position.y });
-            console.log('avant le emit');
             this.socket.emit('place word', { stock: this.stock.letterStock, newLetters: player.letters, newScore: player.score });
-            console.log('apres les emits');
         }
         return errorResult;
     }
@@ -131,6 +118,7 @@ export class MultiPlayerGameService extends SoloGameService {
         return errorResult;
     }
 
+    // TO DO : eviter la duplication de code
     updateBoard(word: string, orientation: string, position: Vec2) {
         if (orientation === 'h') {
             for (const letter of word) {
@@ -138,6 +126,8 @@ export class MultiPlayerGameService extends SoloGameService {
                 character.tile.position.x = position.x;
                 character.tile.position.y = position.y;
                 this.gridService.drawLetter(character, position.x, position.y);
+                this.gridService.scrabbleBoard.squares[position.x][position.y].isValidated = true;
+                this.gridService.scrabbleBoard.squares[position.x][position.y].isBonusUsed = true;
                 position.x++;
             }
         } else {
@@ -146,6 +136,7 @@ export class MultiPlayerGameService extends SoloGameService {
                 character.tile.position.x = position.x;
                 character.tile.position.y = position.y;
                 this.gridService.drawLetter(character, position.x, position.y);
+                this.gridService.scrabbleBoard.squares[position.x][position.y].isValidated = true;
                 position.y++;
             }
         }

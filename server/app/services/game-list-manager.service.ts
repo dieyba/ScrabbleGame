@@ -42,8 +42,7 @@ export class GameListManager {
         return room;
     }
     public addRoom(game: GameParameters): GameParameters {
-        // let newRoom = new GameParameters(game.creatorPlayer.name, game.totalCountDown, game.randomBonus, this.currentRoomID++, game.scrabbleBoard);
-        // newRoom = game;
+        ;
         game.creatorPlayer.roomId = game.gameRoom.idGame;
         game.setIdGame(game.gameRoom.idGame);
         this.existingRooms.push(game);

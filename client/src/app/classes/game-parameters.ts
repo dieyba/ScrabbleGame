@@ -21,7 +21,7 @@ export interface GameRoom {
 }
 
 export class GameParameters {
-    gameRoom: GameRoom; // = { idGame: 15, capacity: 2, playersName: new Array<string>() };
+    gameRoom: GameRoom;
     players: Player[];
     localPlayer: Player;
     opponentPlayer: Player;
@@ -39,7 +39,6 @@ export class GameParameters {
 
     constructor(creatorPlayerName: string, timer: number, isRandom: boolean) {
         this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
-        // this.dictionary = new Dictionary(0);
         this.creatorPlayer = new LocalPlayer(creatorPlayerName)
         this.creatorPlayer.isActive = true
         this.localPlayer = new LocalPlayer(creatorPlayerName);

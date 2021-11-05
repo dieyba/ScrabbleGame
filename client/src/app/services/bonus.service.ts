@@ -24,11 +24,9 @@ export class BonusService {
         this.pinkBonusCount = 0;
         this.redBonusCount = 0;
         let total = 0;
-        console.log('ey');
         for (let i = 0; i < scrabbleWord.content.length; i++) {
             // Account for letter pale/dark blue bonuses
             if (scrabbleWord.orientation === Axis.H) {
-                console.log('position : ', this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y]);
                 if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed) {
                     total += this.calculateValue(
                         scrabbleWord.content[i],

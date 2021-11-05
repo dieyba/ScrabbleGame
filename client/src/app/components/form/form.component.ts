@@ -13,7 +13,6 @@ import { WaitingAreaComponent } from '../waiting-area/waiting-area.component';
     styleUrls: ['./form.component.scss'],
 })
 export class FormComponent implements OnInit {
-    // mode: ClassicModeComponent;
     myForm: FormGroup;
     name: FormControl;
     timer: FormControl;
@@ -25,7 +24,6 @@ export class FormComponent implements OnInit {
     selectedPlayer: string;
     random: number;
     dictionary: string;
-    // singleGame: GameParameters;
 
     defaultTimer: string;
     defaultDictionary: string;

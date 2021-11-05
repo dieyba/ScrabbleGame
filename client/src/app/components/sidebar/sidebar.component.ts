@@ -21,8 +21,6 @@ export class SidebarComponent {
         this.socket = SocketHandler.requestSocket(this.server);
         this.winnerName = '';
         this.socket.on('roomLeft', (game: GameParameters) => {
-            console.log('left')
-            // let playerWinner = ;
             this.gameService.currentGameService.game.localPlayer.isWinner = true;
             this.gameService.currentGameService.game.isEndGame = true;
         })
@@ -96,7 +94,6 @@ export class SidebarComponent {
         }
     }
     quitGame(): void {
-        console.log('quitGame')
         // calls server to display message in opponent's chat box 
         // this.socket.emit('playerQuit');
         // User confirmation popup
@@ -106,7 +103,7 @@ export class SidebarComponent {
         this.dialogRef.afterClosed().subscribe((confirmQuit) => {
             if (confirmQuit) {
                 this.socket.emit('leaveRoom')
-                this.socket = SocketHandler.disconnectSocket();
+                // this.socket = SocketHandler.disconnectSocket();
                 this.router.navigate(['/start']);
             }
         });
@@ -125,11 +122,6 @@ export class SidebarComponent {
         </div> `,
 })
 export class EndGamePopupComponent {
-    // private readonly server = 'http://' + window.location.hostname + ':3000';
-    // private socket: io.Socket;
     constructor(@Optional() public dialogReference: MatDialogRef<unknown>,) {}
-    //     disconnect() {
-    //         console.log('disconnect');
-    //         this.gameList.disconnectUser();
-    //     }
+
 }
