@@ -12,7 +12,7 @@ export enum GameType {
 }
 
 // TODO: vrm besoin de ça? players name peut appeler player attributs directement et capacité toujours 2
-// unless we plan to make a game with more than 2 players, 
+// unless we plan to make a game with more than 2 players
 // then having players instead of localPlayer/opponentPlayer would be better
 export interface GameRoom {
     idGame: number;
@@ -33,9 +33,10 @@ export class GameParameters {
     scrabbleBoard: ScrabbleBoard;
     stock: ScrabbleLetter[];
     isTurnPassed: boolean;
-    hasTurnsBeenPassed: boolean[];
+    consecutivePassedTurns: number;
     isEndGame: boolean;
     newWords: ScrabbleWord[];
+    hasTurnsBeenPassed: boolean[];
 
     constructor(creatorPlayerName: string, timer: number, isRandom: boolean) {
         this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
@@ -47,6 +48,7 @@ export class GameParameters {
         this.opponentPlayer = new LocalPlayer('')
         this.stock = [];
         this.hasTurnsBeenPassed = [];
+        this.consecutivePassedTurns = 0;
         this.isEndGame = false;
         this.isTurnPassed = false;
         this.randomBonus = isRandom;

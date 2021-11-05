@@ -17,9 +17,6 @@ import * as io from 'socket.io-client';
 })
 export class WaitingAreaComponent {
     // mettre server dans un ficher pour les constantes
-    private readonly server: string;
-    private timer: any;
-    private socket: io.Socket;
     selectedGame: GameParameters;
     playerName: FormControl;
     playerList: string[];
@@ -33,7 +30,9 @@ export class WaitingAreaComponent {
     joindre: boolean;
     full: boolean;
     gameCancelled: boolean;
-
+    private readonly server: string;
+    private timer: any;
+    private socket: io.Socket;
 
     constructor(
         private multiManService: MultiPlayerGameService,
@@ -48,6 +47,7 @@ export class WaitingAreaComponent {
         this.playerList = [];
         this.list = [];
         this.name = false;
+        this.isStarting = false;
         if (gameSelected) {
             this.selectedGame = new GameParameters('', 0, false);
             this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(12), Validators.minLength(3)]);
@@ -117,7 +117,7 @@ export class WaitingAreaComponent {
     }
 
     startIfFull(): void {
-        if (this.playerList.length == 2) {
+        if (this.playerList.length === 2) {
             this.isStarting = true;
             clearInterval(this.timer);
             this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
@@ -151,11 +151,13 @@ export class WaitingAreaComponent {
     openForm() {
         this.dialog.open(FormComponent, {});
     }
+
     convert(isSolo: boolean) {
         this.name = false;
         this.closeDialog();
         this.dialog.open(FormComponent, { data: isSolo });
     }
+
     closeDialog() {
         this.name = false;
         this.dialogRef.close();

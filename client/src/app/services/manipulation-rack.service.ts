@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
+import { ERROR_NUMBER } from '@app/classes/utilities';
 import { RackService } from './rack.service';
-
-const ERROR_NUMBER = -1;
 
 @Injectable({
     providedIn: 'root',

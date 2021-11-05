@@ -8,6 +8,7 @@ import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
+import { BehaviorSubject } from 'rxjs';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 import { SoloGameService } from './solo-game.service';
@@ -19,7 +20,7 @@ const DEFAULT_HEIGHT = 600;
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
 /* eslint-disable  no-unused-expressions */
-describe('GameService', () => {
+describe('SoloGameService', () => {
     let service: SoloGameService;
     let changeActivePlayerSpy: jasmine.Spy<any>;
     let secondsToMinutesSpy: jasmine.Spy<any>;
@@ -68,8 +69,7 @@ describe('GameService', () => {
         const myForm = new FormGroup({ name, timer, bonus, dictionaryForm, level, opponent });
         service.initializeGame(myForm);
         expect(service.game.creatorPlayer.name).toEqual('Ariane');
-        expect(service.game.creatorPlayer.letters.length).toEqual(0);
-        expect(service.game.creatorPlayer.isActive).toEqual(true);
+        expect(service.game.creatorPlayer.letters.length).toEqual(7);
         expect(service.game.opponentPlayer.name).toEqual('Sara');
         expect(service.game.opponentPlayer.letters.length).toEqual(7);
         expect(service.game.totalCountDown).toEqual(60);
@@ -79,14 +79,16 @@ describe('GameService', () => {
     });
 
     it('createNewGame should clear scrabble board and fill rack', () => {
-        service.game.creatorPlayer = new LocalPlayer('Ariane');
+        service.game.localPlayer = new LocalPlayer('Ariane');
+        service.game.opponentPlayer = new VirtualPlayer('Sara', Difficulty.Easy);
         const firstLetter: ScrabbleLetter = new ScrabbleLetter('D', 1);
         const secondLetter: ScrabbleLetter = new ScrabbleLetter('e', 2);
         const thirdLetter: ScrabbleLetter = new ScrabbleLetter('j', 3);
-        service.game.creatorPlayer.letters = [firstLetter, secondLetter, thirdLetter];
+        service.game.localPlayer.letters = [firstLetter, secondLetter, thirdLetter];
+        service.game.opponentPlayer.isActive = true;
+        service.game.localPlayer.isActive = false;
         rackServiceSpy.gridContext = ctxStub;
         service.createNewGame();
-        expect(rackServiceSpy.addLetter).toHaveBeenCalled();
         expect(addRackLettersSpy).toHaveBeenCalled();
         expect(startCountdownSpy).toHaveBeenCalled();
     });
@@ -104,36 +106,42 @@ describe('GameService', () => {
     });
 
     it('when localPlayer is active, changeActivePlayer should set game.opponentPlayer to active', () => {
-        service.game.creatorPlayer = new LocalPlayer('Ariane');
+        service.game.localPlayer = new LocalPlayer('Ariane');
         service.game.opponentPlayer = new VirtualPlayer('Sara', Difficulty.Easy);
-        service.game.creatorPlayer.letters = [new ScrabbleLetter('D', 1)];
-        service.game.creatorPlayer.isActive = true;
+        service.game.localPlayer.letters = [new ScrabbleLetter('D', 1)];
+        service.game.localPlayer.isActive = true;
+        service.game.opponentPlayer.isActive = false;
         service.changeActivePlayer();
         expect(secondsToMinutesSpy).toHaveBeenCalled();
         expect(startCountdownSpy).toHaveBeenCalled();
-        expect(service.game.creatorPlayer.isActive).toEqual(false);
+        expect(service.game.localPlayer.isActive).toEqual(false);
         expect(service.game.opponentPlayer.isActive).toEqual(true);
     });
 
     it('when game.opponentPlayer is active, changeActivePlayer should set localPlayer to active', () => {
-        service.game.creatorPlayer = new LocalPlayer('Ariane');
+        service.game.localPlayer = new LocalPlayer('Ariane');
         service.game.opponentPlayer = new VirtualPlayer('Sara', Difficulty.Easy);
         service.game.opponentPlayer.letters = [new ScrabbleLetter('D', 1)];
         service.game.opponentPlayer.isActive = true;
+        service.game.localPlayer.isActive = false;
         service.changeActivePlayer();
-        expect(service.game.creatorPlayer.isActive).toEqual(true);
+        expect(service.game.localPlayer.isActive).toEqual(true);
         expect(service.game.opponentPlayer.isActive).toEqual(false);
     });
 
     it('passTurn should make game.opponentPlayer active and clear interval', () => {
-        service.game.creatorPlayer = new LocalPlayer('Ariane');
+        service.game.localPlayer = new LocalPlayer('Ariane');
         service.game.opponentPlayer = new VirtualPlayer('Sara', Difficulty.Easy);
-        service.game.creatorPlayer.letters = [new ScrabbleLetter('D', 1)];
-        service.game.creatorPlayer.isActive = true;
-        service.passTurn(service.game.creatorPlayer);
+        service.game.localPlayer.letters = [new ScrabbleLetter('D', 1)];
+        service.game.localPlayer.isActive = true;
+        service.game.opponentPlayer.isActive = false;
+        service.virtualPlayerSubject = new BehaviorSubject<boolean>(service.game.localPlayer.isActive);
+        service.isVirtualPlayerObservable = service.virtualPlayerSubject.asObservable();
+        service.virtualPlayerSubject.next(true);
+        service.passTurn(service.game.localPlayer);
         expect(changeActivePlayerSpy).toHaveBeenCalled();
         expect(secondsToMinutesSpy).toHaveBeenCalled();
-        expect(service.game.creatorPlayer.isActive).toEqual(false);
+        expect(service.game.localPlayer.isActive).toEqual(false);
         expect(service.game.opponentPlayer.isActive).toEqual(true);
     });
 
@@ -165,16 +173,17 @@ describe('GameService', () => {
         service.game.opponentPlayer = new VirtualPlayer('Ariane', Difficulty.Easy);
         service.game.opponentPlayer.isActive = false;
 
-        const spy = spyOn(service.game.creatorPlayer, 'addLetter').and.callThrough();
+        const addRackLetterSpy = spyOn(service, 'addRackLetter').and.callThrough();
+        const addLetterToPlayerSpy = spyOn(service, 'addLetterToPlayer').and.callThrough();
         service.exchangeLetters(service.game.creatorPlayer, 'b');
-        expect(spy).not.toHaveBeenCalled();
         expect(rackServiceSpy.removeLetter).not.toHaveBeenCalled();
-        expect(rackServiceSpy.addLetter).not.toHaveBeenCalled();
+        expect(addRackLetterSpy).not.toHaveBeenCalled();
+        expect(addLetterToPlayerSpy).not.toHaveBeenCalled();
 
         service.exchangeLetters(service.game.creatorPlayer, 'a');
-        expect(spy).toHaveBeenCalled();
         expect(rackServiceSpy.removeLetter).toHaveBeenCalled();
-        expect(rackServiceSpy.addLetter).toHaveBeenCalled();
+        expect(addRackLetterSpy).toHaveBeenCalled();
+        expect(addLetterToPlayerSpy).toHaveBeenCalled();
     });
 
     it('exchange not possible when local player dont have the letters or stock barely empty', () => {

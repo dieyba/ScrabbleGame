@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ERROR_NUMBER } from '@app/classes/utilities';
 
 export const RACK_WIDTH = 500;
 export const RACK_HEIGHT = 60;
@@ -54,7 +55,7 @@ export class RackService {
     }
 
     removeLetter(scrabbleLetter: ScrabbleLetter): number {
-        let pos = -1;
+        let pos = ERROR_NUMBER;
         for (let i = 0; i < this.rackLetters.length; i++) {
             if (this.rackLetters[i].character === scrabbleLetter.character) {
                 this.rackLetters.splice(i, 1);

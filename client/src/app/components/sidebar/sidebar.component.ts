@@ -1,10 +1,11 @@
-import { Component, Optional } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GameParameters } from '@app/classes/game-parameters';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
+import { EndGamePopupComponent } from '../end-game-popup/end-game-popup.component';
 @Component({
     selector: 'app-sidebar',
     templateUrl: './sidebar.component.html',
@@ -85,17 +86,14 @@ export class SidebarComponent {
         if (this.isDrawnGame()) {
             this.winnerName =
                 this.gameService.currentGameService.game.localPlayer.name + ' et ' + this.gameService.currentGameService.game.opponentPlayer.name;
-        }
-        if (this.gameService.currentGameService.game.localPlayer.isWinner) {
+        } else if (this.gameService.currentGameService.game.localPlayer.isWinner) {
             this.winnerName = this.gameService.currentGameService.game.localPlayer.name;
-        }
-        if (this.gameService.currentGameService.game.opponentPlayer.isWinner) {
+        } else if (this.gameService.currentGameService.game.opponentPlayer.isWinner) {
             this.winnerName = this.gameService.currentGameService.game.opponentPlayer.name;
         }
     }
+
     quitGame(): void {
-        // calls server to display message in opponent's chat box 
-        // this.socket.emit('playerQuit');
         // User confirmation popup
         this.dialogRef = this.dialog.open(EndGamePopupComponent);
 
@@ -104,24 +102,11 @@ export class SidebarComponent {
             if (confirmQuit) {
                 this.socket.emit('leaveRoom')
                 // this.socket = SocketHandler.disconnectSocket();
+                // calls server to display message in opponent's chat box
+                // this.socket.emit('playerQuit');
                 this.router.navigate(['/start']);
             }
         });
     }
 }
 
-@Component({
-    template: `<h1 md-dialog-title>Fin de la partie</h1>
-
-        <div md-dialog-content>Êtes-vous sûr/sûre de vouloir partir?</div>
-
-        <div md-dialog-actions align="center">
-            <button md-raised-button color="warn" (click)="dialogReference.close(true)">OUI</button>
-            <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
-            <button id="cancelQuitButton" md-raised-button color="primary" (click)="dialogReference.close(false)">NON</button>
-        </div> `,
-})
-export class EndGamePopupComponent {
-    constructor(@Optional() public dialogReference: MatDialogRef<unknown>,) {}
-
-}

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter, UNPLACED } from '@app/classes/scrabble-letter';
 import { Square, SquareColor } from '@app/classes/square';
+import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 
 export enum Colors {
@@ -244,15 +245,15 @@ export class GridService {
         this.drawLetters();
     }
 
-    removeInvalidLetters(coord: Vec2, length: number, orientation: string): ScrabbleLetter[] {
+    removeInvalidLetters(coord: Vec2, length: number, orientation: Axis): ScrabbleLetter[] {
         const removedScrabbleLetters: ScrabbleLetter[] = [];
         for (let i = 0; i < length; i++) {
-            if (orientation === 'v') {
+            if (orientation === Axis.V) {
                 if (this.scrabbleBoard.squares[coord.x][coord.y + i].isValidated === false) {
                     removedScrabbleLetters.push(this.removeSquare(coord.x, coord.y + i));
                 }
             }
-            if (orientation === 'h') {
+            if (orientation === Axis.H) {
                 if (this.scrabbleBoard.squares[coord.x + i][coord.y].isValidated === false) {
                     removedScrabbleLetters.push(this.removeSquare(coord.x + i, coord.y));
                 }

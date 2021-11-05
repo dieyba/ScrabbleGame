@@ -99,12 +99,13 @@ export class LetterStock {
     }
 
     takeLetter(letter: string): ScrabbleLetter {
-        for (const l of this.letterStock) {
-            if (l.character === letter) {
-                return l;
+        for (let i = 0; i < this.letterStock.length; i++) {
+            if (this.letterStock[i].character === letter) {
+                this.letterStock.splice(i, 1);
+                return this.letterStock[i];
             }
         }
-        return new ScrabbleLetter(letter);
+        return new ScrabbleLetter('');
     }
 
     isEmpty(): boolean {
