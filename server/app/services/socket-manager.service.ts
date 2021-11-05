@@ -27,12 +27,11 @@ export class SocketManagerService {
             socket.on('validateWords', (newWords: string[]) => {
                 this.validateWords(socket, newWords);
             });
-            socket.on('deleteRoom', (game: any) => {
-                // console.log('delete')
+            socket.on('deleteRoom', () => {
                 this.deleteRoom(socket);
                 this.getAllGames(socket);
             });
-            socket.on('addPlayer', (player: any, game: any) => {
+            socket.on('addPlayer', (player: Player) => {
                 this.addPlayer(socket, player);
                 this.getAllGames(socket);
             });
@@ -50,8 +49,7 @@ export class SocketManagerService {
                     this.displayChatEntry(socket, message);
                 }
             });
-            socket.on('leaveRoom', (player: any) => {
-                // console.log('catch')
+            socket.on('leaveRoom', () => {
                 this.leaveRoom(socket)
             });
             socket.on('sendSystemChatEntry', (message: string) => {
@@ -60,7 +58,7 @@ export class SocketManagerService {
             socket.on('getAllGames', (game: Array<GameParameters>) => {
                 this.getAllGames(socket);
             });
-            socket.on('reset timer', (timerMs: number) => {
+            socket.on('reset timer', () => {
                 this.resetTimer(socket);
             });
             socket.on('updateTurnsPassed', (isCurrentTurnedPassed: boolean, hasTurnsBeenPassed: boolean[]) => {
@@ -79,7 +77,6 @@ export class SocketManagerService {
                 // }, 5000);
             });
             socket.on('word placed', (word: any) => {
-                // console.log('emit word placed catched');
                 let sender = this.playerMan.getPlayerBySocketID(socket.id);
                 const opponent = this.gameListMan.getOtherPlayer(sender.getSocketId(), sender.roomId) as Player;
 
@@ -91,7 +88,6 @@ export class SocketManagerService {
                 this.sio.to(opponent?.getSocketId()).emit('letters exchange', update);
             });
             socket.on('place word', (update: any) => {
-                // console.log('emit place word catched');
                 let sender = this.playerMan.getPlayerBySocketID(socket.id);
                 const opponent = this.gameListMan.getOtherPlayer(sender.getSocketId(), sender.roomId) as Player;
                 this.sio.to(opponent?.getSocketId()).emit('update place', update);
@@ -165,8 +161,8 @@ export class SocketManagerService {
     private getAllGames(socket: io.Socket) {
         this.sio.emit('getAllGames', this.gameListMan.existingRooms);
     }
-    private addPlayer(socket: io.Socket, player: any) {
-        this.playerMan.addPlayer(player.player.name, socket.id);
+    private addPlayer(socket: io.Socket, player: Player) {
+        this.playerMan.addPlayer(player.name, socket.id);
     }
     private joinRoom(socket: io.Socket, game: any) {
         let joiner = this.playerMan.getPlayerBySocketID(socket.id);
