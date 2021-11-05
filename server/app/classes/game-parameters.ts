@@ -45,10 +45,4 @@ export class GameParameters {
             this.players.push(player);
         }
     }
-    setPlayerName(name: string) {
-        this.gameRoom.playersName.push(name);
-    }
-    setIdGame(id: number) {
-        this.gameRoom.idGame = id;
-    }
 }

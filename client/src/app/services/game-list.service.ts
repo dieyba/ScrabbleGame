@@ -37,7 +37,14 @@ export class GameListService {
     }
 
     createRoom(game: GameParameters): void {
-        this.socket.emit('createRoom', { name: game.creatorPlayer.name, timer: game.totalCountDown, board: game.randomBonus, creatorLetters: game.creatorPlayer.letters, opponentLetters: game.opponentPlayer.letters, stock: game.stock });
+        this.socket.emit('createRoom', {
+            name: game.creatorPlayer.name,
+            timer: game.totalCountDown,
+            board: game.randomBonus,
+            creatorLetters: game.creatorPlayer.letters,
+            opponentLetters: game.opponentPlayer.letters,
+            stock: game.stock
+        });
     }
     deleteRoom(): void {
         this.socket.emit('deleteRoom');

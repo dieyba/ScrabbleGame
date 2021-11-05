@@ -21,6 +21,9 @@ export class SidebarComponent {
         this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
         this.winnerName = '';
+        this.roomLeft()
+    }
+    roomLeft() {
         this.socket.on('roomLeft', (game: GameParameters) => {
             this.gameService.currentGameService.game.localPlayer.isWinner = true;
             this.gameService.currentGameService.game.isEndGame = true;

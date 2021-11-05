@@ -1,14 +1,13 @@
 import { GameParameters } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import { Service } from 'typedi';
-import { ValidationService } from './validation.service';
 
 @Service()
 export class GameListManager {
     existingRooms: Array<GameParameters>;
     currentGames: Array<GameParameters>;
     currentRoomID: number;
-    constructor(private validationService: ValidationService) {
+    constructor() {
         this.existingRooms = new Array<GameParameters>();
         this.currentGames = new Array<GameParameters>();
         this.currentRoomID = this.existingRooms.length;
@@ -26,25 +25,17 @@ export class GameListManager {
     getOtherPlayer(playerID: string, roomId: number): Player | undefined {
         const game = this.getCurrentGame(roomId);
         if (game) {
-            return game.players[0].getSocketId() === playerID ? game.players[1] : game.players[0];
+            return game.players[0].socketId === playerID ? game.players[1] : game.players[0];
         }
         return undefined;
     }
-    public validateNewWords(newWords: string[]): boolean {
-        if (this.validationService.validateWords(newWords)) {
-            return true;
-        } else {
-            return false
-        }
-    }
+
     public createRoom(game: GameParameters): GameParameters {
         let room = this.addRoom(game);
         return room;
     }
     public addRoom(game: GameParameters): GameParameters {
-        ;
         game.creatorPlayer.roomId = game.gameRoom.idGame;
-        game.setIdGame(game.gameRoom.idGame);
         this.existingRooms.push(game);
         return game;
     }

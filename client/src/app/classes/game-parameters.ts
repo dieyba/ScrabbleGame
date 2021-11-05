@@ -40,6 +40,7 @@ export class GameParameters {
 
     constructor(creatorPlayerName: string, timer: number, isRandom: boolean) {
         this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
+        this.players = [];
         this.creatorPlayer = new LocalPlayer(creatorPlayerName)
         this.creatorPlayer.isActive = true
         this.localPlayer = new LocalPlayer(creatorPlayerName);
