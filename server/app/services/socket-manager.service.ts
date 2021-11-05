@@ -1,3 +1,4 @@
+/* eslint-disable */ // TODO Remove and fix lint errors
 import { GameParameters } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import * as http from 'http';
