@@ -15,15 +15,12 @@ export class GamePageComponent {
     private socket: io.Socket;
     private readonly server: string;
     private canNavBack: boolean = false;
-    constructor(public router: Router, public dialog: MatDialog) {
+    constructor(private router: Router, private dialog: MatDialog) {
         this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
-        history.pushState(null, '', window.location.href);
-    }
-
-    @HostListener('window:beforeunload', ['$event'])
-    onBeforeUnload() {
-        this.socket.emit('disconnect');
+        if (this.router.url === '/game') {
+            history.pushState(null, '', window.location.href);
+        }
     }
 
     @HostListener('window:popstate', ['$event'])
@@ -36,15 +33,14 @@ export class GamePageComponent {
             this.dialogRef.afterClosed().subscribe((confirmQuit) => {
                 if (confirmQuit) {
                     // calls server to display message in opponent's chat box
-                    this.socket.emit('playerQuit');
+                    this.socket.emit('leaveRoom');
                     this.canNavBack = true;
-                    this.router.navigateByUrl('/');
-                    this.router.navigate(['/classic']);
+                    history.back();
                 } else {
+                    this.canNavBack = false;
                     history.pushState(null, '', window.location.href);
                 }
             });
-            this.socket.emit('disconnect');
         }
     }
 
