@@ -31,7 +31,10 @@ export class SocketManagerService {
                 this.createRoom(socket, game);
                 this.getAllGames(socket);
             });
-            socket.on('deleteRoom', (game: any) => {
+            socket.on('validateWords', (newWords: string[]) => {
+                this.validateWords(socket, newWords);
+            });
+            socket.on('deleteRoom', () => {
                 this.deleteRoom(socket);
                 this.getAllGames(socket);
             });
@@ -180,7 +183,6 @@ export class SocketManagerService {
 
     private validateWords(socket: io.Socket, newWords: string[]) {
         const result = this.validationService.validateWords(newWords);
-        console.log(newWords + " is valid : " + result);
         this.sio.to(socket.id).emit('areWordsValid', result);
     }
 
@@ -219,7 +221,7 @@ export class SocketManagerService {
     }
     private changeTurn(socket: io.Socket, isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) {
         const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId;
-        if (roomId) {
+        if (roomId !== undefined) {
             if (isCurrentTurnedPassed) {
                 consecutivePassedTurns++;
             } else {
