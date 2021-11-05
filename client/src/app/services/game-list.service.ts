@@ -23,23 +23,29 @@ export class GameListService {
         this.server = 'http://' + window.location.hostname + ':3000';
         this.existingRooms = new Array<GameParameters>();
         this.myRoom = new Array<GameRoom>();
-        this.socket = SocketHandler.requestSocket(this.server)
+        this.socket = SocketHandler.requestSocket(this.server);
         this.player = new LocalPlayer('');
         // this.roomInfo = new GameParameters('', 0, false);
         this.players = new Array<LocalPlayer>();
         this.full = false;
-        this.socket.emit('addPlayer', { player: this.player });
+        this.socket.emit('addPlayer', this.player);
         this.socket.on('getAllGames', (game: GameParameters[]) => {
             this.existingRooms = game;
         });
-
     }
     getList(): GameParameters[] {
         return this.existingRooms;
     }
 
     createRoom(game: GameParameters): void {
-        this.socket.emit('createRoom', { name: game.creatorPlayer.name, timer: game.totalCountDown, board: game.randomBonus, creatorLetters: game.creatorPlayer.letters, opponentLetters: game.opponentPlayer.letters, stock: game.stock });
+        this.socket.emit('createRoom', {
+            name: game.creatorPlayer.name,
+            timer: game.totalCountDown,
+            board: game.randomBonus,
+            creatorLetters: game.creatorPlayer.letters,
+            opponentLetters: game.opponentPlayer.letters,
+            stock: game.stock,
+        });
     }
     deleteRoom(): void {
         this.socket.emit('deleteRoom');
@@ -57,6 +63,6 @@ export class GameListService {
     // }
     someoneLeftRoom() {
         console.log('someoneLeftRoom');
-        this.socket.emit('leaveRoom')
+        this.socket.emit('leaveRoom');
     }
 }
