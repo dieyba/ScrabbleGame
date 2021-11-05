@@ -12,7 +12,7 @@ describe('Commands', () => {
     }
     const player = new LocalPlayer('Erika');
 
-    it('should ', () => {
+    it('should create an instance', () => {
         expect(new CommandTest(player)).toBeTruthy();
     });
 });

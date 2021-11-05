@@ -8,5 +8,4 @@ import { MatDialogRef } from '@angular/material/dialog';
 })
 export class EndGamePopupComponent {
   constructor(@Optional() public dialogReference: MatDialogRef<unknown>) {}
-
 }

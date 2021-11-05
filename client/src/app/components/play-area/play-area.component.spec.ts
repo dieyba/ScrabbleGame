@@ -50,7 +50,7 @@ describe('PlayAreaComponent', () => {
             declarations: [PlayAreaComponent],
             providers: [
                 { provide: GridService, useValue: gridServiceSpy },
-                { provide: GameService, useValue: gameServiceSpy },                
+                { provide: GameService, useValue: gameServiceSpy },
                 { provide: SoloGameService, useValue: soloGameServiceSpy },
                 { provide: RackService, useValue: rackServiceSpy },
                 { provide: CommandInvokerService, useValue: commandInvokerServiceSpy },
@@ -74,13 +74,13 @@ describe('PlayAreaComponent', () => {
         gameServiceSpy.currentGameService.game = new GameParameters(form.controls.name.value, +form.controls.timer.value, form.controls.bonus.value);
         gameServiceSpy.currentGameService.game.creatorPlayer = new LocalPlayer(form.controls.name.value);
         gameServiceSpy.currentGameService.game.creatorPlayer.isActive = true;
-        gameServiceSpy.currentGameService.game.stock = new LetterStock();
+        gameServiceSpy.currentGameService.stock = new LetterStock();
         gameServiceSpy.currentGameService.game.localPlayer = new LocalPlayer(form.controls.name.value);
         gameServiceSpy.currentGameService.game.creatorPlayer = gameServiceSpy.currentGameService.game.localPlayer;
         gameServiceSpy.currentGameService.game.opponentPlayer = new VirtualPlayer(form.controls.opponent.value, form.controls.level.value);
-        const localLetters = gameServiceSpy.currentGameService.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        const localLetters = gameServiceSpy.currentGameService.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         gameServiceSpy.currentGameService.game.localPlayer.letters = localLetters;
-        const opponentLetters = gameServiceSpy.currentGameService.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        const opponentLetters = gameServiceSpy.currentGameService.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         gameServiceSpy.currentGameService.game.opponentPlayer.letters = opponentLetters;
         gameServiceSpy.currentGameService.game.dictionary = new Dictionary(+form.controls.dictionaryForm.value);
         gameServiceSpy.currentGameService.game.randomBonus = form.controls.bonus.value;
