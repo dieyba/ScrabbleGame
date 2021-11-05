@@ -22,7 +22,7 @@ const DEFAULT_HEIGHT = 600;
 /* eslint-disable  no-unused-expressions */
 describe('SoloGameService', () => {
     let service: SoloGameService;
-    let changeActivePlayerSpy: jasmine.Spy<any>;
+    let changeTurnSpy: jasmine.Spy<any>;
     let secondsToMinutesSpy: jasmine.Spy<any>;
     let startCountdownSpy: jasmine.Spy<any>;
     let gridServiceSpy: jasmine.SpyObj<GridService>;
@@ -42,7 +42,7 @@ describe('SoloGameService', () => {
             ],
         });
         service = TestBed.inject(SoloGameService);
-        changeActivePlayerSpy = spyOn<any>(service, 'changeActivePlayer').and.callThrough();
+        changeTurnSpy = spyOn<any>(service, 'changeTurn').and.callThrough();
         secondsToMinutesSpy = spyOn<any>(service, 'secondsToMinutes').and.callThrough();
         startCountdownSpy = spyOn<any>(service, 'startCountdown').and.callThrough();
         addRackLettersSpy = spyOn<any>(service, 'addRackLetters').and.callThrough();
@@ -111,9 +111,7 @@ describe('SoloGameService', () => {
         service.game.localPlayer.letters = [new ScrabbleLetter('D', 1)];
         service.game.localPlayer.isActive = true;
         service.game.opponentPlayer.isActive = false;
-        service.changeActivePlayer();
-        expect(secondsToMinutesSpy).toHaveBeenCalled();
-        expect(startCountdownSpy).toHaveBeenCalled();
+        service.updateActivePlayer();
         expect(service.game.localPlayer.isActive).toEqual(false);
         expect(service.game.opponentPlayer.isActive).toEqual(true);
     });
@@ -124,7 +122,7 @@ describe('SoloGameService', () => {
         service.game.opponentPlayer.letters = [new ScrabbleLetter('D', 1)];
         service.game.opponentPlayer.isActive = true;
         service.game.localPlayer.isActive = false;
-        service.changeActivePlayer();
+        service.updateActivePlayer();
         expect(service.game.localPlayer.isActive).toEqual(true);
         expect(service.game.opponentPlayer.isActive).toEqual(false);
     });
@@ -139,7 +137,7 @@ describe('SoloGameService', () => {
         service.isVirtualPlayerObservable = service.virtualPlayerSubject.asObservable();
         service.virtualPlayerSubject.next(true);
         service.passTurn(service.game.localPlayer);
-        expect(changeActivePlayerSpy).toHaveBeenCalled();
+        expect(changeTurnSpy).toHaveBeenCalled();
         expect(secondsToMinutesSpy).toHaveBeenCalled();
         expect(service.game.localPlayer.isActive).toEqual(false);
         expect(service.game.opponentPlayer.isActive).toEqual(true);

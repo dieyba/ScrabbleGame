@@ -49,7 +49,7 @@ describe('SidebarComponent', () => {
         gameServiceSpy.currentGameService.game.opponentPlayer = new VirtualPlayer('Sara', Difficulty.Easy);
         gameServiceSpy.currentGameService.game.opponentPlayer.score = 70;
         gameServiceSpy.currentGameService.game.opponentPlayer.letters = [firstLetter, thirdLetter, firstLetter];
-        gameServiceSpy.currentGameService.game.stock = new LetterStock();
+        gameServiceSpy.currentGameService.stock = new LetterStock();
     });
 
     beforeEach(() => {

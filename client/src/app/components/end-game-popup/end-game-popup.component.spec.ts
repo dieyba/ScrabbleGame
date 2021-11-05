@@ -26,9 +26,4 @@ describe('EndGamePopupComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-
-  it('disconnect should call gameListService disconnectUser', () => {
-    component.disconnect();
-    expect(gameListServiceSpy.disconnectUser).toHaveBeenCalled();
-  });
 });
