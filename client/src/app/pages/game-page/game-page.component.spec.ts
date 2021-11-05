@@ -30,7 +30,8 @@ describe('GamePageComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent, SidebarComponent, PlayAreaComponent, ChatDisplayComponent],
             imports: [RouterModule, MatDialogModule],
-            providers: [{ provide: Router, useValue: { navigate: () => new Observable() } },
+            providers: [
+                { provide: Router, useValue: { navigate: () => new Observable() } },
                 { provide: MatDialog, useValue: { open: () => new Observable() } },
                 { provide: GameService, useValue: gameServiceSpy },
                 { provide: RackService, useValue: rackServiceSpy },

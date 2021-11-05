@@ -245,13 +245,13 @@ export class MouseWordPlacerService {
             // Update rack
             this.updateRack();
             // Prepare for next call
-            const nextSquare = this.companionService.findNextSquare(this.currentAxis, this.currentPosition);
+            const nextSquare = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
             if (this.currentPosition.x <= ABSOLUTE_BOARD_SIZE || this.currentPosition.y <= ABSOLUTE_BOARD_SIZE) {
                 this.currentPosition = nextSquare;
                 const pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
                 let nextArrow = this.currentPosition;
                 if (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied === true)
-                    nextArrow = this.companionService.findNextSquare(this.currentAxis, this.currentPosition);
+                    nextArrow = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
                 this.drawArrow(nextArrow, this.currentAxis);
                 // Arrow display bug is here, need to fix before final commit. Works for 1st skip but not further ones.
             }
@@ -305,7 +305,7 @@ export class MouseWordPlacerService {
         // Draw letter on the end of the canvas
         this.rackService.drawExistingLetters();
         const lastLetterPos = this.currentPosition;
-        let previousSquare = this.companionService.findPreviousSquare(this.currentAxis, lastLetterPos);
+        let previousSquare = this.companionService.findPreviousSquare(this.currentAxis, lastLetterPos, this.gridService.scrabbleBoard);
         if (this.deletePosition.x !== 0 || this.deletePosition.y !== 0) {
             previousSquare = this.deletePosition;
             this.deletePosition = new Vec2(0, 0);

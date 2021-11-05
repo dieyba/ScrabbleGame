@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
+import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { SquareColor } from '@app/classes/square';
 import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
-import { BOARD_OFFSET, BOARD_SIZE, GridService } from './grid.service';
+import { BOARD_OFFSET, BOARD_SIZE } from './grid.service';
 import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE } from './mouse-word-placer.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MouseWordPlacerCompanionService {
-    constructor(private gridService: GridService) {}
     convertPositionToGridIndex(position: Vec2): number[] {
         const positionInGrid: Vec2 = new Vec2(position.x - BOARD_OFFSET, position.y - BOARD_OFFSET);
         // gridIndex : [row, column]
@@ -18,7 +18,7 @@ export class MouseWordPlacerCompanionService {
         return gridIndex;
     }
     // Resets the canvas and the word in progress
-    findNextSquare(axis: Axis, position: Vec2): Vec2 {
+    findNextSquare(axis: Axis, position: Vec2, board: ScrabbleBoard): Vec2 {
         const newPosition = new Vec2(position.x, position.y);
         if (axis === Axis.H) {
             newPosition.x = position.x + ACTUAL_SQUARE_SIZE;
@@ -27,10 +27,10 @@ export class MouseWordPlacerCompanionService {
         }
         if (newPosition.x > ABSOLUTE_BOARD_SIZE || newPosition.y > ABSOLUTE_BOARD_SIZE) return new Vec2(0, 0);
         const newPositionIndexes = this.convertPositionToGridIndex(newPosition);
-        if (this.gridService.scrabbleBoard.squares[newPositionIndexes[0]][newPositionIndexes[1]].occupied) this.findNextSquare(axis, newPosition);
+        if (board.squares[newPositionIndexes[0]][newPositionIndexes[1]].occupied) this.findNextSquare(axis, newPosition, board);
         return newPosition;
     }
-    findPreviousSquare(axis: Axis, position: Vec2): Vec2 {
+    findPreviousSquare(axis: Axis, position: Vec2, board: ScrabbleBoard): Vec2 {
         const newPosition = new Vec2(position.x, position.y);
         if (axis === Axis.H) {
             newPosition.x = position.x - ACTUAL_SQUARE_SIZE;
@@ -39,7 +39,7 @@ export class MouseWordPlacerCompanionService {
         }
         if (newPosition.x < 0 || newPosition.y < 0) return new Vec2(0, 0);
         const newPositionIndexes = this.convertPositionToGridIndex(newPosition);
-        if (this.gridService.scrabbleBoard.squares[newPositionIndexes[0]][newPositionIndexes[1]].occupied) this.findPreviousSquare(axis, newPosition);
+        if (board.squares[newPositionIndexes[0]][newPositionIndexes[1]].occupied) this.findPreviousSquare(axis, newPosition, board);
         return newPosition;
     }
     samePosition(pos: Vec2, otherPos: Vec2): boolean {
