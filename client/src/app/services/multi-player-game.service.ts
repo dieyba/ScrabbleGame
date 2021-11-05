@@ -42,13 +42,17 @@ export class MultiPlayerGameService extends SoloGameService {
         this.socket.on('turn changed', (isTurnPassed: boolean, consecutivePassedTurns: number) => {
             this.game.isTurnPassed = isTurnPassed
             this.game.consecutivePassedTurns = consecutivePassedTurns;
-            const isLocalPlayerEndingGame = this.game.consecutivePassedTurns >= MAX_TURNS_PASSED && this.game.localPlayer.isActive;
-            if (isLocalPlayerEndingGame) {
-                this.endGame();
+            if (!this.game.isEndGame) { // if it is not already the endgame
+                const isLocalPlayerEndingGame = this.game.consecutivePassedTurns >= MAX_TURNS_PASSED && this.game.localPlayer.isActive;
+                if (isLocalPlayerEndingGame) {
+                    this.endGame();
+                }
+                this.updateActivePlayer();
+                this.resetTimer();
+                console.log("Changed turn (multi mode): ", this.game.localPlayer.name, " active:", this.game.opponentPlayer.isActive, ',',
+                    this.game.localPlayer.name, " active: ", this.game.opponentPlayer.isActive, ',consecutive passed turns:', this.game.consecutivePassedTurns);
+                this.game.isTurnPassed = false;
             }
-            this.updateActivePlayer();
-            this.resetTimer();
-            this.game.isTurnPassed = false;
         });
         this.socket.on('gameEnded', () => {
             this.displayEndGameMessage();
@@ -100,9 +104,8 @@ export class MultiPlayerGameService extends SoloGameService {
     }
 
     override async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
-        const errorResult = super.place(player, placeParams);
-        // la fonction peut retourner NoError mais le mot n'appartient pas au dictionnaire ?
-        if (await errorResult === ErrorType.NoError) {
+        const errorResult = await super.place(player, placeParams);
+        if (errorResult === ErrorType.NoError) {
             this.socket.emit('word placed', { word: placeParams.word, orientation: placeParams.orientation, positionX: placeParams.position.x, positionY: placeParams.position.y });
             this.socket.emit('place word', { stock: this.stock.letterStock, newLetters: player.letters, newScore: player.score });
         }

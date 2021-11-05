@@ -100,10 +100,10 @@ export class SoloGameService {
                 this.game.timerMs--;
                 if (this.game.timerMs < 0) {
                     this.game.isTurnPassed = true;
-                    const activePlayer = this.game.localPlayer.isActive ? this.game.localPlayer : this.game.opponentPlayer;
                     this.changeTurn();
-                    console.log("End of timer:", activePlayer.name, " should have turned pass");
                     // TODO: send 'activePlayerName >> !passer' message to chat via observer?
+                    // const activePlayer = this.game.localPlayer.isActive ? this.game.localPlayer : this.game.opponentPlayer;
+                    // console.log("End of timer:", activePlayer.name, " should have turned pass");
                 }
                 this.secondsToMinutes();
             }, TIMER_INTERVAL);
@@ -118,11 +118,16 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
     changeTurn() {
-        this.updateConsecutivePassedTurns();
-        this.updateActivePlayer();
-        this.resetTimer();
-        if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
-        this.game.isTurnPassed = false; // reset isTurnedPassed when new turn starts
+        if (!this.game.isEndGame) {
+            this.updateConsecutivePassedTurns();
+            this.updateActivePlayer();
+            this.resetTimer();
+            console.log("Changed turn:", this.game.localPlayer.name, " active:", this.game.localPlayer.isActive, ',',
+                this.game.opponentPlayer.name, " active: ", this.game.opponentPlayer.isActive, ',consecutive passed turns:', this.game.consecutivePassedTurns);
+            this.game.isTurnPassed = false;
+            if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
+            this.game.isTurnPassed = false; // reset isTurnedPassed when new turn starts
+        }
     }
     // Check if last 5 turns have been passed (by the command or the timer running out) (current turn is the 6th)
     updateConsecutivePassedTurns() {
