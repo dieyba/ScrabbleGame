@@ -50,7 +50,7 @@ describe('PlayAreaComponent', () => {
             declarations: [PlayAreaComponent],
             providers: [
                 { provide: GridService, useValue: gridServiceSpy },
-                { provide: GameService, useValue: gameServiceSpy },                
+                { provide: GameService, useValue: gameServiceSpy },
                 { provide: SoloGameService, useValue: soloGameServiceSpy },
                 { provide: RackService, useValue: rackServiceSpy },
                 { provide: CommandInvokerService, useValue: commandInvokerServiceSpy },
@@ -87,9 +87,9 @@ describe('PlayAreaComponent', () => {
         gameServiceSpy.currentGameService.game.totalCountDown = form.controls.timer.value;
         gameServiceSpy.currentGameService.game.timerMs = form.controls.timer.value;
         gameServiceSpy.currentGameService.game.localPlayer = gameServiceSpy.currentGameService.game.creatorPlayer;
-        soloGameServiceSpy.virtualPlayerSubject = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
-        soloGameServiceSpy.isVirtualPlayerObservable = soloGameServiceSpy.virtualPlayerSubject.asObservable();
-        soloGameServiceSpy.virtualPlayerSubject.next(true);
+        soloGameServiceSpy.opponentPlayerSubject = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
+        soloGameServiceSpy.opponentPlayerObservable = soloGameServiceSpy.opponentPlayerSubject.asObservable();
+        soloGameServiceSpy.opponentPlayerSubject.next(true);
     });
 
     beforeEach(() => {

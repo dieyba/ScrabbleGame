@@ -111,7 +111,7 @@ describe('SoloGameService', () => {
         service.game.localPlayer.letters = [new ScrabbleLetter('D', 1)];
         service.game.localPlayer.isActive = true;
         service.game.opponentPlayer.isActive = false;
-        service.changeActivePlayer();
+        service.changeTurn();
         expect(secondsToMinutesSpy).toHaveBeenCalled();
         expect(startCountdownSpy).toHaveBeenCalled();
         expect(service.game.localPlayer.isActive).toEqual(false);
@@ -124,7 +124,7 @@ describe('SoloGameService', () => {
         service.game.opponentPlayer.letters = [new ScrabbleLetter('D', 1)];
         service.game.opponentPlayer.isActive = true;
         service.game.localPlayer.isActive = false;
-        service.changeActivePlayer();
+        service.changeTurn();
         expect(service.game.localPlayer.isActive).toEqual(true);
         expect(service.game.opponentPlayer.isActive).toEqual(false);
     });
@@ -135,9 +135,9 @@ describe('SoloGameService', () => {
         service.game.localPlayer.letters = [new ScrabbleLetter('D', 1)];
         service.game.localPlayer.isActive = true;
         service.game.opponentPlayer.isActive = false;
-        service.virtualPlayerSubject = new BehaviorSubject<boolean>(service.game.localPlayer.isActive);
-        service.isVirtualPlayerObservable = service.virtualPlayerSubject.asObservable();
-        service.virtualPlayerSubject.next(true);
+        service.opponentPlayerSubject = new BehaviorSubject<boolean>(service.game.localPlayer.isActive);
+        service.opponentPlayerObservable = service.opponentPlayerSubject.asObservable();
+        service.opponentPlayerSubject.next(true);
         service.passTurn(service.game.localPlayer);
         expect(changeActivePlayerSpy).toHaveBeenCalled();
         expect(secondsToMinutesSpy).toHaveBeenCalled();
