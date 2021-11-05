@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { GameParameters, GameType } from '@app/classes/game-parameters';
+import { GameType } from '@app/classes/game-parameters';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
@@ -13,7 +13,6 @@ import { GameService } from '@app/services/game.service';
     styleUrls: ['./form.component.scss'],
 })
 export class FormComponent implements OnInit {
-    // mode: ClassicModeComponent;
     myForm: FormGroup;
     name: FormControl;
     timer: FormControl;
@@ -25,7 +24,6 @@ export class FormComponent implements OnInit {
     selectedPlayer: string;
     random: number;
     dictionary: string;
-    singleGame: GameParameters;
 
     defaultTimer: string;
     defaultDictionary: string;
@@ -119,9 +117,9 @@ export class FormComponent implements OnInit {
                 this.closeDialog();
                 this.gameService.initializeGameType(GameType.MultiPlayer);
                 this.gameService.currentGameService.initializeGame(this.myForm);
-                const single = this.gameService.currentGameService.game;
+                let single = this.gameService.currentGameService.game;
                 this.gameList.createRoom(single);
-                this.dialog.open(WaitingAreaComponent, {});
+                this.dialog.open(WaitingAreaComponent, { disableClose: true });
             }
         }
     }

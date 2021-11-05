@@ -21,7 +21,6 @@ export class WordBuilderService {
 
         // get full word that can be read on the placed word's row/column
         let wordBuilt = this.buildScrabbleWord(coord, axis);
-        wordBuilt.startPosition = coord;
         wordBuilt.orientation = axis;
         const placedWord = wordBuilt;
         if (wordBuilt.content.length >= MIN_WORD_LENGHT) {
@@ -38,7 +37,6 @@ export class WordBuilderService {
 
             const oppositeAxis = invertAxis[axis];
             wordBuilt = this.buildScrabbleWord(currentCoord, oppositeAxis);
-            wordBuilt.startPosition = coord;
             wordBuilt.orientation = axis;
             if (wordBuilt.content.length >= MIN_WORD_LENGHT) {
                 result.push(wordBuilt);
@@ -48,13 +46,15 @@ export class WordBuilderService {
     }
 
     buildScrabbleWord(coord: Vec2, axis: Axis): ScrabbleWord {
-        const word = new ScrabbleWord();
+        let word = new ScrabbleWord();
         if (this.gridService.scrabbleBoard.isCoordInsideBoard(coord)) {
             if (this.gridService.scrabbleBoard.squares[coord.x][coord.y].occupied) {
                 const startCoord = this.findWordEdge(coord, axis, TOWARD_START);
                 const endCoord = this.findWordEdge(coord, axis, TOWARD_END);
                 // Adding 1 to get the correct word lenght since coordinates start at 0
                 const lenght = axis === Axis.H ? endCoord.x - startCoord.x + 1 : endCoord.y - startCoord.y + 1;
+                word.startPosition.x = startCoord.x;
+                word.startPosition.y = startCoord.y;
 
                 const currentCoord = startCoord;
                 let currentLetter;

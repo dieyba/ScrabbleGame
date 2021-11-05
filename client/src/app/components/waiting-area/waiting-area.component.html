@@ -9,14 +9,14 @@
                 <button class="small-btn" (click)="startIfFull()">Commencer</button>
             </div>
         </div>
-        <!--<div class="games" *ngFor="let game of list">
-             <button class="game-btn" (click)="openName(true); onSelect(game)">
-                    <span> Partie #{{ game.gameRoom.idGame }} - </span>
-                    <span> Créateur: {{ game.creatorPlayer.name }} - </span>
-                    <span> Dictionnaire: {{ game.dictionary.title }} - </span>
-                    <span> Temps: {{ game.totalCountDown }} secondes</span>
-                </button>
-        </div>-->
+        <div class="games" *ngFor="let game of list">
+            <button class="game-btn" (click)="openName(true); onSelect(game)">
+                <span> Partie #{{ game.gameRoom.idGame }} - </span>
+                <span> Créateur: {{ game.creatorPlayer.name }} - </span>
+                <span> Dictionnaire: {{ game.dictionary.title }} - </span>
+                <span> Temps: {{ game.totalCountDown }} secondes</span>
+            </button>
+        </div>
         <button class="small-btn" (click)="convert(true); deleteRoom()">Convertir en Mode Solo</button>
         <button class="small-btn" (click)="closeDialog(); openForm(); deleteRoom()">Annuler</button>
     </div>
@@ -41,9 +41,9 @@
                 <md-hint *ngIf="error" align="start">{{ nameErrorMessage }}</md-hint>
                 <md-hint *ngIf="!error" align="start">{{ nameErrorMessage }}</md-hint>
             </mat-form-field>
-            <button class="small-btn" (click)="confirmName(selectedGame)">Valider</button>
+            <button class="small-btn" *ngIf="playerName.valid" (click)="confirmName(selectedGame)">Valider</button>
             <div *ngIf="gameCancelled">
-                <h3>Le Joueur a annulé la partie, veuillez selectionner une autre partie</h3>
+                <h3>La partie #{{ roomDeletedId }} a été supprimé, veuillez selectionner une autre partie si vous souhaitiez la joindre</h3>
             </div>
             <div class="row" *ngIf="joindre">
                 <h3 class="column">Veuillez cliquer ici pour joindre la partie :</h3>
@@ -59,6 +59,6 @@
                 <mat-spinner class="load"></mat-spinner>
             </div>
         </div>
-        <button class="small-btn" (click)="closeDialog(); openForm()">Retour</button>
+        <button class="small-btn" (click)="closeDialog(); someoneLeftRoom()">Retour</button>
     </div>
 </div>

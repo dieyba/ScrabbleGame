@@ -1,8 +1,8 @@
-import { LetterStock } from '@app/services/letter-stock.service';
 import { Dictionary } from './dictionary';
 import { LocalPlayer } from './local-player';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
+import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
 
 export enum GameType {
@@ -21,7 +21,7 @@ export interface GameRoom {
 }
 
 export class GameParameters {
-    gameRoom: GameRoom; // = { idGame: 15, capacity: 2, playersName: new Array<string>() };
+    gameRoom: GameRoom;
     players: Player[];
     localPlayer: Player;
     opponentPlayer: Player;
@@ -31,22 +31,27 @@ export class GameParameters {
     totalCountDown: number;
     timerMs: number;
     scrabbleBoard: ScrabbleBoard;
-    stock: LetterStock;
+    stock: ScrabbleLetter[];
     isTurnPassed: boolean;
     consecutivePassedTurns: number;
     isEndGame: boolean;
     newWords: ScrabbleWord[];
+    hasTurnsBeenPassed: boolean[];
 
     constructor(creatorPlayerName: string, timer: number, isRandom: boolean) {
-        this.gameRoom = { idGame: 15, capacity: 2, playersName: new Array<string>() };
-        this.dictionary = new Dictionary(0);
+        this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
+        this.creatorPlayer = new LocalPlayer(creatorPlayerName)
+        this.creatorPlayer.isActive = true
         this.localPlayer = new LocalPlayer(creatorPlayerName);
-        this.timerMs = timer;
-        this.stock = new LetterStock();
+        this.totalCountDown = timer;
+        this.timerMs = +this.totalCountDown;
+        this.opponentPlayer = new LocalPlayer('')
+        this.stock = [];
+        this.hasTurnsBeenPassed = [];
         this.consecutivePassedTurns = 0;
         this.isEndGame = false;
         this.isTurnPassed = false;
-        this.randomBonus = false;
-        this.scrabbleBoard = new ScrabbleBoard(isRandom);
+        this.randomBonus = isRandom;
+        this.scrabbleBoard = new ScrabbleBoard(this.randomBonus);
     }
 }

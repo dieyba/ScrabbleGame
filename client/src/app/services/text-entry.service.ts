@@ -145,7 +145,7 @@ export class TextEntryService {
     extractStockParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
             const defaultParams = { player, serviceCalled: this.chatDisplayService };
-            const stockLetters: string = scrabbleLetterstoString(this.gameService.currentGameService.game.stock.letterStock);
+            const stockLetters: string = scrabbleLetterstoString(this.gameService.currentGameService.stock.letterStock);
             return { defaultParams, specificParams: stockLetters };
         }
         return undefined;

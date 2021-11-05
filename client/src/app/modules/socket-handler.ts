@@ -10,7 +10,8 @@ export module SocketHandler {
         return activeSocket;
     }
 
-    export function disconnectSocket(): void {
-        activeSocket.disconnect();
-    }
+    // export function disconnectSocket(): any {
+    //     activeSocket.disconnect();
+    //     return activeSocket === undefined;
+    // }
 }

@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, HostListener, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -21,6 +21,7 @@ export class WaitingAreaComponent {
     playerName: FormControl;
     playerList: string[];
     list: GameParameters[];
+    roomDeletedId: number;
     nameErrorMessage: string;
     isStarting: boolean;
     name: boolean;
@@ -42,36 +43,58 @@ export class WaitingAreaComponent {
         @Inject(MAT_DIALOG_DATA) public gameSelected: boolean,
     ) {
         this.server = 'http://' + window.location.hostname + ':3000';
+        this.socket = SocketHandler.requestSocket(this.server);
         this.playerList = [];
         this.list = [];
         this.name = false;
         this.isStarting = false;
         if (gameSelected) {
             this.selectedGame = new GameParameters('', 0, false);
-            this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
+            this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(12), Validators.minLength(3)]);
         }
-        this.socket = SocketHandler.requestSocket(this.server);
-        this.list = this.gameList.getList();
         this.full = false;
         this.nameErrorMessage = '';
         this.nameValid = false;
         this.timer = setInterval(() => {
             this.list = this.gameList.getList();
-            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
-            // this.startIfFull();
         }, 500);
+
         this.socket.on('updateInfo', (game: GameParameters) => {
-            // this.players = players;
             this.dialogRef.close();
             this.router.navigate(['/game']);
             this.multiManService.initializeGame2(game);
             this.socket.emit('deleteRoom');
         });
-        this.socket.on('roomdeleted', () => {
+        this.socket.on('roomdeleted', (game: GameParameters) => {
+            this.joindre = false;
+            this.nameValid = false;
+            this.gameCancelled = true;
+            this.roomDeletedId = game.gameRoom.idGame;
+        })
+        this.socket.on('roomJoined', (game: GameParameters) => {
+            this.gameList.roomInfo = game;
+            this.gameList.roomInfo.gameRoom = game.gameRoom;
+            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
+        });
+        this.socket.on('roomcreated', (game: GameParameters) => {
+            this.gameList.roomInfo = game;
+            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
+        });
+        this.socket.on('roomLeft', (game: GameParameters) => {
+            this.gameList.roomInfo = game;
+            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
             this.joindre = false;
             this.nameValid = false;
             this.gameCancelled = true;
         });
+    }
+    @HostListener('window:beforeunload', ['$event'])
+    onBeforeUnload(event: MouseEvent) {
+        this.gameList.someoneLeftRoom();
+    }
+    @HostListener('window:popstate', ['$event'])
+    onPopState(event: MouseEvent) {
+        this.gameList.someoneLeftRoom();
     }
 
     onSelect(game: GameParameters): GameParameters {
@@ -79,6 +102,11 @@ export class WaitingAreaComponent {
             this.selectedGame = game;
         }
         return this.selectedGame;
+    }
+    someoneLeftRoom() {
+        if (!this.isStarting) {
+            this.gameList.someoneLeftRoom();
+        }
     }
 
     openName(selected: boolean): boolean {
@@ -106,7 +134,7 @@ export class WaitingAreaComponent {
     }
 
     confirmName(game: GameParameters) {
-        if (this.playerName.value === game.creatorPlayer.name) {
+        if (this.playerName.value === game.creatorPlayer.name || !this.playerName.valid) {
             this.error = true;
             this.nameErrorMessage = 'Vous ne pouvez pas avoir le meme nom que votre adversaire';
         } else {
@@ -129,7 +157,7 @@ export class WaitingAreaComponent {
         this.closeDialog();
         this.dialog.open(FormComponent, { data: isSolo });
     }
-    
+
     closeDialog() {
         this.name = false;
         this.dialogRef.close();

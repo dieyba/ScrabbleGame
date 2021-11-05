@@ -72,19 +72,22 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.mouseWordPlacerService.overlayContext = this.overlayCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.gameService.currentGameService.createNewGame();
-        this.gridService.scrabbleBoard = new ScrabbleBoard(this.gameService.currentGameService.game.randomBonus);
+        this.gridService.scrabbleBoard = new ScrabbleBoard(false); //this.gameService.currentGameService.game.scrabbleBoard;
+        this.gridService.scrabbleBoard.squares = this.gameService.currentGameService.game.scrabbleBoard.squares;
+        this.gridService.scrabbleBoard.colorStock = this.gameService.currentGameService.game.scrabbleBoard.colorStock;
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
         this.rackContext = this.rackService.gridContext;
 
-        if (!this.gameService.isMultiplayerGame) {
-            this.gameService.currentGameService.isVirtualPlayerObservable.subscribe((isActive: boolean) => {
-                if (isActive && !this.gameService.currentGameService.game.isEndGame) {
+        this.gameService.currentGameService.isVirtualPlayerObservable.subscribe((isActive: boolean) => {
+            if (isActive) {
+                if (!this.gameService.isMultiplayerGame && !this.gameService.currentGameService.game.isEndGame) {
                     this.virtualPlayerService.playTurn();
                 }
-            });
-        }
+                this.mouseWordPlacerService.onBlur();
+            }
+        });
     }
 
     passTurn() {
@@ -136,7 +139,7 @@ export class PlayAreaComponent implements AfterViewInit {
 
     lessThanSevenLettersInStock(): boolean {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        return this.gameService.currentGameService.game.stock.letterStock.length < 7;
+        return this.gameService.currentGameService.stock.letterStock.length < 7;
     }
 
     exchange() {

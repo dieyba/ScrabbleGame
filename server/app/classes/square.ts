@@ -9,6 +9,13 @@ export enum SquareColor {
     Red = 4,
 }
 
+export enum ColorQuantity {
+    Teal = 24,
+    DarkBlue = 12,
+    Pink = 17,
+    Red = 8,
+}
+
 export class Square {
     position: Vec2; // Where the square is on the board
     color: SquareColor;
@@ -16,6 +23,7 @@ export class Square {
     isValidated: boolean;
     isBonusUsed: boolean;
     letter: ScrabbleLetter;
+    // We should create an "id" to facilitate the *randomize bonuses* feature.
 
     constructor(horizontalPosition: number, verticalPosition: number) {
         this.position = new Vec2(0, 0);
