@@ -124,7 +124,6 @@ export class SoloGameService {
             this.resetTimer();
             console.log("Changed turn:", this.game.localPlayer.name, " active:", this.game.localPlayer.isActive, ',',
                 this.game.opponentPlayer.name, " active: ", this.game.opponentPlayer.isActive, ',consecutive passed turns:', this.game.consecutivePassedTurns);
-            this.game.isTurnPassed = false;
             if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
             this.game.isTurnPassed = false; // reset isTurnedPassed when new turn starts
         }
