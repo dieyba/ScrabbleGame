@@ -28,6 +28,7 @@ export class GameParameters {
 
     constructor(creatorPlayerName: string, timer: number, randBonus: boolean, id: number) {
         this.players = new Array<Player>();
+        this.dictionary = new Dictionary(0);
         this.hasTurnsBeenPassed = [false, false, false];
         this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
         this.gameRoom.idGame = id;
