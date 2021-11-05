@@ -11,8 +11,6 @@ import { expect } from 'chai';
 import * as http from 'http';
 import * as sinon from 'sinon';
 import * as io from 'socket.io';
-import { GameListManager } from './game-list-manager.service';
-import { PlayerManagerService } from './player-manager.service';
 import { SocketManagerService } from './socket-manager.service';
 import { ValidationService } from './validation.service';
 
@@ -172,76 +170,76 @@ describe('SocketManager service', () => {
         sinon.assert.called(initializeGameStub);
     });
 
-    it('resetTimer should do nothing if there is no player related to the socket', () => {
-        // This should register the "connection" event and connect a false client
-        socketManagerService.handleSockets();
-        serverMock.triggerEvent('connection');
+    // it('resetTimer should do nothing if there is no player related to the socket', () => {
+    //     // This should register the "connection" event and connect a false client
+    //     socketManagerService.handleSockets();
+    //     serverMock.triggerEvent('connection');
 
-        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+    //     const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-        // stub and spy
-        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-        playerManagerServiceStub.getPlayerBySocketID.returns(undefined as unknown as Player);
-        socketManagerService.playerMan = playerManagerServiceStub;
-        const serverSpy = sinon.spy(serverMock, 'to');
+    //     // stub and spy
+    //     const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+    //     playerManagerServiceStub.getPlayerBySocketID.returns(undefined as unknown as Player);
+    //     socketManagerService.playerMan = playerManagerServiceStub;
+    //     const serverSpy = sinon.spy(serverMock, 'to');
 
-        // "reset timer" event
-        socketMock.triggerEvent('reset timer');
+    //     // "reset timer" event
+    //     socketMock.triggerEvent('reset timer');
 
-        serverSpy.restore();
+    //     serverSpy.restore();
 
-        sinon.assert.notCalled(serverSpy);
-    });
+    //     sinon.assert.notCalled(serverSpy);
+    // });
 
-    it('resetTimer should do nothing if there is no game related to room.id', () => {
-        // This should register the "connection" event and connect a false client
-        socketManagerService.handleSockets();
-        serverMock.triggerEvent('connection');
+    // it('resetTimer should do nothing if there is no game related to room.id', () => {
+    //     // This should register the "connection" event and connect a false client
+    //     socketManagerService.handleSockets();
+    //     serverMock.triggerEvent('connection');
 
-        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+    //     const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-        // stub and spy
-        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-        playerManagerServiceStub.getPlayerBySocketID.returns(new Player('myName', socketMock.id));
-        socketManagerService.playerMan = playerManagerServiceStub;
+    //     // stub and spy
+    //     const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+    //     playerManagerServiceStub.getPlayerBySocketID.returns(new Player('myName', socketMock.id));
+    //     socketManagerService.playerMan = playerManagerServiceStub;
 
-        const gameListManagerStub = sinon.createStubInstance(GameListManager);
-        gameListManagerStub.getCurrentGame.returns(undefined as unknown as GameParameters);
-        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+    //     const gameListManagerStub = sinon.createStubInstance(GameListManager);
+    //     gameListManagerStub.getCurrentGame.returns(undefined as unknown as GameParameters);
+    //     socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-        const serverSpy = sinon.spy(serverMock, 'to');
+    //     const serverSpy = sinon.spy(serverMock, 'to');
 
-        // "reset timer" event
-        socketMock.triggerEvent('reset timer');
+    //     // "reset timer" event
+    //     socketMock.triggerEvent('reset timer');
 
-        serverSpy.restore();
+    //     serverSpy.restore();
 
-        sinon.assert.notCalled(serverSpy);
-    });
+    //     sinon.assert.notCalled(serverSpy);
+    // });
 
-    it('resetTimer should emit a "timer reset"', () => {
-        // This should register the "connection" event and connect a false client
-        socketManagerService.handleSockets();
-        serverMock.triggerEvent('connection');
+    // it('resetTimer should emit a "timer reset"', () => {
+    //     // This should register the "connection" event and connect a false client
+    //     socketManagerService.handleSockets();
+    //     serverMock.triggerEvent('connection');
 
-        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+    //     const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-        // stub and spy
-        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-        playerManagerServiceStub.getPlayerBySocketID.returns(new Player('myName', socketMock.id));
-        socketManagerService.playerMan = playerManagerServiceStub;
+    //     // stub and spy
+    //     const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+    //     playerManagerServiceStub.getPlayerBySocketID.returns(new Player('myName', socketMock.id));
+    //     socketManagerService.playerMan = playerManagerServiceStub;
 
-        const gameListManagerStub = sinon.createStubInstance(GameListManager);
-        gameListManagerStub.getCurrentGame.returns(new GameParameters('name', 60, false, 0));
-        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+    //     const gameListManagerStub = sinon.createStubInstance(GameListManager);
+    //     gameListManagerStub.getCurrentGame.returns(new GameParameters('name', 60, false, 0));
+    //     socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-        const serverSpy = sinon.spy(serverMock, 'to');
+    //     const serverSpy = sinon.spy(serverMock, 'to');
 
-        // "reset timer" event
-        socketMock.triggerEvent('reset timer');
+    //     // "reset timer" event
+    //     socketMock.triggerEvent('reset timer');
 
-        serverSpy.restore();
+    //     serverSpy.restore();
 
-        sinon.assert.called(serverSpy);
-    });
+    //     sinon.assert.called(serverSpy);
+    // });
 });
