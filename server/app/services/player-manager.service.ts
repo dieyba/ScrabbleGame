@@ -13,8 +13,8 @@ export class PlayerManagerService {
         return newPlayer;
     }
 
-    public getPlayerBySocketID(socketId: string): Player{
-        const playerArrayIndex = this.allPlayers.findIndex((p) => p.getSocketId() === socketId);
+    public getPlayerBySocketID(socketId: string): Player {
+        const playerArrayIndex = this.allPlayers.findIndex((p) => p.socketId === socketId);
         return this.allPlayers[playerArrayIndex];
     }
 }

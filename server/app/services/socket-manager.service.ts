@@ -11,15 +11,22 @@ export class SocketManagerService {
     private sio: io.Server;
     private gameListMan: GameListManager;
     playerMan: PlayerManagerService;
-    constructor(server: http.Server, private readonly validationService: ValidationService) {
-        this.gameListMan = new GameListManager(this.validationService);
+    private validationService: ValidationService
+    constructor(server: http.Server) {
+        this.gameListMan = new GameListManager();
         this.playerMan = new PlayerManagerService();
+        this.validationService = new ValidationService();
+
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
     }
 
     public handleSockets(): void {
         this.sio.on('connection', (socket) => {
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
+            socket.on('addPlayer', (player: Player) => {
+                this.addPlayer(socket, player);
+                this.getAllGames(socket);
+            });
             socket.on('createRoom', (game: any) => {
                 this.createRoom(socket, game);
                 this.getAllGames(socket);
@@ -31,16 +38,37 @@ export class SocketManagerService {
                 this.deleteRoom(socket);
                 this.getAllGames(socket);
             });
-            socket.on('addPlayer', (player: Player) => {
-                this.addPlayer(socket, player);
-                this.getAllGames(socket);
-            });
             socket.on('joinRoom', (game: any) => {
                 this.joinRoom(socket, game);
                 this.getAllGames(socket);
             });
             socket.on('initializeGame', (roomId: number) => {
                 this.initializeGame(socket, roomId);
+            });
+            socket.on('leaveRoom', () => {
+                this.leaveRoom(socket)
+            });
+            socket.on('getAllGames', (game: Array<GameParameters>) => {
+                this.getAllGames(socket);
+            });
+            socket.on('word placed', (word: any) => {
+                let sender = this.playerMan.getPlayerBySocketID(socket.id);
+                const opponent = this.gameListMan.getOtherPlayer(sender.socketId, sender.roomId) as Player;
+
+                this.sio.to(opponent?.socketId).emit('update board', word);
+            });
+            socket.on('exchange letters', (update: any) => {
+                let sender = this.playerMan.getPlayerBySocketID(socket.id);
+                const opponent = this.gameListMan.getOtherPlayer(sender.socketId, sender.roomId) as Player;
+                this.sio.to(opponent?.socketId).emit('letters exchange', update);
+            });
+            socket.on('place word', (update: any) => {
+                let sender = this.playerMan.getPlayerBySocketID(socket.id);
+                const opponent = this.gameListMan.getOtherPlayer(sender.socketId, sender.roomId) as Player;
+                this.sio.to(opponent?.socketId).emit('update place', update);
+            });
+            socket.on('validateWords', (newWords: string[]) => {
+                this.validateWords(socket, newWords);
             });
             socket.on('sendChatEntry', (message: string, messageToOpponent?: string) => {
                 if (messageToOpponent !== undefined) {
@@ -49,14 +77,8 @@ export class SocketManagerService {
                     this.displayChatEntry(socket, message);
                 }
             });
-            socket.on('leaveRoom', () => {
-                this.leaveRoom(socket)
-            });
             socket.on('sendSystemChatEntry', (message: string) => {
                 this.displaySystemChatEntry(socket, message);
-            });
-            socket.on('getAllGames', (game: Array<GameParameters>) => {
-                this.getAllGames(socket);
             });
             socket.on('change turn', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
                 this.changeTurn(socket, isCurrentTurnedPassed, consecutivePassedTurns);
@@ -70,22 +92,6 @@ export class SocketManagerService {
             socket.on('disconnect', () => {
                 console.log(`Deconnexion par l'utilisateur avec id : ${socket.id}`);
                 this.disconnect(socket)
-            });
-            socket.on('word placed', (word: any) => {
-                let sender = this.playerMan.getPlayerBySocketID(socket.id);
-                const opponent = this.gameListMan.getOtherPlayer(sender.getSocketId(), sender.roomId) as Player;
-
-                this.sio.to(opponent?.getSocketId()).emit('update board', word);
-            });
-            socket.on('exchange letters', (update: any) => {
-                let sender = this.playerMan.getPlayerBySocketID(socket.id);
-                const opponent = this.gameListMan.getOtherPlayer(sender.getSocketId(), sender.roomId) as Player;
-                this.sio.to(opponent?.getSocketId()).emit('letters exchange', update);
-            });
-            socket.on('place word', (update: any) => {
-                let sender = this.playerMan.getPlayerBySocketID(socket.id);
-                const opponent = this.gameListMan.getOtherPlayer(sender.getSocketId(), sender.roomId) as Player;
-                this.sio.to(opponent?.getSocketId()).emit('update place', update);
             });
         });
         setInterval(() => {}, 1000);
@@ -103,7 +109,7 @@ export class SocketManagerService {
         emptyOpponent.letters = game.opponentLetters;
         room.creatorPlayer.letters = game.creatorLetters;
         room.opponentPlayer = emptyOpponent;
-        let index = this.playerMan.allPlayers.findIndex((p) => p.getSocketId() === socket.id);
+        let index = this.playerMan.allPlayers.findIndex((p) => p.socketId === socket.id);
         this.playerMan.allPlayers.splice(index, 1);
         this.playerMan.allPlayers.push(newPlayer)
         room.stock = game.stock;
@@ -176,7 +182,7 @@ export class SocketManagerService {
     }
 
     private validateWords(socket: io.Socket, newWords: string[]) {
-        const result = this.gameListMan.validateNewWords(newWords);
+        const result = this.validationService.validateWords(newWords);
         this.sio.to(socket.id).emit('areWordsValid', result);
     }
 
@@ -192,7 +198,7 @@ export class SocketManagerService {
         const sender = this.playerMan.getPlayerBySocketID(senderId);
         const opponent = this.gameListMan.getOtherPlayer(senderId, sender.roomId);
         if (opponent) {
-            const opponentId = opponent.getSocketId();
+            const opponentId = opponent.socketId;
             const chatEntrySender = { senderName: sender.name, message: messageToSender };
             const chatEntryOpponent = { senderName: sender.name, message: messageToOpponent };
             this.sio.to(senderId).emit('addChatEntry', chatEntrySender);
