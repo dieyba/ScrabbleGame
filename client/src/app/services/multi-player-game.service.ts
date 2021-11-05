@@ -49,8 +49,8 @@ export class MultiPlayerGameService extends SoloGameService {
                 }
                 this.updateActivePlayer();
                 this.resetTimer();
-                console.log("Changed turn (multi mode): ", this.game.localPlayer.name, " active:", this.game.opponentPlayer.isActive, ',',
-                    this.game.localPlayer.name, " active: ", this.game.opponentPlayer.isActive, ',consecutive passed turns:', this.game.consecutivePassedTurns);
+                console.log("Changed turn (multi mode): ", this.game.localPlayer.name, " active:", this.game.localPlayer.isActive, ',',
+                    this.game.opponentPlayer.name, " active: ", this.game.opponentPlayer.isActive, ',consecutive passed turns:', this.game.consecutivePassedTurns);
                 this.game.isTurnPassed = false;
             }
         });
