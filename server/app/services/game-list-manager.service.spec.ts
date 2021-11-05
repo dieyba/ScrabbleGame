@@ -1,21 +1,16 @@
 import { GameParameters } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import { expect } from 'chai';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { GameListManager } from './game-list-manager.service';
-import { ValidationService } from './validation.service';
 
 describe('GameListManager service', () => {
     let gameListMan: GameListManager;
-    let validationServiceStub: SinonStubbedInstance<ValidationService>;
     let game1 = new GameParameters('dieyba', 60, false, 1)
     let game2 = new GameParameters('kevin', 60, false, 2)
     let game3 = new GameParameters('erika', 0, false, 3);
     let game4 = new GameParameters('Sara', 0, false, 4);
     beforeEach(async () => {
-        validationServiceStub = createStubInstance(ValidationService);
-        validationServiceStub.validateWords.resolves(true);
-        gameListMan = new GameListManager(validationServiceStub);
+        gameListMan = new GameListManager();
     });
     it('should create playerManagerService', () => {
         expect(gameListMan).to.exist;
@@ -54,13 +49,29 @@ describe('GameListManager service', () => {
         expect(gameListMan.getOtherPlayer('fbie4737d', 1)).to.equal(game1.players[0])
     });
     it('getOtherPlayer should return undefined', () => {
-        gameListMan.currentGames.push(game1)
-        gameListMan.currentGames.push(game2)
-        gameListMan.currentGames[0].players[0] = new Player('dieyba', 'bd72eydbey')
-        gameListMan.currentGames[0].players[1] = new Player('ariane', 'fbie4737d')
+        gameListMan.currentGames.push(game1);
+        gameListMan.currentGames.push(game2);
+        gameListMan.currentGames[0].players[0] = new Player('dieyba', 'bd72eydbey');
+        gameListMan.currentGames[0].players[1] = new Player('ariane', 'fbie4737d');
         gameListMan.currentGames[0].players[0].roomId = 1;
         gameListMan.currentGames[0].players[0].roomId = 1;
         expect(gameListMan.getOtherPlayer('bd72eydbey', -1)).to.equal(undefined);
+    });
+    it('deleteRoom should remove room', () => {
+        gameListMan.existingRooms.push(game1);
+        gameListMan.existingRooms.push(game2);
+        gameListMan.existingRooms.push(game3);
+        gameListMan.existingRooms.push(game4);
+        gameListMan.deleteExistingRoom(1);
+        expect(gameListMan.existingRooms.length).to.equal(3);
+    });
+    it('deleteRoom should not remove room', () => {
+        gameListMan.existingRooms.push(game1);
+        gameListMan.existingRooms.push(game2);
+        gameListMan.existingRooms.push(game3);
+        gameListMan.existingRooms.push(game4);
+        gameListMan.deleteExistingRoom(-1);
+        expect(gameListMan.existingRooms.length).to.equal(4);
     });
     // it('should remove a room', () => {
     //     const room1 = new GameParameters('erika', 0, false, 0);
