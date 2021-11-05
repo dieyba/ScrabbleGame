@@ -19,8 +19,8 @@ describe('GameListManager service', () => {
     it('should create add a player', () => {
         const room1 = new GameParameters('erika', 0, false, 0);
         const room2 = new GameParameters('Sara', 0, false, 0);
-        gameListMan.addRoom(room2.creatorPlayer.name, 0, false);
-        gameListMan.addRoom(room1.creatorPlayer.name, 0, false);
+        gameListMan.addRoom(room2);
+        gameListMan.addRoom(room1);
         expect(gameListMan.existingRooms.length).to.be.equal(2);
         gameListMan.getAllGames();
         expect(gameListMan.existingRooms.length).to.be.equal(2);
@@ -28,8 +28,8 @@ describe('GameListManager service', () => {
     it('should create a room', () => {
         const room1 = new GameParameters('erika', 0, false, 0);
         const room2 = new GameParameters('Sara', 0, false, 0);
-        gameListMan.createRoom(room2.creatorPlayer.name, 0, false);
-        gameListMan.createRoom(room1.creatorPlayer.name, 0, false);
+        gameListMan.createRoom(room2);
+        gameListMan.createRoom(room1);
         expect(gameListMan.existingRooms.length).to.be.equal(2);
     });
     // it('should remove a room', () => {
