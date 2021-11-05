@@ -3,6 +3,8 @@ import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { SquareColor } from '@app/classes/square';
+import { Axis } from '@app/classes/utilities';
+import { Vec2 } from '@app/classes/vec2';
 import { GridService } from '@app/services/grid.service';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
@@ -187,5 +189,51 @@ describe('GridService', () => {
         service.drawSingleSquareColor(1, 1);
         expect(fillTextSpy).not.toHaveBeenCalled();
         expect(fillRectSpy).toHaveBeenCalled();
+    });
+
+    it('removeInvalidLetters should set the board square to unoccupied (h)', () => {
+        const startCoord = new Vec2(0, 0);
+        const letter1 = new ScrabbleLetter('l', 1);
+        service.drawLetter(letter1, 0, 0);
+        const letter2 = new ScrabbleLetter('e', 1);
+        service.drawLetter(letter2, 1, 0);
+        service.removeInvalidLetters(startCoord, 2, Axis.H);
+        expect(service.scrabbleBoard.squares[0][0].occupied).toEqual(false);
+        expect(service.scrabbleBoard.squares[1][0].occupied).toEqual(false);
+    });
+
+    it('removeInvalidLetters should set the board square to unoccupied (v)', () => {
+        const startCoord = new Vec2(0, 0);
+        const letter1 = new ScrabbleLetter('l', 1);
+        service.drawLetter(letter1, 0, 0);
+        const letter2 = new ScrabbleLetter('e', 1);
+        service.drawLetter(letter2, 0, 1);
+        service.removeInvalidLetters(startCoord, 2, Axis.V);
+        expect(service.scrabbleBoard.squares[0][0].occupied).toEqual(false);
+        expect(service.scrabbleBoard.squares[0][1].occupied).toEqual(false);
+    });
+
+    it('removeInvalidLetters should remove only invalid letters (v)', () => {
+        const startCoord = new Vec2(0, 0);
+        const letter1 = new ScrabbleLetter('l', 1);
+        service.drawLetter(letter1, 0, 0);
+        const letter2 = new ScrabbleLetter('e', 1);
+        service.drawLetter(letter2, 0, 1);
+        service.scrabbleBoard.squares[0][1].isValidated = true;
+        service.removeInvalidLetters(startCoord, 2, Axis.V);
+        expect(service.scrabbleBoard.squares[0][0].occupied).toEqual(false);
+        expect(service.scrabbleBoard.squares[0][1].occupied).toEqual(true);
+    });
+
+    it('removeInvalidLetters should remove only invalid letters (h)', () => {
+        const startCoord = new Vec2(0, 0);
+        const letter1 = new ScrabbleLetter('l', 1);
+        service.drawLetter(letter1, 0, 0);
+        const letter2 = new ScrabbleLetter('e', 1);
+        service.drawLetter(letter2, 1, 0);
+        service.scrabbleBoard.squares[1][0].isValidated = true;
+        service.removeInvalidLetters(startCoord, 2, Axis.H);
+        expect(service.scrabbleBoard.squares[0][0].occupied).toEqual(false);
+        expect(service.scrabbleBoard.squares[1][0].occupied).toEqual(true);
     });
 });

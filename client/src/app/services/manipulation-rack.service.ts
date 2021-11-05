@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
+import { ERROR_NUMBER } from '@app/classes/utilities';
 import { RackService } from './rack.service';
-
-const ERROR_NUMBER = -1;
 
 @Injectable({
     providedIn: 'root',
@@ -20,10 +19,6 @@ export class ManipulationRackService {
             if (this.rackService.exchangeSelected[position - 1] === true) {
                 this.rackService.exchangeSelected[position - 1] = false;
             }
-
-            // for (let i = 0; i < this.rackService.handlingSelected.length; i++) {
-            //     this.rackService.deselect(i + 1, rackContext, false);
-            // }
             this.rackService.select(position, rackContext, false);
             this.letterSelectedPosition = position - 1;
         }

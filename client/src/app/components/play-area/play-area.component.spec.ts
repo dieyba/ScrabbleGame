@@ -1,12 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
+import { Router, RouterModule } from '@angular/router';
+import { Dictionary } from '@app/classes/dictionary';
+import { GameParameters, GameType } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { VirtualPlayer } from '@app/classes/virtual-player';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
+import { CommandInvokerService } from '@app/services/command-invoker.service';
+import { ExchangeService } from '@app/services/exchange.service';
+import { GameService } from '@app/services/game.service';
 import { GridService } from '@app/services/grid.service';
-import { RackService } from '@app/services/rack.service';
-import { SoloGameService } from '@app/services/solo-game.service';
+import { LetterStock } from '@app/services/letter-stock.service';
+import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service';
+import { RackService, RACK_HEIGHT, RACK_WIDTH } from '@app/services/rack.service';
+import { DEFAULT_LETTER_COUNT, SoloGameService } from '@app/services/solo-game.service';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
 /* eslint-disable  no-unused-expressions */
@@ -14,22 +24,23 @@ describe('PlayAreaComponent', () => {
     let component: PlayAreaComponent;
     let fixture: ComponentFixture<PlayAreaComponent>;
     let gridServiceSpy: jasmine.SpyObj<GridService>;
+    let gameServiceSpy: jasmine.SpyObj<GameService>;
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
+    let commandInvokerServiceSpy: jasmine.SpyObj<CommandInvokerService>;
+    let mouseWordPlacerServiceSpy: jasmine.SpyObj<MouseWordPlacerService>;
+    let exchangeServiceSpy: jasmine.SpyObj<ExchangeService>;
 
     beforeEach(async () => {
         TestBed.configureTestingModule({
-            imports: [MatCardModule],
+            imports: [MatCardModule, RouterModule],
         });
         gridServiceSpy = jasmine.createSpyObj('GridService', ['sizeUpLetters', 'sizeDownLetters', 'drawGrid', 'drawColors', 'drawLetter']);
-        soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', [
-            'localPlayer',
-            'virtualPlayer',
-            'createNewGame',
-            'passTurn',
-            'changeActivePlayer',
-            'removeRackLetter',
-        ]);
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['currentGameService', 'initializeGameType']);
+        commandInvokerServiceSpy = jasmine.createSpyObj('CommandInvokerService', ['executeCommand']);
+        soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['initializeGame', 'createNewGame', 'getLettersSelected']);
+        mouseWordPlacerServiceSpy = jasmine.createSpyObj('MouseWordPlacerService', ['onKeyDown', 'onBlur', 'onMouseClick']);
+        exchangeServiceSpy = jasmine.createSpyObj('ExchangeService', ['atLeastOneLetterSelected', 'exchange', 'cancelExchange']);
         // pour les properties, cette faôn de faire empêche les modifs. check sur le lien suivant pour modifer ça.
         // https://stackoverflow.com/questions/64560390/jasmine-createspyobj-with-properties
         rackServiceSpy = jasmine.createSpyObj('RackService', ['drawRack', 'deselectForExchange', 'selectForExchange'], {
@@ -39,16 +50,46 @@ describe('PlayAreaComponent', () => {
             declarations: [PlayAreaComponent],
             providers: [
                 { provide: GridService, useValue: gridServiceSpy },
+                { provide: GameService, useValue: gameServiceSpy },                
                 { provide: SoloGameService, useValue: soloGameServiceSpy },
                 { provide: RackService, useValue: rackServiceSpy },
+                { provide: CommandInvokerService, useValue: commandInvokerServiceSpy },
+                { provide: MouseWordPlacerService, useValue: mouseWordPlacerServiceSpy },
+                { provide: ExchangeService, useValue: exchangeServiceSpy },
+                { provide: Router, useValue: { navigate: () => new Observable() } },
             ],
         }).compileComponents();
 
         gridServiceSpy.scrabbleBoard = new ScrabbleBoard(false);
-        const letter: ScrabbleLetter = new ScrabbleLetter('a', 1);
-        soloGameServiceSpy.game.creatorPlayer = new LocalPlayer('Ariane');
-        soloGameServiceSpy.game.creatorPlayer.score = 73;
-        soloGameServiceSpy.game.creatorPlayer.letters = [letter];
+        gameServiceSpy.initializeGameType(GameType.Solo);
+        gameServiceSpy.currentGameService = soloGameServiceSpy;
+        const form = new FormGroup({
+            name: new FormControl('dieyna'),
+            timer: new FormControl('1:00'),
+            bonus: new FormControl(true),
+            level: new FormControl('easy'),
+            dictionaryForm: new FormControl('Francais'),
+            opponent: new FormControl('Sara'),
+        });
+        gameServiceSpy.currentGameService.game = new GameParameters(form.controls.name.value, +form.controls.timer.value, form.controls.bonus.value);
+        gameServiceSpy.currentGameService.game.creatorPlayer = new LocalPlayer(form.controls.name.value);
+        gameServiceSpy.currentGameService.game.creatorPlayer.isActive = true;
+        gameServiceSpy.currentGameService.game.stock = new LetterStock();
+        gameServiceSpy.currentGameService.game.localPlayer = new LocalPlayer(form.controls.name.value);
+        gameServiceSpy.currentGameService.game.creatorPlayer = gameServiceSpy.currentGameService.game.localPlayer;
+        gameServiceSpy.currentGameService.game.opponentPlayer = new VirtualPlayer(form.controls.opponent.value, form.controls.level.value);
+        const localLetters = gameServiceSpy.currentGameService.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        gameServiceSpy.currentGameService.game.localPlayer.letters = localLetters;
+        const opponentLetters = gameServiceSpy.currentGameService.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        gameServiceSpy.currentGameService.game.opponentPlayer.letters = opponentLetters;
+        gameServiceSpy.currentGameService.game.dictionary = new Dictionary(+form.controls.dictionaryForm.value);
+        gameServiceSpy.currentGameService.game.randomBonus = form.controls.bonus.value;
+        gameServiceSpy.currentGameService.game.totalCountDown = form.controls.timer.value;
+        gameServiceSpy.currentGameService.game.timerMs = form.controls.timer.value;
+        gameServiceSpy.currentGameService.game.localPlayer = gameServiceSpy.currentGameService.game.creatorPlayer;
+        soloGameServiceSpy.virtualPlayerSubject = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
+        soloGameServiceSpy.isVirtualPlayerObservable = soloGameServiceSpy.virtualPlayerSubject.asObservable();
+        soloGameServiceSpy.virtualPlayerSubject.next(true);
     });
 
     beforeEach(() => {
@@ -63,7 +104,7 @@ describe('PlayAreaComponent', () => {
 
     it('ngAfterViewInit should call drawGrid and drawColors', () => {
         component.ngAfterViewInit();
-        expect(soloGameServiceSpy.createNewGame).toHaveBeenCalled();
+        expect(gameServiceSpy.currentGameService.createNewGame).toHaveBeenCalled();
         expect(gridServiceSpy.drawGrid).toHaveBeenCalled();
         expect(gridServiceSpy.drawColors).toHaveBeenCalled();
     });
@@ -78,8 +119,48 @@ describe('PlayAreaComponent', () => {
         expect(gridServiceSpy.sizeDownLetters).toHaveBeenCalled();
     });
 
-    it('passTurn should call soloGameservices passTurn', () => {
+    it('passTurn should call commandInvokerService.executeCommand', () => {
         component.passTurn();
-        expect(soloGameServiceSpy.passTurn).toHaveBeenCalled();
+        expect(commandInvokerServiceSpy.executeCommand).toHaveBeenCalled();
+    });
+
+    it('onKeyDown should call mouseWordPlacerService onKeyDown method', () => {
+        const keyboardEvent = {
+            code: 'a',
+        } as KeyboardEvent;
+        component.onKeyDown(keyboardEvent);
+        expect(mouseWordPlacerServiceSpy.onKeyDown).toHaveBeenCalled();
+    });
+
+    it('onMouseDown should call mouseWordPlacerService onMouseClick method', () => {
+        const mouseEvent = {
+            offsetX: 25,
+            offsetY: 25,
+            button: 0,
+        } as MouseEvent;
+        component.onMouseDown(mouseEvent);
+        expect(mouseWordPlacerServiceSpy.onMouseClick).toHaveBeenCalled();
+    });
+
+    it('rackHeight should return play area rack height', () => {
+        expect(component.rackHeight).toEqual(RACK_HEIGHT);
+    });
+
+    it('rackWidth should return play area rack width', () => {
+        expect(component.rackWidth).toEqual(RACK_WIDTH);
+    });
+
+    it('lessThanSevenLettersInStock should return the right value', () => {
+        expect(component.lessThanSevenLettersInStock()).toEqual(false);
+    });
+
+    it('exchange should call exchangeService exchange method', () => {
+        component.exchange();
+        expect(exchangeServiceSpy.exchange).toHaveBeenCalled();
+    });
+
+    it('cancelExchange should call exchangeService cancelExchange method', () => {
+        component.cancelExchange();
+        expect(exchangeServiceSpy.cancelExchange).toHaveBeenCalled();
     });
 });

@@ -1,0 +1,9 @@
+<div>
+    <h1 md-dialog-title>Fin de la partie</h1>
+    <div md-dialog-content>Êtes-vous sûr/sûre de vouloir partir?</div>
+    <div md-dialog-actions align="center">
+        <button md-raised-button color="warn" (click)="dialogReference.close(true)">OUI</button>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
+        <button id="cancelQuitButton" md-raised-button color="primary" (click)="dialogReference.close(false)">NON</button>
+    </div>
+</div>

@@ -3,9 +3,9 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GameType } from '@app/classes/game-parameters';
+import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
-import { WaitingAreaComponent } from '../waiting-area/waiting-area.component';
 
 @Component({
     selector: 'app-form',
@@ -13,7 +13,6 @@ import { WaitingAreaComponent } from '../waiting-area/waiting-area.component';
     styleUrls: ['./form.component.scss'],
 })
 export class FormComponent implements OnInit {
-    // mode: ClassicModeComponent;
     myForm: FormGroup;
     name: FormControl;
     timer: FormControl;
@@ -25,7 +24,6 @@ export class FormComponent implements OnInit {
     selectedPlayer: string;
     random: number;
     dictionary: string;
-    // singleGame: GameParameters;
 
     defaultTimer: string;
     defaultDictionary: string;
@@ -96,6 +94,7 @@ export class FormComponent implements OnInit {
         this.selectedPlayer = list[this.random];
         this.myForm.controls.opponent.setValue(this.selectedPlayer);
     }
+
     convert() {
         this.dialog.open(FormComponent, { data: this.isSolo === true });
     }

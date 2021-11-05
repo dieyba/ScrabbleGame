@@ -7,6 +7,7 @@ import { Vec2 } from './vec2';
 const PARSE_INT_BASE = 10;
 const ROW_OFFSET = 'a'.charCodeAt(0);
 const COLUMN_OFFSET = 1;
+export const ERROR_NUMBER = -1;
 
 export enum Axis {
     H = 'h',

@@ -2,13 +2,13 @@ import { GameService } from '@app/services/game.service';
 import { ChatDisplayEntry, ChatEntryColor, createErrorEntry } from './chat-display-entry';
 import { Command, CommandName, CommandResult, DefaultCommandParams, PlaceParams } from './commands';
 import { ErrorType } from './errors';
-import { convertCoordToString } from './utilities';
+import { Axis, convertCoordToString } from './utilities';
 import { Vec2 } from './vec2';
 
 export class PlaceCmd extends Command {
     private gameService: GameService;
     private position: Vec2;
-    private orientation: string;
+    private orientation: Axis;
     private word: string;
 
     constructor(defaultParams: DefaultCommandParams, params: PlaceParams) {

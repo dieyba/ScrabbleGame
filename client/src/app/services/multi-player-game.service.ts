@@ -14,7 +14,7 @@ import { GridService } from './grid.service';
 import { LetterStock } from './letter-stock.service';
 import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
-import { DEFAULT_LETTER_COUNT, SoloGameService } from './solo-game.service';
+import { DEFAULT_LETTER_COUNT, MAX_TURNS_PASSED, SoloGameService } from './solo-game.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 const LOCAL_PLAYER_INDEX = 0;
@@ -39,17 +39,20 @@ export class MultiPlayerGameService extends SoloGameService {
         super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService);
         this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
-        this.socket.on('timer reset', (timer: number) => {
-            this.updateActivePlayer();
-            this.resetTimer();
-        });
-        this.socket.on('increaseTurnsPassed', (hasTurnsBeenPassed: boolean[]) => {
-            this.game.hasTurnsBeenPassed = hasTurnsBeenPassed;
-            const isLocalPlayerEndingGame = this.isConsecutivePassedTurnsLimit() && this.game.localPlayer.isActive;
-            if (isLocalPlayerEndingGame) {
-                this.endGame(); // calling MultiPlayerGameService to end game on both clients
+        this.socket.on('turn changed', (isTurnPassed: boolean, consecutivePassedTurns: number) => {
+            this.game.isTurnPassed = isTurnPassed
+            this.game.consecutivePassedTurns = consecutivePassedTurns;
+            if (!this.game.isEndGame) { // if it is not already the endgame
+                const isLocalPlayerEndingGame = this.game.consecutivePassedTurns >= MAX_TURNS_PASSED && this.game.localPlayer.isActive;
+                if (isLocalPlayerEndingGame) {
+                    this.endGame();
+                }
+                this.updateActivePlayer();
+                this.resetTimer();
+                console.log("Changed turn (multi mode): ", this.game.localPlayer.name, " active:", this.game.opponentPlayer.isActive, ',',
+                    this.game.localPlayer.name, " active: ", this.game.opponentPlayer.isActive, ',consecutive passed turns:', this.game.consecutivePassedTurns);
+                this.game.isTurnPassed = false;
             }
-            this.currentTurnId++;
         });
         this.socket.on('gameEnded', () => {
             this.displayEndGameMessage();
@@ -68,9 +71,6 @@ export class MultiPlayerGameService extends SoloGameService {
             this.game.opponentPlayer.letters = update.newLetters;
             this.game.opponentPlayer.score = update.newScore;
         });
-        // TODO: add a socket.on 'synchronize' for board and player or something
-        // Need to have the opponent player letters syncrhonized on both clients for the displayEndGameMessage(),
-        // or ill pass it when emitting end game ig but its simpler to just synchronize when exchange/place
     }
     override initializeGame(gameInfo: FormGroup): GameParameters {
         this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value, gameInfo.controls.bonus.value);
@@ -98,27 +98,16 @@ export class MultiPlayerGameService extends SoloGameService {
 
         this.game.localPlayer = new LocalPlayer(game.gameRoom.playersName[localPlayerIndex]);
         this.game.localPlayer.letters = this.socket.id === this.game.players[0].socketId ? this.game.creatorPlayer.letters : this.game.opponentPlayer.letters;
-        // this.game.opponentPlayer = new LocalPlayer(game.gameRoom.playersName[opponentPlayerIndex]);
-
-        // this.game.opponentPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        // this.game.localPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
 
         this.game.localPlayer.isActive = this.game.players[localPlayerIndex].isActive;
         this.game.opponentPlayer.isActive = this.game.players[opponentPlayerIndex].isActive;
-        // this.game.localPlayer = this.socket.id === this.game.creatorPlayer.socketId ? this.game.creatorPlayer : this.game.opponentPlayer;
-        /// todo c'est ici que le 2e rejoint pour randomize qui joue en 1er
-        console.log('les joueurs dans le initialize2 : ', this.game);
     }
 
     override async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
-        const errorResult = super.place(player, placeParams);
-        // la fonction peut retourner NoError mais le mot n'appartient pas au dictionnaire, a regler
-        if (await errorResult === ErrorType.NoError) {
-            console.log('avant les emits');
+        const errorResult = await super.place(player, placeParams);
+        if (errorResult === ErrorType.NoError) {
             this.socket.emit('word placed', { word: placeParams.word, orientation: placeParams.orientation, positionX: placeParams.position.x, positionY: placeParams.position.y });
-            console.log('avant le emit');
             this.socket.emit('place word', { stock: this.stock.letterStock, newLetters: player.letters, newScore: player.score });
-            console.log('apres les emits');
         }
         return errorResult;
     }
@@ -131,6 +120,7 @@ export class MultiPlayerGameService extends SoloGameService {
         return errorResult;
     }
 
+    // TO DO : eviter la duplication de code
     updateBoard(word: string, orientation: string, position: Vec2) {
         if (orientation === 'h') {
             for (const letter of word) {
@@ -138,6 +128,8 @@ export class MultiPlayerGameService extends SoloGameService {
                 character.tile.position.x = position.x;
                 character.tile.position.y = position.y;
                 this.gridService.drawLetter(character, position.x, position.y);
+                this.gridService.scrabbleBoard.squares[position.x][position.y].isValidated = true;
+                this.gridService.scrabbleBoard.squares[position.x][position.y].isBonusUsed = true;
                 position.x++;
             }
         } else {
@@ -146,18 +138,16 @@ export class MultiPlayerGameService extends SoloGameService {
                 character.tile.position.x = position.x;
                 character.tile.position.y = position.y;
                 this.gridService.drawLetter(character, position.x, position.y);
+                this.gridService.scrabbleBoard.squares[position.x][position.y].isValidated = true;
                 position.y++;
             }
         }
     }
+    override changeTurn() {
+        this.socket.emit('change turn', this.game.isTurnPassed, this.game.consecutivePassedTurns);
+    }
 
-    override updateHasTurnsBeenPassed(isCurrentTurnedPassed: boolean) {
-        this.socket.emit('updateTurnsPassed', isCurrentTurnedPassed, this.game.hasTurnsBeenPassed);
-    }
-    override changeActivePlayer() {
-        this.socket.emit('reset timer');
-    }
-    // TODO: see if endGame multi (and solo ig) works for when triggered by empty racks
+    // TODO: see if endGame multi (and solo) works for when triggered by empty racks
     override endGame() {
         this.socket.emit('endGame');
     }

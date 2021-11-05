@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { DARK_BLUE_FACTOR, PALE_BLUE_FACTOR, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { SquareColor } from '@app/classes/square';
-import { Axis } from '@app/classes/utilities';
+import { Axis, ERROR_NUMBER } from '@app/classes/utilities';
 import { GridService } from './grid.service';
 
 const PINK_FACTOR = 2;
@@ -24,11 +24,9 @@ export class BonusService {
         this.pinkBonusCount = 0;
         this.redBonusCount = 0;
         let total = 0;
-        console.log('ey');
         for (let i = 0; i < scrabbleWord.content.length; i++) {
             // Account for letter pale/dark blue bonuses
             if (scrabbleWord.orientation === Axis.H) {
-                console.log('position : ', this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y]);
                 if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed) {
                     total += this.calculateValue(
                         scrabbleWord.content[i],
@@ -47,7 +45,7 @@ export class BonusService {
                     total += scrabbleWord.content[i].value;
                 }
             } else {
-                total += scrabbleWord.content[i].value; // For purposes of testing, when we don't need an orientation.
+                total = ERROR_NUMBER;
             }
         }
         // Word pink/red bonuses
@@ -149,5 +147,4 @@ export class BonusService {
                 break;
         }
     }
-
 }

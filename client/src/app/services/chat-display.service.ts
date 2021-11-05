@@ -5,8 +5,6 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { scrabbleLetterstoString } from '@app/classes/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
-// import { GameService } from './game.service';
-// import { MultiPlayerGameService } from './multi-player-game.service';
 
 const ACTIVE_DEBUG_MESSAGE = 'Affichages de débogage activés';
 const INACTIVE_DEBUG_MESSAGE = 'Affichages de débogage désactivés';
@@ -74,7 +72,7 @@ export class ChatDisplayService {
         const remainingLettersMessage = 'Fin de partie - ' + scrabbleLetterstoString(remainingLetters);
         const firstPlayerMessage = firstPlayer.name + ' : ' + scrabbleLetterstoString(firstPlayer.letters);
         const secondPlayerMessage = secondPlayer.name + ' : ' + scrabbleLetterstoString(secondPlayer.letters);
-        let endGameMessage: ChatDisplayEntry[] = [];
+        const endGameMessage: ChatDisplayEntry[] = [];
         endGameMessage.push({
             color: ChatEntryColor.SystemColor,
             message: remainingLettersMessage,

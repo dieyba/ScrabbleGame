@@ -48,7 +48,6 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly commandInvokerService: CommandInvokerService,
         private readonly virtualPlayerService: VirtualPlayerService,
     ) {
-        // this.gridService = new GridService();
         this.mousePosition = new Vec2(0, 0);
         this.canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         this.rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);

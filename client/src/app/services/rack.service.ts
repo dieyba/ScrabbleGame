@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ERROR_NUMBER } from '@app/classes/utilities';
 
 export const RACK_WIDTH = 500;
 export const RACK_HEIGHT = 60;
@@ -54,7 +55,7 @@ export class RackService {
     }
 
     removeLetter(scrabbleLetter: ScrabbleLetter): number {
-        let pos = -1;
+        let pos = ERROR_NUMBER;
         for (let i = 0; i < this.rackLetters.length; i++) {
             if (this.rackLetters[i].character === scrabbleLetter.character) {
                 this.rackLetters.splice(i, 1);
@@ -129,34 +130,6 @@ export class RackService {
         this.handleExchangeSelection(position, ctx);
         this.drawRack();
     }
-
-    // selectForHandling(position: number, ctx: CanvasRenderingContext2D) {
-    //     ctx.fillStyle = 'red';
-    //     this.handlingSelected[position - 1] = true;
-    //     this.handleExchangeSelection(position, ctx);
-    // }
-
-    // deselectForHandling(position: number, ctx: CanvasRenderingContext2D) {
-    //     ctx.fillStyle = 'white';
-    //     this.handlingSelected[position - 1] = false;
-    //     this.handleExchangeSelection(position, ctx);
-    //     this.drawRack();
-    // }
-
-    // selectForExchange(position: number, ctx: CanvasRenderingContext2D) {
-    //     // const squareOrigin = this.findSquareOrigin(position);
-    //     ctx.fillStyle = 'orange';
-    //     this.exchangeSelected[position - 1] = true;
-    //     this.handleExchangeSelection(position, ctx);
-    // }
-
-    // deselectForExchange(position: number, ctx: CanvasRenderingContext2D) {
-    //     // const squareOrigin = this.findSquareOrigin(position);
-    //     ctx.fillStyle = 'white';
-    //     this.exchangeSelected[position - 1] = false;
-    //     this.handleExchangeSelection(position, ctx);
-    //     this.drawRack();
-    // }
 
     deselectAll(ctx: CanvasRenderingContext2D) {
         for (let i = 0; i < this.exchangeSelected.length; i++) {

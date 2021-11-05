@@ -19,9 +19,6 @@ export class ExchangeService {
         if (this.rackService.handlingSelected[position - 1] === true) {
             this.rackService.handlingSelected[position - 1] = false;
         }
-
-        // s'il faut désélectionner la lettre de manip quand celle de échanger
-        // est sélectionnée, ce sera comme ça
         for (let i = 0; i < this.rackService.handlingSelected.length; i++) {
             if (this.rackService.handlingSelected[i] === true) {
                 this.rackService.deselect(i + 1, rackContext, false);

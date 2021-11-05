@@ -58,11 +58,8 @@ export class SocketManagerService {
             socket.on('getAllGames', (game: Array<GameParameters>) => {
                 this.getAllGames(socket);
             });
-            socket.on('reset timer', () => {
-                this.resetTimer(socket);
-            });
-            socket.on('updateTurnsPassed', (isCurrentTurnedPassed: boolean, hasTurnsBeenPassed: boolean[]) => {
-                this.increaseHasTurnsPassed(socket, isCurrentTurnedPassed, hasTurnsBeenPassed);
+            socket.on('change turn', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
+                this.changeTurn(socket, isCurrentTurnedPassed, consecutivePassedTurns);
             });
             socket.on('endGame', () => {
                 this.endGame(socket);
@@ -70,11 +67,9 @@ export class SocketManagerService {
             socket.on('playerQuit', () => {
                 this.displayPlayerQuitMessage(socket);
             });
-            socket.on('disconnect', (reason) => {
-                // setTimeout(() => {
+            socket.on('disconnect', () => {
                 console.log(`Deconnexion par l'utilisateur avec id : ${socket.id}`);
                 this.disconnect(socket)
-                // }, 5000);
             });
             socket.on('word placed', (word: any) => {
                 let sender = this.playerMan.getPlayerBySocketID(socket.id);
@@ -95,17 +90,6 @@ export class SocketManagerService {
         });
         setInterval(() => {}, 1000);
     }
-    private resetTimer(socket: io.Socket) {
-        let commandSender = this.playerMan.getPlayerBySocketID(socket.id);
-        if (commandSender) {
-            let roomId = commandSender.roomId;
-            let roomGame = this.gameListMan.getCurrentGame(roomId);
-            if (roomGame) {
-                this.sio.to(roomId.toString()).emit('timer reset', roomGame.totalCountDown);
-            }
-        }
-    }
-
     private createRoom(socket: io.Socket, game: any): void {
         let newRoom = new GameParameters(game.name, game.timer, game.board, this.gameListMan.currentRoomID++)
         newRoom.localPlayer.socketId = socket.id;
@@ -128,14 +112,13 @@ export class SocketManagerService {
     }
     private deleteRoom(socket: io.Socket): void {
         let player = this.playerMan.getPlayerBySocketID(socket.id);
-        if (player) {
+        let roomGame = this.gameListMan.getGameFromExistingRooms(player.roomId) as GameParameters;
+        if (player !== undefined) {
             this.gameListMan.deleteRoom(player.roomId);
+            this.sio.emit('roomdeleted', roomGame);
         }
-        this.sio.emit('roomdeleted');
-
     }
     private leaveRoom(socket: io.Socket) {
-        console.log('leaveRoom')
         let player = this.playerMan.getPlayerBySocketID(socket.id);
         if (player !== undefined) {
             let roomGame = this.gameListMan.getCurrentGame(player.roomId) as GameParameters;
@@ -143,12 +126,17 @@ export class SocketManagerService {
                 roomGame.gameRoom.playersName.splice(roomGame.gameRoom.playersName.indexOf(player.name), 1);
                 roomGame.players.splice(roomGame.players.indexOf(player), 1);
                 if (roomGame.gameRoom.playersName.length === 0) {
-                    this.gameListMan.deleteRoom(player.roomId);
+                    this.gameListMan.currentGames.splice(this.gameListMan.currentGames.indexOf(roomGame), 1);
                 }
                 else {
                     this.displayPlayerQuitMessage(socket);
                     this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomLeft', roomGame);
                 }
+            }
+            else {
+                this.deleteRoom(socket);
+                this.getAllGames(socket)
+
             }
             socket.leave(player.roomId.toString());
         }
@@ -226,10 +214,16 @@ export class SocketManagerService {
         const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId.toString();
         this.sio.in(roomId).emit('addSystemChatEntry', message);
     }
-    private increaseHasTurnsPassed(socket: io.Socket, isCurrentTurnedPassed: boolean, hasTurnsBeenPassed: boolean[]) {
-        const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId.toString();
-        hasTurnsBeenPassed.push(isCurrentTurnedPassed);
-        this.sio.in(roomId).emit('increaseTurnsPassed', hasTurnsBeenPassed);
+    private changeTurn(socket: io.Socket, isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) {
+        const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId;
+        if (roomId) {
+            if (isCurrentTurnedPassed) {
+                consecutivePassedTurns++;
+            } else {
+                consecutivePassedTurns = 0;
+            }
+            this.sio.in(roomId.toString()).emit('turn changed', isCurrentTurnedPassed, consecutivePassedTurns);
+        }
     }
     private endGame(socket: io.Socket) {
         const roomId = this.playerMan.getPlayerBySocketID(socket.id).roomId.toString();

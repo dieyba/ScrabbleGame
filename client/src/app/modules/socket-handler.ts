@@ -1,6 +1,6 @@
 import * as io from 'socket.io-client';
 
-export namespace SocketHandler {
+export module SocketHandler {
     let activeSocket: io.Socket;
 
     export function requestSocket(server: string): io.Socket {
@@ -10,8 +10,8 @@ export namespace SocketHandler {
         return activeSocket;
     }
 
-    export function disconnectSocket(): any {
-        activeSocket.disconnect();
-        return activeSocket === undefined;
-    }
+    // export function disconnectSocket(): any {
+    //     activeSocket.disconnect();
+    //     return activeSocket === undefined;
+    // }
 }

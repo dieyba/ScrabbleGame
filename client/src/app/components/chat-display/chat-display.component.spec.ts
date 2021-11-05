@@ -67,4 +67,9 @@ describe('ChatDisplayComponent', () => {
         expect(isNewEntrySpy).toHaveBeenCalled();
         expect(scrollDownSpy).not.toHaveBeenCalled();
     });
+
+    it('scrollDown should set scrollTop to scrollHeight', () => {
+        chatDisplay.scrollDown();
+        expect(chatDisplay.chatDisplayBox.nativeElement.scrollTop).toEqual(0);
+    });
 });

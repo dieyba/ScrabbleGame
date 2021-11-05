@@ -41,7 +41,7 @@ export class MouseWordPlacerService {
         this.wordString = '';
     }
     onMouseClick(e: MouseEvent) {
-        if (this.gameService.currentGameService.game.localPlayer.isActive === false || this.currentWord.length > 0) return;
+        if (this.gameService.currentGameService.game.isEndGame || this.gameService.currentGameService.game.localPlayer.isActive === false || this.currentWord.length > 0) return;
         this.clearOverlay();
         if (this.initialPosition.x !== 0 && this.initialPosition.y !== 0) {
             this.drawArrow(this.initialPosition, this.currentAxis);
@@ -248,7 +248,6 @@ export class MouseWordPlacerService {
         if (indexes[0] >= BOARD_SIZE || indexes[1] >= BOARD_SIZE) return;
         let foundLetter: ScrabbleLetter = new ScrabbleLetter('', 0);
         if (letter === letter.toUpperCase()) {
-            console.log('dans le 2e if');
             // Look for a blank piece on the rack
             for (const rackLetter of this.rackService.rackLetters) {
                 if (rackLetter.character === '*') {

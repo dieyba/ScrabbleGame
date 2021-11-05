@@ -9,8 +9,6 @@ import { GameService } from './game.service';
     providedIn: 'root',
 })
 export class GameListService {
-    private readonly server: string;
-    private socket: io.Socket;
     isStarting: boolean;
     player: LocalPlayer;
     existingRooms: GameParameters[];
@@ -18,6 +16,8 @@ export class GameListService {
     myRoom: GameRoom[];
     roomInfo: GameParameters;
     full: boolean;
+    private readonly server: string;
+    private socket: io.Socket;
 
     constructor(private gameService: GameService) {
         this.server = 'http://' + window.location.hostname + ':3000';
@@ -25,7 +25,6 @@ export class GameListService {
         this.myRoom = new Array<GameRoom>();
         this.socket = SocketHandler.requestSocket(this.server);
         this.player = new LocalPlayer('');
-        // this.roomInfo = new GameParameters('', 0, false);
         this.players = new Array<LocalPlayer>();
         this.full = false;
         this.socket.emit('addPlayer', this.player);
@@ -57,12 +56,7 @@ export class GameListService {
     initializeGame(roomId: number) {
         this.socket.emit('initializeGame', roomId);
     }
-    // disconnectUser(): void {
-    //     console.log('disconnect User')
-    //     this.socket.emit('disconnect');
-    // }
     someoneLeftRoom() {
-        console.log('someoneLeftRoom');
         this.socket.emit('leaveRoom');
     }
 }
