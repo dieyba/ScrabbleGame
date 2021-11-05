@@ -21,14 +21,18 @@ export class ExchangeService {
         }
         for (let i = 0; i < this.rackService.handlingSelected.length; i++) {
             if (this.rackService.handlingSelected[i] === true) {
-                this.rackService.deselect(i + 1, rackContext, false);
+                this.rackService.deselect(i + 1, this.rackService.gridContext, false);
             }
         }
 
+        if (this.rackService.handlingSelected[position - 1] === true) {
+            this.rackService.handlingSelected[position - 1] = false;
+        }
+
         if (this.rackService.exchangeSelected[position - 1] === true) {
-            this.rackService.deselect(position, rackContext, true);
+            this.rackService.deselect(position, this.rackService.gridContext, true);
         } else {
-            this.rackService.select(position, rackContext, true);
+            this.rackService.select(position, this.rackService.gridContext, true);
         }
     }
 

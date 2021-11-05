@@ -14,12 +14,28 @@ export class ManipulationRackService {
         this.firstOccurencePosition = ERROR_NUMBER;
     }
 
-    handleSelection(rackContext: CanvasRenderingContext2D, position: number) {
+    // set selectedPosition(newValue: number) {
+    //     this.letterSelectedPosition = newValue;
+    // }
+
+    // set firstOccurence(newValue: number) {
+    //     this.firstOccurencePosition = newValue;
+    // }
+
+    // get getSelectedPosition() {
+    //     return this.letterSelectedPosition;
+    // }
+
+    // get getFirstOccurence() {
+    //     return this.firstOccurencePosition;
+    // }
+
+    handleSelection(position: number) {
         if (this.rackService.handlingSelected[position - 1] === false) {
             if (this.rackService.exchangeSelected[position - 1] === true) {
                 this.rackService.exchangeSelected[position - 1] = false;
             }
-            this.rackService.select(position, rackContext, false);
+            this.rackService.select(position, this.rackService.gridContext, false);
             this.letterSelectedPosition = position - 1;
         }
     }
