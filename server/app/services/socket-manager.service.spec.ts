@@ -75,7 +75,7 @@ describe('SocketManager service', () => {
     beforeEach(() => {
         validationServiceStub = sinon.createStubInstance(ValidationService);
         httpServer = http.createServer();
-        socketManagerService = new SocketManagerService(httpServer, validationServiceStub);
+        socketManagerService = new SocketManagerService(httpServer);
 
         // Mocking the server
         serverMock = new ServerMock();
@@ -399,9 +399,8 @@ describe('SocketManager service', () => {
         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
         // stub, spy and mock
-        const gameListManagerStub = sinon.createStubInstance(GameListManager);
-        gameListManagerStub.validateNewWords.returns(true);
-        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+        validationServiceStub.validateWords.returns(true);
+        socketManagerService['validationService'] = validationServiceStub as unknown as ValidationService;
 
         const serverMockSpy = sinon.spy(serverMock, 'to');
 
@@ -410,7 +409,7 @@ describe('SocketManager service', () => {
         // "validateWords" event
         socketMock.triggerEvent('validateWords', wordsToValidate);
 
-        expect(gameListManagerStub.validateNewWords.called).to.be.true;
+        expect(validationServiceStub.validateWords.called).to.be.true;
         sinon.assert.called(serverMockSpy);
     });
 
