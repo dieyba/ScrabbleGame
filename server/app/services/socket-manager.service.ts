@@ -112,8 +112,8 @@ export class SocketManagerService {
     }
     private deleteRoom(socket: io.Socket): void {
         let player = this.playerMan.getPlayerBySocketID(socket.id);
-        let roomGame = this.gameListMan.getGameFromExistingRooms(player.roomId) as GameParameters;
         if (player !== undefined) {
+            let roomGame = this.gameListMan.getGameFromExistingRooms(player.roomId) as GameParameters;
             this.gameListMan.deleteRoom(player.roomId);
             this.sio.emit('roomdeleted', roomGame);
         }
