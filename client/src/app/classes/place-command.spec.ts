@@ -13,11 +13,12 @@ import { Vec2 } from './vec2';
 const PLAYER_NAME = 'Sara';
 const OPPONENT_NAME = 'Not Sara';
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('PlaceCmd', () => {
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
-    let localPlayer = new LocalPlayer(PLAYER_NAME);
-    let opponentPlayer = new LocalPlayer(OPPONENT_NAME);
+    const localPlayer = new LocalPlayer(PLAYER_NAME);
+    const opponentPlayer = new LocalPlayer(OPPONENT_NAME);
     const placeParams: PlaceParams = { position: new Vec2(7, 7), orientation: Axis.H, word: 'word' };
 
     beforeEach(async () => {
@@ -27,16 +28,15 @@ describe('PlaceCmd', () => {
         TestBed.configureTestingModule({
             providers: [
                 { provide: GameService, useValue: gameServiceSpy },
-                { provide: SoloGameService, useValue: soloGameServiceSpy }
+                { provide: SoloGameService, useValue: soloGameServiceSpy },
             ],
         });
         gameServiceSpy.currentGameService = soloGameServiceSpy;
-        gameServiceSpy.currentGameService.place = soloGameServiceSpy.place.and.returnValue(Promise.resolve(ErrorType.NoError));;
+        gameServiceSpy.currentGameService.place = soloGameServiceSpy.place.and.returnValue(Promise.resolve(ErrorType.NoError));
         gameServiceSpy.currentGameService.game = new GameParameters(LocalPlayer.name, 0, false);
         gameServiceSpy.currentGameService.game.localPlayer = localPlayer;
         gameServiceSpy.currentGameService.game.opponentPlayer = opponentPlayer;
     });
-
 
     it('should create an instance', () => {
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
@@ -55,7 +55,7 @@ describe('PlaceCmd', () => {
     it('should execute and return successful command message from local player', async () => {
         gameServiceSpy.initializeGameType(GameType.Solo);
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
-        const localPlayerEntry = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + " >> !placer h8h word" };
+        const localPlayerEntry = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + ' >> !placer h8h word' };
         const place = new PlaceCmd(defaultParams, placeParams);
         place.player.isActive = true;
         soloGameServiceSpy.place.and.returnValue(Promise.resolve(ErrorType.NoError));
@@ -66,19 +66,18 @@ describe('PlaceCmd', () => {
     it('should execute and return successful command message from opponent player', async () => {
         gameServiceSpy.initializeGameType(GameType.Solo);
         const defaultParams: DefaultCommandParams = { player: opponentPlayer, serviceCalled: gameServiceSpy };
-        const opponentPlayerEntry = { color: ChatEntryColor.RemotePlayer, message: OPPONENT_NAME + " >> !placer h8h word" };
+        const opponentPlayerEntry = { color: ChatEntryColor.RemotePlayer, message: OPPONENT_NAME + ' >> !placer h8h word' };
         const place = new PlaceCmd(defaultParams, placeParams);
         place.player.isActive = true;
         const executionResult = await place.execute();
         expect(executionResult).toEqual({ isExecuted: true, executionMessages: [opponentPlayerEntry] });
-
     });
 
     it('should execute and return impossible command error', async () => {
         gameServiceSpy.initializeGameType(GameType.Solo);
         gameServiceSpy.currentGameService.place = soloGameServiceSpy.place.and.returnValue(Promise.resolve(ErrorType.ImpossibleCommand));
         const defaultParams: DefaultCommandParams = { player: opponentPlayer, serviceCalled: gameServiceSpy };
-        const errorEntry = createErrorEntry(ErrorType.ImpossibleCommand, "!placer h8h word");
+        const errorEntry = createErrorEntry(ErrorType.ImpossibleCommand, '!placer h8h word');
         const place = new PlaceCmd(defaultParams, placeParams);
         place.player.isActive = false;
         const executionResult = await place.execute();

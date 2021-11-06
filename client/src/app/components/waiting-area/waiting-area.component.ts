@@ -52,7 +52,12 @@ export class WaitingAreaComponent {
         this.isStarting = false;
         if (gameSelected) {
             this.selectedGame = new GameParameters('', 0, false);
-            this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(12), Validators.minLength(3)]);
+            this.playerName = new FormControl('', [
+                Validators.required,
+                Validators.pattern('[a-zA-ZÉé]*'),
+                Validators.maxLength(12),
+                Validators.minLength(3),
+            ]);
         }
         this.full = false;
         this.nameErrorMessage = '';
@@ -60,14 +65,14 @@ export class WaitingAreaComponent {
         this.timer = setInterval(() => {
             this.list = this.gameList.getList();
         }, 500);
-        this.socketOnConnect()
+        this.socketOnConnect();
     }
     @HostListener('window:beforeunload', ['$event'])
-    onBeforeUnload(event: MouseEvent) {
+    onBeforeUnload() {
         this.gameList.someoneLeftRoom();
     }
     @HostListener('window:popstate', ['$event'])
-    onPopState(event: MouseEvent) {
+    onPopState() {
         this.gameList.someoneLeftRoom();
     }
 
@@ -148,7 +153,7 @@ export class WaitingAreaComponent {
             this.nameValid = false;
             this.gameCancelled = true;
             this.roomDeletedId = game.gameRoom.idGame;
-        })
+        });
         this.socket.on('roomJoined', (game: GameParameters) => {
             this.gameList.roomInfo = game;
             this.gameList.roomInfo.gameRoom = game.gameRoom;

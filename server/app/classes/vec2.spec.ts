@@ -1,6 +1,8 @@
 import { Vec2 } from '@app/classes/vec2';
 import { expect } from 'chai';
 
+/* eslint-disable  @typescript-eslint/no-unused-expressions */
+/* eslint-disable  no-unused-expressions */
 describe('Vec2', () => {
     it('should create an instance', () => {
         expect(new Vec2()).to.exist;

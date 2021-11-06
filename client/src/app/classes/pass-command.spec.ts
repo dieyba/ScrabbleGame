@@ -14,8 +14,8 @@ const OPPONENT_NAME = 'Not Sara';
 describe('PassTurnCmd', () => {
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
-    let localPlayer = new LocalPlayer(PLAYER_NAME);
-    let opponentPlayer = new LocalPlayer(OPPONENT_NAME);
+    const localPlayer = new LocalPlayer(PLAYER_NAME);
+    const opponentPlayer = new LocalPlayer(OPPONENT_NAME);
 
     beforeEach(() => {
         soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['passTurn']);
@@ -24,7 +24,7 @@ describe('PassTurnCmd', () => {
         TestBed.configureTestingModule({
             providers: [
                 { provide: GameService, useValue: gameServiceSpy },
-                { provide: SoloGameService, useValue: soloGameServiceSpy }
+                { provide: SoloGameService, useValue: soloGameServiceSpy },
             ],
         });
         gameServiceSpy.currentGameService = soloGameServiceSpy;
@@ -33,7 +33,6 @@ describe('PassTurnCmd', () => {
         gameServiceSpy.currentGameService.game.localPlayer = localPlayer;
         gameServiceSpy.currentGameService.game.opponentPlayer = opponentPlayer;
     });
-
 
     it('should create an instance', () => {
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
@@ -53,7 +52,7 @@ describe('PassTurnCmd', () => {
         gameServiceSpy.initializeGameType(GameType.Solo);
         soloGameServiceSpy.passTurn.and.returnValue(ErrorType.NoError);
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
-        const commandEntry = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + " >> !passer" };
+        const commandEntry = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + ' >> !passer' };
         const pass = new PassTurnCmd(defaultParams);
         pass.player.isActive = true;
         expect(pass.execute()).toEqual({ isExecuted: true, executionMessages: [commandEntry] });
@@ -63,7 +62,7 @@ describe('PassTurnCmd', () => {
         gameServiceSpy.initializeGameType(GameType.Solo);
         soloGameServiceSpy.passTurn.and.returnValue(ErrorType.ImpossibleCommand);
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
-        const errorMessage = createErrorEntry(ErrorType.ImpossibleCommand, "!passer");
+        const errorMessage = createErrorEntry(ErrorType.ImpossibleCommand, '!passer');
         const pass = new PassTurnCmd(defaultParams);
         pass.player.isActive = false;
         expect(pass.execute()).toEqual({ isExecuted: false, executionMessages: [errorMessage] });
@@ -72,7 +71,7 @@ describe('PassTurnCmd', () => {
         gameServiceSpy.initializeGameType(GameType.Solo);
         soloGameServiceSpy.passTurn.and.returnValue(ErrorType.NoError);
         const defaultParams: DefaultCommandParams = { player: opponentPlayer, serviceCalled: gameServiceSpy };
-        const commandEntry = { color: ChatEntryColor.RemotePlayer, message: OPPONENT_NAME + " >> !passer" };
+        const commandEntry = { color: ChatEntryColor.RemotePlayer, message: OPPONENT_NAME + ' >> !passer' };
         const pass = new PassTurnCmd(defaultParams);
         pass.player.isActive = true;
         expect(pass.execute()).toEqual({ isExecuted: true, executionMessages: [commandEntry] });
@@ -82,7 +81,7 @@ describe('PassTurnCmd', () => {
         gameServiceSpy.initializeGameType(GameType.Solo);
         soloGameServiceSpy.passTurn.and.returnValue(ErrorType.ImpossibleCommand);
         const defaultParams: DefaultCommandParams = { player: opponentPlayer, serviceCalled: gameServiceSpy };
-        const errorMessage = createErrorEntry(ErrorType.ImpossibleCommand, "!passer");
+        const errorMessage = createErrorEntry(ErrorType.ImpossibleCommand, '!passer');
         const pass = new PassTurnCmd(defaultParams);
         pass.player.isActive = false;
         expect(pass.execute()).toEqual({ isExecuted: false, executionMessages: [errorMessage] });

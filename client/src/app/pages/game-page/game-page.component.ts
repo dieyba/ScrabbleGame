@@ -12,10 +12,10 @@ import { environment } from 'src/environments/environment';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
+    canNavBack: boolean = false;
     private dialogRef: MatDialogRef<EndGamePopupComponent>;
     private socket: io.Socket;
     private readonly server: string;
-    canNavBack: boolean = false;
     constructor(private dialog: MatDialog, private gameService: GameService) {
         // this.server = 'http://' + window.location.hostname + ':3000';
         this.server = environment.socketUrl;
@@ -44,5 +44,4 @@ export class GamePageComponent {
             });
         }
     }
-
 }

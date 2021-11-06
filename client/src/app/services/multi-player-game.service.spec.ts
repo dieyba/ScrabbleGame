@@ -15,6 +15,11 @@ import { RackService } from './rack.service';
 import { SoloGameService } from './solo-game.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-unused-vars */
+/* eslint-disable dot-notation */
 class SocketMock {
     id: string = 'Socket mock';
     events: Map<string, CallableFunction> = new Map();
@@ -39,6 +44,7 @@ class SocketMock {
     }
 }
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('MultiPlayerGameService', () => {
     let service: MultiPlayerGameService;
     let chatDisplayServiceSpy: jasmine.SpyObj<ChatDisplayService>;
@@ -60,7 +66,7 @@ describe('MultiPlayerGameService', () => {
         opponent: new FormControl('Sara'),
     });
 
-    let gameParameters = new GameParameters('Erika', 60, true);
+    const gameParameters = new GameParameters('Erika', 60, true);
 
     const creatorLetters = [
         new ScrabbleLetter('d'),
@@ -69,7 +75,7 @@ describe('MultiPlayerGameService', () => {
         new ScrabbleLetter('a'),
         new ScrabbleLetter('t'),
         new ScrabbleLetter('l'),
-        new ScrabbleLetter('i')
+        new ScrabbleLetter('i'),
     ];
     const opponentLetters = [
         new ScrabbleLetter('p'),
@@ -78,9 +84,8 @@ describe('MultiPlayerGameService', () => {
         new ScrabbleLetter('b'),
         new ScrabbleLetter('r'),
         new ScrabbleLetter('o'),
-        new ScrabbleLetter('l')
+        new ScrabbleLetter('l'),
     ];
-
 
     beforeEach(() => {
         chatDisplayServiceSpy = jasmine.createSpyObj('ChatDisplayService', ['sendMessageToServer', 'createEndGameMessages']);
@@ -103,7 +108,7 @@ describe('MultiPlayerGameService', () => {
             ],
         });
         service = TestBed.inject(MultiPlayerGameService);
-        service.game = new GameParameters('dieyba', 60, false)
+        service.game = new GameParameters('dieyba', 60, false);
         socketMock = new SocketMock();
         service['socket'] = socketMock as unknown as io.Socket;
         socketOnMockSpy = spyOn(socketMock, 'on').and.callThrough();
@@ -125,8 +130,6 @@ describe('MultiPlayerGameService', () => {
         gameParameters.opponentPlayer.letters = opponentLetters;
         gameParameters.players.push(gameParameters.creatorPlayer);
         gameParameters.players.push(gameParameters.opponentPlayer);
-
-
     });
 
     it('should be created', () => {
@@ -196,14 +199,12 @@ describe('MultiPlayerGameService', () => {
         service.game = gameParameters;
         const word = 'test';
         const position = new Vec2();
-        let startPosition = new Vec2();
+        const startPosition = new Vec2();
         service.updateBoard(word, 'v', position);
 
         for (startPosition.y; startPosition.y < word.length; startPosition.y++) {
-            console.log(gridServiceSpy.scrabbleBoard.squares[startPosition.x][startPosition.y]);
             expect(gridServiceSpy.scrabbleBoard.squares[startPosition.x][startPosition.y].isValidated).toBeTrue();
             expect(gridServiceSpy.scrabbleBoard.squares[startPosition.x][startPosition.y].isBonusUsed).toBeTrue();
         }
     });
-
 });

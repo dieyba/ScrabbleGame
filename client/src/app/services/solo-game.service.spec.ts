@@ -29,12 +29,19 @@ describe('SoloGameService', () => {
     let startCountdownSpy: jasmine.Spy<any>;
     let gridServiceSpy: jasmine.SpyObj<GridService>;
     let addRackLettersSpy: jasmine.Spy<any>;
-    let rackServiceSpy: jasmine.SpyObj<RackService>;    
+    let rackServiceSpy: jasmine.SpyObj<RackService>;
     let ctxStub: CanvasRenderingContext2D;
     beforeEach(() => {
         ctxStub = CanvasTestHelper.createCanvas(DEFAULT_WIDTH, DEFAULT_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
         gridServiceSpy = jasmine.createSpyObj('GridService', ['drawLetter', 'drawLetters'], { scrabbleBoard: new ScrabbleBoard(false) });
-        rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'drawLetter', 'removeLetter', 'addLetter', 'rackLetters', 'exchangeSelected']);
+        rackServiceSpy = jasmine.createSpyObj('RackService', [
+            'gridContext',
+            'drawLetter',
+            'removeLetter',
+            'addLetter',
+            'rackLetters',
+            'exchangeSelected',
+        ]);
         TestBed.configureTestingModule({
             providers: [
                 { provide: GridService, useValue: gridServiceSpy },
@@ -321,7 +328,7 @@ describe('SoloGameService', () => {
 
     it('startCountDown should changeTurn when timer has passed', fakeAsync(() => {
         service.game.isEndGame = false;
-        service.game.timerMs = 0; 
+        service.game.timerMs = 0;
         service.startCountdown();
         tick(1000);
         expect(changeTurnSpy).toHaveBeenCalled();
