@@ -3,11 +3,7 @@ import { GameParameters } from './game-parameters';
 import { Player } from './player';
 
 describe('GameParameters', () => {
-    let game = new GameParameters('dieyba', 60, false, 0);;
-    // game = new GameParameters('dieyba', 60, false, 0);
-    // beforeEach(async () => {
-    //     game = new GameParameters('dieyba', 60, false, 0);
-    // });
+    let game = new GameParameters('dieyba', 60, false, 0);
     it('should create a game parameters', () => {
         expect(game).to.exist;
     });

@@ -39,7 +39,7 @@ export class GameListManager {
         this.existingRooms.push(game);
         return game;
     }
-    public deleteRoom(roomId: number): void {
+    public deleteExistingRoom(roomId: number): void {
         const index = this.existingRooms.findIndex((r) => r.gameRoom.idGame === roomId)
         if (index > -1) {
             this.existingRooms.splice(index, 1);

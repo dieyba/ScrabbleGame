@@ -260,7 +260,7 @@ describe('SocketManager service', () => {
         socketMock.triggerEvent('deleteRoom');
 
         assert(playerManagerServiceStub.getPlayerBySocketID.called);
-        assert(gameListManagerStub.deleteRoom.called);
+        assert(gameListManagerStub.deleteExistingRoom.called);
         sinon.assert.called(serverMockSpy);
     });
 

@@ -58,6 +58,22 @@ describe('GameListManager service', () => {
         gameListMan.currentGames[0].players[0].roomId = 1;
         expect(gameListMan.getOtherPlayer('bd72eydbey', -1)).to.equal(undefined);
     });
+    it('deleteRoom should remove room', () => {
+        gameListMan.existingRooms.push(game1);
+        gameListMan.existingRooms.push(game2);
+        gameListMan.existingRooms.push(game3);
+        gameListMan.existingRooms.push(game4);
+        gameListMan.deleteExistingRoom(1);
+        expect(gameListMan.existingRooms.length).to.equal(3);
+    });
+    it('deleteRoom should not remove room', () => {
+        gameListMan.existingRooms.push(game1);
+        gameListMan.existingRooms.push(game2);
+        gameListMan.existingRooms.push(game3);
+        gameListMan.existingRooms.push(game4);
+        gameListMan.deleteExistingRoom(-1);
+        expect(gameListMan.existingRooms.length).to.equal(4);
+    });
     // it('should remove a room', () => {
     //     const room1 = new GameParameters('erika', 0, false, 0);
     //     const room2 = new GameParameters('Sara', 0, false, 0);

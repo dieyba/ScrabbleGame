@@ -120,7 +120,7 @@ export class SocketManagerService {
         let player = this.playerMan.getPlayerBySocketID(socket.id);
         if (player !== undefined) {
             let roomGame = this.gameListMan.getGameFromExistingRooms(player.roomId) as GameParameters;
-            this.gameListMan.deleteRoom(player.roomId);
+            this.gameListMan.deleteExistingRoom(player.roomId);
             this.sio.emit('roomdeleted', roomGame);
         }
     }
