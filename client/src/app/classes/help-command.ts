@@ -10,7 +10,7 @@ const HELP_PASS = '!passer: permet de passer son tour';
 const HELP_PLACE = '!placer rangéeColonneOrientation mot: permet de valider et placer un mot sur le plateau.';
 const HELP_PLACE_PARAMS = '(rangée: a-o, colonne: 1-15, orientation: h ou v, mot: lettres blanches en majuscule)';
 const HELP_STOCK = '!réserve : affiche les lettres restantes dans la réserve';
-const HELP_MESSAGES = [HELP_INTRO_MESSAGE, HELP_MESSAGE, HELP_DEBUG, HELP_EXCHANGE, HELP_PASS, HELP_PLACE, HELP_PLACE_PARAMS, HELP_STOCK];
+export const HELP_MESSAGES = [HELP_INTRO_MESSAGE, HELP_MESSAGE, HELP_DEBUG, HELP_EXCHANGE, HELP_PASS, HELP_PLACE, HELP_PLACE_PARAMS, HELP_STOCK];
 
 const IS_FROM_LOCAL_PLAYER = true;
 

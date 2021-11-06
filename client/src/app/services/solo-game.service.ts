@@ -194,7 +194,7 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
-    async place(player: Player, placeParams: PlaceParams): Promise<ErrorType /* Promise<ErrorType> */> /* Promise<ErrorType> */ {
+    async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
         if (!player.isActive) {
             return ErrorType.ImpossibleCommand;
         }

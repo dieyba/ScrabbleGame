@@ -6,8 +6,8 @@ import { scrabbleLetterstoString } from '@app/classes/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 
-const ACTIVE_DEBUG_MESSAGE = 'Affichages de débogage activés';
-const INACTIVE_DEBUG_MESSAGE = 'Affichages de débogage désactivés';
+export const ACTIVE_DEBUG_MESSAGE = 'Affichages de débogage activés';
+export const INACTIVE_DEBUG_MESSAGE = 'Affichages de débogage désactivés';
 
 @Injectable({
     providedIn: 'root',
