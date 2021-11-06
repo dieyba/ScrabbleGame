@@ -11,7 +11,7 @@ import { GameService } from '@app/services/game.service';
 import { LetterStock } from '@app/services/letter-stock.service';
 import { RackService } from '@app/services/rack.service';
 import { SoloGameService } from '@app/services/solo-game.service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
 describe('GamePageComponent', () => {
@@ -20,6 +20,15 @@ describe('GamePageComponent', () => {
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
+    let isClosed = true;
+
+    const dialogRefStub = {
+        // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
+        afterClosed() {
+            return of(isClosed);
+        },
+    };
+    const dialogStub = { open: () => dialogRefStub };
 
     beforeEach(async () => {
         gameServiceSpy = jasmine.createSpyObj('GameService', ['currentGameService', 'initializeGameType']);
@@ -32,11 +41,12 @@ describe('GamePageComponent', () => {
             imports: [RouterModule, MatDialogModule],
             providers: [
                 { provide: Router, useValue: { navigate: () => new Observable() } },
-                { provide: MatDialog, useValue: { open: () => new Observable() } },
+                { provide: MatDialog, dialogStub },
                 { provide: GameService, useValue: gameServiceSpy },
                 { provide: RackService, useValue: rackServiceSpy },
             ],
         }).compileComponents();
+
         const firstLetter: ScrabbleLetter = new ScrabbleLetter('a', 1);
         const secondLetter: ScrabbleLetter = new ScrabbleLetter('p', 3);
         const thirdLetter: ScrabbleLetter = new ScrabbleLetter('u', 4);
@@ -52,12 +62,12 @@ describe('GamePageComponent', () => {
         gameServiceSpy.currentGameService.game.opponentPlayer = new LocalPlayer('Sara');
         gameServiceSpy.currentGameService.game.opponentPlayer.score = 70;
         gameServiceSpy.currentGameService.game.opponentPlayer.letters = [firstLetter, thirdLetter, firstLetter];
-        gameServiceSpy.currentGameService.game.stock = new LetterStock();
+        gameServiceSpy.currentGameService.stock = new LetterStock();
         gameServiceSpy.currentGameService.game.opponentPlayer.isActive = false;
         gameServiceSpy.currentGameService.game.localPlayer.isActive = true;
-        soloGameServiceSpy.opponentPlayerSubject = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
-        soloGameServiceSpy.opponentPlayerObservable = soloGameServiceSpy.opponentPlayerSubject.asObservable();
-        soloGameServiceSpy.opponentPlayerSubject.next(true);
+        soloGameServiceSpy.virtualPlayerSubject = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
+        soloGameServiceSpy.isVirtualPlayerObservable = soloGameServiceSpy.virtualPlayerSubject.asObservable();
+        soloGameServiceSpy.virtualPlayerSubject.next(true);
     });
     beforeEach(() => {
         TestBed.createComponent(SidebarComponent);
@@ -68,5 +78,31 @@ describe('GamePageComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('onPopState should open end game dialog if canNavBack is false (leave)', () => {
+        const matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefStub); // eslint-disable-line deprecation/deprecation
+        component.canNavBack = false;
+        isClosed = true;
+        component.onPopState();
+        expect(matdialog).toHaveBeenCalled();
+        expect(component.canNavBack).toBeTruthy();
+    });
+
+    it('onPopState should open end game dialog if canNavBack is false (stay)', () => {
+        const matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefStub); // eslint-disable-line deprecation/deprecation
+        component.canNavBack = false;
+        isClosed = false;
+        component.onPopState();
+        expect(matdialog).toHaveBeenCalled();
+        expect(component.canNavBack).not.toBeTruthy();
+    });
+
+    it('onPopState should not open end game dialog if canNavBack is true', () => {
+        const matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefStub); // eslint-disable-line deprecation/deprecation
+        component.canNavBack = true;
+        component.onPopState();
+        expect(matdialog).not.toHaveBeenCalled();
+        expect(component.canNavBack).toBeTruthy();
     });
 });

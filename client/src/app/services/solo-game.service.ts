@@ -32,9 +32,9 @@ const LOCAL_PLAYER_INDEX = 0;
 })
 export class SoloGameService {
     game: GameParameters;
-    opponentPlayerObservable: Observable<boolean>;
-    opponentPlayerSubject: BehaviorSubject<boolean>;
-    timeoutObservable: Observable<boolean>;
+    stock: LetterStock;
+    isVirtualPlayerObservable: Observable<boolean>;
+    virtualPlayerSubject: BehaviorSubject<boolean>;
     timer: string;
     intervalValue: NodeJS.Timeout;
 
@@ -45,18 +45,19 @@ export class SoloGameService {
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
         protected placeService: PlaceService,
-    ) {}
+    ) {
+        this.stock = new LetterStock();
+    }
     initializeGame(gameInfo: FormGroup) {
         this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value, gameInfo.controls.bonus.value);
         this.chatDisplayService.entries = [];
         this.game.creatorPlayer = new LocalPlayer(gameInfo.controls.name.value);
         this.game.creatorPlayer.isActive = true;
-        this.game.stock = new LetterStock();
         this.game.localPlayer = new LocalPlayer(gameInfo.controls.name.value); // where does local player take his letters from stock?
         this.game.creatorPlayer = this.game.localPlayer;
         this.game.opponentPlayer = new VirtualPlayer(gameInfo.controls.opponent.value, gameInfo.controls.level.value);
-        this.game.localPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        this.game.opponentPlayer.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.localPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        this.game.opponentPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.dictionary = new Dictionary(+gameInfo.controls.dictionaryForm.value);
         this.game.randomBonus = gameInfo.controls.bonus.value;
         this.game.totalCountDown = +gameInfo.controls.timer.value;
@@ -67,8 +68,8 @@ export class SoloGameService {
         return this.game;
     }
     createNewGame() {
-        this.opponentPlayerSubject = new BehaviorSubject<boolean>(this.game.opponentPlayer.isActive);
-        this.opponentPlayerObservable = this.opponentPlayerSubject.asObservable();
+        this.virtualPlayerSubject = new BehaviorSubject<boolean>(this.game.opponentPlayer.isActive);
+        this.isVirtualPlayerObservable = this.virtualPlayerSubject.asObservable();
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
         this.chatDisplayService.initialize(this.game.localPlayer.name);
@@ -99,10 +100,7 @@ export class SoloGameService {
                 this.game.timerMs--;
                 if (this.game.timerMs < 0) {
                     this.game.isTurnPassed = true;
-                    const activePlayer = this.game.localPlayer.isActive ? this.game.localPlayer : this.game.opponentPlayer;
                     this.changeTurn();
-                    console.log("End of timer:", activePlayer.name, " should have turned pass");
-                    // TODO: send 'activePlayerName >> !passer' message to chat via observer?
                 }
                 this.secondsToMinutes();
             }, TIMER_INTERVAL);
@@ -117,11 +115,25 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
     changeTurn() {
-        this.updateConsecutivePassedTurns();
-        this.updateActivePlayer();
-        this.resetTimer();
-        if (this.game.opponentPlayer.isActive) this.opponentPlayerSubject.next(this.game.opponentPlayer.isActive);
-        this.game.isTurnPassed = false; // reset isTurnedPassed when new turn starts
+        if (!this.game.isEndGame) {
+            this.updateConsecutivePassedTurns();
+            this.updateActivePlayer();
+            this.resetTimer();
+            console.log(
+                'Changed turn:',
+                this.game.localPlayer.name,
+                ' active:',
+                this.game.localPlayer.isActive,
+                ',',
+                this.game.opponentPlayer.name,
+                ' active: ',
+                this.game.opponentPlayer.isActive,
+                ',consecutive passed turns:',
+                this.game.consecutivePassedTurns,
+            );
+            if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
+            this.game.isTurnPassed = false; // reset isTurnedPassed when new turn starts
+        }
     }
     // Check if last 5 turns have been passed (by the command or the timer running out) (current turn is the 6th)
     updateConsecutivePassedTurns() {
@@ -138,7 +150,7 @@ export class SoloGameService {
         // Switch the active player
         if (this.game.localPlayer.isActive) {
             // If the rack is empty, end game + player won
-            if (this.game.localPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+            if (this.game.localPlayer.letters.length === 0 && this.stock.isEmpty()) {
                 this.game.localPlayer.isWinner = true;
                 this.endGame();
                 return;
@@ -147,7 +159,7 @@ export class SoloGameService {
             this.game.opponentPlayer.isActive = true;
         } else {
             // If the rack is empty, end game + player won
-            if (this.game.opponentPlayer.letters.length === 0 && this.game.stock.isEmpty()) {
+            if (this.game.opponentPlayer.letters.length === 0 && this.stock.isEmpty()) {
                 this.game.opponentPlayer.isWinner = true;
                 this.endGame();
                 return;
@@ -168,14 +180,14 @@ export class SoloGameService {
         this.game.localPlayer.addLetter(letter);
     }
     exchangeLetters(player: Player, letters: string): ErrorType {
-        if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
+        if (player.isActive && this.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
             const lettersToRemove: ScrabbleLetter[] = [];
             if (player.removeLetter(letters) === true) {
                 for (let i = 0; i < letters.length; i++) {
                     lettersToRemove[i] = new ScrabbleLetter(letters[i]);
                 }
 
-                const lettersToAdd: ScrabbleLetter[] = this.game.stock.exchangeLetters(lettersToRemove);
+                const lettersToAdd: ScrabbleLetter[] = this.stock.exchangeLetters(lettersToRemove);
                 for (let i = 0; i < lettersToAdd.length; i++) {
                     this.rackService.removeLetter(lettersToRemove[i]);
                     this.addRackLetter(lettersToAdd[i]);
@@ -189,7 +201,7 @@ export class SoloGameService {
         return ErrorType.ImpossibleCommand;
     }
 
-    async place(player: Player, placeParams: PlaceParams): Promise<ErrorType /* Promise<ErrorType> */> /* Promise<ErrorType> */ {
+    async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
         if (!player.isActive) {
             return ErrorType.ImpossibleCommand;
         }
@@ -224,7 +236,7 @@ export class SoloGameService {
                     // Score
                     this.validationService.updatePlayerScore(tempScrabbleWords, player);
                     // Take new letters
-                    const newLetters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+                    const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
                     this.addRackLetters(newLetters);
                     newLetters.forEach((letter) => {
                         this.addLetterToPlayer(letter);
@@ -239,7 +251,7 @@ export class SoloGameService {
     }
     displayEndGameMessage() {
         const endGameMessages = this.chatDisplayService.createEndGameMessages(
-            this.game.stock.letterStock,
+            this.stock.letterStock,
             this.game.localPlayer,
             this.game.opponentPlayer,
         );

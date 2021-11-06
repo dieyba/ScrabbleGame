@@ -1,29 +1,40 @@
-import { ScrabbleLetter } from './scrabble-letter';
+import { ScrabbleLetter } from "./scrabble-letter";
 
 describe('ScrabbleLetter', () => {
     it('should create an instance', () => {
         expect(new ScrabbleLetter('a', 1)).toBeTruthy();
     });
 
-    it('tealBonus should mutliply the value by 2', () => {
-        const letter = new ScrabbleLetter('a', 1);
-        expect(letter.getTealBonus()).toEqual(2);
+    it('should set the value with the right number', () => {
+        let letter = new ScrabbleLetter('j');
+        expect(letter.value).toEqual(8);
     });
 
-    it('tealBonus should mutliply the value by 2', () => {
-        const letter = new ScrabbleLetter('a', 1);
-        letter.setTealBonus();
-        expect(letter.value).toEqual(2);
+    it('setLetter should remove the accents', () => {
+        let letter = new ScrabbleLetter('a', 1);
+        letter.setLetter('à');
+        expect(letter.character).toEqual('a');
     });
 
-    it('darkBlueBonus should mutliply the value by 3', () => {
-        const letter = new ScrabbleLetter('a', 1);
-        expect(letter.getDarkBlueBonus()).toEqual(3);
-    });
+    // it('tealBonus should mutliply the value by 2', () => {
+    //     const letter = new ScrabbleLetter('a', 1);
+    //     expect(letter.getTealBonus()).toEqual(2);
+    // });
 
-    it('darkBlueBonus should mutliply the value by 3', () => {
-        const letter = new ScrabbleLetter('a', 1);
-        letter.setDarkBlueBonus();
-        expect(letter.value).toEqual(3);
-    });
+    // it('tealBonus should mutliply the value by 2', () => {
+    //     const letter = new ScrabbleLetter('a', 1);
+    //     letter.setTealBonus();
+    //     expect(letter.value).toEqual(2);
+    // });
+
+    // it('darkBlueBonus should mutliply the value by 3', () => {
+    //     const letter = new ScrabbleLetter('a', 1);
+    //     expect(letter.getDarkBlueBonus()).toEqual(3);
+    // });
+
+    // it('darkBlueBonus should mutliply the value by 3', () => {
+    //     const letter = new ScrabbleLetter('a', 1);
+    //     letter.setDarkBlueBonus();
+    //     expect(letter.value).toEqual(3);
+    // });
 });

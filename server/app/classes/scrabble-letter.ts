@@ -24,18 +24,6 @@ export class ScrabbleLetter {
         this.color = SquareColor.None;
         this.tile = new Square(UNPLACED, UNPLACED); // -1, -1 means it is not placed yet
     }
-    getTealBonus(): number {
-        return PALE_BLUE_FACTOR * this.value;
-    }
-    setTealBonus(): void {
-        this.value = PALE_BLUE_FACTOR * this.value;
-    }
-    getDarkBlueBonus(): number {
-        return DARK_BLUE_FACTOR * this.value;
-    }
-    setDarkBlueBonus(): void {
-        this.value = DARK_BLUE_FACTOR * this.value;
-    }
     setLetter(character: string): void {
         this.character = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }

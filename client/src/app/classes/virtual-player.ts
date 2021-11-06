@@ -12,8 +12,4 @@ export class VirtualPlayer extends Player {
         super(name);
         this.type = type;
     }
-
-    playTurn() {
-        // What do we do with this?
-    }
 }

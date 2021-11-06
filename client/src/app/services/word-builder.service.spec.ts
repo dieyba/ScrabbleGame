@@ -16,7 +16,7 @@ describe('WordBuilderService', () => {
     let gridServiceSpy: jasmine.SpyObj<GridService>;
 
     beforeEach(() => {
-        gridServiceSpy = jasmine.createSpyObj('GridService', { scrabbleBoard: new ScrabbleBoard(false) });
+        gridServiceSpy = jasmine.createSpyObj('GridService', { scrabbleBoard: ScrabbleBoard });
         TestBed.configureTestingModule({
             providers: [{ provide: GridService, useValue: gridServiceSpy }],
         });

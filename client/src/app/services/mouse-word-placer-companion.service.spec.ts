@@ -3,7 +3,6 @@ import { BOARD_SIZE, ScrabbleBoard } from '@app/classes/scrabble-board';
 import { SquareColor } from '@app/classes/square';
 import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
-
 import { MouseWordPlacerCompanionService } from './mouse-word-placer-companion.service';
 import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE } from './mouse-word-placer.service';
 

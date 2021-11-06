@@ -14,16 +14,28 @@ export class ManipulationRackService {
         this.firstOccurencePosition = ERROR_NUMBER;
     }
 
-    handleSelection(rackContext: CanvasRenderingContext2D, position: number) {
+    set setLetterSelectedPosition(newValue: number) {
+        this.letterSelectedPosition = newValue;
+    }
+
+    set setFirstOccurencePosition(newValue: number) {
+        this.firstOccurencePosition = newValue;
+    }
+
+    get getLetterSelectedPosition() {
+        return this.letterSelectedPosition;
+    }
+
+    get getFirstOccurencePosition() {
+        return this.firstOccurencePosition;
+    }
+
+    handleSelection(position: number) {
         if (this.rackService.handlingSelected[position - 1] === false) {
             if (this.rackService.exchangeSelected[position - 1] === true) {
                 this.rackService.exchangeSelected[position - 1] = false;
             }
-
-            // for (let i = 0; i < this.rackService.handlingSelected.length; i++) {
-            //     this.rackService.deselect(i + 1, rackContext, false);
-            // }
-            this.rackService.select(position, rackContext, false);
+            this.rackService.select(position, this.rackService.gridContext, false);
             this.letterSelectedPosition = position - 1;
         }
     }

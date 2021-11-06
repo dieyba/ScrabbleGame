@@ -15,8 +15,22 @@ describe('PlayerManager service', () => {
     it('should create add a player', () => {
         let player1 = new Player('erika', '');
         let player2 = new Player('Sara', '');
-        playerManagerService.addPlayer(player1.name, player1.getSocketId());
-        playerManagerService.addPlayer(player2.name, player2.getSocketId());
+        playerManagerService.addPlayer(player1.name, player1.socketId);
+        playerManagerService.addPlayer(player2.name, player2.socketId);
         expect(playerManagerService.allPlayers.length).to.be.equal(2);
+    });
+    it('getPlayerBySocketID should get the right socketId of a player', () => {
+        let player1 = new Player('erika', 'jbf63q3hed');
+        let player2 = new Player('Sara', 'fjc8e8r7');
+        playerManagerService.allPlayers.push(player2);
+        playerManagerService.allPlayers.push(player1);
+        expect(playerManagerService.getPlayerBySocketID('jbf63q3hed')).to.be.equal(player1);
+    });
+    it(' getPlayerBySocketID should return undefined', () => {
+        let player1 = new Player('erika', 'jbf63q3hed');
+        let player2 = new Player('Sara', 'fjc8e8r7');
+        playerManagerService.allPlayers.push(player2);
+        playerManagerService.allPlayers.push(player1);
+        expect(playerManagerService.getPlayerBySocketID('ifjeir8339')).to.be.equal(undefined);
     });
 });
