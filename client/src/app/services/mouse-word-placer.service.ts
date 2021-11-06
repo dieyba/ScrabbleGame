@@ -64,9 +64,9 @@ export class MouseWordPlacerService {
         const clickedSquare: Vec2 = new Vec2(xBaseOfSquare, yBaseOfSquare);
         const indexes = this.companionService.convertPositionToGridIndex(clickedSquare);
         if (indexes[0] >= BOARD_SIZE || indexes[1] >= BOARD_SIZE) return;
+        if (this.gridService.scrabbleBoard.squares[indexes[0]][indexes[1]].occupied === true) return;
         this.currentPosition = clickedSquare;
         this.initialPosition = clickedSquare;
-        if (this.gridService.scrabbleBoard.squares[indexes[0]][indexes[1]].occupied === true) return;
         if (!this.companionService.samePosition(clickedSquare, this.latestPosition)) {
             this.removeAllLetters();
             this.clearOverlay();
