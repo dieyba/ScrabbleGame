@@ -87,10 +87,4 @@ export class MouseWordPlacerCompanionService {
                 break;
         }
     }
-    removeLetterFromString(word: string, letter: string): string {
-        const charPosition = word.lastIndexOf(letter);
-        const partOne = word.substring(0, charPosition);
-        const partTwo = word.substring(charPosition + 1);
-        return partOne + partTwo;
-    }
 }

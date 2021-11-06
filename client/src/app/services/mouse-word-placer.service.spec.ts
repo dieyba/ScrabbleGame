@@ -14,7 +14,7 @@ import { MouseWordPlacerCompanionService } from './mouse-word-placer-companion.s
 import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE, MouseWordPlacerService } from './mouse-word-placer.service';
 import { RackService, RACK_HEIGHT, RACK_WIDTH } from './rack.service';
 
-fdescribe('MouseWordPlacerService', () => {
+describe('MouseWordPlacerService', () => {
     let service: MouseWordPlacerService;
     let ctxSpy: CanvasRenderingContext2D;
     let gridServiceSpy: jasmine.SpyObj<GridService>;
