@@ -36,7 +36,6 @@ export class ValidationService {
     }
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
         const wordsValue = this.calculateScore(newWords);
-        player.score += wordsValue;
         // Retirer lettres du board
         setTimeout(() => {
             if (this.areWordsValid) {
@@ -46,6 +45,7 @@ export class ValidationService {
                             this.gridService.removeSquare(letter.tile.position.x, letter.tile.position.y);
                         });
                     } else {
+                        player.score += wordsValue;
                         newWord.content.forEach((letter) => {
                             letter.tile.isValidated = true;
                         });
