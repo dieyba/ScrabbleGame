@@ -89,9 +89,9 @@ describe('PlayAreaComponent', () => {
         gameServiceSpy.currentGameService.game.totalCountDown = form.controls.timer.value;
         gameServiceSpy.currentGameService.game.timerMs = form.controls.timer.value;
         gameServiceSpy.currentGameService.game.localPlayer = gameServiceSpy.currentGameService.game.creatorPlayer;
-        soloGameServiceSpy.opponentPlayerSubject = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
-        soloGameServiceSpy.opponentPlayerObservable = soloGameServiceSpy.opponentPlayerSubject.asObservable();
-        soloGameServiceSpy.opponentPlayerSubject.next(true);
+        soloGameServiceSpy.virtualPlayerSubject = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
+        soloGameServiceSpy.isVirtualPlayerObservable = soloGameServiceSpy.virtualPlayerSubject.asObservable();
+        soloGameServiceSpy.virtualPlayerSubject.next(true);
     });
 
     beforeEach(() => {
