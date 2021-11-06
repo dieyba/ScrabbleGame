@@ -5,6 +5,7 @@ import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { ERROR_NUMBER } from '@app/classes/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 import { BonusService } from './bonus.service';
 import { BOARD_SIZE, GridService } from './grid.service';
 
@@ -27,7 +28,8 @@ export class ValidationService {
         this.dictionary = new Dictionary(DictionaryType.Default);
         this.words = [];
         this.isTimerElapsed = false;
-        this.server = 'http://' + window.location.hostname + ':3000';
+        // this.server = 'http://' + window.location.hostname + ':3000';
+        this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.areWordsValid = false;
         this.socket.on('areWordsValid', (result: boolean) => {

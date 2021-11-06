@@ -9,6 +9,7 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { Vec2 } from '@app/classes/vec2';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { LetterStock } from './letter-stock.service';
@@ -36,7 +37,8 @@ export class MultiPlayerGameService extends SoloGameService {
         protected placeService: PlaceService,
     ) {
         super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService);
-        this.server = 'http://' + window.location.hostname + ':3000';
+        // this.server = 'http://' + window.location.hostname + ':3000';
+        this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
     }
