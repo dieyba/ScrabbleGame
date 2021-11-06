@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { GameParameters } from '@app/classes/game-parameters';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
@@ -24,7 +23,7 @@ export class SidebarComponent {
         this.roomLeft()
     }
     roomLeft() {
-        this.socket.on('roomLeft', (game: GameParameters) => {
+        this.socket.on('roomLeft', () => {
             this.gameService.currentGameService.game.localPlayer.isWinner = true;
             this.gameService.currentGameService.game.isEndGame = true;
         })
