@@ -17,7 +17,7 @@ export class ChatDisplayService {
     entries: ChatDisplayEntry[];
     private readonly server: string;
     private localPlayerName: string;
-    private socket?: io.Socket;
+    private socket: io.Socket;
 
     constructor() {
         this.server = 'http://' + window.location.hostname + ':3000';
@@ -25,6 +25,9 @@ export class ChatDisplayService {
         this.entries = [];
 
         this.socket = SocketHandler.requestSocket(this.server);
+        this.socketOnConnect()
+    }
+    socketOnConnect() {
         this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
             const chatEntryColor = chatEntry.senderName === this.localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
             this.addEntry({ color: chatEntryColor, message: chatEntry.message });
@@ -41,18 +44,16 @@ export class ChatDisplayService {
     }
 
     sendMessageToServer(messageFromLocalPlayer: string, messageToRemotePlayer?: string) {
-        if (this.socket) {
-            if (messageToRemotePlayer) {
-                this.socket.emit('sendChatEntry', messageFromLocalPlayer, messageToRemotePlayer);
-            } else {
-                this.socket.emit('sendChatEntry', messageFromLocalPlayer);
-            }
+        if (messageToRemotePlayer) {
+            this.socket.emit('sendChatEntry', messageFromLocalPlayer, messageToRemotePlayer);
+        } else {
+            this.socket.emit('sendChatEntry', messageFromLocalPlayer);
         }
+
     }
     sendSystemMessageToServer(message: string) {
-        if (this.socket) {
-            this.socket.emit('sendSystemChatEntry', message);
-        }
+        this.socket.emit('sendSystemChatEntry', message);
+
     }
 
     addEntry(entry: ChatDisplayEntry): void {

@@ -30,6 +30,10 @@ export class ValidationService {
         this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
         this.areWordsValid = false;
+        this.wordsValid();
+    }
+
+    wordsValid() {
         this.socket.on('areWordsValid', (result: boolean) => {
             this.areWordsValid = result;
         });

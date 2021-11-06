@@ -7,27 +7,60 @@ import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { ValidationService, WAIT_TIME } from '@app/services/validation.service';
+import * as io from 'socket.io-client';
 import { GridService } from './grid.service';
+class SocketMock {
+    id: string = 'Socket mock';
+    events: Map<string, CallableFunction> = new Map();
+    on(eventName: string, cb: CallableFunction) {
+        this.events.set(eventName, cb);
+    }
 
+    triggerEvent(eventName: string, ...args: any[]) {
+        const arrowFunction = this.events.get(eventName) as CallableFunction;
+        arrowFunction(...args);
+    }
+
+    join(...args: any[]) {
+        return;
+    }
+    emit(...args: any[]) {
+        return;
+    }
+
+    disconnect() {
+        return;
+    }
+}
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('ValidationService', () => {
     let service: ValidationService;
     let gridServiceSpy: jasmine.SpyObj<GridService>;
-
+    let socketMock: SocketMock;
+    let socketOnMockSpy: jasmine.SpyObj<any>;
     beforeEach(() => {
         gridServiceSpy = jasmine.createSpyObj('GridService', { scrabbleBoard: new ScrabbleBoard(false), removeSquare() {} });
         TestBed.configureTestingModule({
             providers: [{ provide: GridService, useValue: gridServiceSpy }],
         });
         service = TestBed.inject(ValidationService);
-
+        socketMock = new SocketMock();
+        service['socket'] = socketMock as unknown as io.Socket;
+        socketOnMockSpy = spyOn(socketMock, 'on').and.callThrough();
         service.dictionary = new Dictionary(DictionaryType.Default);
         gridServiceSpy.scrabbleBoard = new ScrabbleBoard(false);
     });
 
     it('should be created', () => {
         expect(service).toBeTruthy();
+    });
+    it('socketOnConnect should handle socket.on event update board', () => {
+        service.wordsValid();
+        // let board = new ScrabbleBoard(false);
+        // board.word
+        socketMock.triggerEvent('areWordsValid', true);
+        expect(socketOnMockSpy).toHaveBeenCalled();
     });
 
     it('if one word is not valid, areWordsValid should be false', () => {
@@ -174,4 +207,5 @@ describe('ValidationService', () => {
         expect(gridServiceSpy.removeSquare).toHaveBeenCalled();
         expect(service.isTimerElapsed).toEqual(true);
     }));
+
 });

@@ -57,7 +57,6 @@ describe('WaitingAreaComponent', () => {
                 MatInputModule,
                 RouterTestingModule,
                 MatDialogModule,
-                // AppRoutingModule,
             ],
             providers: [
                 { provide: MAT_DIALOG_DATA, useValue: {} },
