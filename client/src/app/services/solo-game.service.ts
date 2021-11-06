@@ -101,9 +101,6 @@ export class SoloGameService {
                 if (this.game.timerMs < 0) {
                     this.game.isTurnPassed = true;
                     this.changeTurn();
-                    // TODO: send 'activePlayerName >> !passer' message to chat via observer?
-                    // const activePlayer = this.game.localPlayer.isActive ? this.game.localPlayer : this.game.opponentPlayer;
-                    // console.log("End of timer:", activePlayer.name, " should have turned pass");
                 }
                 this.secondsToMinutes();
             }, TIMER_INTERVAL);
