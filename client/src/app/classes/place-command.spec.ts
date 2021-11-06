@@ -13,7 +13,7 @@ import { Vec2 } from './vec2';
 const PLAYER_NAME = 'Sara';
 const OPPONENT_NAME = 'Not Sara';
 
-fdescribe('PlaceCmd', () => {
+describe('PlaceCmd', () => {
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
     let localPlayer = new LocalPlayer(PLAYER_NAME);
