@@ -112,6 +112,35 @@ describe('PlayAreaComponent', () => {
         expect(mouseWordPlacerServiceSpy.onKeyDown).toHaveBeenCalled();
     });
 
+    it('onBlur should do nothing if document doesn\'t have focus or relatedTarget is null or relatedTarget is "confirm"', () => {
+        let focusEventMock: unknown = { relatedTarget: null };
+        const hasFocusSpy = spyOn(document, 'hasFocus').and.returnValue(false);
+        mouseWordPlacerServiceSpy.onBlur.calls.reset(); // Reset previous calls. I don't know why this function is called before the test
+
+        component.onBlur(focusEventMock as FocusEvent);
+
+        hasFocusSpy.and.returnValue(true);
+
+        component.onBlur(focusEventMock as unknown as FocusEvent);
+
+        focusEventMock = { relatedTarget: { id: 'confirm' } };
+
+        component.onBlur(focusEventMock as unknown as FocusEvent);
+
+        expect(hasFocusSpy).toHaveBeenCalled();
+        expect(mouseWordPlacerServiceSpy.onBlur).not.toHaveBeenCalled();
+    });
+
+    // it('onBlur should call MouseWordPlacerService.onBlur when relatedTarget.id is not confirm', () => {
+    //     const focusEventMock = { relatedTarget: { id: 'notConfirm' } };
+    //     spyOn(document, 'hasFocus').and.returnValue(true);
+    //     mouseWordPlacerServiceSpy.onBlur.calls.reset(); // Reset previous calls. I don't know why this function is called before the test
+
+    //     component.onBlur(focusEventMock as unknown as FocusEvent);
+
+    //     expect(mouseWordPlacerServiceSpy.onBlur).toHaveBeenCalled();
+    // }); // TODO fix this test
+
     it('ngAfterViewInit should call drawGrid and drawColors', () => {
         component.ngAfterViewInit();
         expect(gameServiceSpy.currentGameService.createNewGame).toHaveBeenCalled();
