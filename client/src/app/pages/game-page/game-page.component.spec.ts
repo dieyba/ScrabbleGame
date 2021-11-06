@@ -36,10 +36,30 @@
 //                         { provide: RackService, useValue: rackServiceSpy }]
 //         }).compileComponents();
 
-//         const firstLetter: ScrabbleLetter = new ScrabbleLetter('a', 1);
-//         const secondLetter: ScrabbleLetter = new ScrabbleLetter('p', 3);
-//         const thirdLetter: ScrabbleLetter = new ScrabbleLetter('u', 4);
-//         const fourthLetter: ScrabbleLetter = new ScrabbleLetter('m', 3);
+        gameServiceSpy.initializeGameType(GameType.Solo);        
+        gameServiceSpy.currentGameService = soloGameServiceSpy;
+        gameServiceSpy.currentGameService.game = new GameParameters('Ari', 60, false);
+        gameServiceSpy.currentGameService.game.creatorPlayer = new LocalPlayer('Ariane');
+        gameServiceSpy.currentGameService.game.creatorPlayer.score = 73;
+        gameServiceSpy.currentGameService.game.creatorPlayer.letters = [firstLetter, secondLetter, thirdLetter, fourthLetter];
+        gameServiceSpy.currentGameService.game.localPlayer = gameServiceSpy.currentGameService.game.creatorPlayer;
+        gameServiceSpy.currentGameService.game.opponentPlayer = new LocalPlayer('Sara');
+        gameServiceSpy.currentGameService.game.opponentPlayer.score = 70;
+        gameServiceSpy.currentGameService.game.opponentPlayer.letters = [firstLetter, thirdLetter, firstLetter];
+        gameServiceSpy.currentGameService.stock = new LetterStock();
+        gameServiceSpy.currentGameService.game.opponentPlayer.isActive = false;        
+        gameServiceSpy.currentGameService.game.localPlayer.isActive = true;
+        soloGameServiceSpy.virtualPlayerSubject = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
+        soloGameServiceSpy.isVirtualPlayerObservable = soloGameServiceSpy.virtualPlayerSubject.asObservable();
+        soloGameServiceSpy.virtualPlayerSubject.next(true);
+    });
+    
+    beforeEach(() => {
+        TestBed.createComponent(SidebarComponent);
+        fixture = TestBed.createComponent(GamePageComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
 //         gameServiceSpy.initializeGameType(GameType.Solo);        
 //         gameServiceSpy.currentGameService = soloGameServiceSpy;
