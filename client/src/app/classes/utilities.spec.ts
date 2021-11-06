@@ -50,11 +50,14 @@ describe('ScrabbleWord', () => {
         expect(utilities.removeAccents(word)).toEqual('aeu');
     });
 
-    it('isValidLetter should return false if it is not a letter or if it has an accent', () => {
+    it('isValidLetter should return false if it is not a letter, if it has an accent of if the string is empty', () => {
         let letter = 'à';
         expect(utilities.isValidLetter(letter)).toBeFalse();
 
         letter = 'a';
         expect(utilities.isValidLetter(letter)).toBeTrue();
+
+        letter = '';
+        expect(utilities.isValidLetter(letter)).toBeFalse();
     });
 });

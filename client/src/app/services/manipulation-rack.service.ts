@@ -14,21 +14,21 @@ export class ManipulationRackService {
         this.firstOccurencePosition = ERROR_NUMBER;
     }
 
-    // set selectedPosition(newValue: number) {
-    //     this.letterSelectedPosition = newValue;
-    // }
+    set setLetterSelectedPosition(newValue: number) {
+        this.letterSelectedPosition = newValue;
+    }
 
-    // set firstOccurence(newValue: number) {
-    //     this.firstOccurencePosition = newValue;
-    // }
+    set setFirstOccurencePosition(newValue: number) {
+        this.firstOccurencePosition = newValue;
+    }
 
-    // get getSelectedPosition() {
-    //     return this.letterSelectedPosition;
-    // }
+    get getLetterSelectedPosition() {
+        return this.letterSelectedPosition;
+    }
 
-    // get getFirstOccurence() {
-    //     return this.firstOccurencePosition;
-    // }
+    get getFirstOccurencePosition() {
+        return this.firstOccurencePosition;
+    }
 
     handleSelection(position: number) {
         if (this.rackService.handlingSelected[position - 1] === false) {

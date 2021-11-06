@@ -8,11 +8,11 @@ import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { VirtualPlayer } from '@app/classes/virtual-player';
-import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH, PlayAreaComponent } from '@app/components/play-area/play-area.component';
 import { CommandInvokerService } from '@app/services/command-invoker.service';
 import { ExchangeService } from '@app/services/exchange.service';
 import { GameService } from '@app/services/game.service';
-import { DEFAULT_HEIGHT, DEFAULT_WIDTH, GridService } from '@app/services/grid.service';
+import { GridService } from '@app/services/grid.service';
 import { LetterStock } from '@app/services/letter-stock.service';
 import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service';
 import { RackService, RACK_HEIGHT, RACK_WIDTH } from '@app/services/rack.service';
@@ -40,7 +40,7 @@ describe('PlayAreaComponent', () => {
         gameServiceSpy = jasmine.createSpyObj('GameService', ['currentGameService', 'initializeGameType']);
         commandInvokerServiceSpy = jasmine.createSpyObj('CommandInvokerService', ['executeCommand']);
         soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['initializeGame', 'createNewGame', 'getLettersSelected']);
-        mouseWordPlacerServiceSpy = jasmine.createSpyObj('MouseWordPlacerService', ['onKeyDown', 'onBlur', 'onMouseClick']);
+        mouseWordPlacerServiceSpy = jasmine.createSpyObj('MouseWordPlacerService', ['onKeyDown', 'onBlur', 'onMouseClick', 'confirmWord']);
         exchangeServiceSpy = jasmine.createSpyObj('ExchangeService', ['atLeastOneLetterSelected', 'exchange', 'cancelExchange']);
         // pour les properties, cette faôn de faire empêche les modifs. check sur le lien suivant pour modifer ça.
         // https://stackoverflow.com/questions/64560390/jasmine-createspyobj-with-properties
@@ -104,6 +104,14 @@ describe('PlayAreaComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('onKeyDown should call mouseWordPlacerService onKeyDown method', () => {
+        const keyboardEvent = {
+            code: 'a',
+        } as KeyboardEvent;
+        component.onKeyDown(keyboardEvent);
+        expect(mouseWordPlacerServiceSpy.onKeyDown).toHaveBeenCalled();
+    });
+
     it('ngAfterViewInit should call drawGrid and drawColors', () => {
         component.ngAfterViewInit();
         expect(gameServiceSpy.currentGameService.createNewGame).toHaveBeenCalled();
@@ -111,9 +119,9 @@ describe('PlayAreaComponent', () => {
         expect(gridServiceSpy.drawColors).toHaveBeenCalled();
     });
 
-    it('passTurn should call soloGameservices passTurn', () => {
+    it('passTurn should call commandInvokerService.executeCommand', () => {
         component.passTurn();
-        expect(soloGameServiceSpy.passTurn).toHaveBeenCalled();
+        expect(commandInvokerServiceSpy.executeCommand).toHaveBeenCalled();
     });
 
     it('width should return the width of the canvas', () => {
@@ -124,13 +132,13 @@ describe('PlayAreaComponent', () => {
         expect(component.height).toEqual(DEFAULT_HEIGHT);
     });
 
-    // it('rackWidth should return the width of the rack', () => {
-    //     expect(component.rackWidth).toEqual(RACK_WIDTH);
-    // });
+    it('rackHeight should return play area rack height', () => {
+        expect(component.rackHeight).toEqual(RACK_HEIGHT);
+    });
 
-    // it('rackHeight should return the height of the rack', () => {
-    //     expect(component.rackHeight).toEqual(RACK_HEIGHT);
-    // });
+    it('rackWidth should return play area rack width', () => {
+        expect(component.rackWidth).toEqual(RACK_WIDTH);
+    });
 
     it('sizeUpLetters should call gridservices sizeUpLetters', () => {
         component.sizeUpLetters();
@@ -140,19 +148,6 @@ describe('PlayAreaComponent', () => {
     it('sizeDownLetters should call gridservices sizeDownLetters', () => {
         component.sizeDownLetters();
         expect(gridServiceSpy.sizeDownLetters).toHaveBeenCalled();
-    });
-
-    it('passTurn should call commandInvokerService.executeCommand', () => {
-        component.passTurn();
-        expect(commandInvokerServiceSpy.executeCommand).toHaveBeenCalled();
-    });
-
-    it('onKeyDown should call mouseWordPlacerService onKeyDown method', () => {
-        const keyboardEvent = {
-            code: 'a',
-        } as KeyboardEvent;
-        component.onKeyDown(keyboardEvent);
-        expect(mouseWordPlacerServiceSpy.onKeyDown).toHaveBeenCalled();
     });
 
     it('onMouseDown should call mouseWordPlacerService onMouseClick method', () => {
@@ -165,26 +160,9 @@ describe('PlayAreaComponent', () => {
         expect(mouseWordPlacerServiceSpy.onMouseClick).toHaveBeenCalled();
     });
 
-    it('rackHeight should return play area rack height', () => {
-        expect(component.rackHeight).toEqual(RACK_HEIGHT);
-    });
-
-    it('rackWidth should return play area rack width', () => {
-        expect(component.rackWidth).toEqual(RACK_WIDTH);
-    });
-
-    it('lessThanSevenLettersInStock should return the right value', () => {
-        expect(component.lessThanSevenLettersInStock()).toEqual(false);
-    });
-
-    it('exchange should call exchangeService exchange method', () => {
-        component.exchange();
-        expect(exchangeServiceSpy.exchange).toHaveBeenCalled();
-    });
-
-    it('cancelExchange should call exchangeService cancelExchange method', () => {
-        component.cancelExchange();
-        expect(exchangeServiceSpy.cancelExchange).toHaveBeenCalled();
+    it('confirmWord should call confirmWord mouseWordPlacerService', () => {
+        component.confirmWord();
+        expect(mouseWordPlacerServiceSpy.confirmWord).toHaveBeenCalled();
     });
 
     it('atLeastOneLetterSelected should call exchangeService atLeastOneLetterSelected', () => {
@@ -192,52 +170,9 @@ describe('PlayAreaComponent', () => {
         expect(exchangeServiceSpy.atLeastOneLetterSelected).toHaveBeenCalled();
     });
 
-    // it('buttonDetect should call manipulateRackService switchLeft if we press arrow left button', () => {
-    //     const testEvent = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
-    //     fixture.nativeElement.dispatchEvent(testEvent);
-    //     expect(manipulateRackServiceSpy.switchLeft).toHaveBeenCalled();
-    //     expect(manipulateRackServiceSpy.switchRight).not.toHaveBeenCalled();
-    //     expect(manipulateRackServiceSpy.selectByLetter).not.toHaveBeenCalled();
-    // });
-
-    // it('buttonDetect should call manipulateRackService switchRight if we press arrow right button', () => {
-    //     const testEvent = new KeyboardEvent('keydown', { key: 'ArrowRight' });
-    //     fixture.nativeElement.dispatchEvent(testEvent);
-    //     expect(manipulateRackServiceSpy.switchRight).toHaveBeenCalled();
-    //     expect(manipulateRackServiceSpy.switchLeft).not.toHaveBeenCalled();
-    //     expect(manipulateRackServiceSpy.selectByLetter).not.toHaveBeenCalled();
-    // });
-
-    // it('buttonDetect should call manipulateRackService selectByLetter if we press a button else than left or right arrow', () => {
-    //     const testEvent = new KeyboardEvent('keydown', { key: 'Space' });
-    //     fixture.nativeElement.dispatchEvent(testEvent);
-    //     expect(manipulateRackServiceSpy.selectByLetter).toHaveBeenCalled();
-    //     expect(manipulateRackServiceSpy.switchLeft).not.toHaveBeenCalled();
-    //     expect(manipulateRackServiceSpy.switchRight).not.toHaveBeenCalled();
-    // });
-
-    // il faut verifier l appel a focus() mais comment je fais avec le view child ?
-    // it('buttonDetect should call ', () => {
-    //     let element: ElementRef<HTMLCanvasElement>;
-    //     element = jasmine.createSpyObj('ElementRef<HTMLCanvasElement>', ['nativeElement']);
-    //     component.rackCanvas = element;
-    //     // element.nativeElement
-
-    //     // let canvasElement: HTMLCanvasElement;
-    //     // canvasElement = jasmine.createSpyObj('HTMLCanvasElement', ['focus']);
-    //     // component.rackCanvas.nativeElement = canvasElement;
-    //     // expect(canvasElement.focus).toHaveBeenCalled();
-
-    //     const testEvent = new KeyboardEvent('keydown', { key: 'Space' });
-    //     fixture.nativeElement.dispatchEvent(testEvent);
-
-    //     let nativeElement: HTMLCanvasElement;
-    //     nativeElement = component.rackCanvas.nativeElement;
-    //     const spy = spyOn(nativeElement, 'focus');
-    //     expect(spy).toHaveBeenCalled();
-
-    //     // component.rackCanvas = new ElementRef({element: jasmine.createSpyObj('ElementRef<HTMLCanvasElement>', ['nativeElement'])});
-    // });
+    it('lessThanSevenLettersInStock should return the right value', () => {
+        expect(component.lessThanSevenLettersInStock()).toEqual(false);
+    });
 
     it('lessThanSevenLettersInStock should return true if there is less than seven letters in the letter stock', () => {
         soloGameServiceSpy.stock.letterStock = [new ScrabbleLetter('j'), new ScrabbleLetter('p')];
@@ -255,25 +190,13 @@ describe('PlayAreaComponent', () => {
         expect(component.lessThanSevenLettersInStock()).toBeFalse();
     });
 
-    it('exchange should call exchangeServiceSpy exchange', () => {
+    it('exchange should call exchangeService exchange method', () => {
         component.exchange();
         expect(exchangeServiceSpy.exchange).toHaveBeenCalled();
     });
 
-    // meme problème, comment je récupère un element du html
-    // it('exchange should be called when we click on exchange button', () => {
-    //     let button = fixture.nativeElement.querySelector('exchangeButton');
-    //     button.click();
-    //     expect(exchangeServiceSpy.exchange).toHaveBeenCalled();
-    // });
-
-    it('cancelExchange should call exchangeServiceSpy cancelExchange', () => {
+    it('cancelExchange should call exchangeService cancelExchange method', () => {
         component.cancelExchange();
         expect(exchangeServiceSpy.cancelExchange).toHaveBeenCalled();
     });
-
-    // meme probleme de html
-    // it('cancelExchange should be called when we click on cancel button', () => {
-
-    // });
 });

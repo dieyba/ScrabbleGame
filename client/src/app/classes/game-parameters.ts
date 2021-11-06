@@ -53,5 +53,6 @@ export class GameParameters {
         this.isTurnPassed = false;
         this.randomBonus = isRandom;
         this.scrabbleBoard = new ScrabbleBoard(this.randomBonus);
+        this.players = [];
     }
 }

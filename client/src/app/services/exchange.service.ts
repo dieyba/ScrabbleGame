@@ -15,7 +15,7 @@ export class ExchangeService {
         private commandInvokerService: CommandInvokerService,
     ) {}
 
-    handleSelection(rackContext: CanvasRenderingContext2D, position: number) {
+    handleSelection(position: number) {
         if (this.rackService.handlingSelected[position - 1] === true) {
             this.rackService.handlingSelected[position - 1] = false;
         }
@@ -23,10 +23,6 @@ export class ExchangeService {
             if (this.rackService.handlingSelected[i] === true) {
                 this.rackService.deselect(i + 1, this.rackService.gridContext, false);
             }
-        }
-
-        if (this.rackService.handlingSelected[position - 1] === true) {
-            this.rackService.handlingSelected[position - 1] = false;
         }
 
         if (this.rackService.exchangeSelected[position - 1] === true) {
@@ -43,9 +39,9 @@ export class ExchangeService {
         this.commandInvokerService.executeCommand(command);
     }
 
-    cancelExchange(rackContext: CanvasRenderingContext2D) {
+    cancelExchange() {
         for (let i = 1; i <= this.gameService.currentGameService.game.localPlayer.letters.length; i++) {
-            this.rackService.deselect(i, rackContext, true);
+            this.rackService.deselect(i, this.rackService.gridContext, true);
         }
     }
 

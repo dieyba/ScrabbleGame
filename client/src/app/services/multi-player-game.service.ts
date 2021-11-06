@@ -52,11 +52,14 @@ export class MultiPlayerGameService extends SoloGameService {
                 console.log("Changed turn (multi mode): ", this.game.localPlayer.name, " active:", this.game.localPlayer.isActive, ',',
                     this.game.opponentPlayer.name, " active: ", this.game.opponentPlayer.isActive, ',consecutive passed turns:', this.game.consecutivePassedTurns);
                 this.game.isTurnPassed = false;
+            } else {
+                this.resetTimer();
             }
         });
         this.socket.on('gameEnded', () => {
             this.displayEndGameMessage();
             this.endLocalGame();
+            this.resetTimer();
         });
         this.socket.on('update board', (board: any) => {
             this.updateBoard(board.word, board.orientation, new Vec2(board.positionX, board.positionY));
@@ -138,6 +141,7 @@ export class MultiPlayerGameService extends SoloGameService {
                 character.tile.position.x = position.x;
                 character.tile.position.y = position.y;
                 this.gridService.drawLetter(character, position.x, position.y);
+                this.gridService.scrabbleBoard.squares[position.x][position.y].isBonusUsed = true;
                 this.gridService.scrabbleBoard.squares[position.x][position.y].isValidated = true;
                 position.y++;
             }

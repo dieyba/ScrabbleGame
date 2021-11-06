@@ -1,14 +1,20 @@
 import { TestBed } from '@angular/core/testing';
+import { FormControl, FormGroup } from '@angular/forms';
+import { GameParameters, GameType } from '@app/classes/game-parameters';
+// import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ExchangeService } from './exchange.service';
+import { GameService } from './game.service';
+import { LetterStock } from './letter-stock.service';
 import { RackService } from './rack.service';
-import { SoloGameService } from './solo-game.service';
+import { DEFAULT_LETTER_COUNT, SoloGameService } from './solo-game.service';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('ExchangeService', () => {
     let service: ExchangeService;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
+    let gameServiceSpy: jasmine.SpyObj<GameService>;
 
     beforeEach(() => {
         rackServiceSpy = jasmine.createSpyObj('RackService', ['drawRack', 'select', 'deselect', 'deselectAll', 'handleExchangeSelection'], {
@@ -16,21 +22,40 @@ describe('ExchangeService', () => {
             ['handlingSelected']: [false, false, false, false, false, false, false],
         });
         soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', [
-            'localPlayer',
-            'virtualPlayer',
+            'game',
             'createNewGame',
             'passTurn',
             'changeActivePlayer',
             'removeRackLetter',
             'stock',
-            'exchangeLettersSelected',
+            'getLettersSelected',
+            'exchangeLetters ',
         ]);
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['currentGameService', 'initializeGameType']);
         TestBed.configureTestingModule({
             providers: [
                 { provide: RackService, useValue: rackServiceSpy },
+                { provide: GameService, useValue: gameServiceSpy },
                 { provide: SoloGameService, useValue: soloGameServiceSpy },
             ],
         });
+
+        // gridServiceSpy.scrabbleBoard = new ScrabbleBoard(false);
+        gameServiceSpy.initializeGameType(GameType.Solo);
+        gameServiceSpy.currentGameService = soloGameServiceSpy;
+        const form = new FormGroup({
+            name: new FormControl('dieyna'),
+            timer: new FormControl('1:00'),
+            bonus: new FormControl(true),
+            level: new FormControl('easy'),
+            dictionaryForm: new FormControl('Francais'),
+            opponent: new FormControl('Sara'),
+        });
+        gameServiceSpy.currentGameService.game = new GameParameters(form.controls.name.value, +form.controls.timer.value, form.controls.bonus.value);
+        gameServiceSpy.currentGameService.stock = new LetterStock();
+        const localLetters = gameServiceSpy.currentGameService.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        gameServiceSpy.currentGameService.game.localPlayer.letters = localLetters;
+
         service = TestBed.inject(ExchangeService);
     });
 
@@ -65,11 +90,11 @@ describe('ExchangeService', () => {
     it('exchange should call soloGameService exchangeLettersSelected', () => {
         service.exchange();
 
-        expect(soloGameServiceSpy.exchangeLettersSelected).toHaveBeenCalled();
+        expect(soloGameServiceSpy.getLettersSelected).toHaveBeenCalled();
     });
 
     it('cancelExchange should call rackService deselect seven times', () => {
-        soloGameServiceSpy.localPlayer.letters = [
+        gameServiceSpy.currentGameService.game.localPlayer.letters = [
             new ScrabbleLetter('j'),
             new ScrabbleLetter('p'),
             new ScrabbleLetter('b'),
