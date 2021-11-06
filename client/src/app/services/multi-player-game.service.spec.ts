@@ -173,16 +173,16 @@ describe('MultiPlayerGameService', () => {
         service.game.isEndGame = false;
         expect(service.resetTimer).toHaveBeenCalled;
     });
-    it('socketOnConnect should handle socket.on event gameEnded', () => {
-        service.socketOnConnect();
-        socketMock.triggerEvent('gameEnded', {});
-        expect(socketOnMockSpy).toHaveBeenCalled();
-    });
-    it('socketOnConnect should handle socket.on event update board', () => {
-        service.socketOnConnect();
-        socketMock.triggerEvent('update board', ['maison', 'h']);
-        expect(socketOnMockSpy).toHaveBeenCalled();
-    });
+    // it('socketOnConnect should handle socket.on event gameEnded', () => {
+    //     service.socketOnConnect();
+    //     socketMock.triggerEvent('gameEnded', {});
+    //     expect(socketOnMockSpy).toHaveBeenCalled();
+    // });
+    // it('socketOnConnect should handle socket.on event update board', () => {
+    //     service.socketOnConnect();
+    //     socketMock.triggerEvent('update board', ['maison', 'h']);
+    //     expect(socketOnMockSpy).toHaveBeenCalled();
+    // });
     it('should emit changeTurn ', () => {
         service.changeTurn();
         expect(socketEmitMockSpy).toHaveBeenCalledWith('change turn', service.game.isTurnPassed, service.game.consecutivePassedTurns);

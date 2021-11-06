@@ -47,7 +47,6 @@ describe('WaitingAreaComponent', () => {
     let fixture: ComponentFixture<WaitingAreaComponent>;
     let gameListServiceSpy: jasmine.SpyObj<GameListService>;
     let multiplayerMode: jasmine.SpyObj<MultiPlayerGameService>;
-    let event: MouseEvent;
     let socketMock: SocketMock;
     let socketMockSpy: jasmine.SpyObj<any>;
 
@@ -172,12 +171,12 @@ describe('WaitingAreaComponent', () => {
     });
     it('onPopState should call gameList someoneLeftRoom', () => {
         component.isStarting = true;
-        component.onPopState(event);
+        component.onPopState();
         expect(gameListServiceSpy.someoneLeftRoom).toHaveBeenCalled();
     });
     it('onBefreUnload should call gameList someoneLeftRoom', () => {
         component.isStarting = true;
-        component.onBeforeUnload(event);
+        component.onBeforeUnload();
         expect(gameListServiceSpy.someoneLeftRoom).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event updateInfo', () => {
