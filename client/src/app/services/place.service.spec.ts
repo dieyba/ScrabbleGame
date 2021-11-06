@@ -147,7 +147,9 @@ describe('PlaceService', () => {
         expect(rackServiceSpy.removeLetter).not.toHaveBeenCalled();
         expect(playerLetter).toEqual(letterA);
         // When coord are negative, it means that the letter is not placed
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(letterA.tile.position.x).toEqual(-1);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(letterA.tile.position.y).toEqual(-1);
     });
 

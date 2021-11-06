@@ -84,7 +84,6 @@ describe('ChatDisplayService', () => {
         expect(service.entries).toEqual([]);
         expect(service.isActiveDebug).toEqual(false);
         expect(service['localPlayerName']).toEqual('someone');
-
     });
 
     it('addEntry should add an entry to entries', () => {
@@ -127,7 +126,6 @@ describe('ChatDisplayService', () => {
     });
 
     it('should add remaining letters and both players remaining letters', () => {
-
         const remainingLetters: ScrabbleLetter[] = [new ScrabbleLetter('a', 1), new ScrabbleLetter('b', 1)];
         const firstPlayerLetters: ScrabbleLetter[] = [new ScrabbleLetter('c', 1), new ScrabbleLetter('d', 1)];
         const secondPlayerLetters: ScrabbleLetter[] = [new ScrabbleLetter('e', 1), new ScrabbleLetter('f', 1)];
@@ -147,5 +145,4 @@ describe('ChatDisplayService', () => {
         expect(endGameMessages[1]).toEqual(firstPlayerEntry);
         expect(endGameMessages[2]).toEqual(secondPlayerEntry);
     });
-
 });

@@ -31,7 +31,7 @@ export class GameListManager {
     }
 
     createRoom(game: GameParameters): GameParameters {
-        let room = this.addRoom(game);
+        const room = this.addRoom(game);
         return room;
     }
     addRoom(game: GameParameters): GameParameters {

@@ -1,6 +1,8 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import * as io from 'socket.io-client';
 
-export module SocketHandler {
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace SocketHandler {
     let activeSocket: io.Socket;
 
     export function requestSocket(server: string): io.Socket {

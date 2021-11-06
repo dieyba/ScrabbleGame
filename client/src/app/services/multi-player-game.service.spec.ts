@@ -171,7 +171,7 @@ describe('MultiPlayerGameService', () => {
         socketMock.triggerEvent('turn changed', { isTurnPassed: false, consecutivePassedTurns: 0 });
         expect(socketOnMockSpy).toHaveBeenCalled();
         service.game.isEndGame = false;
-        expect(service.resetTimer).toHaveBeenCalled
+        expect(service.resetTimer).toHaveBeenCalled();
     });
     it('should emit changeTurn ', () => {
         service.changeTurn();
@@ -186,7 +186,6 @@ describe('MultiPlayerGameService', () => {
         service.exchangeLetters(service.game.creatorPlayer, 'dc');
         expect(SoloGameService.prototype.exchangeLetters).toHaveBeenCalled();
     });
-
 
     it('updateBoard should call drawLetter gridService', () => {
         service.game = gameParameters;
