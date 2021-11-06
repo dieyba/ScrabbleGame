@@ -7,16 +7,48 @@ import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameParameters } from '@app/classes/game-parameters';
+import { LocalPlayer } from '@app/classes/local-player';
 import { GameListService } from '@app/services/game-list.service';
+import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
 import { Observable } from 'rxjs';
+import * as io from 'socket.io-client';
 import { WaitingAreaComponent } from './waiting-area.component';
+class SocketMock {
+    id: string = 'Socket mock';
+    events: Map<string, CallableFunction> = new Map();
+    on(eventName: string, cb: CallableFunction) {
+        this.events.set(eventName, cb);
+    }
+
+    triggerEvent(eventName: string, ...args: any[]) {
+        const arrowFunction = this.events.get(eventName) as CallableFunction;
+        arrowFunction(...args);
+    }
+
+    join(...args: any[]) {
+        return;
+    }
+    emit(...args: any[]) {
+        return;
+    }
+
+    disconnect() {
+        return;
+    }
+}
+
 describe('WaitingAreaComponent', () => {
     let component: WaitingAreaComponent;
     let fixture: ComponentFixture<WaitingAreaComponent>;
     let gameListServiceSpy: jasmine.SpyObj<GameListService>;
+    let multiplayerMode: jasmine.SpyObj<MultiPlayerGameService>;
+    let event: MouseEvent;
+    let socketMock: SocketMock;
+    let socketMockSpy: jasmine.SpyObj<any>;
 
     beforeEach(async () => {
-        gameListServiceSpy = jasmine.createSpyObj('GameListService', ['initializeGame', 'getList', 'start', 'deleteRoom']);
+        gameListServiceSpy = jasmine.createSpyObj('GameListService', ['initializeGame', 'getList', 'start', 'deleteRoom', 'someoneLeftRoom']);
+        multiplayerMode = jasmine.createSpyObj('MultiPlayerGameService', ['initializeGame2']);
         await TestBed.configureTestingModule({
             declarations: [WaitingAreaComponent],
             imports: [
@@ -25,6 +57,7 @@ describe('WaitingAreaComponent', () => {
                 MatInputModule,
                 RouterTestingModule,
                 MatDialogModule,
+                // AppRoutingModule,
             ],
             providers: [
                 { provide: MAT_DIALOG_DATA, useValue: {} },
@@ -32,6 +65,7 @@ describe('WaitingAreaComponent', () => {
                 { provide: Router, useValue: { navigate: () => new Observable() } },
                 { provide: MatDialog, useValue: { open: () => new Observable() } },
                 { provide: GameListService, useValue: gameListServiceSpy },
+                { provide: MultiPlayerGameService, useValue: multiplayerMode },
             ],
         }).compileComponents();
     });
@@ -39,6 +73,9 @@ describe('WaitingAreaComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(WaitingAreaComponent);
         component = fixture.componentInstance;
+        socketMock = new SocketMock();
+        component['socket'] = socketMock as unknown as io.Socket;
+        socketMockSpy = spyOn(socketMock, 'on').and.callThrough();
         fixture.detectChanges();
     });
 
@@ -123,6 +160,64 @@ describe('WaitingAreaComponent', () => {
     it('deleteRoom should call gameList deleteRoom', () => {
         component.deleteRoom();
         expect(gameListServiceSpy.deleteRoom).toHaveBeenCalled();
+    });
+
+    it('someoneLeftRoom should call gameList someoneLeftRoom', () => {
+        component.isStarting = false;
+        component.someoneLeftRoom();
+        expect(gameListServiceSpy.someoneLeftRoom).toHaveBeenCalled();
+    });
+    it('someoneLeftRoom should not  call gameList someoneLeftRoom', () => {
+        component.isStarting = true;
+        component.someoneLeftRoom();
+        expect(gameListServiceSpy.someoneLeftRoom).not.toHaveBeenCalled();
+    });
+    it('onPopState should call gameList someoneLeftRoom', () => {
+        component.isStarting = true;
+        component.onPopState(event);
+        expect(gameListServiceSpy.someoneLeftRoom).toHaveBeenCalled();
+    });
+    it('onBefreUnload should call gameList someoneLeftRoom', () => {
+        component.isStarting = true;
+        component.onBeforeUnload(event);
+        expect(gameListServiceSpy.someoneLeftRoom).toHaveBeenCalled();
+    });
+    it('socketOnConnect should handle socket.on event updateInfo', () => {
+        component.socketOnConnect();
+        let game = new GameParameters('dieyba', 0, false);
+        game.players[0] = new LocalPlayer('dieyba');
+        game.players[1] = new LocalPlayer('sara');
+        game.players[0].socketId = '1he2rwgfw8e'
+        game.players[1].socketId = '1he2rwgfw8e'
+        game.players[0].isActive = false;
+        game.players[1].isActive = false;
+        socketMock.triggerEvent('updateInfo', game);
+        expect(multiplayerMode.initializeGame2).toHaveBeenCalled();
+        expect(socketMockSpy).toHaveBeenCalled();
+    });
+    it('socketOnConnect should handle socket.on event roomdeleted', () => {
+        component.socketOnConnect();
+        let game = new GameParameters('dieyba', 0, false)
+        socketMock.triggerEvent('roomdeleted', game);
+        expect(socketMockSpy).toHaveBeenCalled();
+    });
+    it('socketOnConnect should handle socket.on event roomcreated', () => {
+        component.socketOnConnect();
+        let game = new GameParameters('dieyba', 0, false)
+        socketMock.triggerEvent('roomcreated', game);
+        expect(socketMockSpy).toHaveBeenCalled();
+    });
+    it('socketOnConnect should handle socket.on event roomJoined', () => {
+        component.socketOnConnect();
+        let game = new GameParameters('dieyba', 0, false)
+        socketMock.triggerEvent('roomJoined', game);
+        expect(socketMockSpy).toHaveBeenCalled();
+    });
+    it('socketOnConnect should handle socket.on event roomLeft', () => {
+        component.socketOnConnect();
+        let game = new GameParameters('dieyba', 0, false)
+        socketMock.triggerEvent('roomLeft', game);
+        expect(socketMockSpy).toHaveBeenCalled();
     });
 
     it('openForm should open dialog', () => {

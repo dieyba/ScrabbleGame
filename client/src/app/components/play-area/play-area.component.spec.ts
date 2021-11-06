@@ -50,7 +50,7 @@ describe('PlayAreaComponent', () => {
             declarations: [PlayAreaComponent],
             providers: [
                 { provide: GridService, useValue: gridServiceSpy },
-                { provide: GameService, useValue: gameServiceSpy },                
+                { provide: GameService, useValue: gameServiceSpy },
                 { provide: SoloGameService, useValue: soloGameServiceSpy },
                 { provide: RackService, useValue: rackServiceSpy },
                 { provide: CommandInvokerService, useValue: commandInvokerServiceSpy },

@@ -7,14 +7,17 @@ export class PlayerManagerService {
     constructor() {
         this.allPlayers = [];
     }
-    public addPlayer(playerName: string, socketId: string): Player {
+    addPlayer(playerName: string, socketId: string): Player {
         let newPlayer = new Player(playerName, socketId);
         this.allPlayers.push(newPlayer);
         return newPlayer;
     }
 
-    public getPlayerBySocketID(socketId: string): Player{
-        const playerArrayIndex = this.allPlayers.findIndex((p) => p.getSocketId() === socketId);
-        return this.allPlayers[playerArrayIndex];
+    getPlayerBySocketID(socketId: string): Player | undefined {
+        const playerArrayIndex = this.allPlayers.findIndex((p) => p.socketId === socketId);
+        if (playerArrayIndex > -1) {
+            return this.allPlayers[playerArrayIndex];
+        }
+        return undefined;
     }
 }

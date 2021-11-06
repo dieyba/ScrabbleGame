@@ -16,7 +16,7 @@ import { GamePageComponent } from './game-page.component';
 
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
-    let fixture: ComponentFixture<GamePageComponent>;    
+    let fixture: ComponentFixture<GamePageComponent>;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
@@ -31,17 +31,17 @@ describe('GamePageComponent', () => {
             declarations: [GamePageComponent, SidebarComponent, PlayAreaComponent, ChatDisplayComponent],
             imports: [RouterModule, MatDialogModule],
             providers: [{ provide: Router, useValue: { navigate: () => new Observable() } },
-                        { provide: MatDialog, useValue: { open: () => new Observable() } },
-                        { provide: GameService, useValue: gameServiceSpy },
-                        { provide: RackService, useValue: rackServiceSpy }]
+            { provide: MatDialog, useValue: { open: () => new Observable() } },
+            { provide: GameService, useValue: gameServiceSpy },
+            { provide: RackService, useValue: rackServiceSpy }]
         }).compileComponents();
-        
+
         const firstLetter: ScrabbleLetter = new ScrabbleLetter('a', 1);
         const secondLetter: ScrabbleLetter = new ScrabbleLetter('p', 3);
         const thirdLetter: ScrabbleLetter = new ScrabbleLetter('u', 4);
         const fourthLetter: ScrabbleLetter = new ScrabbleLetter('m', 3);
 
-        gameServiceSpy.initializeGameType(GameType.Solo);        
+        gameServiceSpy.initializeGameType(GameType.Solo);
         gameServiceSpy.currentGameService = soloGameServiceSpy;
         gameServiceSpy.currentGameService.game = new GameParameters('Ari', 60, false);
         gameServiceSpy.currentGameService.game.creatorPlayer = new LocalPlayer('Ariane');
@@ -52,13 +52,13 @@ describe('GamePageComponent', () => {
         gameServiceSpy.currentGameService.game.opponentPlayer.score = 70;
         gameServiceSpy.currentGameService.game.opponentPlayer.letters = [firstLetter, thirdLetter, firstLetter];
         gameServiceSpy.currentGameService.stock = new LetterStock();
-        gameServiceSpy.currentGameService.game.opponentPlayer.isActive = false;        
+        gameServiceSpy.currentGameService.game.opponentPlayer.isActive = false;
         gameServiceSpy.currentGameService.game.localPlayer.isActive = true;
         soloGameServiceSpy.virtualPlayerSubject = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
         soloGameServiceSpy.isVirtualPlayerObservable = soloGameServiceSpy.virtualPlayerSubject.asObservable();
         soloGameServiceSpy.virtualPlayerSubject.next(true);
     });
-    
+
     beforeEach(() => {
         TestBed.createComponent(SidebarComponent);
         fixture = TestBed.createComponent(GamePageComponent);

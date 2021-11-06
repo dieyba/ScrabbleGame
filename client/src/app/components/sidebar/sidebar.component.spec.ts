@@ -10,13 +10,37 @@ import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { GameService } from '@app/services/game.service';
 import { LetterStock } from '@app/services/letter-stock.service';
 import { Observable, of } from 'rxjs';
+import * as io from 'socket.io-client';
+class SocketMock {
+    id: string = 'Socket mock';
+    events: Map<string, CallableFunction> = new Map();
+    on(eventName: string, cb: CallableFunction) {
+        this.events.set(eventName, cb);
+    }
 
+    triggerEvent(eventName: string, ...args: any[]) {
+        const arrowFunction = this.events.get(eventName) as CallableFunction;
+        arrowFunction(...args);
+    }
+    join(...args: any[]) {
+        return;
+    }
+    emit(...args: any[]) {
+        return;
+    }
+
+    disconnect() {
+        return;
+    }
+}
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('SidebarComponent', () => {
     let component: SidebarComponent;
     let fixture: ComponentFixture<SidebarComponent>;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let isClosed: boolean = true;
+    let socketMock: SocketMock;
+    let socketMockSpy: jasmine.SpyObj<any>;
     const dialogRefStub = {
         afterClosed() {
             return of(isClosed);
@@ -55,6 +79,9 @@ describe('SidebarComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(SidebarComponent);
         component = fixture.componentInstance;
+        socketMock = new SocketMock();
+        component['socket'] = socketMock as unknown as io.Socket;
+        socketMockSpy = spyOn(socketMock, 'on').and.callThrough();
         fixture.detectChanges();
     });
 
@@ -166,5 +193,11 @@ describe('SidebarComponent', () => {
         const router = spyOn(TestBed.get(Router), 'navigate').and.returnValue(routerRefSpyObj); // eslint-disable-line deprecation/deprecation
         component.quitGame();
         expect(router).not.toHaveBeenCalled();
+    });
+    it('socketOnConnect should handle socket.on event roomdeleted', () => {
+        component.roomLeft();
+        let game = new GameParameters('dieyba', 0, false)
+        socketMock.triggerEvent('roomLeft', game);
+        expect(socketMockSpy).toHaveBeenCalled();
     });
 });
