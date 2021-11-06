@@ -36,7 +36,6 @@ export class GameParameters {
     consecutivePassedTurns: number;
     isEndGame: boolean;
     newWords: ScrabbleWord[];
-    hasTurnsBeenPassed: boolean[];
 
     constructor(creatorPlayerName: string, timer: number, isRandom: boolean) {
         this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
@@ -47,7 +46,6 @@ export class GameParameters {
         this.timerMs = +this.totalCountDown;
         this.opponentPlayer = new LocalPlayer('')
         this.stock = [];
-        this.hasTurnsBeenPassed = [];
         this.consecutivePassedTurns = 0;
         this.isEndGame = false;
         this.isTurnPassed = false;
