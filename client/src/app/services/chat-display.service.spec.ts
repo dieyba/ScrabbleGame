@@ -6,6 +6,10 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import * as io from 'socket.io-client';
 import { ACTIVE_DEBUG_MESSAGE, ChatDisplayService, INACTIVE_DEBUG_MESSAGE } from './chat-display.service';
+
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-vars */
+/* eslint-disable dot-notation */
 class SocketMock {
     id: string = 'Socket mock';
     events: Map<string, CallableFunction> = new Map();
@@ -50,13 +54,13 @@ describe('ChatDisplayService', () => {
         expect(service).toBeTruthy();
     });
     it('should emit sendSystemMessageToServer ', () => {
-        let message = 'allo';
+        const message = 'allo';
         service.sendSystemMessageToServer(message);
         expect(socketEmitMockSpy).toHaveBeenCalledWith('sendSystemChatEntry', message);
     });
     it('should emit sendMessageToServer ', () => {
-        let message = 'allo';
-        let message2 = 'helloWorld'
+        const message = 'allo';
+        const message2 = 'helloWorld';
         service.sendMessageToServer(message);
         expect(socketEmitMockSpy).toHaveBeenCalledWith('sendChatEntry', message);
         service.sendMessageToServer(message, message2);
@@ -64,13 +68,13 @@ describe('ChatDisplayService', () => {
     });
     it('socketOnConnect should handle socket.on event addChatEntry', () => {
         service.socketOnConnect();
-        let serverChatEntry: ServerChatEntry = { senderName: 'dieyba', message: 'salut' };
+        const serverChatEntry: ServerChatEntry = { senderName: 'dieyba', message: 'salut' };
         socketMock.triggerEvent('addChatEntry', serverChatEntry);
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event addSystemChatEntry', () => {
         service.socketOnConnect();
-        let systemEntry = 'system';
+        const systemEntry = 'system';
         socketMock.triggerEvent('addSystemChatEntry', systemEntry);
         expect(socketMockSpy).toHaveBeenCalled();
     });

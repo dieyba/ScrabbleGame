@@ -71,7 +71,7 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.mouseWordPlacerService.overlayContext = this.overlayCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.gameService.currentGameService.createNewGame();
-        this.gridService.scrabbleBoard = new ScrabbleBoard(false); //this.gameService.currentGameService.game.scrabbleBoard;
+        this.gridService.scrabbleBoard = new ScrabbleBoard(false);
         this.gridService.scrabbleBoard.squares = this.gameService.currentGameService.game.scrabbleBoard.squares;
         this.gridService.scrabbleBoard.colorStock = this.gameService.currentGameService.game.scrabbleBoard.colorStock;
         this.gridService.drawGrid();

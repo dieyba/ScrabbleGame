@@ -27,7 +27,7 @@ export class ChatDisplayService {
         this.entries = [];
 
         this.socket = SocketHandler.requestSocket(this.server);
-        this.socketOnConnect()
+        this.socketOnConnect();
     }
     socketOnConnect() {
         this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
@@ -51,11 +51,9 @@ export class ChatDisplayService {
         } else {
             this.socket.emit('sendChatEntry', messageFromLocalPlayer);
         }
-
     }
     sendSystemMessageToServer(message: string) {
         this.socket.emit('sendSystemChatEntry', message);
-
     }
 
     addEntry(entry: ChatDisplayEntry): void {

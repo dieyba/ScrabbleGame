@@ -46,7 +46,7 @@ export class WordBuilderService {
     }
 
     buildScrabbleWord(coord: Vec2, axis: Axis): ScrabbleWord {
-        let word = new ScrabbleWord();
+        const word = new ScrabbleWord();
         if (this.gridService.scrabbleBoard.isCoordInsideBoard(coord)) {
             if (this.gridService.scrabbleBoard.squares[coord.x][coord.y].occupied) {
                 const startCoord = this.findWordEdge(coord, axis, TOWARD_START);

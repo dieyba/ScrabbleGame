@@ -1,7 +1,7 @@
 import { Difficulty, VirtualPlayer } from './virtual-player';
 
 describe('VirtualPlayer', () => {
-    let virtualPlayer = new VirtualPlayer('Sara', Difficulty.Difficult);
+    const virtualPlayer = new VirtualPlayer('Sara', Difficulty.Difficult);
 
     it('should create an instance', () => {
         expect(virtualPlayer).toBeTruthy();

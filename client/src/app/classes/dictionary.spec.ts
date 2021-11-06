@@ -1,7 +1,7 @@
 import { Dictionary, DictionaryType } from './dictionary';
 
 describe('Dictionary', () => {
-    let dictionary = new Dictionary(DictionaryType.Default);
+    const dictionary = new Dictionary(DictionaryType.Default);
 
     it('should create an instance', () => {
         expect(dictionary).toBeTruthy();

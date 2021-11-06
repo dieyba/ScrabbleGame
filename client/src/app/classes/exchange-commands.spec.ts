@@ -15,8 +15,8 @@ const LETTERS = 'abcd';
 describe('ExchangeCmd', () => {
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
-    let localPlayer = new LocalPlayer(PLAYER_NAME);
-    let opponentPlayer = new LocalPlayer(OPPONENT_NAME);
+    const localPlayer = new LocalPlayer(PLAYER_NAME);
+    const opponentPlayer = new LocalPlayer(OPPONENT_NAME);
 
     beforeEach(() => {
         soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['exchangeLetters']);
@@ -25,7 +25,7 @@ describe('ExchangeCmd', () => {
         TestBed.configureTestingModule({
             providers: [
                 { provide: GameService, useValue: gameServiceSpy },
-                { provide: SoloGameService, useValue: soloGameServiceSpy }
+                { provide: SoloGameService, useValue: soloGameServiceSpy },
             ],
         });
         gameServiceSpy.currentGameService = soloGameServiceSpy;
@@ -34,7 +34,6 @@ describe('ExchangeCmd', () => {
         gameServiceSpy.currentGameService.game.localPlayer = localPlayer;
         gameServiceSpy.currentGameService.game.opponentPlayer = opponentPlayer;
     });
-
 
     it('should create an instance', () => {
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
@@ -68,10 +67,9 @@ describe('ExchangeCmd', () => {
         gameServiceSpy.initializeGameType(GameType.Solo);
         soloGameServiceSpy.exchangeLetters.and.returnValue(ErrorType.NoError);
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
-        const localPlayerEntry = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + " >> !échanger " + LETTERS };
-        const opponentPlayerEntry = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + " >> !échanger " + LETTERS.length + " lettre(s)" };
+        const localPlayerEntry = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + ' >> !échanger ' + LETTERS };
+        const opponentPlayerEntry = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + ' >> !échanger ' + LETTERS.length + ' lettre(s)' };
         const exchange = new ExchangeCmd(defaultParams, LETTERS);
-        console.log(exchange.execute().executionMessages);
         exchange.player.isActive = true;
         expect(exchange.execute()).toEqual({ isExecuted: true, executionMessages: [localPlayerEntry, opponentPlayerEntry] });
     });
@@ -80,8 +78,8 @@ describe('ExchangeCmd', () => {
         gameServiceSpy.initializeGameType(GameType.Solo);
         soloGameServiceSpy.exchangeLetters.and.returnValue(ErrorType.NoError);
         const defaultParams: DefaultCommandParams = { player: opponentPlayer, serviceCalled: gameServiceSpy };
-        const localPlayerEntry = { color: ChatEntryColor.RemotePlayer, message: OPPONENT_NAME + " >> !échanger " + LETTERS };
-        const opponentPlayerEntry = { color: ChatEntryColor.RemotePlayer, message: OPPONENT_NAME + " >> !échanger " + LETTERS.length + " lettre(s)" };
+        const localPlayerEntry = { color: ChatEntryColor.RemotePlayer, message: OPPONENT_NAME + ' >> !échanger ' + LETTERS };
+        const opponentPlayerEntry = { color: ChatEntryColor.RemotePlayer, message: OPPONENT_NAME + ' >> !échanger ' + LETTERS.length + ' lettre(s)' };
         const exchange = new ExchangeCmd(defaultParams, LETTERS);
         exchange.player.isActive = true;
         expect(exchange.execute()).toEqual({ isExecuted: true, executionMessages: [opponentPlayerEntry, localPlayerEntry] });
@@ -91,7 +89,7 @@ describe('ExchangeCmd', () => {
         gameServiceSpy.initializeGameType(GameType.Solo);
         soloGameServiceSpy.exchangeLetters.and.returnValue(ErrorType.ImpossibleCommand);
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
-        const errorMessage = createErrorEntry(ErrorType.ImpossibleCommand, "!échanger AAAAAAAA");
+        const errorMessage = createErrorEntry(ErrorType.ImpossibleCommand, '!échanger AAAAAAAA');
         const exchange = new ExchangeCmd(defaultParams, 'AAAAAAAA');
         exchange.player.isActive = false;
         expect(exchange.execute()).toEqual({ isExecuted: false, executionMessages: [errorMessage] });

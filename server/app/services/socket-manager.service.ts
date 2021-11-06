@@ -22,7 +22,6 @@ export class SocketManagerService {
 
     public handleSockets(): void {
         this.sio.on('connection', (socket) => {
-            console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
             socket.on('addPlayer', (player: Player) => {
                 this.addPlayer(socket, player);
                 this.getAllGames(socket);
@@ -89,7 +88,6 @@ export class SocketManagerService {
                 this.displayPlayerQuitMessage(socket);
             });
             socket.on('disconnect', () => {
-                console.log(`Deconnexion par l'utilisateur avec id : ${socket.id}`);
                 this.disconnect(socket)
             });
         });
