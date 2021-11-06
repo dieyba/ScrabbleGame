@@ -83,7 +83,7 @@ describe('MultiPlayerGameService', () => {
 
 
     beforeEach(() => {
-        chatDisplayServiceSpy = jasmine.createSpyObj('ChatDisplayService', ['sendMessageToServer']);
+        chatDisplayServiceSpy = jasmine.createSpyObj('ChatDisplayService', ['sendMessageToServer', 'createEndGameMessages']);
         validationServiceSpy = jasmine.createSpyObj('ValidationService', ['updatePlayerScore']);
         wordBuilderServiceSpy = jasmine.createSpyObj('WordBuilderService', ['buildWordsOnBoard']);
         placeServiceSpy = jasmine.createSpyObj('PlaceService', ['place']);
@@ -170,18 +170,6 @@ describe('MultiPlayerGameService', () => {
         service.game.isEndGame = false;
         expect(service.resetTimer).toHaveBeenCalled
     });
-    it('socketOnConnect should handle socket.on event gameEnded', () => {
-        service.socketOnConnect();
-        socketMock.triggerEvent('gameEnded', {});
-        expect(socketOnMockSpy).toHaveBeenCalled();
-    });
-    it('socketOnConnect should handle socket.on event update board', () => {
-        service.socketOnConnect();
-        // let board = new ScrabbleBoard(false);
-        // board.word
-        socketMock.triggerEvent('update board', ['maison', 'h',]);
-        expect(socketOnMockSpy).toHaveBeenCalled();
-    });
     it('should emit changeTurn ', () => {
         service.changeTurn();
         expect(socketEmitMockSpy).toHaveBeenCalledWith('change turn', service.game.isTurnPassed, service.game.consecutivePassedTurns);
@@ -192,10 +180,10 @@ describe('MultiPlayerGameService', () => {
     });
     it('exchangeLetters should call exchangeLetters SoloGameService', () => {
         service.game = gameParameters;
-        service.exchangeLetters(service.game.localPlayer, 'ks');
-
+        service.exchangeLetters(service.game.creatorPlayer, 'dc');
         expect(SoloGameService.prototype.exchangeLetters).toHaveBeenCalled();
     });
+
 
     it('updateBoard should call drawLetter gridService', () => {
         service.game = gameParameters;
