@@ -14,21 +14,22 @@ import { SoloGameService } from '@app/services/solo-game.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
-    let isClosed: boolean = true;
+    let isClosed = true;
 
     const dialogRefStub = {
         afterClosed() {
             return of(isClosed);
-        }
+        },
     };
     const dialogStub = { open: () => dialogRefStub };
-
 
     beforeEach(async () => {
         gameServiceSpy = jasmine.createSpyObj('GameService', ['currentGameService', 'initializeGameType']);
@@ -39,10 +40,12 @@ describe('GamePageComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent, SidebarComponent, PlayAreaComponent, ChatDisplayComponent],
             imports: [RouterModule, MatDialogModule],
-            providers: [{ provide: Router, useValue: { navigate: () => new Observable() } },
-            { provide: MatDialog, dialogStub },
-            { provide: GameService, useValue: gameServiceSpy },
-            { provide: RackService, useValue: rackServiceSpy }]
+            providers: [
+                { provide: Router, useValue: { navigate: () => new Observable() } },
+                { provide: MatDialog, dialogStub },
+                { provide: GameService, useValue: gameServiceSpy },
+                { provide: RackService, useValue: rackServiceSpy },
+            ],
         }).compileComponents();
 
         const firstLetter: ScrabbleLetter = new ScrabbleLetter('a', 1);

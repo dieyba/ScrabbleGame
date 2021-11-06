@@ -1,7 +1,7 @@
 import { RACK_SIZE, ScrabbleRack } from './scrabble-rack';
 
 describe('ScrabbleRack', () => {
-    let scrabbleRack = new ScrabbleRack();
+    const scrabbleRack = new ScrabbleRack();
 
     it('should create an instance', () => {
         expect(scrabbleRack).toBeTruthy();

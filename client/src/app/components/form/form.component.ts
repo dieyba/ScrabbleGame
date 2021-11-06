@@ -117,7 +117,7 @@ export class FormComponent implements OnInit {
                 this.closeDialog();
                 this.gameService.initializeGameType(GameType.MultiPlayer);
                 this.gameService.currentGameService.initializeGame(this.myForm);
-                let single = this.gameService.currentGameService.game;
+                const single = this.gameService.currentGameService.game;
                 this.gameList.createRoom(single);
                 this.dialog.open(WaitingAreaComponent, { disableClose: true });
             }

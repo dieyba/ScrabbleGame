@@ -5,6 +5,7 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { scrabbleLetterstoString } from '@app/classes/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 
 export const ACTIVE_DEBUG_MESSAGE = 'Affichages de débogage activés';
 export const INACTIVE_DEBUG_MESSAGE = 'Affichages de débogage désactivés';
@@ -17,14 +18,18 @@ export class ChatDisplayService {
     entries: ChatDisplayEntry[];
     private readonly server: string;
     private localPlayerName: string;
-    private socket?: io.Socket;
+    private socket: io.Socket;
 
     constructor() {
-        this.server = 'http://' + window.location.hostname + ':3000';
+        // this.server = 'http://' + window.location.hostname + ':3000';
+        this.server = environment.socketUrl;
         this.isActiveDebug = false;
         this.entries = [];
 
         this.socket = SocketHandler.requestSocket(this.server);
+        this.socketOnConnect();
+    }
+    socketOnConnect() {
         this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
             const chatEntryColor = chatEntry.senderName === this.localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
             this.addEntry({ color: chatEntryColor, message: chatEntry.message });
@@ -41,18 +46,14 @@ export class ChatDisplayService {
     }
 
     sendMessageToServer(messageFromLocalPlayer: string, messageToRemotePlayer?: string) {
-        if (this.socket) {
-            if (messageToRemotePlayer) {
-                this.socket.emit('sendChatEntry', messageFromLocalPlayer, messageToRemotePlayer);
-            } else {
-                this.socket.emit('sendChatEntry', messageFromLocalPlayer);
-            }
+        if (messageToRemotePlayer) {
+            this.socket.emit('sendChatEntry', messageFromLocalPlayer, messageToRemotePlayer);
+        } else {
+            this.socket.emit('sendChatEntry', messageFromLocalPlayer);
         }
     }
     sendSystemMessageToServer(message: string) {
-        if (this.socket) {
-            this.socket.emit('sendSystemChatEntry', message);
-        }
+        this.socket.emit('sendSystemChatEntry', message);
     }
 
     addEntry(entry: ChatDisplayEntry): void {

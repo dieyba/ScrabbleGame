@@ -4,6 +4,7 @@ import { EndGamePopupComponent } from '@app/components/end-game-popup/end-game-p
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-game-page',
@@ -11,12 +12,13 @@ import * as io from 'socket.io-client';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
+    canNavBack: boolean = false;
     private dialogRef: MatDialogRef<EndGamePopupComponent>;
     private socket: io.Socket;
     private readonly server: string;
-    canNavBack: boolean = false;
     constructor(private dialog: MatDialog, private gameService: GameService) {
-        this.server = 'http://' + window.location.hostname + ':3000';
+        // this.server = 'http://' + window.location.hostname + ':3000';
+        this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         history.pushState(null, '', window.location.href);
     }
@@ -42,5 +44,4 @@ export class GamePageComponent {
             });
         }
     }
-
 }
