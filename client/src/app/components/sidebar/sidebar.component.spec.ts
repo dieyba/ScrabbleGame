@@ -12,6 +12,11 @@ import { LetterStock } from '@app/services/letter-stock.service';
 import { Observable, of } from 'rxjs';
 import * as io from 'socket.io-client';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable dot-notation */
+/* eslint-disable no-unused-vars */
 class SocketMock {
     id: string = 'Socket mock';
     events: Map<string, CallableFunction> = new Map();
@@ -40,13 +45,13 @@ describe('SidebarComponent', () => {
     let component: SidebarComponent;
     let fixture: ComponentFixture<SidebarComponent>;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
-    let isClosed: boolean = true;
+    let isClosed = true;
     let socketMock: SocketMock;
     let socketMockSpy: jasmine.SpyObj<any>;
     const dialogRefStub = {
         afterClosed() {
             return of(isClosed);
-        }
+        },
     };
     const dialogStub = { open: () => dialogRefStub };
 
@@ -55,10 +60,12 @@ describe('SidebarComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [SidebarComponent],
             imports: [MatCardModule],
-            providers: [{ provide: GameService, useValue: gameServiceSpy },
-            { provide: Router, useValue: { navigate: () => new Observable() } },
-            { provide: MatDialog, useValue: dialogStub },
-            { provide: MatDialogRef, useValue: { close: () => {} } }],
+            providers: [
+                { provide: GameService, useValue: gameServiceSpy },
+                { provide: Router, useValue: { navigate: () => new Observable() } },
+                { provide: MatDialog, useValue: dialogStub },
+                { provide: MatDialogRef, useValue: { close: () => {} } },
+            ],
         }).compileComponents();
 
         const firstLetter: ScrabbleLetter = new ScrabbleLetter('a', 1);
@@ -93,7 +100,7 @@ describe('SidebarComponent', () => {
 
     it('socketOnConnect should handle socket.on event roomdeleted', () => {
         component.roomLeft();
-        let game = new GameParameters('dieyba', 0, false)
+        const game = new GameParameters('dieyba', 0, false);
         socketMock.triggerEvent('roomLeft', game);
         expect(socketMockSpy).toHaveBeenCalled();
     });
@@ -164,21 +171,21 @@ describe('SidebarComponent', () => {
     it('getWinnerName should set winnerName to right name if one winner exists', () => {
         gameServiceSpy.currentGameService.game.opponentPlayer.isWinner = true;
         gameServiceSpy.currentGameService.game.creatorPlayer.isWinner = false;
-        component.getWinnerName()
+        component.getWinnerName();
         expect(component.winnerName).toEqual('Sara');
     });
 
     it('getWinnerName should set winnerName to right name if one winner exists', () => {
         gameServiceSpy.currentGameService.game.opponentPlayer.isWinner = false;
         gameServiceSpy.currentGameService.game.creatorPlayer.isWinner = true;
-        component.getWinnerName()
+        component.getWinnerName();
         expect(component.winnerName).toEqual('Ariane');
     });
 
     it('getWinnerName should set winnerName to two names if two winners exists', () => {
         gameServiceSpy.currentGameService.game.opponentPlayer.isWinner = true;
         gameServiceSpy.currentGameService.game.creatorPlayer.isWinner = true;
-        component.getWinnerName()
+        component.getWinnerName();
         expect(component.winnerName).toEqual('Ariane et Sara');
     });
 
@@ -205,7 +212,7 @@ describe('SidebarComponent', () => {
     });
     it('socketOnConnect should handle socket.on event roomdeleted', () => {
         component.roomLeft();
-        let game = new GameParameters('dieyba', 0, false)
+        const game = new GameParameters('dieyba', 0, false);
         socketMock.triggerEvent('roomLeft', game);
         expect(socketMockSpy).toHaveBeenCalled();
     });

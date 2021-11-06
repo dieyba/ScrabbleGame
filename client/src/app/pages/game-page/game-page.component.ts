@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
-    canNavBack = false;
+    canNavBack: boolean = false;
     private dialogRef: MatDialogRef<EndGamePopupComponent>;
     private socket: io.Socket;
     private readonly server: string;

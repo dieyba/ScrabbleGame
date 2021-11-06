@@ -15,7 +15,7 @@ export class PlaceService {
 
     place(player: Player, placeParams: PlaceParams): ErrorType {
         const tempCoord = new Vec2();
-        // Checking if its player's turn
+        // Checking the word is placable
         if (!this.canPlaceWord(placeParams)) {
             return ErrorType.SyntaxError;
         }

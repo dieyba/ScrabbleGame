@@ -13,6 +13,11 @@ import { MultiPlayerGameService } from '@app/services/multi-player-game.service'
 import { Observable } from 'rxjs';
 import * as io from 'socket.io-client';
 import { WaitingAreaComponent } from './waiting-area.component';
+
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-vars */
+/* eslint-disable dot-notation */
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 class SocketMock {
     id: string = 'Socket mock';
     events: Map<string, CallableFunction> = new Map();
@@ -42,7 +47,6 @@ describe('WaitingAreaComponent', () => {
     let fixture: ComponentFixture<WaitingAreaComponent>;
     let gameListServiceSpy: jasmine.SpyObj<GameListService>;
     let multiplayerMode: jasmine.SpyObj<MultiPlayerGameService>;
-    let event: MouseEvent;
     let socketMock: SocketMock;
     let socketMockSpy: jasmine.SpyObj<any>;
 
@@ -51,13 +55,7 @@ describe('WaitingAreaComponent', () => {
         multiplayerMode = jasmine.createSpyObj('MultiPlayerGameService', ['initializeGame2']);
         await TestBed.configureTestingModule({
             declarations: [WaitingAreaComponent],
-            imports: [
-                MatCardModule,
-                MatFormFieldModule,
-                MatInputModule,
-                RouterTestingModule,
-                MatDialogModule,
-            ],
+            imports: [MatCardModule, MatFormFieldModule, MatInputModule, RouterTestingModule, MatDialogModule],
             providers: [
                 { provide: MAT_DIALOG_DATA, useValue: {} },
                 { provide: MatDialogRef, useValue: { close: () => {} } }, // eslint-disable-line @typescript-eslint/no-empty-function
@@ -113,14 +111,14 @@ describe('WaitingAreaComponent', () => {
         component.startIfFull();
         expect(component.isStarting).toEqual(true);
         expect(gameListServiceSpy.initializeGame).toHaveBeenCalled();
-    })
+    });
 
     it('startIfFull should not initializeGame if one player has joined', () => {
         component.playerList = ['Ari'];
         component.startIfFull();
         expect(component.isStarting).toEqual(false);
         expect(gameListServiceSpy.initializeGame).not.toHaveBeenCalled();
-    })
+    });
 
     it('start should set nameValid to true and call gameList start when only one player', () => {
         component.selectedGame = new GameParameters('Ari', 60, false);
@@ -173,21 +171,21 @@ describe('WaitingAreaComponent', () => {
     });
     it('onPopState should call gameList someoneLeftRoom', () => {
         component.isStarting = true;
-        component.onPopState(event);
+        component.onPopState();
         expect(gameListServiceSpy.someoneLeftRoom).toHaveBeenCalled();
     });
     it('onBefreUnload should call gameList someoneLeftRoom', () => {
         component.isStarting = true;
-        component.onBeforeUnload(event);
+        component.onBeforeUnload();
         expect(gameListServiceSpy.someoneLeftRoom).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event updateInfo', () => {
         component.socketOnConnect();
-        let game = new GameParameters('dieyba', 0, false);
+        const game = new GameParameters('dieyba', 0, false);
         game.players[0] = new LocalPlayer('dieyba');
         game.players[1] = new LocalPlayer('sara');
-        game.players[0].socketId = '1he2rwgfw8e'
-        game.players[1].socketId = '1he2rwgfw8e'
+        game.players[0].socketId = '1he2rwgfw8e';
+        game.players[1].socketId = '1he2rwgfw8e';
         game.players[0].isActive = false;
         game.players[1].isActive = false;
         socketMock.triggerEvent('updateInfo', game);
@@ -196,25 +194,25 @@ describe('WaitingAreaComponent', () => {
     });
     it('socketOnConnect should handle socket.on event roomdeleted', () => {
         component.socketOnConnect();
-        let game = new GameParameters('dieyba', 0, false)
+        const game = new GameParameters('dieyba', 0, false);
         socketMock.triggerEvent('roomdeleted', game);
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomcreated', () => {
         component.socketOnConnect();
-        let game = new GameParameters('dieyba', 0, false)
+        const game = new GameParameters('dieyba', 0, false);
         socketMock.triggerEvent('roomcreated', game);
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomJoined', () => {
         component.socketOnConnect();
-        let game = new GameParameters('dieyba', 0, false)
+        const game = new GameParameters('dieyba', 0, false);
         socketMock.triggerEvent('roomJoined', game);
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomLeft', () => {
         component.socketOnConnect();
-        let game = new GameParameters('dieyba', 0, false)
+        const game = new GameParameters('dieyba', 0, false);
         socketMock.triggerEvent('roomLeft', game);
         expect(socketMockSpy).toHaveBeenCalled();
     });
@@ -236,5 +234,3 @@ describe('WaitingAreaComponent', () => {
         expect(matdialog).toHaveBeenCalled();
     });
 });
-
-

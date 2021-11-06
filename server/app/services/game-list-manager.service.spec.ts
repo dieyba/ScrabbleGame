@@ -3,7 +3,9 @@ import { GameParameters } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import { expect } from 'chai';
 import { GameListManager } from './game-list-manager.service';
-
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable  @typescript-eslint/no-unused-expressions */
+/* eslint-disable  no-unused-expressions */
 describe('GameListManager service', () => {
     let gameListMan: GameListManager;
     const game1 = new GameParameters('dieyba', 60, false, 1);

@@ -8,7 +8,7 @@ export class PlayerManagerService {
         this.allPlayers = [];
     }
     addPlayer(playerName: string, socketId: string): Player {
-        let newPlayer = new Player(playerName, socketId);
+        const newPlayer = new Player(playerName, socketId);
         this.allPlayers.push(newPlayer);
         return newPlayer;
     }

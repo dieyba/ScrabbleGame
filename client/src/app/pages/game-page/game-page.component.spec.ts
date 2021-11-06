@@ -14,6 +14,8 @@ import { SoloGameService } from '@app/services/solo-game.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;

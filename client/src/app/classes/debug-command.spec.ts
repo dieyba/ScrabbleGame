@@ -19,7 +19,6 @@ describe('DebugCmd', () => {
         chatDisplayServiceSpy.isActiveDebug = false;
     });
 
-
     it('should create an instance', () => {
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: chatDisplayServiceSpy };
         const debug = new DebugCmd(defaultParams);
@@ -37,8 +36,8 @@ describe('DebugCmd', () => {
         chatDisplayServiceSpy.invertDebugState.and.returnValue(ACTIVE_DEBUG_MESSAGE);
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: chatDisplayServiceSpy };
         const debug = new DebugCmd(defaultParams);
-        const commandMessage = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + " >> !debug" };
-        const systemMessage = { color: ChatEntryColor.SystemColor, message: "Système >> " + ACTIVE_DEBUG_MESSAGE };
+        const commandMessage = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + ' >> !debug' };
+        const systemMessage = { color: ChatEntryColor.SystemColor, message: 'Système >> ' + ACTIVE_DEBUG_MESSAGE };
         expect(debug.execute()).toEqual({ isExecuted: true, executionMessages: [commandMessage, systemMessage] });
     });
 
@@ -46,11 +45,10 @@ describe('DebugCmd', () => {
         chatDisplayServiceSpy.invertDebugState.and.returnValue(INACTIVE_DEBUG_MESSAGE);
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: chatDisplayServiceSpy };
         const debug = new DebugCmd(defaultParams);
-        const commandMessage = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + " >> !debug" };
-        const systemMessage = { color: ChatEntryColor.SystemColor, message: "Système >> " + INACTIVE_DEBUG_MESSAGE };
+        const commandMessage = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + ' >> !debug' };
+        const systemMessage = { color: ChatEntryColor.SystemColor, message: 'Système >> ' + INACTIVE_DEBUG_MESSAGE };
         expect(debug.execute()).toEqual({ isExecuted: true, executionMessages: [commandMessage, systemMessage] });
     });
-
 
     it('createDebugCmd should create an instance', () => {
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: chatDisplayServiceSpy };

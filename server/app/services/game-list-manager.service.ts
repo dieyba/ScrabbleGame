@@ -4,8 +4,8 @@ import { Service } from 'typedi';
 
 @Service()
 export class GameListManager {
-    existingRooms: Array<GameParameters>;
-    currentGames: Array<GameParameters>;
+    existingRooms: GameParameters[];
+    currentGames: GameParameters[];
     currentRoomID: number;
     constructor() {
         this.existingRooms = new Array<GameParameters>();
@@ -30,17 +30,17 @@ export class GameListManager {
         return undefined;
     }
 
-    public createRoom(game: GameParameters): GameParameters {
+    createRoom(game: GameParameters): GameParameters {
         let room = this.addRoom(game);
         return room;
     }
-    public addRoom(game: GameParameters): GameParameters {
+    addRoom(game: GameParameters): GameParameters {
         game.creatorPlayer.roomId = game.gameRoom.idGame;
         this.existingRooms.push(game);
         return game;
     }
-    public deleteExistingRoom(roomId: number): void {
-        const index = this.existingRooms.findIndex((r) => r.gameRoom.idGame === roomId)
+    deleteExistingRoom(roomId: number): void {
+        const index = this.existingRooms.findIndex((r) => r.gameRoom.idGame === roomId);
         if (index > -1) {
             this.existingRooms.splice(index, 1);
         }

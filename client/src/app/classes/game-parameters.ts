@@ -40,12 +40,12 @@ export class GameParameters {
     constructor(creatorPlayerName: string, timer: number, isRandom: boolean) {
         this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
         this.players = [];
-        this.creatorPlayer = new LocalPlayer(creatorPlayerName)
-        this.creatorPlayer.isActive = true
+        this.creatorPlayer = new LocalPlayer(creatorPlayerName);
+        this.creatorPlayer.isActive = true;
         this.localPlayer = new LocalPlayer(creatorPlayerName);
         this.totalCountDown = timer;
         this.timerMs = +this.totalCountDown;
-        this.opponentPlayer = new LocalPlayer('')
+        this.opponentPlayer = new LocalPlayer('');
         this.stock = [];
         this.consecutivePassedTurns = 0;
         this.isEndGame = false;

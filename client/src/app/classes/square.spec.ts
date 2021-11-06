@@ -1,7 +1,8 @@
 import { Square } from './square';
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('Square', () => {
-    let square = new Square(5, 3);
+    const square = new Square(5, 3);
     it('should create an instance', () => {
         expect(square).toBeTruthy();
     });
