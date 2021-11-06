@@ -9,8 +9,10 @@ import { Vec2 } from '@app/classes/vec2';
 import { ValidationService, WAIT_TIME } from '@app/services/validation.service';
 import { GridService } from './grid.service';
 
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-/* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable @typescript-eslint/no-empty-function */
 describe('ValidationService', () => {
     let service: ValidationService;
     let gridServiceSpy: jasmine.SpyObj<GridService>;
@@ -44,7 +46,7 @@ describe('ValidationService', () => {
         word2.orientation = Axis.H;
         word2.startPosition = new Vec2(0, 0);
         const words: ScrabbleWord[] = [word1, word2];
-        service.validateWords(words)
+        service.validateWords(words);
         expect(service.areWordsValid).toEqual(false);
     });
     // TODO : Not working

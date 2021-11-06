@@ -21,6 +21,7 @@ import { SoloGameService } from './solo-game.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('MultiPlayerGameService', () => {
     let service: MultiPlayerGameService;
     let chatDisplayServiceSpy: jasmine.SpyObj<ChatDisplayService>;
@@ -45,7 +46,7 @@ describe('MultiPlayerGameService', () => {
         opponent: new FormControl('Sara'),
     });
 
-    let gameParameters = new GameParameters('Erika', 60, true);
+    const gameParameters = new GameParameters('Erika', 60, true);
 
     const creatorLetters = [
         new ScrabbleLetter('d'),
@@ -54,7 +55,7 @@ describe('MultiPlayerGameService', () => {
         new ScrabbleLetter('a'),
         new ScrabbleLetter('t'),
         new ScrabbleLetter('l'),
-        new ScrabbleLetter('i')
+        new ScrabbleLetter('i'),
     ];
     const opponentLetters = [
         new ScrabbleLetter('p'),
@@ -63,7 +64,7 @@ describe('MultiPlayerGameService', () => {
         new ScrabbleLetter('b'),
         new ScrabbleLetter('r'),
         new ScrabbleLetter('o'),
-        new ScrabbleLetter('l')
+        new ScrabbleLetter('l'),
     ];
 
     beforeEach(() => {
@@ -201,11 +202,10 @@ describe('MultiPlayerGameService', () => {
         service.game = gameParameters;
         const word = 'test';
         const position = new Vec2();
-        let startPosition = new Vec2();
+        const startPosition = new Vec2();
         service.updateBoard(word, 'v', position);
 
         for (startPosition.y; startPosition.y < word.length; startPosition.y++) {
-            console.log(gridServiceSpy.scrabbleBoard.squares[startPosition.x][startPosition.y]);
             expect(gridServiceSpy.scrabbleBoard.squares[startPosition.x][startPosition.y].isValidated).toBeTrue();
             expect(gridServiceSpy.scrabbleBoard.squares[startPosition.x][startPosition.y].isBonusUsed).toBeTrue();
         }

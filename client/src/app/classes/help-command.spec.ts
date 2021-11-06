@@ -19,8 +19,8 @@ describe('HelpCmd', () => {
     it('should execute and return help messages', () => {
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: chatDisplayService };
         const debug = new HelpCmd(defaultParams);
-        const commandMessage = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + " >> !aide" };
-        let expectedResult: ChatDisplayEntry[] = [commandMessage];
+        const commandMessage = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + ' >> !aide' };
+        const expectedResult: ChatDisplayEntry[] = [commandMessage];
         for (const message of HELP_MESSAGES) {
             expectedResult.push({ color: ChatEntryColor.SystemColor, message });
         }

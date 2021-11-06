@@ -10,21 +10,43 @@ import { scrabbleLetterstoString } from './utilities';
 
 const PLAYER_NAME = 'Sara';
 
+/* eslint-disable @typescript-eslint/no-shadow */
 describe('StockCmd', () => {
     let chatDisplayServiceSpy: jasmine.SpyObj<ChatDisplayService>;
     const localPlayer = new LocalPlayer(PLAYER_NAME);
     const stock = new LetterStock();
     const stockLetters = scrabbleLetterstoString(stock.letterStock);
     const expectedResult = [
-        'a : 9', 'b : 2', 'c : 2', 'd : 3', 'e : 15',
-        'f : 2', 'g : 2', 'h : 2', 'i : 8', 'j : 1',
-        'k : 1', 'l : 5', 'm : 3', 'n : 6', 'o : 6',
-        'p : 2', 'q : 1', 'r : 6', 's : 6', 't : 6',
-        'u : 6', 'v : 2', 'w : 1', 'x : 1', 'y : 1',
-        'z : 1', '* : 2'
-    ]
+        'a : 9',
+        'b : 2',
+        'c : 2',
+        'd : 3',
+        'e : 15',
+        'f : 2',
+        'g : 2',
+        'h : 2',
+        'i : 8',
+        'j : 1',
+        'k : 1',
+        'l : 5',
+        'm : 3',
+        'n : 6',
+        'o : 6',
+        'p : 2',
+        'q : 1',
+        'r : 6',
+        's : 6',
+        't : 6',
+        'u : 6',
+        'v : 2',
+        'w : 1',
+        'x : 1',
+        'y : 1',
+        'z : 1',
+        '* : 2',
+    ];
     beforeEach(() => {
-        chatDisplayServiceSpy = jasmine.createSpyObj('ChatDisplayService', { 'isActiveDebug': false });
+        chatDisplayServiceSpy = jasmine.createSpyObj('ChatDisplayService', { isActiveDebug: false });
         TestBed.configureTestingModule({
             providers: [{ provide: ChatDisplayService, useValue: chatDisplayServiceSpy }],
         });
@@ -41,11 +63,11 @@ describe('StockCmd', () => {
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: chatDisplayServiceSpy };
         const stock = new StockCmd(defaultParams, stockLetters);
         const executionResult = stock.execute();
-        let spy = spyOn(stock, 'createStockMessage').and.callThrough();
+        const spy = spyOn(stock, 'createStockMessage').and.callThrough();
         expect(spy).toHaveBeenCalledTimes(0);
         expect(executionResult).toEqual({
             isExecuted: false,
-            executionMessages: [createErrorEntry(ErrorType.ImpossibleCommand, '!réserve')]
+            executionMessages: [createErrorEntry(ErrorType.ImpossibleCommand, '!réserve')],
         });
     });
     it('should call createStockMessage and return successful execution messages', () => {
@@ -53,11 +75,14 @@ describe('StockCmd', () => {
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: chatDisplayServiceSpy };
         const stock = new StockCmd(defaultParams, stockLetters);
         const commandMessage = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + ' >> !réserve' };
-        let expectedMessages = [commandMessage];
+        const expectedMessages = [commandMessage];
         for (const message of expectedResult) {
-            expectedMessages.push({ color: ChatEntryColor.SystemColor, message: message });
+            expectedMessages.push({
+                color: ChatEntryColor.SystemColor,
+                message: message,
+            });
         }
-        let spy = spyOn(stock, 'createStockMessage').and.callThrough();
+        const spy = spyOn(stock, 'createStockMessage').and.callThrough();
         const executionResult = stock.execute();
         expect(spy).toHaveBeenCalledOnceWith(stockLetters);
         expect(executionResult).toEqual({ isExecuted: true, executionMessages: expectedMessages });
@@ -79,7 +104,10 @@ describe('StockCmd', () => {
 
     it('createStockCmd should create an instance', () => {
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: chatDisplayServiceSpy };
-        const helpParams = { defaultParams: defaultParams, specificParams: stockLetters };
+        const helpParams = {
+            defaultParams: defaultParams,
+            specificParams: stockLetters,
+        };
         expect(createStockCmd(helpParams)).toBeTruthy();
     });
 });

@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { GameParameters } from '@app/classes/game-parameters';
+import { EndGamePopupComponent } from '@app/components/end-game-popup/end-game-popup.component';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
-import { EndGamePopupComponent } from '../end-game-popup/end-game-popup.component';
 @Component({
     selector: 'app-sidebar',
     templateUrl: './sidebar.component.html',
@@ -21,13 +20,13 @@ export class SidebarComponent {
         this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
         this.winnerName = '';
-        this.roomLeft()
+        this.roomLeft();
     }
     roomLeft() {
-        this.socket.on('roomLeft', (game: GameParameters) => {
+        this.socket.on('roomLeft', () => {
             this.gameService.currentGameService.game.localPlayer.isWinner = true;
             this.gameService.currentGameService.game.isEndGame = true;
-        })
+        });
     }
 
     getPlayer1Name(): string {
@@ -104,7 +103,7 @@ export class SidebarComponent {
         // User confirmation response
         this.dialogRef.afterClosed().subscribe((confirmQuit) => {
             if (confirmQuit) {
-                this.socket.emit('leaveRoom')
+                this.socket.emit('leaveRoom');
                 // this.socket = SocketHandler.disconnectSocket();
                 // calls server to display message in opponent's chat box
                 // this.socket.emit('playerQuit');
@@ -113,4 +112,3 @@ export class SidebarComponent {
         });
     }
 }
-

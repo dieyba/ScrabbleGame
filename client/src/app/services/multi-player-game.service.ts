@@ -43,17 +43,16 @@ export class MultiPlayerGameService extends SoloGameService {
 
     socketOnConnect() {
         this.socket.on('turn changed', (isTurnPassed: boolean, consecutivePassedTurns: number) => {
-            this.game.isTurnPassed = isTurnPassed
+            this.game.isTurnPassed = isTurnPassed;
             this.game.consecutivePassedTurns = consecutivePassedTurns;
-            if (!this.game.isEndGame) { // if it is not already the endgame
+            if (!this.game.isEndGame) {
+                // if it is not already the endgame
                 const isLocalPlayerEndingGame = this.game.consecutivePassedTurns >= MAX_TURNS_PASSED && this.game.localPlayer.isActive;
                 if (isLocalPlayerEndingGame) {
                     this.endGame();
                 }
                 this.updateActivePlayer();
                 this.resetTimer();
-                console.log("Changed turn (multi mode): ", this.game.localPlayer.name, " active:", this.game.localPlayer.isActive, ',',
-                    this.game.opponentPlayer.name, " active: ", this.game.opponentPlayer.isActive, ',consecutive passed turns:', this.game.consecutivePassedTurns);
                 this.game.isTurnPassed = false;
             } else {
                 this.resetTimer();
@@ -64,6 +63,8 @@ export class MultiPlayerGameService extends SoloGameService {
             this.endLocalGame();
             this.resetTimer();
         });
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
         this.socket.on('update board', (board: any) => {
             this.updateBoard(board.word, board.orientation, new Vec2(board.positionX, board.positionY));
         });
@@ -77,7 +78,6 @@ export class MultiPlayerGameService extends SoloGameService {
             this.game.opponentPlayer.letters = update.newLetters;
             this.game.opponentPlayer.score = update.newScore;
         });
-
     }
     override initializeGame(gameInfo: FormGroup): GameParameters {
         this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value, gameInfo.controls.bonus.value);
@@ -98,13 +98,14 @@ export class MultiPlayerGameService extends SoloGameService {
         const localPlayerIndex = this.socket.id === this.game.players[0].socketId ? 0 : 1;
         const opponentPlayerIndex = this.socket.id === this.game.players[0].socketId ? 1 : 0;
 
-        let tempOpponentPlayer = new LocalPlayer(game.gameRoom.playersName[opponentPlayerIndex]);
+        const tempOpponentPlayer = new LocalPlayer(game.gameRoom.playersName[opponentPlayerIndex]);
         tempOpponentPlayer.letters = game.opponentPlayer.letters;
         this.game.creatorPlayer = game.creatorPlayer;
         this.game.opponentPlayer = tempOpponentPlayer;
 
         this.game.localPlayer = new LocalPlayer(game.gameRoom.playersName[localPlayerIndex]);
-        this.game.localPlayer.letters = this.socket.id === this.game.players[0].socketId ? this.game.creatorPlayer.letters : this.game.opponentPlayer.letters;
+        this.game.localPlayer.letters =
+            this.socket.id === this.game.players[0].socketId ? this.game.creatorPlayer.letters : this.game.opponentPlayer.letters;
 
         this.game.localPlayer.isActive = this.game.players[localPlayerIndex].isActive;
         this.game.opponentPlayer.isActive = this.game.players[opponentPlayerIndex].isActive;
@@ -113,7 +114,12 @@ export class MultiPlayerGameService extends SoloGameService {
     override async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
         const errorResult = await super.place(player, placeParams);
         if (errorResult === ErrorType.NoError) {
-            this.socket.emit('word placed', { word: placeParams.word, orientation: placeParams.orientation, positionX: placeParams.position.x, positionY: placeParams.position.y });
+            this.socket.emit('word placed', {
+                word: placeParams.word,
+                orientation: placeParams.orientation,
+                positionX: placeParams.position.x,
+                positionY: placeParams.position.y,
+            });
             this.socket.emit('place word', { stock: this.stock.letterStock, newLetters: player.letters, newScore: player.score });
         }
         return errorResult;
@@ -131,7 +137,7 @@ export class MultiPlayerGameService extends SoloGameService {
     updateBoard(word: string, orientation: string, position: Vec2) {
         if (orientation === 'h') {
             for (const letter of word) {
-                let character = new ScrabbleLetter(letter);
+                const character = new ScrabbleLetter(letter);
                 character.tile.position.x = position.x;
                 character.tile.position.y = position.y;
                 this.gridService.drawLetter(character, position.x, position.y);
@@ -141,7 +147,7 @@ export class MultiPlayerGameService extends SoloGameService {
             }
         } else {
             for (const letter of word) {
-                let character = new ScrabbleLetter(letter)
+                const character = new ScrabbleLetter(letter);
                 character.tile.position.x = position.x;
                 character.tile.position.y = position.y;
                 this.gridService.drawLetter(character, position.x, position.y);
