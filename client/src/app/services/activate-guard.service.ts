@@ -8,8 +8,7 @@ import { GameService } from './game.service';
 })
 export class ActivateGuard implements CanActivate {
 
-  constructor(private gameService: GameService) {
-  }
+  constructor(private gameService: GameService) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     if (this.gameService.currentGameService.game.isEndGame === true) {

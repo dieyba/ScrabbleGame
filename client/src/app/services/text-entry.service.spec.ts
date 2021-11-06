@@ -33,7 +33,7 @@
 //             ],
 //         });
 //         service = TestBed.inject(TextEntryService);
-//         gameServiceSpy.game = new GameParameters(LOCAL_PLAYER_NAME, 60);
+//         gameServiceSpy.game = new GameParameters(LOCAL_PLAYER_NAME, 60, false);
 //         gameServiceSpy.game.creatorPlayer = new LocalPlayer(LOCAL_PLAYER_NAME);
 //         gameServiceSpy.game.opponentPlayer = new VirtualPlayer(VIRTUAL_PLAYER_NAME, Difficulty.Easy);
 //     });
@@ -42,27 +42,27 @@
 //         expect(service).toBeTruthy();
 //     });
 
-//     it('should send ! starting input to createCommand', () => {
+//     it('handleInput should send ! starting input to createCommand', () => {
 //         const spy = spyOn(service, 'createCommand').and.callThrough();
 //         const fakeCommand = '!fake command name';
-//         service.handleInput(fakeCommand, IS_LOCAL_PLAYER);
+//         service.handleInput(fakeCommand);
 //         expect(spy).toHaveBeenCalledWith(fakeCommand, gameServiceSpy.game.creatorPlayer);
 //     });
 
-//     it('should send input as normal chat message', () => {
+//     it('handleInput should send input as normal chat message', () => {
 //         const chatMessage = 'not a command';
-//         service.handleInput(chatMessage, IS_LOCAL_PLAYER);
+//         service.handleInput(chatMessage);
 //         expect(chatDisplayServiceSpy.addEntry).toHaveBeenCalled();
 //     });
 
-//     it('should display successful command message', () => {
+//     it('handleInput should display successful command message', () => {
 //         const validCmd = '!debug';
 //         chatDisplayServiceSpy.invertDebugState.and.callThrough();
-//         service.handleInput(validCmd, IS_LOCAL_PLAYER);
+//         service.handleInput(validCmd);
 //         expect(chatDisplayServiceSpy.addEntry).toHaveBeenCalled();
 //     });
 
-//     it('should create and display local exchange command message', () => {
+//     it('handleInput should create and display local exchange command message', () => {
 //         const validExchangeCmd = '!échanger lettres';
 
 //         gameServiceSpy.exchangeLetters.and.returnValue(ErrorType.NoError);
@@ -97,12 +97,12 @@
 //         const invalidCmds = ['!', '! debug', '!random name', '!echanger', '!123'];
 
 //         for (const input of validNameCmds) {
-//             service.handleInput(input, IS_LOCAL_PLAYER);
+//             service.handleInput(input);
 //             expect(chatDisplayServiceSpy.addPlayerEntry).toHaveBeenCalled();
 //         }
 
 //         for (const input of invalidCmds) {
-//             service.handleInput(input, IS_LOCAL_PLAYER);
+//             service.handleInput(input);
 //             expect(chatDisplayServiceSpy.addErrorMessage).toHaveBeenCalledWith(ErrorType.InvalidCommand, input);
 //         }
 //     });
@@ -139,12 +139,12 @@
 //         ];
 
 //         for (const input of validSyntaxCmds) {
-//             service.handleInput(input, IS_LOCAL_PLAYER);
+//             service.handleInput(input);
 //             expect(chatDisplayServiceSpy.addPlayerEntry).toHaveBeenCalled();
 //         }
 
 //         for (const input of syntaxErrorCmds) {
-//             service.handleInput(input, IS_LOCAL_PLAYER);
+//             service.handleInput(input);
 //             expect(chatDisplayServiceSpy.addErrorMessage).toHaveBeenCalledWith(ErrorType.SyntaxError, input);
 //         }
 //     });
@@ -152,7 +152,7 @@
 //     it('should send impossible command error message when execution returns it', () => {
 //         gameServiceSpy.exchangeLetters.and.returnValue(ErrorType.ImpossibleCommand);
 //         const cmd = '!échanger aaa';
-//         service.handleInput(cmd, IS_LOCAL_PLAYER);
+//         service.handleInput(cmd);
 //         expect(chatDisplayServiceSpy.addErrorMessage).toHaveBeenCalledWith(ErrorType.ImpossibleCommand, cmd);
 //     });
 

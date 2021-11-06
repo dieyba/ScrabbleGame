@@ -2,22 +2,16 @@ import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup } from '@angular/forms';
 import { GameParameters } from '@app/classes/game-parameters';
 import { LocalPlayer } from '@app/classes/local-player';
-// import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
-// import { Dictionary } from '@app/classes/dictionary';
-// import { GameParameters } from '@app/classes/game-parameters';
-// import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { ChatDisplayService } from './chat-display.service';
-import { /* DEFAULT_HEIGHT, DEFAULT_WIDTH,*/ GridService } from './grid.service';
-// import { LetterStock } from './letter-stock.service';
+import { GridService } from './grid.service';
 import { MultiPlayerGameService } from './multi-player-game.service';
 import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
 import { SoloGameService } from './solo-game.service';
-// import { DEFAULT_LETTER_COUNT } from './solo-game.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
@@ -29,12 +23,6 @@ describe('MultiPlayerGameService', () => {
     let placeServiceSpy: jasmine.SpyObj<PlaceService>;
     let gridServiceSpy: jasmine.SpyObj<GridService>;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
-
-    // let changeActivePlayerSpy: jasmine.Spy<any>;
-    // let secondsToMinutesSpy: jasmine.Spy<any>;
-    // let startCountdownSpy: jasmine.Spy<any>;
-    // let addRackLettersSpy: jasmine.Spy<any>;
-    // let ctxStub: CanvasRenderingContext2D;
 
     const form = new FormGroup({
         name: new FormControl('Erika'),
@@ -67,7 +55,6 @@ describe('MultiPlayerGameService', () => {
     ];
 
     beforeEach(() => {
-        // ctxStub = CanvasTestHelper.createCanvas(DEFAULT_WIDTH, DEFAULT_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
         chatDisplayServiceSpy = jasmine.createSpyObj('ChatDisplayService', ['sendMessageToServer']);
         validationServiceSpy = jasmine.createSpyObj('ValidationService', ['updatePlayerScore']);
         wordBuilderServiceSpy = jasmine.createSpyObj('WordBuilderService', ['buildWordsOnBoard']);
@@ -90,40 +77,6 @@ describe('MultiPlayerGameService', () => {
 
         spyOn(SoloGameService.prototype, 'place');
         spyOn(SoloGameService.prototype, 'exchangeLetters');
-
-        // changeActivePlayerSpy = spyOn<any>(service, 'changeActivePlayer').and.callThrough();
-        // secondsToMinutesSpy = spyOn<any>(service, 'secondsToMinutes').and.callThrough();
-        // startCountdownSpy = spyOn<any>(service, 'startCountdown').and.callThrough();
-        // addRackLettersSpy = spyOn<any>(service, 'addRackLetters').and.callThrough();
-        // service.game = new GameParameters('Bob', 60, false);
-        // const letter: ScrabbleLetter = new ScrabbleLetter('a', 1);
-        // service.game.creatorPlayer = new LocalPlayer('Bob');
-        // service.game.creatorPlayer.score = 73;
-        // service.game.creatorPlayer.letters = [letter];
-        // addRackLetterSpy = spyOn<any>(service, 'addRackLetter').and.callThrough();
-        // spyPlayer = new LocalPlayer('sara');
-
-        // gridServiceSpy.scrabbleBoard = new ScrabbleBoard(false);
-
-        // service.game = new GameParameters(form.controls.name.value, +form.controls.timer.value, form.controls.bonus.value);
-        // service.stock = new LetterStock();
-        // service.game.creatorPlayer = new LocalPlayer(form.controls.name.value);
-        // service.game.creatorPlayer.isActive = true;
-        // service.game.localPlayer = new LocalPlayer(form.controls.name.value);
-        // const localLetters = service.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        // service.game.localPlayer.letters = localLetters;
-        // const opponentLetters = service.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        // service.game.opponentPlayer.letters = opponentLetters;
-        // service.game.dictionary = new Dictionary(+form.controls.dictionaryForm.value);
-        // service.game.randomBonus = form.controls.bonus.value;
-        // service.game.totalCountDown = form.controls.timer.value;
-        // service.game.timerMs = form.controls.timer.value;
-        // service.game.localPlayer = service.game.creatorPlayer;
-        // // service = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
-        // // service.isVirtualPlayerObservable = soloGameServiceSpy.virtualPlayerSubject.asObservable();
-        // // service.game.creatorPlayer = service.game.localPlayer;
-        // // service.game.opponentPlayer = new VirtualPlayer(form.controls.opponent.value, form.controls.level.value);
-        // service.virtualPlayerSubject.next(true);
 
         gameParameters.opponentPlayer = new LocalPlayer('Bob');
         gameParameters.stock = [
