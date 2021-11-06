@@ -102,20 +102,20 @@ export class RackService {
 
     select(position: number, ctx: CanvasRenderingContext2D, isExchange: boolean) {
         if (isExchange) {
-            ctx.fillStyle = 'orange';
+            ctx.fillStyle = 'lightsalmon';
             this.exchangeSelected[position - 1] = true;
         } else {
             for (let i = 0; i < this.handlingSelected.length; i++) {
                 this.deselect(i + 1, this.gridContext, false);
             }
-            ctx.fillStyle = 'red';
+            ctx.fillStyle = 'lightblue';
 
             this.handlingSelected[position - 1] = true;
             for (let i = 0; i < this.exchangeSelected.length; i++) {
                 this.exchangeSelected[i] = false;
             }
         }
-        this.handleExchangeSelection(position, ctx);
+        this.drawSelection(position, ctx);
         this.drawRack();
     }
 
@@ -127,21 +127,20 @@ export class RackService {
         }
 
         ctx.fillStyle = 'white';
-        this.handleExchangeSelection(position, ctx);
+        this.drawSelection(position, ctx);
         this.drawRack();
     }
 
     deselectAll(ctx: CanvasRenderingContext2D) {
-        for (let i = 0; i < this.exchangeSelected.length; i++) {
+        for (let i = 0; i < MAX_LETTER_COUNT; i++) {
             this.deselect(i + 1, ctx, true);
             this.deselect(i + 1, ctx, false);
         }
     }
 
-    handleExchangeSelection(position: number, ctx: CanvasRenderingContext2D) {
+    drawSelection(position: number, ctx: CanvasRenderingContext2D) {
         const squareOrigin = this.findSquareOrigin(position);
-        // Les lettres sont réecrites en gras, on peut le régler en
-        // en redessiant le rack mais ce n'est pas important.
+        // Les lettres sont réecrites en gras, on peut le régler en redessiant le rack mais ce n'est pas important.
         // il faudrait remettre la couleur en blanc avant de la changer.
         // ctx.fillRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
         // this.drawRack();

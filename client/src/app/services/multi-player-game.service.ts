@@ -26,7 +26,6 @@ export class MultiPlayerGameService extends SoloGameService {
     stock: LetterStock;
     private socket: io.Socket;
     private readonly server: string;
-    // localPlayer: LocalPlayer;
 
     constructor(
         protected gridService: GridService,
@@ -39,6 +38,10 @@ export class MultiPlayerGameService extends SoloGameService {
         super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService);
         this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
+        this.socketOnConnect();
+    }
+
+    socketOnConnect() {
         this.socket.on('turn changed', (isTurnPassed: boolean, consecutivePassedTurns: number) => {
             this.game.isTurnPassed = isTurnPassed
             this.game.consecutivePassedTurns = consecutivePassedTurns;
@@ -52,11 +55,14 @@ export class MultiPlayerGameService extends SoloGameService {
                 console.log("Changed turn (multi mode): ", this.game.localPlayer.name, " active:", this.game.localPlayer.isActive, ',',
                     this.game.opponentPlayer.name, " active: ", this.game.opponentPlayer.isActive, ',consecutive passed turns:', this.game.consecutivePassedTurns);
                 this.game.isTurnPassed = false;
+            } else {
+                this.resetTimer();
             }
         });
         this.socket.on('gameEnded', () => {
             this.displayEndGameMessage();
             this.endLocalGame();
+            this.resetTimer();
         });
         this.socket.on('update board', (board: any) => {
             this.updateBoard(board.word, board.orientation, new Vec2(board.positionX, board.positionY));
@@ -71,6 +77,7 @@ export class MultiPlayerGameService extends SoloGameService {
             this.game.opponentPlayer.letters = update.newLetters;
             this.game.opponentPlayer.score = update.newScore;
         });
+
     }
     override initializeGame(gameInfo: FormGroup): GameParameters {
         this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value, gameInfo.controls.bonus.value);
@@ -138,6 +145,7 @@ export class MultiPlayerGameService extends SoloGameService {
                 character.tile.position.x = position.x;
                 character.tile.position.y = position.y;
                 this.gridService.drawLetter(character, position.x, position.y);
+                this.gridService.scrabbleBoard.squares[position.x][position.y].isBonusUsed = true;
                 this.gridService.scrabbleBoard.squares[position.x][position.y].isValidated = true;
                 position.y++;
             }

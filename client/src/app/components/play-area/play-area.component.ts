@@ -37,7 +37,6 @@ export class PlayAreaComponent implements AfterViewInit {
     mousePosition: Vec2;
     private canvasSize: Vec2;
     private rackSize: Vec2;
-    private rackContext: CanvasRenderingContext2D;
 
     constructor(
         private readonly gridService: GridService,
@@ -78,7 +77,6 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
-        this.rackContext = this.rackService.gridContext;
 
         this.gameService.currentGameService.isVirtualPlayerObservable.subscribe((isActive: boolean) => {
             if (isActive) {
@@ -147,6 +145,6 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     cancelExchange() {
-        this.exchangeService.cancelExchange(this.rackContext);
+        this.exchangeService.cancelExchange();
     }
 }
