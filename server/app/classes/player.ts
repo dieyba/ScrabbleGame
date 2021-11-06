@@ -17,8 +17,4 @@ export class Player {
         this.score = 0;
         this.letters = [];
     }
-
-    public getSocketId(): string {
-        return this.socketId;
-    }
 }

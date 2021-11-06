@@ -26,7 +26,6 @@ export class MultiPlayerGameService extends SoloGameService {
     stock: LetterStock;
     private socket: io.Socket;
     private readonly server: string;
-    // localPlayer: LocalPlayer;
 
     constructor(
         protected gridService: GridService,
@@ -39,6 +38,10 @@ export class MultiPlayerGameService extends SoloGameService {
         super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService);
         this.server = 'http://' + window.location.hostname + ':3000';
         this.socket = SocketHandler.requestSocket(this.server);
+        this.socketOnConnect();
+    }
+
+    socketOnConnect() {
         this.socket.on('turn changed', (isTurnPassed: boolean, consecutivePassedTurns: number) => {
             this.game.isTurnPassed = isTurnPassed
             this.game.consecutivePassedTurns = consecutivePassedTurns;
@@ -74,6 +77,7 @@ export class MultiPlayerGameService extends SoloGameService {
             this.game.opponentPlayer.letters = update.newLetters;
             this.game.opponentPlayer.score = update.newScore;
         });
+
     }
     override initializeGame(gameInfo: FormGroup): GameParameters {
         this.game = new GameParameters(gameInfo.controls.name.value, +gameInfo.controls.timer.value, gameInfo.controls.bonus.value);

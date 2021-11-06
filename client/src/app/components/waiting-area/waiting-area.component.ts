@@ -58,35 +58,7 @@ export class WaitingAreaComponent {
         this.timer = setInterval(() => {
             this.list = this.gameList.getList();
         }, 500);
-
-        this.socket.on('updateInfo', (game: GameParameters) => {
-            this.dialogRef.close();
-            this.router.navigate(['/game']);
-            this.multiManService.initializeGame2(game);
-            this.socket.emit('deleteRoom');
-        });
-        this.socket.on('roomdeleted', (game: GameParameters) => {
-            this.joindre = false;
-            this.nameValid = false;
-            this.gameCancelled = true;
-            this.roomDeletedId = game.gameRoom.idGame;
-        })
-        this.socket.on('roomJoined', (game: GameParameters) => {
-            this.gameList.roomInfo = game;
-            this.gameList.roomInfo.gameRoom = game.gameRoom;
-            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
-        });
-        this.socket.on('roomcreated', (game: GameParameters) => {
-            this.gameList.roomInfo = game;
-            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
-        });
-        this.socket.on('roomLeft', (game: GameParameters) => {
-            this.gameList.roomInfo = game;
-            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
-            this.joindre = false;
-            this.nameValid = false;
-            this.gameCancelled = true;
-        });
+        this.socketOnConnect()
     }
     @HostListener('window:beforeunload', ['$event'])
     onBeforeUnload(event: MouseEvent) {
@@ -161,5 +133,35 @@ export class WaitingAreaComponent {
     closeDialog() {
         this.name = false;
         this.dialogRef.close();
+    }
+    socketOnConnect() {
+        this.socket.on('updateInfo', (game: GameParameters) => {
+            this.dialogRef.close();
+            this.router.navigate(['/game']);
+            this.multiManService.initializeGame2(game);
+            this.socket.emit('deleteRoom');
+        });
+        this.socket.on('roomdeleted', (game: GameParameters) => {
+            this.joindre = false;
+            this.nameValid = false;
+            this.gameCancelled = true;
+            this.roomDeletedId = game.gameRoom.idGame;
+        })
+        this.socket.on('roomJoined', (game: GameParameters) => {
+            this.gameList.roomInfo = game;
+            this.gameList.roomInfo.gameRoom = game.gameRoom;
+            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
+        });
+        this.socket.on('roomcreated', (game: GameParameters) => {
+            this.gameList.roomInfo = game;
+            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
+        });
+        this.socket.on('roomLeft', (game: GameParameters) => {
+            this.gameList.roomInfo = game;
+            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
+            this.joindre = false;
+            this.nameValid = false;
+            this.gameCancelled = true;
+        });
     }
 }

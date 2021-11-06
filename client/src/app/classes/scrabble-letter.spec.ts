@@ -1,4 +1,4 @@
-import { ScrabbleLetter } from './scrabble-letter';
+import { ScrabbleLetter } from "./scrabble-letter";
 
 describe('ScrabbleLetter', () => {
     it('should create an instance', () => {

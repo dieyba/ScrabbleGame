@@ -1,40 +1,104 @@
-// import { DefaultCommandParams } from '@app/classes/commands';
-// import { createExchangeCmd, ExchangeCmd } from '@app/classes/exchange-command';
-// import { BonusService } from '@app/services/bonus.service';
-// import { ChatDisplayService } from '@app/services/chat-display.service';
-// import { GridService } from '@app/services/grid.service';
-// import { PlaceService } from '@app/services/place.service';
-// import { RackService } from '@app/services/rack.service';
-// import { SoloGameService } from '@app/services/solo-game.service';
-// import { ValidationService } from '@app/services/validation.service';
-// import { WordBuilderService } from '@app/services/word-builder.service';
-// import { LocalPlayer } from './local-player';
+import { TestBed } from '@angular/core/testing';
+import { createExchangeCmd, ExchangeCmd } from '@app/classes/exchange-command';
+import { LocalPlayer } from '@app/classes/local-player';
+import { GameService } from '@app/services/game.service';
+import { SoloGameService } from '@app/services/solo-game.service';
+import { ChatEntryColor, createErrorEntry } from './chat-display-entry';
+import { DefaultCommandParams } from './commands';
+import { ErrorType } from './errors';
+import { GameParameters, GameType } from './game-parameters';
 
-// describe('ExchangeCmd', () => {
-//     const playerchoice = new LocalPlayer('dieyna');
-//     const chat = new ChatDisplayService();
-//     const rack = new RackService();
-//     const grid = new GridService();
-//     const bonus = new BonusService(grid);
-//     const validation = new ValidationService(grid, bonus);
-//     const wordBuilder = new WordBuilderService(grid);
-//     const place = new PlaceService(grid, rack);
-//     const service = new SoloGameService(grid, rack, chat, validation, wordBuilder, place);
-//     const defaultParams: DefaultCommandParams = { player: playerchoice, serviceCalled: service };
-//     const specificParams = 'test';
-//     const exchange = new ExchangeCmd(defaultParams, 'amd');
+const PLAYER_NAME = 'Sara';
+const OPPONENT_NAME = 'Not Sara';
+const LETTERS = 'abcd';
 
-//     it('should create an instance', () => {
-//         expect(exchange).toBeTruthy();
-//     });
+describe('ExchangeCmd', () => {
+    let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
+    let localPlayer = new LocalPlayer(PLAYER_NAME);
+    let opponentPlayer = new LocalPlayer(OPPONENT_NAME);
 
-//     it('execute should call exchange letters from soloGameService', () => {
-//         const spy = spyOn(service, 'exchangeLetters');
-//         exchange.execute();
-//         expect(spy).toHaveBeenCalled();
-//     });
+    beforeEach(() => {
+        soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['exchangeLetters']);
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['initializeGameType']);
 
-//     it('createExchangeCmd should create an instance', () => {
-//         expect(createExchangeCmd({ defaultParams, specificParams })).toBeTruthy();
-//     });
-// });
+        TestBed.configureTestingModule({
+            providers: [
+                { provide: GameService, useValue: gameServiceSpy },
+                { provide: SoloGameService, useValue: soloGameServiceSpy }
+            ],
+        });
+        gameServiceSpy.currentGameService = soloGameServiceSpy;
+        gameServiceSpy.currentGameService.exchangeLetters = soloGameServiceSpy.exchangeLetters;
+        gameServiceSpy.currentGameService.game = new GameParameters(LocalPlayer.name, 0, false);
+        gameServiceSpy.currentGameService.game.localPlayer = localPlayer;
+        gameServiceSpy.currentGameService.game.opponentPlayer = opponentPlayer;
+    });
+
+
+    it('should create an instance', () => {
+        const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
+        const exchange = new ExchangeCmd(defaultParams, LETTERS);
+        expect(exchange).toBeTruthy();
+    });
+
+    it('should call exchangeLetters from solo game service', () => {
+        gameServiceSpy.initializeGameType(GameType.Solo);
+        const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
+        const exchange = new ExchangeCmd(defaultParams, LETTERS);
+        exchange.execute();
+        expect(gameServiceSpy.currentGameService.exchangeLetters).toHaveBeenCalled();
+    });
+
+    it('should create local exchange message', () => {
+        gameServiceSpy.initializeGameType(GameType.Solo);
+        const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
+        const exchange = new ExchangeCmd(defaultParams, LETTERS);
+        expect(exchange.createExchangeMessage(true, LETTERS)).toEqual(LETTERS);
+    });
+
+    it('should create opponent exchange message', () => {
+        gameServiceSpy.initializeGameType(GameType.Solo);
+        const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
+        const exchange = new ExchangeCmd(defaultParams, LETTERS);
+        expect(exchange.createExchangeMessage(false, LETTERS)).toEqual(LETTERS.length + ' lettre(s)');
+    });
+
+    it('should execute and return successful command message from local player', () => {
+        gameServiceSpy.initializeGameType(GameType.Solo);
+        soloGameServiceSpy.exchangeLetters.and.returnValue(ErrorType.NoError);
+        const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
+        const localPlayerEntry = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + " >> !échanger " + LETTERS };
+        const opponentPlayerEntry = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + " >> !échanger " + LETTERS.length + " lettre(s)" };
+        const exchange = new ExchangeCmd(defaultParams, LETTERS);
+        console.log(exchange.execute().executionMessages);
+        exchange.player.isActive = true;
+        expect(exchange.execute()).toEqual({ isExecuted: true, executionMessages: [localPlayerEntry, opponentPlayerEntry] });
+    });
+
+    it('should execute and return successful command message from opponent player', () => {
+        gameServiceSpy.initializeGameType(GameType.Solo);
+        soloGameServiceSpy.exchangeLetters.and.returnValue(ErrorType.NoError);
+        const defaultParams: DefaultCommandParams = { player: opponentPlayer, serviceCalled: gameServiceSpy };
+        const localPlayerEntry = { color: ChatEntryColor.RemotePlayer, message: OPPONENT_NAME + " >> !échanger " + LETTERS };
+        const opponentPlayerEntry = { color: ChatEntryColor.RemotePlayer, message: OPPONENT_NAME + " >> !échanger " + LETTERS.length + " lettre(s)" };
+        const exchange = new ExchangeCmd(defaultParams, LETTERS);
+        exchange.player.isActive = true;
+        expect(exchange.execute()).toEqual({ isExecuted: true, executionMessages: [opponentPlayerEntry, localPlayerEntry] });
+    });
+
+    it('should execute and return impossible command error', () => {
+        gameServiceSpy.initializeGameType(GameType.Solo);
+        soloGameServiceSpy.exchangeLetters.and.returnValue(ErrorType.ImpossibleCommand);
+        const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
+        const errorMessage = createErrorEntry(ErrorType.ImpossibleCommand, "!échanger AAAAAAAA");
+        const exchange = new ExchangeCmd(defaultParams, 'AAAAAAAA');
+        exchange.player.isActive = false;
+        expect(exchange.execute()).toEqual({ isExecuted: false, executionMessages: [errorMessage] });
+    });
+
+    it('createExchangeCmd should create an instance', () => {
+        const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
+        expect(createExchangeCmd({ defaultParams, specificParams: LETTERS })).toBeTruthy();
+    });
+});

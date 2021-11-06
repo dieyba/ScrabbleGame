@@ -23,7 +23,6 @@ class SocketMock {
         const arrowFunction = this.events.get(eventName) as CallableFunction;
         arrowFunction(...args);
     }
-
     join(...args: any[]) {
         return;
     }
@@ -203,5 +202,11 @@ describe('SidebarComponent', () => {
         const router = spyOn(TestBed.get(Router), 'navigate').and.returnValue(routerRefSpyObj); // eslint-disable-line deprecation/deprecation
         component.quitGame();
         expect(router).not.toHaveBeenCalled();
+    });
+    it('socketOnConnect should handle socket.on event roomdeleted', () => {
+        component.roomLeft();
+        let game = new GameParameters('dieyba', 0, false)
+        socketMock.triggerEvent('roomLeft', game);
+        expect(socketMockSpy).toHaveBeenCalled();
     });
 });

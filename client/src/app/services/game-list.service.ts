@@ -23,7 +23,7 @@ export class GameListService {
         this.server = 'http://' + window.location.hostname + ':3000';
         this.existingRooms = new Array<GameParameters>();
         this.myRoom = new Array<GameRoom>();
-        this.socket = SocketHandler.requestSocket(this.server)
+        this.socket = SocketHandler.requestSocket(this.server);
         this.player = new LocalPlayer('');
         this.players = new Array<LocalPlayer>();
         this.full = false;
@@ -37,7 +37,14 @@ export class GameListService {
     }
 
     createRoom(game: GameParameters): void {
-        this.socket.emit('createRoom', { name: game.creatorPlayer.name, timer: game.totalCountDown, board: game.randomBonus, creatorLetters: game.creatorPlayer.letters, opponentLetters: game.opponentPlayer.letters, stock: game.stock });
+        this.socket.emit('createRoom', {
+            name: game.creatorPlayer.name,
+            timer: game.totalCountDown,
+            board: game.randomBonus,
+            creatorLetters: game.creatorPlayer.letters,
+            opponentLetters: game.opponentPlayer.letters,
+            stock: game.stock,
+        });
     }
     deleteRoom(): void {
         this.socket.emit('deleteRoom');
@@ -50,6 +57,6 @@ export class GameListService {
         this.socket.emit('initializeGame', roomId);
     }
     someoneLeftRoom() {
-        this.socket.emit('leaveRoom')
+        this.socket.emit('leaveRoom');
     }
 }
