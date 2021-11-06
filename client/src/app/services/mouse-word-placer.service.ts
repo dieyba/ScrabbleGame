@@ -84,10 +84,6 @@ export class MouseWordPlacerService {
                     this.currentAxis = Axis.H;
                     break;
             }
-            if (this.currentWord.length > 0) {
-                this.removeAllLetters();
-                this.wordString = '';
-            }
             this.clearOverlay();
             this.drawArrow(clickedSquare, this.currentAxis);
             this.latestPosition = clickedSquare;
@@ -246,15 +242,14 @@ export class MouseWordPlacerService {
             this.updateRack();
             // Prepare for next call
             const nextSquare = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
-            if (this.currentPosition.x <= ABSOLUTE_BOARD_SIZE || this.currentPosition.y <= ABSOLUTE_BOARD_SIZE) {
-                this.currentPosition = nextSquare;
-                const pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
-                let nextArrow = this.currentPosition;
-                if (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied === true)
-                    nextArrow = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
-                this.drawArrow(nextArrow, this.currentAxis);
-                // Arrow display bug is here, need to fix before final commit. Works for 1st skip but not further ones.
-            }
+            this.currentPosition = nextSquare;
+            const pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
+            if (pos[0] >= BOARD_SIZE || pos[1] >= BOARD_SIZE) return;
+            let nextArrow = this.currentPosition;
+            if (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied === true)
+                nextArrow = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
+            this.drawArrow(nextArrow, this.currentAxis);
+            // Arrow display bug is here, need to fix before final commit. Works for 1st skip but not further ones.
         } else return;
     }
     updateRack() {
@@ -263,10 +258,6 @@ export class MouseWordPlacerService {
         this.rackService.drawExistingLetters();
     }
     confirmWord() {
-        // TODO
-        // Send a message to the server that we want to place the word
-        // Wait for the response from the server
-        // If the response is positive, draw the word on the board canvas and remove the overlay
         const posArray = this.companionService.convertPositionToGridIndex(this.initialPosition);
         const posVec = new Vec2(posArray[0], posArray[1]);
         const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.game.localPlayer, serviceCalled: this.gameService };
@@ -275,7 +266,6 @@ export class MouseWordPlacerService {
         this.removeAllLetters();
         const command = new PlaceCmd(defaultParams, params);
         this.commandInvokerService.executeCommand(command);
-        // TODO: Wait 3s before clearing overlay
         this.clearOverlay();
     }
     // Removes the latest drawn arrow indicator
@@ -327,12 +317,12 @@ export class MouseWordPlacerService {
         const indexes = this.companionService.convertPositionToGridIndex(this.initialPosition);
         for (let i = 0; i < this.currentWord.length; i++) {
             if (this.currentAxis === Axis.H) {
-                if (indexes[0] + i < BOARD_SIZE || indexes[1] < BOARD_SIZE) {
+                if (indexes[0] + i < BOARD_SIZE && indexes[1] < BOARD_SIZE) {
                     if (this.gridService.scrabbleBoard.squares[indexes[0] + i][indexes[1]].occupied) indexes[0]++;
                     this.drawLetter(this.currentWord[i], new Vec2(indexes[0] + i, indexes[1]));
                 }
             } else {
-                if (indexes[0] < BOARD_SIZE || indexes[1] + i < BOARD_SIZE) {
+                if (indexes[0] < BOARD_SIZE && indexes[1] + i < BOARD_SIZE) {
                     if (this.gridService.scrabbleBoard.squares[indexes[0]][indexes[1] + i].occupied) indexes[1]++;
                     this.drawLetter(this.currentWord[i], new Vec2(indexes[0], indexes[1] + i));
                 }

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { GameParameters } from '@app/classes/game-parameters';
@@ -36,6 +37,7 @@ fdescribe('MouseWordPlacerService', () => {
             'convertColorToString',
             'changeFillStyleColor',
             'findNextSquare',
+            'samePosition',
         ]);
         ctxSpy = CanvasTestHelper.createCanvas(DEFAULT_WIDTH, DEFAULT_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
         // Provide both the service-to-test and its (spy) dependency
@@ -83,6 +85,113 @@ fdescribe('MouseWordPlacerService', () => {
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
+    it('onMouseClick should not do anything if player is it is not the turn of the player', () => {
+        const clearSpy = spyOn(service, 'clearOverlay');
+        service.currentWord = [];
+        gameServiceSpy.currentGameService.game.localPlayer.isActive = false;
+        const mouseEvent = new MouseEvent('click', {
+            clientX: SEVEN_POS,
+            clientY: H_POS,
+        });
+        service.onMouseClick(mouseEvent);
+        // First function of the method should not be called
+        expect(clearSpy).not.toHaveBeenCalled();
+    });
+    it('onMouseClick should not do anything if a word is being built on the canvas', () => {
+        const clearSpy = spyOn(service, 'clearOverlay');
+        // service.currentWord = [t, e, s, t]; (defined in beforeEach)
+        const mouseEvent = new MouseEvent('click', {
+            clientX: SEVEN_POS,
+            clientY: H_POS,
+        });
+        service.onMouseClick(mouseEvent);
+        // First function of the method should not be called
+        expect(clearSpy).not.toHaveBeenCalled();
+    });
+    it('onMouseClick should not do anything if the game is over', () => {
+        const clearSpy = spyOn(service, 'clearOverlay');
+        service.currentWord = [];
+        gameServiceSpy.currentGameService.game.isEndGame = true;
+        const mouseEvent = new MouseEvent('click', {
+            clientX: SEVEN_POS,
+            clientY: H_POS,
+        });
+        service.onMouseClick(mouseEvent);
+        // First function of the method should not be called
+        expect(clearSpy).not.toHaveBeenCalled();
+    });
+    it('onMouseClick should draw an arrow on the initial position if an initial position is defined', () => {
+        const clearSpy = spyOn(service, 'clearOverlay');
+        const drawArrowSpy = spyOn(service, 'drawArrow');
+        const removeAllLettersSpy = spyOn(service, 'removeAllLetters');
+        service.currentWord = [];
+        service.initialPosition = new Vec2(SEVEN_POS, H_POS);
+        const mouseEvent = new MouseEvent('click', {
+            clientX: SEVEN_POS,
+            clientY: H_POS,
+        });
+        service.onMouseClick(mouseEvent);
+        // First function of the method should not be called
+        expect(clearSpy).toHaveBeenCalled();
+        expect(drawArrowSpy).toHaveBeenCalled();
+        expect(removeAllLettersSpy).toHaveBeenCalled();
+    });
+    it('onMouseClick should draw an arrow on clicked square if it is not the same as the latest clicked square', () => {
+        const clearSpy = spyOn(service, 'clearOverlay');
+        const drawArrowSpy = spyOn(service, 'drawArrow');
+        const removeAllLettersSpy = spyOn(service, 'removeAllLetters');
+        service.currentWord = [];
+        const mouseEvent = new MouseEvent('click', {
+            clientX: SEVEN_POS,
+            clientY: H_POS,
+        });
+        service.onMouseClick(mouseEvent);
+        // First function of the method should not be called
+        expect(clearSpy).toHaveBeenCalled();
+        expect(drawArrowSpy).toHaveBeenCalled();
+        expect(removeAllLettersSpy).toHaveBeenCalled();
+        // Since SEVEN_POS and H_POS are on the top left square corner, we can assert:
+        expect(service.currentPosition).toEqual(new Vec2(SEVEN_POS, H_POS));
+        expect(service.currentAxis).toEqual(Axis.H);
+    });
+    it('onMouseClick should draw a flipped arrow on the clicked square if it is the same as the latest clicked square', () => {
+        const clearSpy = spyOn(service, 'clearOverlay');
+        const drawArrowSpy = spyOn(service, 'drawArrow');
+        const removeAllLettersSpy = spyOn(service, 'removeAllLetters');
+        service.currentWord = [];
+        service.latestPosition = new Vec2(SEVEN_POS, H_POS);
+        const mouseEvent = new MouseEvent('click', {
+            clientX: SEVEN_POS,
+            clientY: H_POS,
+        });
+        companionServiceSpy.samePosition.and.returnValue(true);
+        service.onMouseClick(mouseEvent);
+        // First function of the method should not be called
+        expect(clearSpy).toHaveBeenCalled();
+        expect(drawArrowSpy).toHaveBeenCalled();
+        expect(removeAllLettersSpy).toHaveBeenCalled();
+        // Since SEVEN_POS and H_POS are on the top left square corner, we can assert:
+        expect(service.currentPosition).toEqual(new Vec2(SEVEN_POS, H_POS));
+        expect(service.currentAxis).toEqual(Axis.V);
+        // Another click flips back the arrow
+        service.onMouseClick(mouseEvent);
+        expect(service.currentAxis).toEqual(Axis.H);
+    });
+    it('onMouseClick should reset the axis to Axis.H when clicking on a different square', () => {
+        service.currentWord = [];
+        service.latestPosition = new Vec2(SEVEN_POS + ACTUAL_SQUARE_SIZE, H_POS);
+        const mouseEvent = new MouseEvent('click', {
+            clientX: SEVEN_POS,
+            clientY: H_POS,
+        });
+        service.currentAxis = Axis.V;
+        companionServiceSpy.samePosition.and.returnValue(false);
+        service.onMouseClick(mouseEvent);
+        // First function of the method should not be called
+        // Since SEVEN_POS and H_POS are on the top left square corner, we can assert:
+        expect(service.currentPosition).toEqual(new Vec2(SEVEN_POS, H_POS));
+        expect(service.currentAxis).toEqual(Axis.H);
+    });
     it('onKeyDown should consider Backspace, Enter, Escape, or a letter on the keyboard', () => {
         gameServiceSpy.currentGameService.game.localPlayer.letters = [
             new ScrabbleLetter('t', 1),
@@ -119,6 +228,32 @@ fdescribe('MouseWordPlacerService', () => {
         expect(blurSpy).not.toHaveBeenCalled();
         expect(findPlaceSpy).not.toHaveBeenCalled();
     });
+    it('onKeyDown should not do anything if player is not active', () => {
+        const keyEvent = new KeyboardEvent('keydown', { key: 'a' });
+        gameServiceSpy.currentGameService.game.localPlayer.isActive = false;
+        const removeSpy = spyOn(service, 'removeLetter');
+        const confirmSpy = spyOn(service, 'confirmWord');
+        const blurSpy = spyOn(service, 'onBlur');
+        const findPlaceSpy = spyOn(service, 'findPlaceForLetter');
+        service.onKeyDown(keyEvent);
+        expect(removeSpy).not.toHaveBeenCalled();
+        expect(confirmSpy).not.toHaveBeenCalled();
+        expect(blurSpy).not.toHaveBeenCalled();
+        expect(findPlaceSpy).not.toHaveBeenCalled();
+    });
+    it('onKeyDown should not do anything if no position was defined with the mouse', () => {
+        const keyEvent = new KeyboardEvent('keydown', { key: 'a' });
+        service.initialPosition = new Vec2(0, 0);
+        const removeSpy = spyOn(service, 'removeLetter');
+        const confirmSpy = spyOn(service, 'confirmWord');
+        const blurSpy = spyOn(service, 'onBlur');
+        const findPlaceSpy = spyOn(service, 'findPlaceForLetter');
+        service.onKeyDown(keyEvent);
+        expect(removeSpy).not.toHaveBeenCalled();
+        expect(confirmSpy).not.toHaveBeenCalled();
+        expect(blurSpy).not.toHaveBeenCalled();
+        expect(findPlaceSpy).not.toHaveBeenCalled();
+    });
     it('onBlur should clear the canvas and remove all letters', () => {
         const removeSpy = spyOn(service, 'removeAllLetters').and.callThrough();
         const clearSpy = spyOn(service, 'clearOverlay').and.callThrough();
@@ -138,6 +273,27 @@ fdescribe('MouseWordPlacerService', () => {
         const convertPosSpy = companionServiceSpy.convertPositionToGridIndex;
         convertPosSpy.and.returnValue(posStub);
         gridServiceSpy.scrabbleBoard = new ScrabbleBoard(false);
+        service.drawCurrentWord();
+        expect(convertPosSpy).toHaveBeenCalled();
+        expect(drawLetterSpy).toHaveBeenCalledTimes(service.currentWord.length);
+    });
+    it('drawCurrentWord should skip occupied spaces (horizontal)', () => {
+        const drawLetterSpy = spyOn(service, 'drawLetter').and.callThrough();
+        gridServiceSpy.scrabbleBoard.squares[SEVEN_INDEX + 1][H_INDEX].occupied = true;
+        const posStub: number[] = [SEVEN_INDEX, H_INDEX];
+        const convertPosSpy = companionServiceSpy.convertPositionToGridIndex;
+        convertPosSpy.and.returnValue(posStub);
+        service.drawCurrentWord();
+        expect(convertPosSpy).toHaveBeenCalled();
+        expect(drawLetterSpy).toHaveBeenCalledTimes(service.currentWord.length);
+    });
+    it('drawCurrentWord should skip occupied spaces (vertical)', () => {
+        const drawLetterSpy = spyOn(service, 'drawLetter').and.callThrough();
+        service.currentAxis = Axis.V;
+        gridServiceSpy.scrabbleBoard.squares[SEVEN_INDEX][H_INDEX + 1].occupied = true;
+        const posStub: number[] = [SEVEN_INDEX, H_INDEX];
+        const convertPosSpy = companionServiceSpy.convertPositionToGridIndex;
+        convertPosSpy.and.returnValue(posStub);
         service.drawCurrentWord();
         expect(convertPosSpy).toHaveBeenCalled();
         expect(drawLetterSpy).toHaveBeenCalledTimes(service.currentWord.length);
@@ -293,6 +449,18 @@ fdescribe('MouseWordPlacerService', () => {
         expect(drawCurrentWordSpy).toHaveBeenCalled();
         expect(drawArrowSpy).toHaveBeenCalled();
     });
+    it('placeLetter should not draw an arrow if the position is out of bounds', () => {
+        rackServiceSpy.rackLetters.push(new ScrabbleLetter('s', 1));
+        const drawArrowSpy = spyOn(service, 'drawArrow');
+        const drawCurrentWordSpy = spyOn(service, 'drawCurrentWord');
+        // findNextSquare returns something outside of the board
+        companionServiceSpy.findNextSquare.and.returnValue(
+            new Vec2(ABSOLUTE_BOARD_SIZE + ACTUAL_SQUARE_SIZE, ABSOLUTE_BOARD_SIZE + ACTUAL_SQUARE_SIZE),
+        );
+        service.placeLetter('s');
+        expect(drawCurrentWordSpy).toHaveBeenCalled();
+        expect(drawArrowSpy).not.toHaveBeenCalled();
+    });
     it('findPlaceForLetter should call placeLetter if there is space for the letter on the board', () => {
         const placeLetterSpy = spyOn(service, 'placeLetter');
         service.currentPosition = new Vec2(SEVEN_POS + service.currentWord.length * ACTUAL_SQUARE_SIZE, H_POS);
@@ -313,7 +481,6 @@ fdescribe('MouseWordPlacerService', () => {
         service.findPlaceForLetter('s');
         expect(placeLetterSpy).not.toHaveBeenCalled();
     });
-    // ERROR: scrabbleBoard.squares are undefined. Cannot read properties.
     it('findPlaceForLetter should be able to skip ahead of the letters occupying the board (horizontal)', () => {
         const placeLetterSpy = spyOn(service, 'placeLetter');
         service.currentPosition = new Vec2(SEVEN_POS + service.currentWord.length * ACTUAL_SQUARE_SIZE, H_POS);
@@ -323,15 +490,24 @@ fdescribe('MouseWordPlacerService', () => {
         service.findPlaceForLetter('s');
         expect(placeLetterSpy).toHaveBeenCalled();
     });
-    // ERROR: scrabbleBoard.squares are undefined. Cannot read properties.
     it('findPlaceForLetter should be able to skip ahead of the letters occupying the board (vertical)', () => {
         const placeLetterSpy = spyOn(service, 'placeLetter');
         service.currentAxis = Axis.V;
         service.currentPosition = new Vec2(SEVEN_POS, H_POS + service.currentWord.length * ACTUAL_SQUARE_SIZE);
-        const pos = [SEVEN_INDEX + service.currentWord.length, H_INDEX];
+        const pos = [SEVEN_INDEX, H_INDEX + service.currentWord.length];
         gridServiceSpy.scrabbleBoard.squares[pos[0]][pos[1]].letter = new ScrabbleLetter('s', 1); // T E S T ^S => T E S T S S^
         gridServiceSpy.scrabbleBoard.squares[pos[0]][pos[1]].occupied = true;
         service.findPlaceForLetter('s');
         expect(placeLetterSpy).toHaveBeenCalled();
+    });
+    it('findPlaceForLetter should not place a letter if after skipping the occupied spaces, the position is out of bounds', () => {
+        const placeLetterSpy = spyOn(service, 'placeLetter');
+        service.currentAxis = Axis.V;
+        gridServiceSpy.scrabbleBoard.squares[BOARD_SIZE - 1][BOARD_SIZE - 1].letter = new ScrabbleLetter('s', 1); // T E S T ^S => T E S T S S^
+        gridServiceSpy.scrabbleBoard.squares[BOARD_SIZE - 1][BOARD_SIZE - 1].occupied = true;
+        companionServiceSpy.convertPositionToGridIndex.and.returnValue([BOARD_SIZE - 1, BOARD_SIZE - 1]);
+        service.currentPosition = new Vec2(ABSOLUTE_BOARD_SIZE + BOARD_OFFSET, ABSOLUTE_BOARD_SIZE + BOARD_OFFSET); // Square bottom right
+        service.findPlaceForLetter('s');
+        expect(placeLetterSpy).not.toHaveBeenCalled();
     });
 });
