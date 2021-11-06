@@ -1,25 +1,86 @@
-// import { TestBed } from '@angular/core/testing';
-// import { MatCardModule } from '@angular/material/card';
+import { TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
+import { ServerChatEntry } from '@app/classes/chat-display-entry';
 // import { ChatEntryColor } from '@app/classes/chat-display-entry';
 // import { ErrorType } from '@app/classes/errors';
 // import { LocalPlayer } from '@app/classes/local-player';
 // import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 // import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
-// import { ChatDisplayService } from './chat-display.service';
+import * as io from 'socket.io-client';
+import { ChatDisplayService } from './chat-display.service';
 
-// describe('ChatDisplayService', () => {
-//     let service: ChatDisplayService;
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-vars */
+/* eslint-disable dot-notation */
+class SocketMock {
+    id: string = 'Socket mock';
+    events: Map<string, CallableFunction> = new Map();
+    on(eventName: string, cb: CallableFunction) {
+        this.events.set(eventName, cb);
+    }
 
-//     beforeEach(() => {
-//         TestBed.configureTestingModule({
-//             imports: [MatCardModule],
-//         });
-//         service = TestBed.inject(ChatDisplayService);
-//     });
+    triggerEvent(eventName: string, ...args: any[]) {
+        const arrowFunction = this.events.get(eventName) as CallableFunction;
+        arrowFunction(...args);
+    }
 
-//     it('should be created', () => {
-//         expect(service).toBeTruthy();
-//     });
+    join(...args: any[]) {
+        return;
+    }
+    emit(...args: any[]) {
+        return;
+    }
+
+    disconnect() {
+        return;
+    }
+}
+
+describe('ChatDisplayService', () => {
+    let service: ChatDisplayService;
+    let socketMock: SocketMock;
+    let socketMockSpy: jasmine.SpyObj<any>;
+    let socketEmitMockSpy: jasmine.SpyObj<any>;
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [MatCardModule],
+        });
+        service = TestBed.inject(ChatDisplayService);
+        socketMock = new SocketMock();
+        service['socket'] = socketMock as unknown as io.Socket;
+        socketMockSpy = spyOn(socketMock, 'on').and.callThrough();
+        socketEmitMockSpy = spyOn(socketMock, 'emit');
+    });
+
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
+    it('should emit sendSystemMessageToServer ', () => {
+        const message = 'allo';
+        service.sendSystemMessageToServer(message);
+        expect(socketEmitMockSpy).toHaveBeenCalledWith('sendSystemChatEntry', message);
+    });
+    it('should emit sendMessageToServer ', () => {
+        const message = 'allo';
+        const message2 = 'helloWorld';
+        service.sendMessageToServer(message);
+        expect(socketEmitMockSpy).toHaveBeenCalledWith('sendChatEntry', message);
+        service.sendMessageToServer(message, message2);
+        expect(socketEmitMockSpy).toHaveBeenCalledWith('sendChatEntry', message, message2);
+    });
+    it('socketOnConnect should handle socket.on event addChatEntry', () => {
+        service.socketOnConnect();
+        const serverChatEntry: ServerChatEntry = { senderName: 'dieyba', message: 'salut' };
+        socketMock.triggerEvent('addChatEntry', serverChatEntry);
+        expect(socketMockSpy).toHaveBeenCalled();
+    });
+    it('socketOnConnect should handle socket.on event addSystemChatEntry', () => {
+        service.socketOnConnect();
+        const systemEntry = 'system';
+        socketMock.triggerEvent('addSystemChatEntry', systemEntry);
+        expect(socketMockSpy).toHaveBeenCalled();
+    });
+});
 
 //     it('addPlayerEntry should add a chat player entry', () => {
 //         service.addPlayerEntry(true, 'dieyna', 'bonjour');

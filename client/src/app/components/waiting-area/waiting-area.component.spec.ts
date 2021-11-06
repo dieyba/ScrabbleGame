@@ -56,14 +56,7 @@ describe('WaitingAreaComponent', () => {
         multiplayerMode = jasmine.createSpyObj('MultiPlayerGameService', ['initializeGame2']);
         await TestBed.configureTestingModule({
             declarations: [WaitingAreaComponent],
-            imports: [
-                MatCardModule,
-                MatFormFieldModule,
-                MatInputModule,
-                RouterTestingModule,
-                MatDialogModule,
-                // AppRoutingModule,
-            ],
+            imports: [MatCardModule, MatFormFieldModule, MatInputModule, RouterTestingModule, MatDialogModule],
             providers: [
                 { provide: MAT_DIALOG_DATA, useValue: {} },
                 { provide: MatDialogRef, useValue: { close: () => {} } }, // eslint-disable-line @typescript-eslint/no-empty-function

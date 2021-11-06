@@ -8,6 +8,7 @@ import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
 import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 @Component({
@@ -42,7 +43,8 @@ export class WaitingAreaComponent {
         public gameList: GameListService,
         @Inject(MAT_DIALOG_DATA) public gameSelected: boolean,
     ) {
-        this.server = 'http://' + window.location.hostname + ':3000';
+        // this.server = 'http://' + window.location.hostname + ':3000';
+        this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.playerList = [];
         this.list = [];

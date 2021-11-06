@@ -3,6 +3,7 @@ import { GameParameters, GameRoom, GameType } from '@app/classes/game-parameters
 import { LocalPlayer } from '@app/classes/local-player';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 import { GameService } from './game.service';
 
 @Injectable({
@@ -20,7 +21,8 @@ export class GameListService {
     private socket: io.Socket;
 
     constructor(private gameService: GameService) {
-        this.server = 'http://' + window.location.hostname + ':3000';
+        // this.server = 'http://' + window.location.hostname + ':3000';
+        this.server = environment.socketUrl;
         this.existingRooms = new Array<GameParameters>();
         this.myRoom = new Array<GameRoom>();
         this.socket = SocketHandler.requestSocket(this.server);
