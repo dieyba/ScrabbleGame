@@ -5,6 +5,7 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { scrabbleLetterstoString } from '@app/classes/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 
 export const ACTIVE_DEBUG_MESSAGE = 'Affichages de débogage activés';
 export const INACTIVE_DEBUG_MESSAGE = 'Affichages de débogage désactivés';
@@ -20,7 +21,8 @@ export class ChatDisplayService {
     private socket: io.Socket;
 
     constructor() {
-        this.server = 'http://' + window.location.hostname + ':3000';
+        // this.server = 'http://' + window.location.hostname + ':3000';
+        this.server = environment.socketUrl;
         this.isActiveDebug = false;
         this.entries = [];
 

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 import { EndGamePopupComponent } from '../end-game-popup/end-game-popup.component';
 @Component({
     selector: 'app-sidebar',
@@ -17,7 +18,8 @@ export class SidebarComponent {
     private readonly server: string;
 
     constructor(public router: Router, public dialog: MatDialog, private gameService: GameService) {
-        this.server = 'http://' + window.location.hostname + ':3000';
+        // this.server = 'http://' + window.location.hostname + ':3000';
+        this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.winnerName = '';
         this.roomLeft()
