@@ -68,7 +68,7 @@ describe('GameListService', () => {
         service.start(game, joinerName);
         expect(socketMockSpy).toHaveBeenCalledWith('joinRoom', {
             gameId: game.gameRoom.idGame,
-            joinerName: joinerName,
+            joinerName,
         });
     });
     it('should call someoneLeftRoom ', () => {

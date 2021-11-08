@@ -79,7 +79,7 @@ describe('StockCmd', () => {
         for (const message of expectedResult) {
             expectedMessages.push({
                 color: ChatEntryColor.SystemColor,
-                message: message,
+                message,
             });
         }
         const spy = spyOn(stock, 'createStockMessage').and.callThrough();
@@ -105,7 +105,7 @@ describe('StockCmd', () => {
     it('createStockCmd should create an instance', () => {
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: chatDisplayServiceSpy };
         const helpParams = {
-            defaultParams: defaultParams,
+            defaultParams,
             specificParams: stockLetters,
         };
         expect(createStockCmd(helpParams)).toBeTruthy();
