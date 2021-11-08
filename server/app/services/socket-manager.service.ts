@@ -19,9 +19,9 @@ export class SocketManagerService {
 
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
     }
-
     public handleSockets(): void {
         this.sio.on('connection', (socket) => {
+            console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
             socket.on('addPlayer', (player: Player) => {
                 this.addPlayer(socket, player);
                 this.getAllGames(socket);
@@ -117,14 +117,16 @@ export class SocketManagerService {
         let player = this.playerMan.getPlayerBySocketID(socket.id);
         if (player !== undefined) {
             let roomGame = this.gameListMan.getGameFromExistingRooms(player.roomId) as GameParameters;
-            this.gameListMan.deleteExistingRoom(player.roomId);
-            this.sio.emit('roomdeleted', roomGame);
+            if (roomGame !== undefined) {
+                this.gameListMan.deleteExistingRoom(player.roomId);
+                this.sio.emit('roomdeleted', roomGame);
+            }
         }
     }
     private leaveRoom(socket: io.Socket) {
         let player = this.playerMan.getPlayerBySocketID(socket.id);
         if (player !== undefined) {
-            let roomGame = this.gameListMan.getCurrentGame(player.roomId) as GameParameters;
+            let roomGame = this.gameListMan.getCurrentGame(player.roomId);
             if (roomGame !== undefined) {
                 roomGame.gameRoom.playersName.splice(roomGame.gameRoom.playersName.indexOf(player.name), 1);
                 roomGame.players.splice(roomGame.players.indexOf(player), 1);
@@ -185,10 +187,12 @@ export class SocketManagerService {
 
     private displayChatEntry(socket: io.Socket, message: string) {
         const sender = this.playerMan.getPlayerBySocketID(socket.id) as Player;
-        const senderName = sender.name;
-        const roomId = sender.roomId.toString();
-        const chatEntry = { senderName: senderName, message: message };
-        this.sio.in(roomId).emit('addChatEntry', chatEntry);
+        if (sender !== undefined) {
+            const senderName = sender.name;
+            const roomId = sender.roomId.toString();
+            const chatEntry = { senderName: senderName, message: message };
+            this.sio.in(roomId).emit('addChatEntry', chatEntry);
+        }
     }
     private displayDifferentChatEntry(socket: io.Socket, messageToSender: string, messageToOpponent: string) {
         const senderId = socket.id;
@@ -205,11 +209,13 @@ export class SocketManagerService {
     private displayPlayerQuitMessage(socket: io.Socket) {
         const senderId = socket.id;
         const sender = this.playerMan.getPlayerBySocketID(senderId) as Player;
-        const opponent = this.gameListMan.getOtherPlayer(senderId, sender.roomId);
-        let roomGame = this.gameListMan.getCurrentGame(sender.roomId) as GameParameters;
-        if (opponent) {
-            const message = sender.name + ' a quitté le jeu';
-            this.sio.to(roomGame.gameRoom.idGame.toString()).emit('addSystemChatEntry', message);
+        if (sender !== undefined) {
+            const opponent = this.gameListMan.getOtherPlayer(senderId, sender.roomId);
+            let roomGame = this.gameListMan.getCurrentGame(sender.roomId) as GameParameters;
+            if (opponent && roomGame) {
+                const message = sender.name + ' a quitté le jeu';
+                this.sio.to(roomGame.gameRoom.idGame.toString()).emit('addSystemChatEntry', message);
+            }
         }
     }
     private displaySystemChatEntry(socket: io.Socket, message: string) {

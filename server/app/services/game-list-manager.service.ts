@@ -17,10 +17,18 @@ export class GameListManager {
         return this.existingRooms;
     }
     getGameFromExistingRooms(roomID: number): GameParameters | undefined {
-        return this.existingRooms.find((r) => r.gameRoom.idGame === roomID);
+        const game = this.existingRooms.find((r) => r.gameRoom.idGame === roomID);
+        if (game) {
+            return game;
+        }
+        return undefined;
     }
     getCurrentGame(roomID: number): GameParameters | undefined {
-        return this.currentGames.find((r) => r.gameRoom.idGame === roomID);
+        const game = this.currentGames.find((r) => r.gameRoom.idGame === roomID);
+        if (game) {
+            return game;
+        }
+        return undefined;
     }
     getOtherPlayer(playerID: string, roomId: number): Player | undefined {
         const game = this.getCurrentGame(roomId);
