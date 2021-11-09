@@ -2,6 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { GameParameters } from '@app/classes/game-parameters';
 import * as io from 'socket.io-client';
 import { GameListService } from './game-list.service';
+
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable no-unused-vars */
+/* eslint-disable dot-notation */
 class SocketMock {
     id: string = 'Socket mock';
     events: Map<string, CallableFunction> = new Map();
@@ -41,35 +46,45 @@ describe('GameListService', () => {
         expect(service).toBeTruthy();
     });
     it('should createRoom ', () => {
-        const game = new GameParameters('dieyba', 60, false)
+        const game = new GameParameters('dieyba', 60, false);
         service.createRoom(game);
-        expect(socketMockSpy).toHaveBeenCalledWith('createRoom', { name: 'dieyba', timer: 60, board: false, creatorLetters: [], opponentLetters: [], stock: [] })
+        expect(socketMockSpy).toHaveBeenCalledWith('createRoom', {
+            name: 'dieyba',
+            timer: 60,
+            board: false,
+            creatorLetters: [],
+            opponentLetters: [],
+            stock: [],
+        });
     });
     it('should deleteRoom ', () => {
         service.deleteRoom();
-        expect(socketMockSpy).toHaveBeenCalledWith('deleteRoom')
+        expect(socketMockSpy).toHaveBeenCalledWith('deleteRoom');
     });
     it('should start ', () => {
-        const game = new GameParameters('dieyba', 60, false)
-        game.gameRoom.idGame = 2
-        const joinerName = 'erika'
+        const game = new GameParameters('dieyba', 60, false);
+        game.gameRoom.idGame = 2;
+        const joinerName = 'erika';
         service.start(game, joinerName);
-        expect(socketMockSpy).toHaveBeenCalledWith('joinRoom', { gameId: game.gameRoom.idGame, joinerName: joinerName })
+        expect(socketMockSpy).toHaveBeenCalledWith('joinRoom', {
+            gameId: game.gameRoom.idGame,
+            joinerName: joinerName,
+        });
     });
     it('should call someoneLeftRoom ', () => {
         service.someoneLeftRoom();
-        expect(socketMockSpy).toHaveBeenCalledWith('leaveRoom')
+        expect(socketMockSpy).toHaveBeenCalledWith('leaveRoom');
     });
     it('should call initializeGame ', () => {
         const roomId = 2;
         service.initializeGame(roomId);
-        expect(socketMockSpy).toHaveBeenCalledWith('initializeGame', roomId)
+        expect(socketMockSpy).toHaveBeenCalledWith('initializeGame', roomId);
     });
     it('should getList ', () => {
-        const game = new GameParameters('dieyba', 60, false)
-        service.existingRooms.push(game)
+        const game = new GameParameters('dieyba', 60, false);
+        service.existingRooms.push(game);
         service.getList();
-        expect(service.existingRooms.length).toEqual(1)
+        expect(service.existingRooms.length).toEqual(1);
     });
     // it('should catch event getAllGames ', () => {
     //     let socketMockSpyOn = spyOn(socketMock, 'on');

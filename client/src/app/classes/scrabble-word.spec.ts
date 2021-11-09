@@ -2,7 +2,7 @@ import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
 
 describe('ScrabbleWord', () => {
-    let scrabbleWord = new ScrabbleWord();
+    const scrabbleWord = new ScrabbleWord();
 
     it('should create an instance', () => {
         expect(scrabbleWord).toBeTruthy();

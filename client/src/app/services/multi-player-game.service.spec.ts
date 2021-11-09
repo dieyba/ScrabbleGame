@@ -6,6 +6,7 @@ import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
+import * as io from 'socket.io-client';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { MultiPlayerGameService } from './multi-player-game.service';
@@ -15,6 +16,35 @@ import { SoloGameService } from './solo-game.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-unused-vars */
+/* eslint-disable dot-notation */
+class SocketMock {
+    id: string = 'Socket mock';
+    events: Map<string, CallableFunction> = new Map();
+    on(eventName: string, cb: CallableFunction) {
+        this.events.set(eventName, cb);
+    }
+
+    triggerEvent(eventName: string, ...args: any[]) {
+        const arrowFunction = this.events.get(eventName) as CallableFunction;
+        arrowFunction(...args);
+    }
+
+    join(...args: any[]) {
+        return;
+    }
+    emit(...args: any[]) {
+        return;
+    }
+
+    disconnect() {
+        return;
+    }
+}
+
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('MultiPlayerGameService', () => {
     let service: MultiPlayerGameService;
     let chatDisplayServiceSpy: jasmine.SpyObj<ChatDisplayService>;
@@ -24,6 +54,9 @@ describe('MultiPlayerGameService', () => {
     let gridServiceSpy: jasmine.SpyObj<GridService>;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
 
+    let socketMock: SocketMock;
+    let socketOnMockSpy: jasmine.SpyObj<any>;
+    let socketEmitMockSpy: jasmine.SpyObj<any>;
     const form = new FormGroup({
         name: new FormControl('Erika'),
         timer: new FormControl(60),
@@ -33,7 +66,7 @@ describe('MultiPlayerGameService', () => {
         opponent: new FormControl('Sara'),
     });
 
-    let gameParameters = new GameParameters('Erika', 60, true);
+    const gameParameters = new GameParameters('Erika', 60, true);
 
     const creatorLetters = [
         new ScrabbleLetter('d'),
@@ -42,7 +75,7 @@ describe('MultiPlayerGameService', () => {
         new ScrabbleLetter('a'),
         new ScrabbleLetter('t'),
         new ScrabbleLetter('l'),
-        new ScrabbleLetter('i')
+        new ScrabbleLetter('i'),
     ];
     const opponentLetters = [
         new ScrabbleLetter('p'),
@@ -51,7 +84,7 @@ describe('MultiPlayerGameService', () => {
         new ScrabbleLetter('b'),
         new ScrabbleLetter('r'),
         new ScrabbleLetter('o'),
-        new ScrabbleLetter('l')
+        new ScrabbleLetter('l'),
     ];
 
     beforeEach(() => {
@@ -63,6 +96,7 @@ describe('MultiPlayerGameService', () => {
         rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'drawLetter', 'removeLetter', 'addLetter', 'rackLetters'], {
             rackLetters: [] as ScrabbleLetter[],
         });
+
         TestBed.configureTestingModule({
             providers: [
                 { provide: GridService, useValue: gridServiceSpy },
@@ -74,10 +108,13 @@ describe('MultiPlayerGameService', () => {
             ],
         });
         service = TestBed.inject(MultiPlayerGameService);
-
+        service.game = new GameParameters('dieyba', 60, false);
+        socketMock = new SocketMock();
+        service['socket'] = socketMock as unknown as io.Socket;
+        socketOnMockSpy = spyOn(socketMock, 'on').and.callThrough();
+        socketEmitMockSpy = spyOn(socketMock, 'emit');
         spyOn(SoloGameService.prototype, 'place');
         spyOn(SoloGameService.prototype, 'exchangeLetters');
-
         gameParameters.opponentPlayer = new LocalPlayer('Bob');
         gameParameters.stock = [
             new ScrabbleLetter('l'),
@@ -98,7 +135,6 @@ describe('MultiPlayerGameService', () => {
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
-
     it('initializeGame should set the game attribute with the parameter', () => {
         service.initializeGame(form);
         expect(service.game.localPlayer.name).toEqual('Erika');
@@ -130,12 +166,31 @@ describe('MultiPlayerGameService', () => {
         expect(SoloGameService.prototype.place).toHaveBeenCalled();
     });
 
-    // it('place should return the same value as place SoloGameService', () => {
-    //     const placeParams = { position: new Vec2(), orientation: Axis.H, word: 'test' };
-    //     service.game = gameParameters;
-    //     expect(service.place(service.game.localPlayer, placeParams)).toEqual(Promise.reject(ErrorType.NoError));
+    it('socketOnConnect should handle socket.on event turn changed', () => {
+        service.socketOnConnect();
+        socketMock.triggerEvent('turn changed', { isTurnPassed: false, consecutivePassedTurns: 0 });
+        expect(socketOnMockSpy).toHaveBeenCalled();
+        service.game.isEndGame = false;
+        expect(service.resetTimer).toHaveBeenCalled;
+    });
+    // it('socketOnConnect should handle socket.on event gameEnded', () => {
+    //     service.socketOnConnect();
+    //     socketMock.triggerEvent('gameEnded', {});
+    //     expect(socketOnMockSpy).toHaveBeenCalled();
     // });
-
+    // it('socketOnConnect should handle socket.on event update board', () => {
+    //     service.socketOnConnect();
+    //     socketMock.triggerEvent('update board', ['maison', 'h']);
+    //     expect(socketOnMockSpy).toHaveBeenCalled();
+    // });
+    it('should emit changeTurn ', () => {
+        service.changeTurn();
+        expect(socketEmitMockSpy).toHaveBeenCalledWith('change turn', service.game.isTurnPassed, service.game.consecutivePassedTurns);
+    });
+    it('should emit endGame ', () => {
+        service.endGame();
+        expect(socketEmitMockSpy).toHaveBeenCalledWith('endGame');
+    });
     it('exchangeLetters should call exchangeLetters SoloGameService', () => {
         service.game = gameParameters;
         service.exchangeLetters(service.game.localPlayer, 'ks');
@@ -154,11 +209,10 @@ describe('MultiPlayerGameService', () => {
         service.game = gameParameters;
         const word = 'test';
         const position = new Vec2();
-        let startPosition = new Vec2();
+        const startPosition = new Vec2();
         service.updateBoard(word, 'v', position);
 
         for (startPosition.y; startPosition.y < word.length; startPosition.y++) {
-            console.log(gridServiceSpy.scrabbleBoard.squares[startPosition.x][startPosition.y]);
             expect(gridServiceSpy.scrabbleBoard.squares[startPosition.x][startPosition.y].isValidated).toBeTrue();
             expect(gridServiceSpy.scrabbleBoard.squares[startPosition.x][startPosition.y].isBonusUsed).toBeTrue();
         }

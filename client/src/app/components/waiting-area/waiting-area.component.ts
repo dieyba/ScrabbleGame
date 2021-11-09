@@ -8,6 +8,7 @@ import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
 import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 @Component({
@@ -42,7 +43,8 @@ export class WaitingAreaComponent {
         public gameList: GameListService,
         @Inject(MAT_DIALOG_DATA) public gameSelected: boolean,
     ) {
-        this.server = 'http://' + window.location.hostname + ':3000';
+        // this.server = 'http://' + window.location.hostname + ':3000';
+        this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.playerList = [];
         this.list = [];
@@ -50,7 +52,12 @@ export class WaitingAreaComponent {
         this.isStarting = false;
         if (gameSelected) {
             this.selectedGame = new GameParameters('', 0, false);
-            this.playerName = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(12), Validators.minLength(3)]);
+            this.playerName = new FormControl('', [
+                Validators.required,
+                Validators.pattern('[a-zA-ZÉé]*'),
+                Validators.maxLength(12),
+                Validators.minLength(3),
+            ]);
         }
         this.full = false;
         this.nameErrorMessage = '';
@@ -58,14 +65,14 @@ export class WaitingAreaComponent {
         this.timer = setInterval(() => {
             this.list = this.gameList.getList();
         }, 500);
-        this.socketOnConnect()
+        this.socketOnConnect();
     }
     @HostListener('window:beforeunload', ['$event'])
-    onBeforeUnload(event: MouseEvent) {
+    onBeforeUnload() {
         this.gameList.someoneLeftRoom();
     }
     @HostListener('window:popstate', ['$event'])
-    onPopState(event: MouseEvent) {
+    onPopState() {
         this.gameList.someoneLeftRoom();
     }
 
@@ -146,7 +153,7 @@ export class WaitingAreaComponent {
             this.nameValid = false;
             this.gameCancelled = true;
             this.roomDeletedId = game.gameRoom.idGame;
-        })
+        });
         this.socket.on('roomJoined', (game: GameParameters) => {
             this.gameList.roomInfo = game;
             this.gameList.roomInfo.gameRoom = game.gameRoom;

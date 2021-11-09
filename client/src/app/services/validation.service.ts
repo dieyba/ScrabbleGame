@@ -5,6 +5,7 @@ import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { ERROR_NUMBER } from '@app/classes/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 import { BonusService } from './bonus.service';
 import { BOARD_SIZE, GridService } from './grid.service';
 
@@ -27,16 +28,20 @@ export class ValidationService {
         this.dictionary = new Dictionary(DictionaryType.Default);
         this.words = [];
         this.isTimerElapsed = false;
-        this.server = 'http://' + window.location.hostname + ':3000';
+        // this.server = 'http://' + window.location.hostname + ':3000';
+        this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.areWordsValid = false;
+        this.wordsValid();
+    }
+
+    wordsValid() {
         this.socket.on('areWordsValid', (result: boolean) => {
             this.areWordsValid = result;
         });
     }
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
         const wordsValue = this.calculateScore(newWords);
-        player.score += wordsValue;
         // Retirer lettres du board
         setTimeout(() => {
             if (this.areWordsValid) {
@@ -46,6 +51,7 @@ export class ValidationService {
                             this.gridService.removeSquare(letter.tile.position.x, letter.tile.position.y);
                         });
                     } else {
+                        player.score += wordsValue;
                         newWord.content.forEach((letter) => {
                             letter.tile.isValidated = true;
                         });

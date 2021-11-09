@@ -1,7 +1,8 @@
 import { GameParameters } from './game-parameters';
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('GameParameters', () => {
-    let gameParameters = new GameParameters('Bob', 60, false);
+    const gameParameters = new GameParameters('Bob', 60, false);
 
     it('should create an instance', () => {
         expect(gameParameters).toBeTruthy();

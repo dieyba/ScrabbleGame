@@ -101,9 +101,6 @@ export class SoloGameService {
                 if (this.game.timerMs < 0) {
                     this.game.isTurnPassed = true;
                     this.changeTurn();
-                    // TODO: send 'activePlayerName >> !passer' message to chat via observer?
-                    // const activePlayer = this.game.localPlayer.isActive ? this.game.localPlayer : this.game.opponentPlayer;
-                    // console.log("End of timer:", activePlayer.name, " should have turned pass");
                 }
                 this.secondsToMinutes();
             }, TIMER_INTERVAL);
@@ -122,8 +119,6 @@ export class SoloGameService {
             this.updateConsecutivePassedTurns();
             this.updateActivePlayer();
             this.resetTimer();
-            console.log("Changed turn:", this.game.localPlayer.name, " active:", this.game.localPlayer.isActive, ',',
-                this.game.opponentPlayer.name, " active: ", this.game.opponentPlayer.isActive, ',consecutive passed turns:', this.game.consecutivePassedTurns);
             if (this.game.opponentPlayer.isActive) this.virtualPlayerSubject.next(this.game.opponentPlayer.isActive);
             this.game.isTurnPassed = false; // reset isTurnedPassed when new turn starts
         }

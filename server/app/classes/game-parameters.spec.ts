@@ -2,8 +2,10 @@ import { expect } from 'chai';
 import { GameParameters } from './game-parameters';
 import { Player } from './player';
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable  @typescript-eslint/no-unused-expressions */
 describe('GameParameters', () => {
-    let game = new GameParameters('dieyba', 60, false, 0);
+    const game = new GameParameters('dieyba', 60, false, 0);
     it('should create a game parameters', () => {
         expect(game).to.exist;
     });

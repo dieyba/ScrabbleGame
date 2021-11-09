@@ -2,6 +2,7 @@ import { ScrabbleLetter } from './scrabble-letter';
 import * as utilities from './utilities';
 import { Vec2 } from './vec2';
 
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('ScrabbleWord', () => {
     it('scrabbleLetterstoString should convert a scrabble letter tab to a string', () => {
         const scrabbleLetters = [new ScrabbleLetter('t'), new ScrabbleLetter('e'), new ScrabbleLetter('s'), new ScrabbleLetter('t')];
@@ -15,7 +16,7 @@ describe('ScrabbleWord', () => {
         expect(coords.y).toEqual(5);
 
         const wrongCoords = utilities.convertStringToCoord('l', '19');
-        expect(wrongCoords).not.toBeTruthy()
+        expect(wrongCoords).not.toBeTruthy();
     });
 
     it('convertCoordToString should convert coords between 0 and 14 in string row and column', () => {
