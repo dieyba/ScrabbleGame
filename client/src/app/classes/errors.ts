@@ -1,3 +1,6 @@
+
+// TODO: potentially to duplicate on server (à voir après avoir implémenté game service dans le serveur)
+
 export enum ErrorType {
     NoError,
     SyntaxError,

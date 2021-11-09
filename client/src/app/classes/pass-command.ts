@@ -12,6 +12,7 @@ export class PassTurnCmd extends Command {
         this.gameService = defaultParams.serviceCalled as GameService;
     }
 
+    // TODO: make it async?
     execute(): CommandResult {
         const executionMessages: ChatDisplayEntry[] = [];
         const commandMessage = '!' + CommandName.PassCmd;

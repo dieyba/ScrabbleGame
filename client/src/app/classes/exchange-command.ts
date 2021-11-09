@@ -13,6 +13,7 @@ export class ExchangeCmd extends Command {
         this.letters = letters;
     }
 
+    // TODO: might need to make it async
     execute(): CommandResult {
         const executionMessages: ChatDisplayEntry[] = [];
         const commandMessage = '!' + CommandName.ExchangeCmd;
