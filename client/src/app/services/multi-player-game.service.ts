@@ -89,7 +89,6 @@ export class MultiPlayerGameService extends SoloGameService {
         const starterPlayer = starterPlayerIndex === LOCAL_PLAYER_INDEX ? this.game.localPlayer : this.game.opponentPlayer;
         this.game.opponentPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         this.game.creatorPlayer.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        this.stock.takeLettersFromStock(80);
         this.game.stock = this.stock.letterStock;
         starterPlayer.isActive = true;
         return this.game;
