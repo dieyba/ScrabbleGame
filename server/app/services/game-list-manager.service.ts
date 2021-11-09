@@ -49,6 +49,7 @@ export class GameListManager {
     }
     deleteExistingRoom(roomId: number): void {
         const index = this.existingRooms.findIndex((r) => r.gameRoom.idGame === roomId);
+        /* eslint-disable  @typescript-eslint/no-magic-numbers */
         if (index > -1) {
             this.existingRooms.splice(index, 1);
         }
