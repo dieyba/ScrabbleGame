@@ -47,7 +47,7 @@ export class SocketManagerService {
             socket.on('leaveRoom', () => {
                 this.leaveRoom(socket)
             });
-            socket.on('getAllGames', (game: Array<GameParameters>) => {
+            socket.on('getAllPendingGames', (game: Array<GameParameters>) => {
                 this.getAllGames(socket);
             });
             socket.on('word placed', (word: any) => {
@@ -152,7 +152,7 @@ export class SocketManagerService {
         }, 5000);
     }
     private getAllGames(socket: io.Socket) {
-        this.sio.emit('getAllGames', this.gameListMan.existingRooms);
+        this.sio.emit('getAllPendingGames', this.gameListMan.existingRooms);
     }
     private addPlayer(socket: io.Socket, player: Player) {
         this.playerMan.addPlayer(player.name, socket.id);

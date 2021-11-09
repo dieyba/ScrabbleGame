@@ -1,8 +1,8 @@
 // TODO : Integrate other dictionnaries and choices
 import * as dict_path from '@app/assets/dictionnary.json';
 export enum DictionaryType {
-    Default = 0,
-    English = 1,
+    Default = 'Français',
+    English = 'Anglais', // TODO: see if we need to give each type a name instead of number (to display in forms when selecting a dictionary)
     // Other dictionaries
 }
 

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ChatEntryColor } from '@app/classes/chat-display-entry';
 import { Command, CommandResult } from '@app/classes/commands';
 import { ExchangeCmd } from '@app/classes/exchange-command';
+import { GameType } from '@app/classes/game-parameters';
 import { PassTurnCmd } from '@app/classes/pass-command';
 import { PlaceCmd } from '@app/classes/place-command';
 import { ChatDisplayService } from './chat-display.service';
@@ -27,8 +28,8 @@ export class CommandInvokerService {
     }
 
     displayExecutionResultMessages(commandResult: CommandResult, isExchangeCmd: boolean, isToDisplayRemotely: boolean) {
-        const isSendToServer = this.gameService.isMultiplayerGame && isToDisplayRemotely && commandResult.isExecuted;
-        const isFromVirtualPlayer = !this.gameService.isMultiplayerGame && commandResult.executionMessages[0].color === ChatEntryColor.RemotePlayer;
+        const isSendToServer = isToDisplayRemotely && commandResult.isExecuted;
+        const isFromVirtualPlayer = this.gameService.game.gameMode === GameType.Solo && commandResult.executionMessages[0].color === ChatEntryColor.RemotePlayer;
         if (isSendToServer) {
             // extract command is the only situation where the message is different for the local/remove player
             if (isExchangeCmd) {

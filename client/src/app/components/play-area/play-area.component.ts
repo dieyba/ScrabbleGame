@@ -1,8 +1,9 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { DefaultCommandParams } from '@app/classes/commands';
+import { GameType } from '@app/classes/game-parameters';
 import { PassTurnCmd } from '@app/classes/pass-command';
-import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { Vec2 } from '@app/classes/vec2';
+import { VirtualPlayer } from '@app/classes/virtual-player';
 import { CommandInvokerService } from '@app/services/command-invoker.service';
 import { ExchangeService } from '@app/services/exchange.service';
 import { GameService } from '@app/services/game.service';
@@ -70,36 +71,42 @@ export class PlayAreaComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.mouseWordPlacerService.overlayContext = this.overlayCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        this.gameService.currentGameService.createNewGame();
-        this.gridService.scrabbleBoard = new ScrabbleBoard(false);
-        this.gridService.scrabbleBoard.squares = this.gameService.currentGameService.game.scrabbleBoard.squares;
-        this.gridService.scrabbleBoard.colorStock = this.gameService.currentGameService.game.scrabbleBoard.colorStock;
+        this.gameService.startNewGame();
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
 
-        this.gameService.currentGameService.isVirtualPlayerObservable.subscribe((isActive: boolean) => {
+        this.gameService.isOpponentTurnObservable.subscribe((isActive: boolean) => {
             if (isActive) {
-                if (!this.gameService.isMultiplayerGame && !this.gameService.currentGameService.game.isEndGame) {
+                // put back the letters from the board to the rack in they weren't placed
+                this.mouseWordPlacerService.onBlur();
+                // if the opponent player is a virtual player and not a human player, play virtual player turn
+                let isVirtualPlayerCanPlay =
+                    this.gameService.game.gameMode === GameType.Solo &&
+                    this.gameService.game.players[this.gameService.opponentPlayerIndex] instanceof VirtualPlayer &&
+                    !this.gameService.game.isEndGame;
+                if (isVirtualPlayerCanPlay) {
                     this.virtualPlayerService.playTurn();
                 }
-                this.mouseWordPlacerService.onBlur();
             }
         });
     }
 
     passTurn() {
-        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.game.localPlayer, serviceCalled: this.gameService };
+        const defaultParams: DefaultCommandParams = {
+            player: this.gameService.game.players[this.gameService.localPlayerIndex],
+            serviceCalled: this.gameService,
+        };
         const command = new PassTurnCmd(defaultParams);
         this.commandInvokerService.executeCommand(command);
     }
 
     isLocalPlayerActive(): boolean {
-        return this.gameService.currentGameService.game.localPlayer.isActive;
+        return this.gameService.game.players[this.gameService.localPlayerIndex].isActive;
     }
 
     isEndGame(): boolean {
-        return this.gameService.currentGameService.game.isEndGame;
+        return this.gameService.game.isEndGame;
     }
 
     get width(): number {
@@ -137,7 +144,7 @@ export class PlayAreaComponent implements AfterViewInit {
 
     lessThanSevenLettersInStock(): boolean {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        return this.gameService.currentGameService.stock.letterStock.length < 7;
+        return this.gameService.game.stock.length < 7;
     }
 
     exchange() {

@@ -2,10 +2,12 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { GameType } from '@app/classes/game-parameters';
+import { DictionaryType } from '@app/classes/dictionary';
+import { GameType, PendingGameParameters } from '@app/classes/game-parameters';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
 import { GameListService } from '@app/services/game-list.service';
-import { GameService } from '@app/services/game.service';
+
+export const GAME_CAPACITY = 2; // TODO: to change if we implement games with 2-4 players 
 
 @Component({
     selector: 'app-form',
@@ -20,10 +22,10 @@ export class FormComponent implements OnInit {
     level: FormControl;
     opponent: FormControl;
     dictionaryForm: FormControl;
-    debutantNameList: string[];
+    debutantNameList: string[]; // TODO: and expert too
+    dictionaryList: string[];
     selectedPlayer: string;
-    random: number;
-    dictionary: string;
+    randomPlayerId: number;
 
     defaultTimer: string;
     defaultDictionary: string;
@@ -33,7 +35,6 @@ export class FormComponent implements OnInit {
         private dialog: MatDialog,
         private dialogRef: MatDialogRef<FormComponent>,
         private router: Router,
-        private gameService: GameService,
         private gameList: GameListService,
         @Inject(MAT_DIALOG_DATA) public isSolo: boolean,
     ) {
@@ -45,7 +46,7 @@ export class FormComponent implements OnInit {
         } else {
             this.level = new FormControl('');
         }
-        this.dictionary = 'Français';
+        this.dictionaryList = Object.values(DictionaryType);
         this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
     }
 
@@ -85,13 +86,13 @@ export class FormComponent implements OnInit {
     randomPlayer(list: string[]): void {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         document.getElementById('opponents')!.style.visibility = 'visible';
-        this.random = this.randomNumber(0, list.length);
+        this.randomPlayerId = this.randomNumber(0, list.length);
         do {
-            this.random = this.randomNumber(0, list.length);
-            this.selectedPlayer = list[this.random];
+            this.randomPlayerId = this.randomNumber(0, list.length);
+            this.selectedPlayer = list[this.randomPlayerId];
         } while (this.name.value === this.selectedPlayer);
 
-        this.selectedPlayer = list[this.random];
+        this.selectedPlayer = list[this.randomPlayerId];
         this.myForm.controls.opponent.setValue(this.selectedPlayer);
     }
 
@@ -108,17 +109,23 @@ export class FormComponent implements OnInit {
 
     submit(): void {
         if (this.myForm.valid) {
+            let gameParams = new PendingGameParameters(
+                GameType.MultiPlayer,
+                GAME_CAPACITY,
+                this.dictionaryForm.value,
+                this.timer.value,
+                this.bonus.value,
+                this.name.value,
+            );
             if (this.isSolo === true) {
                 this.closeDialog();
                 this.router.navigate(['/game']);
-                this.gameService.initializeGameType(GameType.Solo);
-                this.gameService.currentGameService.initializeGame(this.myForm);
+                gameParams.gameMode = GameType.Solo;
+                gameParams.joinerName = this.opponent.value;
+                // TODO: emit to server to initialize game with pending game params or something
             } else {
                 this.closeDialog();
-                this.gameService.initializeGameType(GameType.MultiPlayer);
-                this.gameService.currentGameService.initializeGame(this.myForm);
-                const single = this.gameService.currentGameService.game;
-                this.gameList.createRoom(single);
+                this.gameList.createRoom(gameParams);
                 this.dialog.open(WaitingAreaComponent, { disableClose: true });
             }
         }

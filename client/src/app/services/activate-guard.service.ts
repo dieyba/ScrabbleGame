@@ -14,7 +14,7 @@ export class ActivateGuard implements CanActivate {
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot,
     ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-        if (this.gameService.currentGameService.game.isEndGame === true) {
+        if (this.gameService.game.isEndGame === true) {
             return false;
         }
         return true;

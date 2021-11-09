@@ -16,13 +16,13 @@ export class PassTurnCmd extends Command {
     execute(): CommandResult {
         const executionMessages: ChatDisplayEntry[] = [];
         const commandMessage = '!' + CommandName.PassCmd;
-        const executionResult = this.gameService.currentGameService.passTurn(this.player);
+        const executionResult = this.gameService.passTurn(this.player); // TODO: see if need await here
 
         if (executionResult === ErrorType.ImpossibleCommand) {
             executionMessages.push(createErrorEntry(executionResult, commandMessage));
         } else if (executionResult === ErrorType.NoError) {
             this.isExecuted = true;
-            const localPlayerName = this.gameService.currentGameService.game.localPlayer.name;
+            const localPlayerName = this.gameService.game.players[this.gameService.localPlayerIndex].name;
             const color = this.player.name === localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
             executionMessages.push({ color, message: this.player.name + ' >> ' + commandMessage });
         }

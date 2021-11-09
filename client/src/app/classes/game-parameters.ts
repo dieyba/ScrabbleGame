@@ -1,5 +1,5 @@
 // import { Dictionary } from './dictionary';
-import { LocalPlayer } from './local-player';
+import { DictionaryType } from './dictionary';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
@@ -10,54 +10,54 @@ export enum GameType {
     MultiPlayerLog = 2,
 }
 
-
 export interface GameRoom {
     idGame: number;
     capacity: number;
     playersName: string[];
 }
 
-// TODO: big work in progress, à voir plus tard quels paramètres sont encore utiles sur le client
-
-
-export class GameParameters {
-    localPlayer: Player;
-    opponentPlayer: Player;
-    totalCountDown: number; // think we'll need it on client too
-    timerMs: number; // think we'll need it on client too
-    scrabbleBoard: ScrabbleBoard; // init with squares[][] coming from the server?
-
-    // only used for waiting area?
+export class PendingGameParameters {
     gameRoom: GameRoom;
-    creatorPlayer: Player;
+    capacity: number; // if we want to create more than 2 player games
+    creatorName: string;
+    joinerName: string;
+    dictionaryType: DictionaryType;
+    totalCountDown: number;
+    isRandomBonus: boolean;
+    gameMode: GameType;
 
-    // de we need this on client too?
-    stock: ScrabbleLetter[]; // client would only need this for the stock command
-    isEndGame: boolean; // see if it will still be used by methods in the client
-
-    // Not needed in client:
-    /*  players: Player[];
-     dictionary: Dictionary;
-     randomBonus: boolean;
-     isTurnPassed: boolean;
-     consecutivePassedTurns: number;
-     newWords: ScrabbleWord[]; */
-
-    constructor(creatorPlayerName: string, timer: number, isRandom: boolean) {
-        this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
-        this.creatorPlayer = new LocalPlayer(creatorPlayerName);
-        this.creatorPlayer.isActive = true;
-        this.localPlayer = new LocalPlayer(creatorPlayerName);
-        this.opponentPlayer = new LocalPlayer('');
-        this.totalCountDown = timer;
-        this.timerMs = +this.totalCountDown;
-        this.stock = [];
-        this.isEndGame = false;
-        // this.scrabbleBoard = new ScrabbleBoard(isRandom);
-        // this.players = [];
-        // this.consecutivePassedTurns = 0;
-        // this.isTurnPassed = false;
-        // this.randomBonus = isRandom;
-        // this.players = [];
+    // TODO: see assurance qualité if we can have more than 3 params for constructor
+    constructor(
+        gameMode: GameType,
+        capacity: number,
+        dictionaryType: DictionaryType,
+        totalCountDown: number,
+        isRandomBonus: boolean,
+        creatorPlayerName: string,
+        opponentName?: string
+    ) {
+        this.gameMode = gameMode;
+        this.gameRoom = { idGame: 0, capacity: capacity, playersName: new Array<string>() };
+        this.dictionaryType = dictionaryType;
+        this.totalCountDown = totalCountDown;
+        this.isRandomBonus = isRandomBonus;
+        this.creatorName = creatorPlayerName;
+        this.gameRoom.playersName.push(this.creatorName);
+        if (opponentName !== undefined && GameType.Solo) {
+            this.joinerName = opponentName;
+            this.gameRoom.playersName.push(this.joinerName);
+        } else {
+            this.joinerName = '';
+        }
     }
+}
+
+export interface GameParameters {
+    players: Player[];
+    totalCountDown: number;
+    timerMs: number;
+    scrabbleBoard: ScrabbleBoard; // will be constructed with squares[][] coming from the server
+    stock: ScrabbleLetter[];
+    isEndGame: boolean;
+    gameMode: GameType;
 }

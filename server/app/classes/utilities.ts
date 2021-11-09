@@ -2,6 +2,8 @@ import { Column, Row } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
 import { Vec2 } from './vec2';
 
+// TODO: see if we need all those in server version of utilities
+
 const PARSE_INT_BASE = 10;
 const ROW_OFFSET = 'a'.charCodeAt(0);
 const COLUMN_OFFSET = 1;

@@ -28,14 +28,14 @@ export class PlaceCmd extends Command {
 
         const placeParams = { position: this.position, orientation: this.orientation, word: this.word };
 
-        return await this.gameService.currentGameService.place(this.player, placeParams).then((executionResult: ErrorType) => {
+        return await this.gameService.place(this.player, placeParams).then((executionResult: ErrorType) => {
             if (executionResult !== ErrorType.NoError) {
                 executionMessages.push(createErrorEntry(executionResult, commandMessage));
             } else {
                 this.isExecuted = true;
-                const localPlayerName = this.gameService.currentGameService.game.localPlayer.name;
-                const playerName =
-                    this.player.name === localPlayerName ? localPlayerName : this.gameService.currentGameService.game.opponentPlayer.name;
+                const localPlayerName = this.gameService.game.players[this.gameService.localPlayerIndex].name;
+                const opponentPlayerName = this.gameService.game.players[this.gameService.opponentPlayerIndex].name;
+                const playerName = this.player.name === localPlayerName ? localPlayerName : opponentPlayerName;
                 const color = this.player.name === localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
                 executionMessages.push({ color, message: playerName + ' >> ' + commandMessage });
             }

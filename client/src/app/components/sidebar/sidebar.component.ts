@@ -26,61 +26,61 @@ export class SidebarComponent {
     }
     roomLeft() {
         this.socket.on('roomLeft', () => {
-            this.gameService.currentGameService.game.localPlayer.isWinner = true;
-            this.gameService.currentGameService.game.isEndGame = true;
+            this.gameService.game.players[this.gameService.localPlayerIndex].isWinner = true;
+            this.gameService.game.isEndGame = true;
         });
     }
 
     getPlayer1Name(): string {
-        return this.gameService.currentGameService.game.localPlayer.name;
+        return this.gameService.game.players[this.gameService.localPlayerIndex].name;
     }
 
     getPlayer2Name(): string {
-        return this.gameService.currentGameService.game.opponentPlayer.name;
+        return this.gameService.game.players[this.gameService.opponentPlayerIndex].name;
     }
 
     getLettersLeftCount(): number {
-        return this.gameService.currentGameService.stock.letterStock.length;
+        return this.gameService.game.stock.length;
     }
 
     getPlayer1LetterCount(): number {
-        return this.gameService.currentGameService.game.localPlayer.letters.length;
+        return this.gameService.game.players[this.gameService.localPlayerIndex].letters.length;
     }
 
     getPlayer2LetterCount(): number {
-        return this.gameService.currentGameService.game.opponentPlayer.letters.length;
+        return this.gameService.game.players[this.gameService.opponentPlayerIndex].letters.length;
     }
 
     getPlayer1Score(): number {
-        return this.gameService.currentGameService.game.localPlayer.score;
+        return this.gameService.game.players[this.gameService.localPlayerIndex].score;
     }
 
     getPlayer2Score(): number {
-        return this.gameService.currentGameService.game.opponentPlayer.score;
+        return this.gameService.game.players[this.gameService.opponentPlayerIndex].score;
     }
 
     isPlayer1Active(): boolean {
-        return this.gameService.currentGameService.game.localPlayer.isActive;
+        return this.gameService.game.players[this.gameService.localPlayerIndex].isActive;
     }
 
     isPlayer2Active(): boolean {
-        return this.gameService.currentGameService.game.opponentPlayer.isActive;
+        return this.gameService.game.players[this.gameService.opponentPlayerIndex].isActive;
     }
     getTimer(): string {
-        return this.gameService.currentGameService.timer;
+        return this.gameService.timer;
     }
 
     isEndGame(): boolean {
         this.getWinnerName();
-        return this.gameService.currentGameService.game.isEndGame;
+        return this.gameService.game.isEndGame;
     }
 
     hasWinner(): boolean {
-        return this.gameService.currentGameService.game.localPlayer.isWinner || this.gameService.currentGameService.game.opponentPlayer.isWinner;
+        return this.gameService.game.players[this.gameService.localPlayerIndex].isWinner || this.gameService.game.players[this.gameService.opponentPlayerIndex].isWinner;
     }
 
     isDrawnGame(): boolean {
-        if (this.gameService.currentGameService.game.localPlayer.isWinner && this.gameService.currentGameService.game.opponentPlayer.isWinner) {
+        if (this.gameService.game.players[this.gameService.localPlayerIndex].isWinner && this.gameService.game.players[this.gameService.opponentPlayerIndex].isWinner) {
             return true;
         } else {
             return false;
@@ -90,11 +90,11 @@ export class SidebarComponent {
     getWinnerName() {
         if (this.isDrawnGame()) {
             this.winnerName =
-                this.gameService.currentGameService.game.localPlayer.name + ' et ' + this.gameService.currentGameService.game.opponentPlayer.name;
-        } else if (this.gameService.currentGameService.game.localPlayer.isWinner) {
-            this.winnerName = this.gameService.currentGameService.game.localPlayer.name;
-        } else if (this.gameService.currentGameService.game.opponentPlayer.isWinner) {
-            this.winnerName = this.gameService.currentGameService.game.opponentPlayer.name;
+                this.gameService.game.players[this.gameService.localPlayerIndex].name + ' et ' + this.gameService.game.players[this.gameService.opponentPlayerIndex].name;
+        } else if (this.gameService.game.players[this.gameService.localPlayerIndex].isWinner) {
+            this.winnerName = this.gameService.game.players[this.gameService.localPlayerIndex].name;
+        } else if (this.gameService.game.players[this.gameService.opponentPlayerIndex].isWinner) {
+            this.winnerName = this.gameService.game.players[this.gameService.opponentPlayerIndex].name;
         }
     }
 

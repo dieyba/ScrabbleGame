@@ -9,16 +9,19 @@ export interface GameRoom {
     playersName: string[];
 }
 export class GameParameters {
+    // to init when creating game in waiting room
+    // wainting room doesnt actually need game. just needs pending-game with creator player, dictionary, timer, and is random bonus
     gameRoom: GameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
-    players: Player[];
-
-    localPlayer: Player;
     creatorPlayer: Player;
-    opponentPlayer: Player;
+    players: Player[]; // do we still need that?
     dictionary: Dictionary;
-    randomBonus: boolean;
     totalCountDown: number;
-    creatorName: string;
+    randomBonus: boolean;
+
+    // to init when creating the game service
+    localPlayer: Player;
+    opponentPlayer: Player;
+
     timerMs: number;
     scrabbleBoard: ScrabbleBoard;
     stock: ScrabbleLetter[];
