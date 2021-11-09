@@ -10,7 +10,6 @@ import { SoloGameService } from './solo-game.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
-
 describe('CommandInvokerService', () => {
     let service: CommandInvokerService;
     let chatDisplayServiceSpy: ChatDisplayService;
@@ -39,7 +38,6 @@ describe('CommandInvokerService', () => {
         rackService = new RackService();
         placeService = new PlaceService(gridService, rackService);
         soloGameService = new SoloGameService(gridService, rackService, chatDisplayServiceSpy, validationService, wordBuilderService, placeService);
-
 
         TestBed.configureTestingModule({
             providers: [

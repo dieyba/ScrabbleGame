@@ -24,7 +24,6 @@
 //     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
 //     const localPlayer = new LocalPlayer(LOCAL_PLAYER_NAME);
 
-
 //     beforeEach(() => {
 //         chatDisplayServiceSpy = jasmine.createSpyObj('ChatDisplayService', [
 //             'addPlayerEntry',

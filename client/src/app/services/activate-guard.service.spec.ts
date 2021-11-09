@@ -1,5 +1,5 @@
-import { TestBed } from "@angular/core/testing";
-import { ActivateGuard } from "./activate-guard.service";
+import { TestBed } from '@angular/core/testing';
+import { ActivateGuard } from './activate-guard.service';
 
 describe('ActivateGuard', () => {
     let service: ActivateGuard;
