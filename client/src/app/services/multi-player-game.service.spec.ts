@@ -167,11 +167,12 @@ describe('MultiPlayerGameService', () => {
     });
 
     it('socketOnConnect should handle socket.on event turn changed', () => {
+        const spy = spyOn(service, 'resetTimer');
         service.socketOnConnect();
         socketMock.triggerEvent('turn changed', { isTurnPassed: false, consecutivePassedTurns: 0 });
         expect(socketOnMockSpy).toHaveBeenCalled();
         service.game.isEndGame = false;
-        expect(service.resetTimer).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
     });
     it('should emit changeTurn ', () => {
         service.changeTurn();

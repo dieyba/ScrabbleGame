@@ -24,7 +24,6 @@
 //     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
 //     const localPlayer = new LocalPlayer(LOCAL_PLAYER_NAME);
 
-
 //     beforeEach(() => {
 //         chatDisplayServiceSpy = jasmine.createSpyObj('ChatDisplayService', [
 //             'addPlayerEntry',
@@ -56,14 +55,14 @@
 //         expect(service).toBeTruthy();
 //     });
 
-//     it('should send ! starting input to createCommand', () => {
+//     it('handleInput should send ! starting input to createCommand', () => {
 //         const spy = spyOn(service, 'createCommand').and.callThrough();
 //         const fakeCommand = '!fake command name';
 //         service.handleInput(fakeCommand);
 //         expect(spy).toHaveBeenCalledWith(fakeCommand, localPlayer);
 //     });
 
-//     it('should send input as normal chat message', () => {
+//     it('handleInput should send input as normal chat message', () => {
 //         const chatMessage = 'not a command';
 //         service.handleInput(chatMessage);
 //         expect(chatDisplayServiceSpy.addEntry).toHaveBeenCalled();
