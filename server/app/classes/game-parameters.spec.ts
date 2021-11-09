@@ -3,10 +3,11 @@ import { GameParameters } from './game-parameters';
 import { Player } from './player';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
-/* eslint-disable  @typescript-eslint/no-unused-expressions */
 describe('GameParameters', () => {
     const game = new GameParameters('dieyba', 60, false, 0);
     it('should create a game parameters', () => {
+        /* eslint-disable @typescript-eslint/no-unused-expressions*/
+        /* eslint-disable  no-unused-expressions */
         expect(game).to.exist;
     });
     it('should add Player', () => {

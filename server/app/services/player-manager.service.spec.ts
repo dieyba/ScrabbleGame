@@ -9,6 +9,8 @@ describe('PlayerManager service', () => {
         playerManagerService = new PlayerManagerService();
     });
     it('should create playerManagerService', () => {
+        /* eslint-disable @typescript-eslint/no-unused-expressions*/
+        /* eslint-disable  no-unused-expressions */
         expect(playerManagerService).to.exist;
         expect(playerManagerService.allPlayers.length).to.be.equal(0);
     });

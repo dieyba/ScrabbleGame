@@ -15,6 +15,7 @@ export class PlayerManagerService {
 
     getPlayerBySocketID(socketId: string): Player | undefined {
         const playerArrayIndex = this.allPlayers.findIndex((p) => p.socketId === socketId);
+        /* eslint-disable  @typescript-eslint/no-magic-numbers */
         if (playerArrayIndex > -1) {
             return this.allPlayers[playerArrayIndex];
         }

@@ -12,12 +12,13 @@ export class ValidationService {
     }
 
     validateWords(newWords: string[]): boolean {
-        for (let i = 0; i < newWords.length; i++) {
-            // Word not valid, validation fails3
-            if (!this.isWordValid(newWords[i])) {
+        // Word not valid, validation fails
+        for (const word of newWords) {
+            if (!this.isWordValid(word)) {
                 return false;
             }
         }
+
         return true;
     }
 
