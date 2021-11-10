@@ -4,6 +4,8 @@ import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
 
+const UNDEFINE_ID = 'none';
+
 export enum GameType {
     Solo = 0,
     MultiPlayer = 1,
@@ -13,12 +15,13 @@ export enum GameType {
 export interface GameRoom {
     idGame: number;
     capacity: number;
-    playersName: string[];
+    playersName: string[]; // TODO: needed for waiting area component in client, i think?
+    creatorId: string;
+    joinerId: string;
 }
 
-export class PendingGameParameters {
+export class WaitingAreaGameParameters {
     gameRoom: GameRoom;
-    capacity: number; // if we want to create more than 2 player games
     creatorName: string;
     joinerName: string;
     dictionaryType: DictionaryType;
@@ -37,7 +40,13 @@ export class PendingGameParameters {
         opponentName?: string
     ) {
         this.gameMode = gameMode;
-        this.gameRoom = { idGame: 0, capacity: capacity, playersName: new Array<string>() };
+        this.gameRoom = {
+            idGame: 0,
+            capacity: capacity,
+            playersName: new Array<string>(),
+            creatorId: UNDEFINE_ID,
+            joinerId: UNDEFINE_ID
+        };
         this.dictionaryType = dictionaryType;
         this.totalCountDown = totalCountDown;
         this.isRandomBonus = isRandomBonus;

@@ -1,21 +1,23 @@
+import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { DARK_BLUE_FACTOR, PALE_BLUE_FACTOR, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { SquareColor } from '@app/classes/square';
 import { Axis, ERROR_NUMBER } from '@app/classes/utilities';
 import { Service } from 'typedi';
-import { GridService } from './grid.service';
 
 const PINK_FACTOR = 2;
 const RED_FACTOR = 3;
 
-// TODO: see if needs adapting now that it's on the server
+// TODO: see if we want to pass in scrabble board at the beginning or when calling a method?
 
 @Service()
 export class BonusService {
     pinkBonusCount: number;
     redBonusCount: number;
+    scrabbleBoard: ScrabbleBoard;
 
-    constructor(private readonly gridService: GridService) {
+    constructor(scrabbleBoard: ScrabbleBoard) {
+        this.scrabbleBoard = scrabbleBoard;
         this.pinkBonusCount = 0;
         this.redBonusCount = 0;
     }
@@ -27,19 +29,19 @@ export class BonusService {
         for (let i = 0; i < scrabbleWord.content.length; i++) {
             // Account for letter pale/dark blue bonuses
             if (scrabbleWord.orientation === Axis.H) {
-                if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed) {
+                if (!this.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed) {
                     total += this.calculateValue(
                         scrabbleWord.content[i],
-                        this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].color,
+                        this.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].color,
                     );
                 } else {
                     total += scrabbleWord.content[i].value;
                 }
             } else if (scrabbleWord.orientation === Axis.V) {
-                if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed) {
+                if (!this.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed) {
                     total += this.calculateValue(
                         scrabbleWord.content[i],
-                        this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].color,
+                        this.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].color,
                     );
                 } else {
                     total += scrabbleWord.content[i].value;
@@ -97,11 +99,11 @@ export class BonusService {
     useBonus(scrabbleWord: ScrabbleWord) {
         for (let i = 0; i < scrabbleWord.content.length; i++) {
             if (scrabbleWord.orientation === Axis.H) {
-                if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed) {
+                if (!this.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed) {
                     this.useHorizontalWordBonus(scrabbleWord, i);
                 }
             } else if (scrabbleWord.orientation === Axis.V) {
-                if (!this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed) {
+                if (!this.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed) {
                     this.useVerticalWordBonus(scrabbleWord, i);
                 }
             }
@@ -109,41 +111,41 @@ export class BonusService {
     }
 
     useHorizontalWordBonus(scrabbleWord: ScrabbleWord, i: number) {
-        const color = this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].color;
+        const color = this.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].color;
         switch (color) {
             case SquareColor.Teal:
-                this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed = true;
+                this.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed = true;
                 break;
             case SquareColor.DarkBlue:
-                this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed = true;
+                this.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed = true;
                 break;
             case SquareColor.Pink:
                 this.pinkBonusCount++;
-                this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed = true;
+                this.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed = true;
                 break;
             case SquareColor.Red:
                 this.redBonusCount++;
-                this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed = true;
+                this.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].isBonusUsed = true;
                 break;
         }
     }
 
     useVerticalWordBonus(scrabbleWord: ScrabbleWord, i: number) {
-        const color = this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].color;
+        const color = this.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].color;
         switch (color) {
             case SquareColor.Teal:
-                this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed = true;
+                this.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed = true;
                 break;
             case SquareColor.DarkBlue:
-                this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed = true;
+                this.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed = true;
                 break;
             case SquareColor.Pink:
                 this.pinkBonusCount++;
-                this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed = true;
+                this.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed = true;
                 break;
             case SquareColor.Red:
                 this.redBonusCount++;
-                this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed = true;
+                this.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].isBonusUsed = true;
                 break;
         }
     }

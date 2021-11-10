@@ -30,7 +30,7 @@ export class GameService {
     game: GameParameters;
     isOpponentTurnObservable: Observable<boolean>;
     isOpponentTurnSubject: BehaviorSubject<boolean>;
-    localPlayerIndex: number;
+    localPlayerIndex: number; // TODO: create getLocalPlayer(), getOpponent() in game params instead?
     opponentPlayerIndex: number;
     timer: string; // used for the ui timer?
     intervalValue: NodeJS.Timeout;
@@ -88,7 +88,7 @@ export class GameService {
             }
         });
     }
-    // TODO: put this in a socket on?
+    // TODO: put this in a socket.on('init game') or something?
     initializeGame(initInfo: GameInitInfo) {
         this.localPlayerIndex = this.socket.id === this.game.players[0].socketId ? 0 : 1;
         this.opponentPlayerIndex = this.socket.id === this.game.players[0].socketId ? 1 : 0;
@@ -144,6 +144,21 @@ export class GameService {
         }
     }
 
+
+    /*  
+        1) place in client game service: validates place command syntax, places letter on board ui,
+        2) emits place to call place/validation in server game service. Vaildate Words
+        2.a) depending on result will emit to client the word is invalid and make it put letters back in rack
+        2.b) or will do:
+                this.validationService.updatePlayerScore(tempScrabbleWords, player);
+                // Take new letters
+                const newLetters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+                this.addRackLetters(newLetters);
+                newLetters.forEach((letter) => {
+                    this.addLetterToPlayer(letter);
+                });
+            and then emit to client to synchronize player letters and stock
+    */
     async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
         // const errorResult = await super.place(player, placeParams); // replace this by what's in solo game
         const errorResult = ErrorType.NoError;
@@ -160,6 +175,11 @@ export class GameService {
         return errorResult;
     }
 
+    /*
+    1) emits to server to exchange letters
+    2) server exchanges letters
+    3) server emits back to synchronize new letters/stock and calls back give back if error?
+    */
     async exchangeLetters(player: Player, letters: string): Promise<ErrorType> {
         // const errorResult = super.exchangeLetters(player, letters); // TODO: replace this by await promise of emit to server
         const errorResult = ErrorType.NoError;

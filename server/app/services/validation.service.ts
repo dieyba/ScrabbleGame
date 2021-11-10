@@ -1,41 +1,34 @@
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { Player } from '@app/classes/player';
+import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { ERROR_NUMBER } from '@app/classes/utilities';
-import { SocketHandler } from '@app/modules/socket-handler';
-import * as io from 'socket.io-client';
-import { environment } from 'src/environments/environment';
 import { Service } from 'typedi';
-import { BonusService } from './bonus.service';
-import { BOARD_SIZE, GridService } from './grid.service';
 
-
+const BOARD_SIZE = 15;
 const BONUS_LETTER_COUNT = 7;
 const BONUS_POINTS = 50;
 export const WAIT_TIME = 3000;
 
 
+// TODO: see how we want validation service to work on the server, how it's linked with game-service
+// do we create one for each game? or have oonly one with each dictionary and it's called by all games?
+
 @Service()
 export class ValidationService {
     dictionary: Dictionary;
+    scrabbleBoard: ScrabbleBoard;
     isTimerElapsed: boolean;
     words: string[];
     areWordsValid: boolean;
-    private socket: io.Socket;
-    private readonly server: string;
-
-    constructor(private readonly gridService: GridService, private bonusService: BonusService) {
+    constructor(/* private bonusService: BonusService, dictionaryType: DictionaryType */) {
         this.dictionary = new Dictionary(DictionaryType.Default);
         this.words = [];
         this.isTimerElapsed = false;
-        // this.server = 'http://' + window.location.hostname + ':3000';
-        this.server = environment.socketUrl;
-        this.socket = SocketHandler.requestSocket(this.server);
-        this.areWordsValid = false;
         this.areWordsValid = false;
     }
 
-    // TODO: chose if want to work with areWordsValid or just return answer (or both ig)
+    // TODO: chose if want to work with areWordsValid or just return true/false (or both ig)
     validateWords(newWords: string[]): boolean {
         // Word not valid, validation fails
         for (const word of newWords) {
@@ -54,13 +47,17 @@ export class ValidationService {
 
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
         const wordsValue = this.calculateScore(newWords);
+
+        // why did we do that in validation service in client? Wht does it have a timeout?
         // Retirer lettres du board
         setTimeout(() => {
             if (this.areWordsValid) {
                 newWords.forEach((newWord) => {
+
+                    // TODO: replace the error situation handling by a emit? or move removeSquare to server
                     if (wordsValue === ERROR_NUMBER) {
                         newWord.content.forEach((letter) => {
-                            this.gridService.removeSquare(letter.tile.position.x, letter.tile.position.y);
+                            // this.gridService.removeSquare(letter.tile.position.x, letter.tile.position.y);
                         });
                     } else {
                         player.score += wordsValue;
@@ -68,7 +65,7 @@ export class ValidationService {
                             letter.tile.isValidated = true;
                         });
                         // if change the isvalidated = true here, change how its used in solo game service
-                        this.bonusService.useBonus(newWord);
+                        // this.bonusService.useBonus(newWord);
                     }
                 });
             }
@@ -81,7 +78,7 @@ export class ValidationService {
 
         // Adding total score for each new word
         for (const word of newWords) {
-            word.value = this.bonusService.totalValue(word);
+            // word.value = this.bonusService.totalValue(word);
             totalScore += word.value;
         }
 
@@ -99,8 +96,8 @@ export class ValidationService {
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
                 if (
-                    this.gridService.scrabbleBoard.squares[i][j].occupied === true &&
-                    this.gridService.scrabbleBoard.squares[i][j].isValidated === false
+                    this.scrabbleBoard.squares[i][j].occupied === true &&
+                    this.scrabbleBoard.squares[i][j].isValidated === false
                 ) {
                     newLetters++;
                 }

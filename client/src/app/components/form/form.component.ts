@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DictionaryType } from '@app/classes/dictionary';
-import { GameType, PendingGameParameters } from '@app/classes/game-parameters';
+import { GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
 import { GameListService } from '@app/services/game-list.service';
 
@@ -109,7 +109,7 @@ export class FormComponent implements OnInit {
 
     submit(): void {
         if (this.myForm.valid) {
-            let gameParams = new PendingGameParameters(
+            let gameParams = new WaitingAreaGameParameters(
                 GameType.MultiPlayer,
                 GAME_CAPACITY,
                 this.dictionaryForm.value,
@@ -122,7 +122,7 @@ export class FormComponent implements OnInit {
                 this.router.navigate(['/game']);
                 gameParams.gameMode = GameType.Solo;
                 gameParams.joinerName = this.opponent.value;
-                // TODO: emit to server to initialize game with pending game params or something
+                // TODO: emit to server to initialize game with waiting area game params or something
             } else {
                 this.closeDialog();
                 this.gameList.createRoom(gameParams);

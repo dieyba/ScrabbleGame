@@ -1,5 +1,4 @@
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Service } from 'typedi';
 
 enum LetterQuantity {
     A = 9,
@@ -61,13 +60,12 @@ export enum LetterValue {
     Star = 0,
 }
 
-@Service()
 export class LetterStock {
     letterStock: ScrabbleLetter[];
 
     constructor() {
         this.letterStock = [];
-        // TODO: scrabble letter already has a function to give the default letter value. so we dont need to specify it
+        // TODO: scrabble letter already gives the default letter value. so we dont need to specify it
         this.addLettersToStock(new ScrabbleLetter('a', LetterValue.A), LetterQuantity.A); // A
         this.addLettersToStock(new ScrabbleLetter('b', LetterValue.B), LetterQuantity.B); // B
         this.addLettersToStock(new ScrabbleLetter('c', LetterValue.C), LetterQuantity.C); // C
