@@ -4,8 +4,13 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { Router } from '@angular/router';
 import { DictionaryType } from '@app/classes/dictionary';
 import { GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
+import { GameInitInfo } from '@app/classes/server-message';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
+import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
+import { GameService } from '@app/services/game.service';
+import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 
 export const GAME_CAPACITY = 2; // TODO: to change if we implement games with 2-4 players 
 
@@ -26,18 +31,22 @@ export class FormComponent implements OnInit {
     dictionaryList: string[];
     selectedPlayer: string;
     randomPlayerId: number;
-
     defaultTimer: string;
     defaultDictionary: string;
     defaultBonus: boolean;
+    private readonly server: string;
+    private socket: io.Socket;
 
     constructor(
+        private gameService: GameService,
         private dialog: MatDialog,
         private dialogRef: MatDialogRef<FormComponent>,
         private router: Router,
         private gameList: GameListService,
         @Inject(MAT_DIALOG_DATA) public isSolo: boolean,
     ) {
+        this.server = environment.socketUrl;
+        this.socket = SocketHandler.requestSocket(this.server);
         this.defaultTimer = '60';
         this.defaultDictionary = '0';
         this.defaultBonus = false;
@@ -48,6 +57,7 @@ export class FormComponent implements OnInit {
         }
         this.dictionaryList = Object.values(DictionaryType);
         this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
+        this.socketOnConnect();
     }
 
     ngOnInit() {
@@ -119,15 +129,23 @@ export class FormComponent implements OnInit {
             );
             if (this.isSolo === true) {
                 this.closeDialog();
-                this.router.navigate(['/game']);
                 gameParams.gameMode = GameType.Solo;
                 gameParams.joinerName = this.opponent.value;
-                // TODO: emit to server to initialize game with waiting area game params or something
+                this.gameService.game.gameMode = GameType.Solo; // to make sure the service is constructed prior to initialization. Does it work?
+                this.socket.emit('initializeSoloGame', gameParams);
             } else {
                 this.closeDialog();
                 this.gameList.createRoom(gameParams);
                 this.dialog.open(WaitingAreaComponent, { disableClose: true });
             }
         }
+    }
+    socketOnConnect() {
+        this.socket.on('initClientGame', (gameParams: GameInitInfo) => {
+            this.dialogRef.close();
+            this.router.navigate(['/game']);
+            this.gameService.initializeGame(gameParams);
+
+        });
     }
 }

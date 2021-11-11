@@ -17,27 +17,26 @@ export class GameListService {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.waitingAreaGames = new Array<WaitingAreaGameParameters>();
-        this.socket.on('getWaitingAreaGames', (game: WaitingAreaGameParameters[]) => {
+        this.socket.emit('addPlayer');
+        this.socket.on('updateWaitingAreaGames', (game: WaitingAreaGameParameters[]) => {
             this.waitingAreaGames = game;
         });
     }
     getList(): WaitingAreaGameParameters[] {
         return this.waitingAreaGames;
     }
-    // TODO: see if need to add more detail when creating room
     createRoom(gameParams: WaitingAreaGameParameters): void {
-        this.socket.emit('createRoom', gameParams);
+        this.socket.emit('createWaitingAreaRoom', gameParams);
     }
     deleteRoom(): void {
-        this.socket.emit('deleteRoom');
+        this.socket.emit('deleteWaitingAreaRoom');
     }
     start(game: WaitingAreaGameParameters, name: string): void {
-        // TODO: to rename
-        this.socket.emit('joinRoom', { gameId: game.gameRoom.idGame });
+        console.log(name, " pressed join button. Emit to server");
+        this.socket.emit('joinWaitingAreaRoom', name);
     }
-    // TODO: what does this do?
-    initializeGame(roomId: number) {
-        this.socket.emit('initializeGame', roomId);
+    initializeMultiplayerGame() {
+        this.socket.emit('initializeMultiPlayerGame');
     }
     someoneLeftRoom() {
         this.socket.emit('leaveRoom');

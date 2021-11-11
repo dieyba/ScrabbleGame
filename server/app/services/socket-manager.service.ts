@@ -25,8 +25,8 @@ export class SocketManagerService {
     public handleSockets(): void {
         this.sio.on('connection', (socket) => {
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
-            socket.on('addPlayer', (player: Player) => {
-                this.playerMan.addPlayer(player.name, socket.id);
+            socket.on('addPlayer', () => {
+                this.playerMan.addPlayer(socket.id);
                 this.getAllWaitingAreaGames(socket);
             });
             socket.on('createWaitingAreaRoom', (gameParams: WaitingAreaGameParameters) => {
@@ -37,13 +37,16 @@ export class SocketManagerService {
                 this.deleteWaitingAreaRoom(socket);
                 this.getAllWaitingAreaGames(socket);
             });
-            socket.on('joinWaitingAreRoom', (game: any) => {
+            socket.on('joinWaitingAreaRoom', (game: any) => {
+                console.log("received joinWaitingAreaRoom emit");
                 this.joinRoom(socket, game);
                 this.getAllWaitingAreaGames(socket);
             });
-            // see if use the same for both solo/multi
-            socket.on('initializeGame', (clientParametersChosen: WaitingAreaGameParameters) => {
-                this.initializeGame(socket, clientParametersChosen);
+            socket.on('initializeMultiPlayerGame', () => {
+                this.initializeMultiPlayerGame(socket);
+            });
+            socket.on('initializeSoloGame', (clientParametersChosen: WaitingAreaGameParameters) => {
+                this.initializeSoloGame(socket, clientParametersChosen);
             });
             socket.on('getAllWaitingAreaGames', (game: Array<GameParameters>) => {
                 this.getAllWaitingAreaGames(socket);
@@ -116,6 +119,7 @@ export class SocketManagerService {
             creatorPlayer.roomId = gameParams.gameRoom.idGame;
             newRoom.gameRoom.creatorId = socket.id;
             socket.join(newRoom.gameRoom.idGame.toString());
+            console.log(gameParams.creatorName, ' created a game in waiting');
             this.sio.emit('waitingAreaRoomCreated', newRoom);
         }
     }
@@ -155,7 +159,7 @@ export class SocketManagerService {
         socket.leave(player.roomId.toString());
     }
     private getAllWaitingAreaGames(socket: io.Socket) {
-        this.sio.emit('getWaitingAreaGames', this.gameListMan.getAllWaitingAreaGames());
+        this.sio.emit('updateWaitingAreaGames', this.gameListMan.getAllWaitingAreaGames());
     }
     private joinRoom(socket: io.Socket, joinerName: string) {
         let joiner = this.playerMan.getPlayerBySocketID(socket.id);
@@ -167,29 +171,51 @@ export class SocketManagerService {
             waitingAreaGame.joinerName = joinerName;
             waitingAreaGame.gameRoom.joinerId = socket.id;
             socket.join(waitingAreaGame.gameRoom.idGame.toString());
+            console.log(waitingAreaGame.joinerName, ' joined game of ', waitingAreaGame.creatorName);
             this.sio.to(waitingAreaGame.gameRoom.idGame.toString()).emit('roomJoined');
         }
     }
-    private initializeGame(socket: io.Socket, clientGameParams: WaitingAreaGameParameters) {
+    private initializeMultiPlayerGame(socket: io.Socket) {
         const creatorPlayer = this.playerMan.getPlayerBySocketID(socket.id);
         if (creatorPlayer === undefined) {
             return;
         }
-        let roomGame = this.gameListMan.getGameInPlay(creatorPlayer.roomId);
-        if (roomGame === undefined) {
+        // TODO: make sure player socket info are init when creating room and joining room
+        let waitingAreaGame = this.gameListMan.getAWaitingAreaGame(creatorPlayer.roomId);
+        if (waitingAreaGame === undefined) {
+            return;
+        }
+        const serverGameParams = new GameParameters(waitingAreaGame);
+        // TODO: probably not necessary, normally the creator and joiner order should be fixed
+        if (serverGameParams.players[0].name === waitingAreaGame.creatorName) {
+            serverGameParams.players[0].socketId = waitingAreaGame.gameRoom.creatorId;
+            serverGameParams.players[1].socketId = waitingAreaGame.gameRoom.joinerId;
+        } else {
+            serverGameParams.players[1].socketId = waitingAreaGame.gameRoom.creatorId;
+            serverGameParams.players[0].socketId = waitingAreaGame.gameRoom.joinerId;
+        }
+        const newGame = new GameService(this.validationService, this.wordBuilderService);
+        this.gameListMan.addGameInPlay(newGame);
+        const clientInitParams = newGame.initializeGame(serverGameParams);
+        this.sio.to(waitingAreaGame.gameRoom.idGame.toString()).emit('initClientGame', clientInitParams);
+    }
+
+    private initializeSoloGame(socket: io.Socket, clientGameParams: WaitingAreaGameParameters) {
+        const creatorPlayer = this.playerMan.getPlayerBySocketID(socket.id);
+        if (creatorPlayer === undefined) {
             return;
         }
         const serverGameParams = new GameParameters(clientGameParams);
+        // TODO: not really necessary, the creator player is always first in player array
         if (serverGameParams.players[0].name === clientGameParams.creatorName) {
-            serverGameParams.players[0].socketId = clientGameParams.gameRoom.creatorId;
-            serverGameParams.players[1].socketId = clientGameParams.gameRoom.joinerId;
+            serverGameParams.players[0].socketId = socket.id;
         } else {
-            serverGameParams.players[1].socketId = clientGameParams.gameRoom.creatorId;
-            serverGameParams.players[0].socketId = clientGameParams.gameRoom.joinerId;
+            serverGameParams.players[1].socketId = socket.id;
         }
         const newGame = new GameService(this.validationService, this.wordBuilderService);
         const clientInitParams = newGame.initializeGame(serverGameParams);
-        this.sio.to(roomGame.game.gameRoomId.toString()).emit('initClientGame', clientInitParams);
+        this.gameListMan.addSoloGame(newGame);
+        this.sio.to(socket.id).emit('initClientGame', clientInitParams);
     }
 
     private displayChatEntry(socket: io.Socket, message: string) {

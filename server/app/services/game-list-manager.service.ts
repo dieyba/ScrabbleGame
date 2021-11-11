@@ -5,18 +5,14 @@ import { GameService } from './game-service';
 
 @Service()
 export class GameListManager {
+    private currentId: number;
     private waitingAreaGames: WaitingAreaGameParameters[];
     private gamesInPlay: GameService[]; // why is it a bunch of gameparameters and not a bunch of gameServices?
-    private soloGames: GameService[]; // should this be separate from gamesInPlay
     constructor() {
         this.waitingAreaGames = new Array<WaitingAreaGameParameters>();
         this.gamesInPlay = new Array<GameService>();
-        this.soloGames = new Array<GameService>();
+        this.currentId = 0;
     }
-    createSoloGame(game: GameService) {
-        this.soloGames.push(game);
-    }
-
     getAllWaitingAreaGames(): WaitingAreaGameParameters[] {
         return this.waitingAreaGames;
     }
@@ -28,9 +24,9 @@ export class GameListManager {
         return undefined;
     }
     createWaitingAreaGame(game: WaitingAreaGameParameters): WaitingAreaGameParameters {
-        const newGameId = this.waitingAreaGames.length;
-        game.gameRoom.idGame = newGameId;
+        game.gameRoom.idGame = this.currentId;
         this.waitingAreaGames.push(game);
+        this.currentId++;
         return game;
     }
     deleteWaitingAreaGame(roomId: number): void {
@@ -46,14 +42,20 @@ export class GameListManager {
         }
         return undefined;
     }
-    createGameInPlay(game: GameService): GameService {
-        this.gamesInPlay.push(game);
-        return game;
+    addGameInPlay(newGame: GameService): GameService {
+        this.gamesInPlay.push(newGame);
+        return newGame;
     }
     deleteGameInPlay(roomId: number): void {
         const index = this.gamesInPlay.findIndex((r) => r.game.gameRoomId === roomId);
         if (index !== ERROR_NUMBER) {
             this.waitingAreaGames.splice(index, 1);
         }
+    }
+    addSoloGame(newGame: GameService): GameService {
+        newGame.game.gameRoomId = this.currentId;
+        this.gamesInPlay.push(newGame);
+        this.currentId++;
+        return newGame;
     }
 }

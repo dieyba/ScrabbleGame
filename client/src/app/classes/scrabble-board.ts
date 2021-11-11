@@ -46,8 +46,11 @@ export class ScrabbleBoard {
     actualBoardSize: number = BOARD_SIZE - 1;
     colorStock: SquareColor[];
 
-    constructor(squares: Square[][]) {
+    constructor(squares?: Square[][]) {
         this.squares = [];
+        if (squares) {
+            this.squares = squares;
+        }
         // this.colorStock = [];
         // this.addColorToStock(SquareColor.DarkBlue, ColorQuantity.DarkBlue);
         // this.addColorToStock(SquareColor.Teal, ColorQuantity.Teal);

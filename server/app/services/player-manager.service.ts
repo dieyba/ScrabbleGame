@@ -17,9 +17,14 @@ export class PlayerManagerService {
         return undefined;
     }
 
-    addPlayer(playerName: string, socketId: string): Player {
-        const newPlayer = new Player(playerName, socketId);
-        this.allPlayers.push(newPlayer);
+    // TODO : Shouldn't we check it's not already in there before adding a new player?
+    addPlayer(socketId: string, playerName?: string,): Player | undefined {
+        let newPlayer = undefined;
+        if (this.getPlayerBySocketID(socketId) === undefined) {
+            const name = playerName !== undefined ? playerName : '';
+            newPlayer = new Player(name, socketId);
+            this.allPlayers.push(newPlayer);
+        }
         return newPlayer;
     }
 

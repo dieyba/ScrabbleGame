@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PlaceParams } from '@app/classes/commands';
 import { ErrorType } from '@app/classes/errors';
-import { GameParameters } from '@app/classes/game-parameters';
+import { GameParameters, GameType } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
@@ -34,7 +34,6 @@ export class GameService {
     opponentPlayerIndex: number;
     timer: string; // used for the ui timer?
     intervalValue: NodeJS.Timeout;
-
     private socket: io.Socket;
     private readonly server: string;
 
@@ -47,6 +46,15 @@ export class GameService {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
+        this.game = {
+            players: new Array<Player>(),
+            totalCountDown: 0,
+            timerMs: 0,
+            scrabbleBoard: new ScrabbleBoard(),
+            stock: [],
+            isEndGame: false,
+            gameMode: GameType.Solo,
+        };
     }
     socketOnConnect() {
         this.socket.on('turn changed', (isTurnPassed: boolean, consecutivePassedTurns: number) => {
@@ -89,9 +97,11 @@ export class GameService {
         });
     }
     // TODO: put this in a socket.on('init game') or something?
+    // TODO: see if we need a dictionary or not. Normally not but see issue on gitlab
+    // and might want to make sure there is a player in players[] before accessing index
     initializeGame(initInfo: GameInitInfo) {
-        this.localPlayerIndex = this.socket.id === this.game.players[0].socketId ? 0 : 1;
-        this.opponentPlayerIndex = this.socket.id === this.game.players[0].socketId ? 1 : 0;
+        this.localPlayerIndex = this.socket.id === initInfo.players[0].socketId ? 0 : 1;
+        this.opponentPlayerIndex = this.socket.id === initInfo.players[0].socketId ? 1 : 0;
         this.game.gameMode = initInfo.gameMode;
         this.game.players[this.localPlayerIndex] = initInfo.players[this.localPlayerIndex];
         this.game.players[this.opponentPlayerIndex] = initInfo.players[this.opponentPlayerIndex];
@@ -100,6 +110,7 @@ export class GameService {
         this.game.scrabbleBoard = new ScrabbleBoard(initInfo.boardSquares);
         this.game.stock = initInfo.stock;
         this.game.isEndGame = false;
+        console.log('initializedGame:', this.game);
     }
     startNewGame() {
         this.isOpponentTurnSubject = new BehaviorSubject<boolean>(this.game.players[this.opponentPlayerIndex].isActive);

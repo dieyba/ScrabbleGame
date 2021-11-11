@@ -4,9 +4,11 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { Router } from '@angular/router';
 import { DictionaryType } from '@app/classes/dictionary';
 import { GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
+import { GameInitInfo } from '@app/classes/server-message';
 import { FormComponent, GAME_CAPACITY } from '@app/components/form/form.component';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
+import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 /* eslint-disable  @typescript-eslint/no-explicit-any */
@@ -44,6 +46,7 @@ export class WaitingAreaComponent {
     private socket: io.Socket;
 
     constructor(
+        private gameService: GameService,
         private router: Router,
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
         private dialog: MatDialog,
@@ -112,7 +115,7 @@ export class WaitingAreaComponent {
         if (this.playerList.length === 2) {
             this.isStarting = true;
             clearInterval(this.timer);
-            this.gameList.initializeGame(this.gameList.localPlayerRoomInfo.gameRoom.idGame);
+            this.gameList.initializeMultiplayerGame();
         }
     }
 
@@ -155,13 +158,13 @@ export class WaitingAreaComponent {
         this.dialogRef.close();
     }
     socketOnConnect() {
-        this.socket.on('updateInfo', (game: WaitingAreaGameParameters) => {
+        this.socket.on('initClientGame', (gameParams: GameInitInfo) => {
             this.dialogRef.close();
             this.router.navigate(['/game']);
-            // this.multiManService.initializeGame2(game);
-            this.socket.emit('deleteRoom');
+            this.gameService.initializeGame(gameParams);
+            this.socket.emit('deleteWaitingAreaRoom');
         });
-        this.socket.on('roomdeleted', (game: WaitingAreaGameParameters) => {
+        this.socket.on('waitingAreaRoomDeleted', (game: WaitingAreaGameParameters) => {
             this.joindre = false;
             this.nameValid = false;
             this.gameCancelled = true;
@@ -172,7 +175,7 @@ export class WaitingAreaComponent {
             this.gameList.localPlayerRoomInfo.gameRoom = game.gameRoom;
             this.playerList = this.gameList.localPlayerRoomInfo.gameRoom.playersName;
         });
-        this.socket.on('roomcreated', (game: WaitingAreaGameParameters) => {
+        this.socket.on('waitingAreaRoomCreated', (game: WaitingAreaGameParameters) => {
             this.gameList.localPlayerRoomInfo = game;
             this.playerList = this.gameList.localPlayerRoomInfo.gameRoom.playersName;
         });
