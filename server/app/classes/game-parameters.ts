@@ -4,6 +4,7 @@ import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
 import { Square } from './square';
+import { scrabbleLetterstoString } from './utilities';
 import { Difficulty, VirtualPlayer } from './virtual-player';
 
 export const GAME_CAPACITY = 2;
@@ -108,19 +109,21 @@ export class GameParameters {
     }
 
     // TODO: method is a work in progress, to adapt as needed and see if the method works.
-    // convertToVirtualPlayer(previousPlayerIndex: number, virtualPlayerName: string, difficulty: Difficulty): boolean {
-    //     const isValidIndex = previousPlayerIndex > -1 && previousPlayerIndex < this.players.length;
-    //     if (isValidIndex) {
-    //         const previousPlayer = this.players[previousPlayerIndex];
-    //         const newVirtualPlayer = new VirtualPlayer(virtualPlayerName, scrabbleLetterstoString(previousPlayer.letters), difficulty);
-    //         newVirtualPlayer.isActive = previousPlayer.isActive;
-    //         newVirtualPlayer.score = previousPlayer.score;
-    //         newVirtualPlayer.isWinner = previousPlayer.isWinner; // probably wouldn't need that line
-    //         newVirtualPlayer.roomId = previousPlayer.roomId; // does a vp need a room id?
-    //         this.players[previousPlayerIndex] = newVirtualPlayer;
-    //         this.gameMode = GameType.Solo;
-    //     }
-    //     return isValidIndex;
-    // }
+    // see if we want to leave method here or elsewhere
+    convertToVirtualPlayer(previousPlayerIndex: number, virtualPlayerName: string): VirtualPlayer | undefined {
+        let newVirtualPlayer = undefined;
+        const isValidIndex = previousPlayerIndex > -1 && previousPlayerIndex < this.players.length;
+        if (isValidIndex) {
+            const previousPlayer = this.players[previousPlayerIndex];
+            newVirtualPlayer = new VirtualPlayer(virtualPlayerName, scrabbleLetterstoString(previousPlayer.letters), Difficulty.Easy);
+            newVirtualPlayer.isActive = previousPlayer.isActive;
+            newVirtualPlayer.score = previousPlayer.score;
+            newVirtualPlayer.isWinner = previousPlayer.isWinner; // probably wouldn't need that line
+            newVirtualPlayer.roomId = previousPlayer.roomId; // does a vp need a room id?
+            this.players[previousPlayerIndex] = newVirtualPlayer;
+            this.gameMode = GameType.Solo;
+        }
+        return newVirtualPlayer;
+    }
 }
 
