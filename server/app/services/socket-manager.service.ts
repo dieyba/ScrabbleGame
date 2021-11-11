@@ -1,5 +1,5 @@
 /* eslint-disable */ // TODO Remove and fix lint errors
-import { GameParameters, WaitingAreaGameParameters } from '@app/classes/game-parameters';
+import { GameParameters, GAME_CAPACITY, WaitingAreaGameParameters } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import * as http from 'http';
 import * as io from 'socket.io';
@@ -37,9 +37,8 @@ export class SocketManagerService {
                 this.deleteWaitingAreaRoom(socket);
                 this.getAllWaitingAreaGames(socket);
             });
-            socket.on('joinWaitingAreaRoom', (game: any) => {
-                console.log("received joinWaitingAreaRoom emit");
-                this.joinRoom(socket, game);
+            socket.on('joinWaitingAreaRoom', (joinerName: string, roomToJoinId: number) => {
+                this.joinRoom(socket, joinerName, roomToJoinId);
                 this.getAllWaitingAreaGames(socket);
             });
             socket.on('initializeMultiPlayerGame', () => {
@@ -119,7 +118,7 @@ export class SocketManagerService {
             creatorPlayer.roomId = gameParams.gameRoom.idGame;
             newRoom.gameRoom.creatorId = socket.id;
             socket.join(newRoom.gameRoom.idGame.toString());
-            console.log(gameParams.creatorName, ' created a game in waiting');
+            console.log(gameParams.creatorName, ' created a game in waiting of id', newRoom.gameRoom.idGame);
             this.sio.emit('waitingAreaRoomCreated', newRoom);
         }
     }
@@ -161,18 +160,21 @@ export class SocketManagerService {
     private getAllWaitingAreaGames(socket: io.Socket) {
         this.sio.emit('updateWaitingAreaGames', this.gameListMan.getAllWaitingAreaGames());
     }
-    private joinRoom(socket: io.Socket, joinerName: string) {
+    private joinRoom(socket: io.Socket, joinerName: string, roomToJoinId: number) {
         let joiner = this.playerMan.getPlayerBySocketID(socket.id);
         if (joiner === undefined) {
             return;
         }
-        let waitingAreaGame = this.gameListMan.getAWaitingAreaGame(joiner.roomId);
-        if (waitingAreaGame !== undefined) {
+        let waitingAreaGame = this.gameListMan.getAWaitingAreaGame(roomToJoinId);
+        if (waitingAreaGame !== undefined && waitingAreaGame.gameRoom.playersName.length < GAME_CAPACITY) {
+            // TODO: move the addplayer method from game params to waiting game params
             waitingAreaGame.joinerName = joinerName;
             waitingAreaGame.gameRoom.joinerId = socket.id;
+            waitingAreaGame.gameRoom.playersName.push(joinerName);
             socket.join(waitingAreaGame.gameRoom.idGame.toString());
             console.log(waitingAreaGame.joinerName, ' joined game of ', waitingAreaGame.creatorName);
-            this.sio.to(waitingAreaGame.gameRoom.idGame.toString()).emit('roomJoined');
+            console.log('room id:', waitingAreaGame.gameRoom.idGame);
+            this.sio.to(waitingAreaGame.gameRoom.idGame.toString()).emit('roomJoined', waitingAreaGame);
         }
     }
     private initializeMultiPlayerGame(socket: io.Socket) {
@@ -180,13 +182,13 @@ export class SocketManagerService {
         if (creatorPlayer === undefined) {
             return;
         }
-        // TODO: make sure player socket info are init when creating room and joining room
         let waitingAreaGame = this.gameListMan.getAWaitingAreaGame(creatorPlayer.roomId);
         if (waitingAreaGame === undefined) {
             return;
         }
         const serverGameParams = new GameParameters(waitingAreaGame);
         // TODO: probably not necessary, normally the creator and joiner order should be fixed
+        console.log('initializing multiplayer game id:', waitingAreaGame.gameRoom.idGame);
         if (serverGameParams.players[0].name === waitingAreaGame.creatorName) {
             serverGameParams.players[0].socketId = waitingAreaGame.gameRoom.creatorId;
             serverGameParams.players[1].socketId = waitingAreaGame.gameRoom.joinerId;
@@ -197,6 +199,7 @@ export class SocketManagerService {
         const newGame = new GameService(this.validationService, this.wordBuilderService);
         this.gameListMan.addGameInPlay(newGame);
         const clientInitParams = newGame.initializeGame(serverGameParams);
+        newGame.game.gameRoomId = waitingAreaGame.gameRoom.idGame;
         this.sio.to(waitingAreaGame.gameRoom.idGame.toString()).emit('initClientGame', clientInitParams);
     }
 
@@ -215,6 +218,7 @@ export class SocketManagerService {
         const newGame = new GameService(this.validationService, this.wordBuilderService);
         const clientInitParams = newGame.initializeGame(serverGameParams);
         this.gameListMan.addSoloGame(newGame);
+        newGame.game.gameRoomId = clientGameParams.gameRoom.idGame;
         this.sio.to(socket.id).emit('initClientGame', clientInitParams);
     }
 

@@ -61,10 +61,12 @@ export class GameParameters {
         this.gameMode = clientParametersChosen.gameMode;
         this.players = new Array<Player>();
         this.dictionary = new Dictionary(clientParametersChosen.dictionaryType);
-        this.players.push(new Player(clientParametersChosen.creatorName, ''));
+        this.players.push(new Player(clientParametersChosen.creatorName, clientParametersChosen.gameRoom.creatorId));
         if (clientParametersChosen.gameMode === GameType.Solo) {
             // TODO: add how to set up vp difficulty
             this.players.push(new VirtualPlayer(clientParametersChosen.joinerName, '', Difficulty.Easy));
+        } else {
+            this.players.push(new Player(clientParametersChosen.joinerName, clientParametersChosen.gameRoom.joinerId));
         }
         this.totalCountDown = clientParametersChosen.totalCountDown;
         this.timerMs = +this.totalCountDown;
@@ -90,13 +92,13 @@ export class GameParameters {
         return playerToFind;
     }
 
-    // to add the joiner player if it's a multiplayer game
-    addPlayer(joinerName: string, joinerSocketId: string) {
-        if (this.players.length < GAME_CAPACITY) {
-            this.players.push(new Player(joinerName, ''));
-            this.players[GAME_CAPACITY].socketId = joinerSocketId;
-        }
-    }
+    // // to add the joiner player if it's a multiplayer game (move to waiting area parameters instead)
+    // addPlayer(joinerName: string, joinerSocketId: string) {
+    //     if (this.players.length < GAME_CAPACITY) {
+    //         this.players.push(new Player(joinerName, ''));
+    //         this.players[GAME_CAPACITY].socketId = joinerSocketId;
+    //     }
+    // }
 
     // removes a player from the game parameters players[] and returns it
     removePlayer(playerId: string): Player | undefined {

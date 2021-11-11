@@ -34,6 +34,9 @@ export class GameService {
         this.game = gameParams;
         const starterPlayerIndex = Math.round(Math.random()); // initialize random starter player
         this.game.players[starterPlayerIndex].isActive = true;
+        this.game.players.forEach(player => {
+            this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+        });
         const clientInitParams: ClientGameInitParameters = {
             players: this.game.players,
             totalCountDown: this.game.totalCountDown,
