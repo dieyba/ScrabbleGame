@@ -76,6 +76,15 @@ export class WaitingAreaComponent {
         this.gameList.someoneLeftRoom();
     }
 
+    randomGame() {
+        let randomFloat = Math.random() * (this.list.length - 1);
+        randomFloat = Math.floor(randomFloat);
+        console.log(randomFloat);
+        this.selectedGame = this.list[randomFloat];
+        this.openName(true);
+        console.log(this.selectedGame);
+    }
+
     onSelect(game: GameParameters): GameParameters {
         if (this.gameSelected) {
             this.selectedGame = game;
