@@ -32,7 +32,6 @@ export class GameListService {
         this.socket.emit('deleteWaitingAreaRoom');
     }
     start(game: WaitingAreaGameParameters, name: string): void {
-        console.log(name, " pressed join button to join roomid ", game.gameRoom.idGame);
         this.socket.emit('joinWaitingAreaRoom', name, game.gameRoom.idGame);
     }
     initializeMultiplayerGame() {

@@ -110,7 +110,6 @@ export class GameService {
         this.game.scrabbleBoard = new ScrabbleBoard(initInfo.boardSquares);
         this.game.stock = initInfo.stock;
         this.game.isEndGame = false;
-        console.log('initializedGame:', this.game);
     }
     startNewGame() {
         this.isOpponentTurnSubject = new BehaviorSubject<boolean>(this.game.players[this.opponentPlayerIndex].isActive);

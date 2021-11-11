@@ -1,6 +1,5 @@
 /* eslint-disable */ // TODO Remove and fix lint errors
 import { GameParameters, GAME_CAPACITY, WaitingAreaGameParameters } from '@app/classes/game-parameters';
-import { Player } from '@app/classes/player';
 import * as http from 'http';
 import * as io from 'socket.io';
 import { GameListManager } from './game-list-manager.service';
@@ -117,8 +116,8 @@ export class SocketManagerService {
             creatorPlayer.name = gameParams.creatorName;
             creatorPlayer.roomId = gameParams.gameRoom.idGame;
             newRoom.gameRoom.creatorId = socket.id;
+            // newRoom.gameRoom.playersName.push(creatorPlayer.name); // do we really need .players[] in server
             socket.join(newRoom.gameRoom.idGame.toString());
-            console.log(gameParams.creatorName, ' created a game in waiting of id', newRoom.gameRoom.idGame);
             this.sio.emit('waitingAreaRoomCreated', newRoom);
         }
     }
@@ -167,13 +166,14 @@ export class SocketManagerService {
         }
         let waitingAreaGame = this.gameListMan.getAWaitingAreaGame(roomToJoinId);
         if (waitingAreaGame !== undefined && waitingAreaGame.gameRoom.playersName.length < GAME_CAPACITY) {
-            // TODO: move the addplayer method from game params to waiting game params
+            // TODO: create a method so we don't forget to init some parameters? same when creator player creates waiting room
+            joiner.name = joinerName;
+            joiner.roomId = waitingAreaGame.gameRoom.idGame;
+            joiner.socketId = socket.id
             waitingAreaGame.joinerName = joinerName;
             waitingAreaGame.gameRoom.joinerId = socket.id;
             waitingAreaGame.gameRoom.playersName.push(joinerName);
             socket.join(waitingAreaGame.gameRoom.idGame.toString());
-            console.log(waitingAreaGame.joinerName, ' joined game of ', waitingAreaGame.creatorName);
-            console.log('room id:', waitingAreaGame.gameRoom.idGame);
             this.sio.to(waitingAreaGame.gameRoom.idGame.toString()).emit('roomJoined', waitingAreaGame);
         }
     }
@@ -188,7 +188,6 @@ export class SocketManagerService {
         }
         const serverGameParams = new GameParameters(waitingAreaGame);
         // TODO: probably not necessary, normally the creator and joiner order should be fixed
-        console.log('initializing multiplayer game id:', waitingAreaGame.gameRoom.idGame);
         if (serverGameParams.players[0].name === waitingAreaGame.creatorName) {
             serverGameParams.players[0].socketId = waitingAreaGame.gameRoom.creatorId;
             serverGameParams.players[1].socketId = waitingAreaGame.gameRoom.joinerId;
@@ -223,7 +222,7 @@ export class SocketManagerService {
     }
 
     private displayChatEntry(socket: io.Socket, message: string) {
-        const sender = this.playerMan.getPlayerBySocketID(socket.id) as Player;
+        const sender = this.playerMan.getPlayerBySocketID(socket.id);
         if (sender !== undefined) {
             const senderName = sender.name;
             const roomId = sender.roomId.toString();
@@ -233,7 +232,10 @@ export class SocketManagerService {
     }
     private displayDifferentChatEntry(socket: io.Socket, messageToSender: string, messageToOpponent: string) {
         const senderId = socket.id;
-        const sender = this.playerMan.getPlayerBySocketID(senderId) as Player;
+        const sender = this.playerMan.getPlayerBySocketID(senderId);
+        if (sender === undefined) {
+            return;
+        }
         const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.game.getOtherPlayerInRoom(senderId);
         if (opponent !== undefined) {
             const opponentId = opponent.socketId;
@@ -259,9 +261,11 @@ export class SocketManagerService {
         }
     }
     private displaySystemChatEntry(socket: io.Socket, message: string) {
-        const player = this.playerMan.getPlayerBySocketID(socket.id) as Player;
-        const roomId = player.roomId.toString();
-        this.sio.in(roomId).emit('addSystemChatEntry', message);
+        const player = this.playerMan.getPlayerBySocketID(socket.id);
+        if (player !== undefined) {
+            const roomId = player.roomId.toString();
+            this.sio.in(roomId).emit('addSystemChatEntry', message);
+        }
     }
 
     // // TODO: see how place method and validation service will work. game service will probably be the one emitting?

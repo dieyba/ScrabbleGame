@@ -71,26 +71,27 @@ export class TextEntryService {
      */
     handleInput(userInput: string) {
         userInput = trimSpaces(userInput);
-        if (!isEmpty(userInput)) {
-            const isACommand = userInput.startsWith('!') && !this.gameService.game.isEndGame;
-            if (!isACommand) {
-                // TODO: toujours envoyer message au serveur maintenant
-                if (this.gameService.game.gameMode === GameType.MultiPlayer) {
-                    this.chatDisplayService.sendMessageToServer(this.gameService.game.players[this.gameService.localPlayerIndex].name + ' >> ' + userInput);
-                } else {
-                    this.chatDisplayService.addEntry(createPlayerEntry(true, this.gameService.game.players[this.gameService.localPlayerIndex].name, userInput));
-                }
+        if (isEmpty(userInput)) {
+            return;
+        }
+        const isACommand = userInput.startsWith('!') && !this.gameService.game.isEndGame;
+        if (!isACommand) {
+            if (this.gameService.game.gameMode === GameType.MultiPlayer) {
+                this.chatDisplayService.sendMessageToServer(this.gameService.game.players[this.gameService.localPlayerIndex].name + ' >> ' + userInput);
             } else {
-                const commandCreationResult = this.createCommand(userInput, this.gameService.game.players[this.gameService.localPlayerIndex]);
-                const isCreated = commandCreationResult instanceof Command;
-                if (isCreated) {
-                    // execute command takes care of sending and displaying messages after execution
-                    this.commandInvokerService.executeCommand(commandCreationResult as Command);
-                } else {
-                    this.chatDisplayService.addEntry(createErrorEntry(commandCreationResult as ErrorType, userInput));
-                }
+                this.chatDisplayService.addEntry(createPlayerEntry(true, this.gameService.game.players[this.gameService.localPlayerIndex].name, userInput));
+            }
+        } else {
+            const commandCreationResult = this.createCommand(userInput, this.gameService.game.players[this.gameService.localPlayerIndex]);
+            const isCreated = commandCreationResult instanceof Command;
+            if (isCreated) {
+                // execute command takes care of sending and displaying messages after execution
+                this.commandInvokerService.executeCommand(commandCreationResult as Command);
+            } else {
+                this.chatDisplayService.addEntry(createErrorEntry(commandCreationResult as ErrorType, userInput));
             }
         }
+
     }
 
     createCommand(commandInput: string, player: Player): CommandCreationResult {

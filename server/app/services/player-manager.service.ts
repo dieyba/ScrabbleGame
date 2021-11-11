@@ -17,7 +17,6 @@ export class PlayerManagerService {
         return undefined;
     }
 
-    // TODO : Shouldn't we check it's not already in there before adding a new player?
     addPlayer(socketId: string, playerName?: string,): Player | undefined {
         let newPlayer = undefined;
         if (this.getPlayerBySocketID(socketId) === undefined) {

@@ -92,14 +92,6 @@ export class GameParameters {
         return playerToFind;
     }
 
-    // // to add the joiner player if it's a multiplayer game (move to waiting area parameters instead)
-    // addPlayer(joinerName: string, joinerSocketId: string) {
-    //     if (this.players.length < GAME_CAPACITY) {
-    //         this.players.push(new Player(joinerName, ''));
-    //         this.players[GAME_CAPACITY].socketId = joinerSocketId;
-    //     }
-    // }
-
     // removes a player from the game parameters players[] and returns it
     removePlayer(playerId: string): Player | undefined {
         const playerToRemove = this.getPlayerBySocketId(playerId);

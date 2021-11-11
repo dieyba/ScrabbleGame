@@ -3,7 +3,6 @@
 import { ClientGameInitParameters, GameParameters } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { VirtualPlayer } from '@app/classes/virtual-player';
 // import { BehaviorSubject, Observable } from 'rxjs'; TODO: is there a server version of observable? if not leave vp on client 
 import { Service } from 'typedi';
 import { ValidationService } from './validation.service';
@@ -41,14 +40,13 @@ export class GameService {
             players: this.game.players,
             totalCountDown: this.game.totalCountDown,
             scrabbleBoard: this.game.scrabbleBoard.squares,
-            stock: this.game.stock.letterStock, // stock is scrabbleLetters[] or string?
+            stock: this.game.stock.letterStock,
             gameMode: this.game.gameMode,
         }
-        console.log('init game of id:', this.game.gameRoomId, ' (should still be undefined if solo)');
-        console.log('creator:', this.game.players[0].name);
-        console.log('opponent:', this.game.players[1].name);
-        console.log('creator is normal player:', this.game.players[0] instanceof Player);
-        console.log('opponent is a jv:', this.game.players[1] instanceof VirtualPlayer, '\n');
+        // console.log('creator:', this.game.players[0].name);
+        // console.log('opponent:', this.game.players[1].name);
+        // console.log('creator is normal player:', this.game.players[0] instanceof Player);
+        // console.log('opponent is a jv:', this.game.players[1] instanceof VirtualPlayer, '\n');
         return clientInitParams;
     }
     startGame() {
