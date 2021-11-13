@@ -1,18 +1,19 @@
+
+// TODO: finish adapting to isLOG2990 choice selection in form 
+
 import { Component, HostListener, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DictionaryType } from '@app/classes/dictionary';
-import { GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
-import { GameInitInfo } from '@app/classes/server-message';
+import { GameInitInfo, GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
 import { FormComponent, GAME_CAPACITY } from '@app/components/form/form.component';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-/* eslint-disable  @typescript-eslint/no-magic-numbers */
+
 @Component({
     selector: 'app-waiting-area',
     templateUrl: './waiting-area.component.html',
@@ -28,12 +29,6 @@ export class WaitingAreaComponent {
     isStarting: boolean;
 
     // TODO: rename the booleans according to convention
-    // name: boolean; the hell does this do?
-    // error: boolean; the hell does this do?
-    // isNameValid: boolean;
-    // joindre: boolean; the hell does this do?
-    // isFull: boolean;
-    // isGameCancelled: boolean;
     name: boolean;
     error: boolean;
     nameValid: boolean;
@@ -65,6 +60,7 @@ export class WaitingAreaComponent {
                 GAME_CAPACITY,
                 DictionaryType.Default,
                 0,
+                false,
                 false,
                 '',
             );

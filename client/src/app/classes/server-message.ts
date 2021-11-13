@@ -1,9 +1,5 @@
-import { GameType } from "./game-parameters";
-import { Player } from "./player";
 import { ScrabbleLetter } from "./scrabble-letter";
-import { Square } from "./square";
 import { Axis } from "./utilities";
-
 
 export interface BoardUpdate {
     word: string,
@@ -19,10 +15,3 @@ export interface LettersUpdate {
     newScore?: number;
 }
 
-export interface GameInitInfo {
-    players: Player[];
-    totalCountDown: number;
-    boardSquares: Square[][];
-    stock: ScrabbleLetter[];
-    gameMode: GameType;
-}

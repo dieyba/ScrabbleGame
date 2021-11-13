@@ -27,7 +27,7 @@ export class PlayerManagerService {
         return newPlayer;
     }
 
-    // // TODO: do we need a remove player method too?
+    // // TODO: do we need a remove player method too? only if socket is disconnected
     // removePlayer(socketId: string) {
     //     const playerArrayIndex = this.allPlayers.findIndex((p) => p.socketId === socketId);
     //     if (playerArrayIndex !== ERROR_NUMBER) {

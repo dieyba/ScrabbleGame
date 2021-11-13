@@ -1,10 +1,10 @@
+
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DictionaryType } from '@app/classes/dictionary';
-import { GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
-import { GameInitInfo } from '@app/classes/server-message';
+import { GameInitInfo, GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
@@ -12,7 +12,7 @@ import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
-export const GAME_CAPACITY = 2; // TODO: to change if we implement games with 2-4 players 
+export const GAME_CAPACITY = 2;
 
 @Component({
     selector: 'app-form',
@@ -27,6 +27,8 @@ export class FormComponent implements OnInit {
     level: FormControl;
     opponent: FormControl;
     dictionaryForm: FormControl;
+
+    isLOG2990: boolean;
     debutantNameList: string[]; // TODO: and expert too
     dictionaryList: string[];
     selectedPlayer: string;
@@ -45,6 +47,7 @@ export class FormComponent implements OnInit {
         private gameList: GameListService,
         @Inject(MAT_DIALOG_DATA) public isSolo: boolean,
     ) {
+        this.isLOG2990 = false; // TODO: implement actual isLOG2990 depending on which page created the form
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.defaultTimer = '60';
@@ -94,8 +97,10 @@ export class FormComponent implements OnInit {
     }
 
     randomPlayer(list: string[]): void {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        document.getElementById('opponents')!.style.visibility = 'visible';
+        let showOpponents = document.getElementById('opponents'); // make sure it is not null
+        if (showOpponents instanceof HTMLElement) {
+            showOpponents.style.visibility = 'visible';
+        }
         this.randomPlayerId = this.randomNumber(0, list.length);
         do {
             this.randomPlayerId = this.randomNumber(0, list.length);
@@ -119,19 +124,20 @@ export class FormComponent implements OnInit {
 
     submit(): void {
         if (this.myForm.valid) {
+            const gameMode = this.isSolo ? GameType.Solo : GameType.MultiPlayer;
             let gameParams = new WaitingAreaGameParameters(
-                GameType.MultiPlayer,
+                gameMode,
                 GAME_CAPACITY,
                 this.dictionaryForm.value,
                 this.timer.value,
                 this.bonus.value,
-                this.name.value,
+                this.isLOG2990,
+                this.name.value, // game creator name
             );
-            if (this.isSolo === true) {
+            if (gameMode === GameType.Solo) {
                 this.closeDialog();
-                gameParams.gameMode = GameType.Solo;
                 gameParams.joinerName = this.opponent.value;
-                this.gameService.game.gameMode = GameType.Solo; // to make sure the service is constructed prior to initialization. Does it work?
+                this.gameService.game.gameMode = GameType.Solo; // TODO: to make sure the service is constructed prior to initialization. is this needed?
                 this.socket.emit('initializeSoloGame', gameParams);
             } else {
                 this.closeDialog();

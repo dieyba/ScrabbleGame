@@ -1,3 +1,6 @@
+// TODO: go put back what we had in sprint2
+
+
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';

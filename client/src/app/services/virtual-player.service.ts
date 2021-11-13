@@ -1,9 +1,6 @@
-
-// TODO: needs some service that are on client (placeService, commandInvoker mostly) and some on the server (wordbuilder, validation)
-// Could leave vp service on client and add some emit with promise or make a vp service on server to handle the server part of vp. à voir 
-
 import { Injectable } from '@angular/core';
 import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
+import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { ExchangeCmd } from '@app/classes/exchange-command';
 import { PassTurnCmd } from '@app/classes/pass-command';
 import { PlaceCmd } from '@app/classes/place-command';
@@ -13,10 +10,12 @@ import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis, ERROR_NUMBER } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
+import { BonusService } from './bonus.service';
 import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
 import { GridService } from './grid.service';
 import { PlaceService } from './place.service';
+import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
     EndTurn = 100, // TODO: put the right probability settings after testing
@@ -34,7 +33,7 @@ export enum Points {
 
 const DEFAULT_VIRTUAL_PLAYER_WAIT_TIME = 3000;
 const NO_MOVE_TOTAL_WAIT_TIME = 20000;
-// const POINTS_INTERVAL = 5;
+const POINTS_INTERVAL = 5;
 const PERCENTAGE = 100;
 const POSITION_ERROR = -1;
 
@@ -47,10 +46,12 @@ export class VirtualPlayerService {
     player: Player;
 
     constructor(
+        private bonusService: BonusService,
+        private commandInvoker: CommandInvokerService,
+        private gameService: GameService,
         private gridService: GridService,
         private placeService: PlaceService,
-        private gameService: GameService,
-        private commandInvoker: CommandInvokerService,
+        private wordBuilderService: WordBuilderService,
     ) {
         this.rack = new ScrabbleRack();
     }
@@ -205,19 +206,18 @@ export class VirtualPlayerService {
                             orientation: axis,
                         };
                         if (this.placeService.canPlaceWord(placeParams)) {
-                            // TODO: adapt this once we know how the vp service is going to work with the new architecture
-                            // if (this.bonusService.totalValue(list[l]) > points || this.bonusService.totalValue(list[l]) < points - POINTS_INTERVAL) {
-                            //     list.splice(l);
-                            // } else {
-                            //     const currentWord = list[l].stringify();
-                            //     const position = this.findPosition(list[l], axis);
-                            //     const otherWords: ScrabbleWord[] = this.wordBuilderService.buildWordsOnBoard(currentWord, position, axis);
-                            //     let sum = 0;
-                            //     for (const word of otherWords) {
-                            //         sum += word.value;
-                            //     }
-                            //     if (sum > points) list.splice(l);
-                            // }
+                            if (this.bonusService.totalValue(list[l]) > points || this.bonusService.totalValue(list[l]) < points - POINTS_INTERVAL) {
+                                list.splice(l);
+                            } else {
+                                const currentWord = list[l].stringify();
+                                const position = this.findPosition(list[l], axis);
+                                const otherWords: ScrabbleWord[] = this.wordBuilderService.buildWordsOnBoard(currentWord, position, axis);
+                                let sum = 0;
+                                for (const word of otherWords) {
+                                    sum += word.value;
+                                }
+                                if (sum > points) list.splice(l);
+                            }
                             movesFound = list.length;
                         }
                     }
@@ -271,8 +271,7 @@ export class VirtualPlayerService {
                         message += ' '; // If it's the last letter
                     } else message += '  '; // If it's not
                 }
-                // TODO: adapt once we know how vp is going to work with new architecture
-                // message += this.bonusService.totalValue(i) + '\n'; // Add score for each move
+                message += this.bonusService.totalValue(i) + '\n'; // Add score for each move
             }
         return message;
     }
@@ -341,11 +340,10 @@ export class VirtualPlayerService {
         return listOfTiles;
     }
     isWordValid(word: string): boolean {
-        // Other function to validate words locally.
-        // TODO: adapt this once we know how vp is going to work with new project architecture
-        // return this.validationService.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'")
-        //     ? true
-        //     : false;
-        return true;
+        // TODO: see where to access dictionary downloaded
+        const dictionary: Dictionary = new Dictionary(DictionaryType.Default);
+        return dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'")
+            ? true
+            : false;
     }
 }

@@ -1,3 +1,5 @@
+// TODO: copy this back on client, server only needs the take letters from stock and LetterStock attributes
+
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 
 enum LetterQuantity {
@@ -95,15 +97,15 @@ export class LetterStock {
         this.addLettersToStock(new ScrabbleLetter('*', LetterValue.Star), LetterQuantity.Star); // *
     }
 
-    takeLetter(letter: string): ScrabbleLetter {
-        for (let i = 0; i < this.letterStock.length; i++) {
-            if (this.letterStock[i].character === letter) {
-                this.letterStock.splice(i, 1);
-                return this.letterStock[i];
-            }
-        }
-        return new ScrabbleLetter('');
-    }
+    // takeLetter(letter: string): ScrabbleLetter {
+    //     for (let i = 0; i < this.letterStock.length; i++) {
+    //         if (this.letterStock[i].character === letter) {
+    //             this.letterStock.splice(i, 1);
+    //             return this.letterStock[i];
+    //         }
+    //     }
+    //     return new ScrabbleLetter('');
+    // }
 
     isEmpty(): boolean {
         return this.letterStock.length === 0;
@@ -128,13 +130,13 @@ export class LetterStock {
         return lettersRemovedFromStock;
     }
 
-    exchangeLetters(playerLetters: ScrabbleLetter[]): ScrabbleLetter[] {
-        const randomLetters = this.takeLettersFromStock(playerLetters.length);
+    // exchangeLetters(playerLetters: ScrabbleLetter[]): ScrabbleLetter[] {
+    //     const randomLetters = this.takeLettersFromStock(playerLetters.length);
 
-        for (const letters of playerLetters) {
-            this.letterStock.push(letters);
-        }
+    //     for (const letters of playerLetters) {
+    //         this.letterStock.push(letters);
+    //     }
 
-        return randomLetters;
-    }
+    //     return randomLetters;
+    // }
 }

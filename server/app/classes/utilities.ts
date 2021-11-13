@@ -1,3 +1,5 @@
+// TODO: do we need some things from here on the server? delete the rest
+
 import { Column, Row } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
 import { Vec2 } from './vec2';

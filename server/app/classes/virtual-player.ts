@@ -1,19 +1,18 @@
-// TODO: see if we want vp service on server or client
-// Would make sense on server, but see what are the dependency of vp service and client services.
 
-import { Player } from './player';
+// TODO: to delete if we initalize virtual players only in client (so for solo games not needing the server)
 
-export enum Difficulty {
-    Easy = 'easy',
-    Difficult = 'difficult',
-}
+// import { Player } from './player';
 
-export class VirtualPlayer extends Player {
-    difficulty: Difficulty;
+// export enum Difficulty {
+//     Easy = 'easy',
+//     Difficult = 'difficult',
+// }
 
-    constructor(name: string, socketId: string, difficulty: Difficulty) {
-        super(name, socketId)
-        this.difficulty = difficulty;
-    }
+// export class VirtualPlayer extends Player {
+//     difficulty: Difficulty;
 
-}
+//     constructor(name: string, socketId: string, difficulty?: Difficulty) {
+//         super(name, socketId)
+//         this.difficulty = difficulty !== undefined ? difficulty : Difficulty.Easy;
+//     }
+// }
