@@ -77,12 +77,12 @@ export class TextEntryService {
         const isACommand = userInput.startsWith('!') && !this.gameService.game.isEndGame;
         if (!isACommand) {
             if (this.gameService.game.gameMode === GameType.MultiPlayer) {
-                this.chatDisplayService.sendMessageToServer(this.gameService.game.players[this.gameService.localPlayerIndex].name + ' >> ' + userInput);
+                this.chatDisplayService.sendMessageToServer(this.gameService.game.getLocalPlayer().name + ' >> ' + userInput);
             } else {
-                this.chatDisplayService.addEntry(createPlayerEntry(true, this.gameService.game.players[this.gameService.localPlayerIndex].name, userInput));
+                this.chatDisplayService.addEntry(createPlayerEntry(true, this.gameService.game.getLocalPlayer().name, userInput));
             }
         } else {
-            const commandCreationResult = this.createCommand(userInput, this.gameService.game.players[this.gameService.localPlayerIndex]);
+            const commandCreationResult = this.createCommand(userInput, this.gameService.game.getLocalPlayer());
             const isCreated = commandCreationResult instanceof Command;
             if (isCreated) {
                 // execute command takes care of sending and displaying messages after execution

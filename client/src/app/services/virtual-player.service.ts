@@ -57,7 +57,7 @@ export class VirtualPlayerService {
     }
     playTurn(): void {
         // Next sprint: implement difficult player type logic by separating here and in virtualPlayerService.makeMoves().
-        this.player = this.gameService.game.players[this.gameService.opponentPlayerIndex];
+        this.player = this.gameService.game.getOpponent();
         const defaultParams: DefaultCommandParams = {
             player: this.player,
             serviceCalled: this.gameService,

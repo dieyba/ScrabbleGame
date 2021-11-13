@@ -33,14 +33,14 @@ export class ExchangeService {
     }
 
     exchange() {
-        const defaultParams: DefaultCommandParams = { player: this.gameService.game.players[this.gameService.localPlayerIndex], serviceCalled: this.gameService };
+        const defaultParams: DefaultCommandParams = { player: this.gameService.game.getLocalPlayer(), serviceCalled: this.gameService };
         const letters = this.gameService.getLettersSelected();
         const command = new ExchangeCmd(defaultParams, letters);
         this.commandInvokerService.executeCommand(command);
     }
 
     cancelExchange() {
-        for (let i = 1; i <= this.gameService.game.players[this.gameService.localPlayerIndex].letters.length; i++) {
+        for (let i = 1; i <= this.gameService.game.getLocalPlayer().letters.length; i++) {
             this.rackService.deselect(i, this.rackService.gridContext, true);
         }
     }

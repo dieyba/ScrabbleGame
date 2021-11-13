@@ -157,7 +157,7 @@ export class WaitingAreaComponent {
         this.socket.on('initClientGame', (gameParams: GameInitInfo) => {
             this.dialogRef.close();
             this.router.navigate(['/game']);
-            this.gameService.initializeGame(gameParams);
+            this.gameService.initializeMultiplayerGame(gameParams);
             this.socket.emit('deleteWaitingAreaRoom');
         });
         this.socket.on('waitingAreaRoomDeleted', (game: WaitingAreaGameParameters) => {

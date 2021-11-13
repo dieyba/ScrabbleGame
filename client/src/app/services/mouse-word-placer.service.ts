@@ -42,7 +42,7 @@ export class MouseWordPlacerService {
     }
     onMouseClick(e: MouseEvent) {
         if (
-            !this.gameService.game.players[this.gameService.localPlayerIndex].isActive ||
+            !this.gameService.game.getLocalPlayer().isActive ||
             this.currentWord.length > 0 ||
             this.gameService.game.isEndGame
         )
@@ -90,7 +90,7 @@ export class MouseWordPlacerService {
         }
     }
     onKeyDown(e: KeyboardEvent) {
-        if (this.gameService.game.players[this.gameService.localPlayerIndex].isActive === false) return;
+        if (this.gameService.game.getLocalPlayer().isActive === false) return;
         if (this.initialPosition.x === 0 && this.initialPosition.y === 0) return;
         const keyPressed = e.key;
         switch (keyPressed) {
@@ -260,7 +260,7 @@ export class MouseWordPlacerService {
     confirmWord() {
         const posArray = this.companionService.convertPositionToGridIndex(this.initialPosition);
         const posVec = new Vec2(posArray[0], posArray[1]);
-        const defaultParams: DefaultCommandParams = { player: this.gameService.game.players[this.gameService.localPlayerIndex], serviceCalled: this.gameService };
+        const defaultParams: DefaultCommandParams = { player: this.gameService.game.getLocalPlayer(), serviceCalled: this.gameService };
         const params: PlaceParams = { position: posVec, orientation: this.currentAxis, word: this.wordString };
         // Refund letters to rack before placing
         this.removeAllLetters();

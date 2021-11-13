@@ -26,17 +26,17 @@ export class SidebarComponent {
     }
     roomLeft() {
         this.socket.on('roomLeft', () => {
-            this.gameService.game.players[this.gameService.localPlayerIndex].isWinner = true;
+            this.gameService.game.getLocalPlayer().isWinner = true;
             this.gameService.game.isEndGame = true;
         });
     }
 
     getPlayer1Name(): string {
-        return this.gameService.game.players[this.gameService.localPlayerIndex].name;
+        return this.gameService.game.getLocalPlayer().name;
     }
 
     getPlayer2Name(): string {
-        return this.gameService.game.players[this.gameService.opponentPlayerIndex].name;
+        return this.gameService.game.getOpponent().name;
     }
 
     getLettersLeftCount(): number {
@@ -44,27 +44,27 @@ export class SidebarComponent {
     }
 
     getPlayer1LetterCount(): number {
-        return this.gameService.game.players[this.gameService.localPlayerIndex].letters.length;
+        return this.gameService.game.getLocalPlayer().letters.length;
     }
 
     getPlayer2LetterCount(): number {
-        return this.gameService.game.players[this.gameService.opponentPlayerIndex].letters.length;
+        return this.gameService.game.getOpponent().letters.length;
     }
 
     getPlayer1Score(): number {
-        return this.gameService.game.players[this.gameService.localPlayerIndex].score;
+        return this.gameService.game.getLocalPlayer().score;
     }
 
     getPlayer2Score(): number {
-        return this.gameService.game.players[this.gameService.opponentPlayerIndex].score;
+        return this.gameService.game.getOpponent().score;
     }
 
     isPlayer1Active(): boolean {
-        return this.gameService.game.players[this.gameService.localPlayerIndex].isActive;
+        return this.gameService.game.getLocalPlayer().isActive;
     }
 
     isPlayer2Active(): boolean {
-        return this.gameService.game.players[this.gameService.opponentPlayerIndex].isActive;
+        return this.gameService.game.getOpponent().isActive;
     }
     getTimer(): string {
         return this.gameService.timer;
@@ -76,11 +76,11 @@ export class SidebarComponent {
     }
 
     hasWinner(): boolean {
-        return this.gameService.game.players[this.gameService.localPlayerIndex].isWinner || this.gameService.game.players[this.gameService.opponentPlayerIndex].isWinner;
+        return this.gameService.game.getLocalPlayer().isWinner || this.gameService.game.getOpponent().isWinner;
     }
 
     isDrawnGame(): boolean {
-        if (this.gameService.game.players[this.gameService.localPlayerIndex].isWinner && this.gameService.game.players[this.gameService.opponentPlayerIndex].isWinner) {
+        if (this.gameService.game.getLocalPlayer().isWinner && this.gameService.game.getOpponent().isWinner) {
             return true;
         } else {
             return false;
@@ -90,11 +90,11 @@ export class SidebarComponent {
     getWinnerName() {
         if (this.isDrawnGame()) {
             this.winnerName =
-                this.gameService.game.players[this.gameService.localPlayerIndex].name + ' et ' + this.gameService.game.players[this.gameService.opponentPlayerIndex].name;
-        } else if (this.gameService.game.players[this.gameService.localPlayerIndex].isWinner) {
-            this.winnerName = this.gameService.game.players[this.gameService.localPlayerIndex].name;
-        } else if (this.gameService.game.players[this.gameService.opponentPlayerIndex].isWinner) {
-            this.winnerName = this.gameService.game.players[this.gameService.opponentPlayerIndex].name;
+                this.gameService.game.getLocalPlayer().name + ' et ' + this.gameService.game.getOpponent().name;
+        } else if (this.gameService.game.getLocalPlayer().isWinner) {
+            this.winnerName = this.gameService.game.getLocalPlayer().name;
+        } else if (this.gameService.game.getOpponent().isWinner) {
+            this.winnerName = this.gameService.game.getOpponent().name;
         }
     }
 

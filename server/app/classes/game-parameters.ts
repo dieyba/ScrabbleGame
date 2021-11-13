@@ -1,7 +1,9 @@
 import { LetterStock } from '@app/classes/letter-stock';
-import { Dictionary, DictionaryType } from './dictionary';
+import { DictionaryType } from './dictionary';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
+import { ScrabbleLetter } from './scrabble-letter';
+import { Square } from './square';
 
 export const GAME_CAPACITY = 2;
 const DEFAULT_LETTER_COUNT = 7;
@@ -27,47 +29,37 @@ export class WaitingAreaGameParameters {
     isRandomBonus: boolean;
     isLOG2990: boolean;
     gameMode: GameType;
-
-    addJoinerPlayer(joinerName: string, joinerSocketId: string): boolean {
-        if (this.gameRoom.playersName.length < this.gameRoom.capacity) {
-            this.joinerName = joinerName;
-            this.gameRoom.joinerId = joinerSocketId;
-            this.gameRoom.playersName = [this.creatorName, joinerName];
-            return true;
-        }
-        return false;
-    }
 }
 
 export class GameInitInfo {
     gameRoomId: number; // needed on server to get a game from the game manager service
     players: Player[];
-    dictionary: Dictionary;
     totalCountDown: number;
-    scrabbleBoard: ScrabbleBoard;
-    stock: LetterStock;
+    scrabbleBoard: Square[][];
+    stockLetters: ScrabbleLetter[];
     gameMode: GameType;
 
     constructor(clientParametersChosen: WaitingAreaGameParameters) {
         this.gameRoomId = clientParametersChosen.gameRoom.idGame;
         this.gameMode = clientParametersChosen.gameMode;
-        this.dictionary = new Dictionary(clientParametersChosen.dictionaryType);
         this.totalCountDown = clientParametersChosen.totalCountDown;
-        this.scrabbleBoard = new ScrabbleBoard(clientParametersChosen.isRandomBonus);
-        this.stock = new LetterStock();
+        this.scrabbleBoard = new ScrabbleBoard(clientParametersChosen.isRandomBonus).squares;
 
-        // Initializing the players and their letters
+        // Initializing the players and their letters and the stock
+        let stock = new LetterStock();
         this.players = new Array<Player>();
         this.players.push(new Player(clientParametersChosen.creatorName, clientParametersChosen.gameRoom.creatorId, this.gameRoomId));
         this.players.push(new Player(clientParametersChosen.joinerName, clientParametersChosen.gameRoom.joinerId, this.gameRoomId));
         const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
         this.players[starterPlayerIndex].isActive = true;
         this.players.forEach(player => {
-            player.letters = this.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+            player.letters = stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         });
+        this.stockLetters = stock.letterStock; // stock with the two players' letters removed
 
+        // TODO: pick the 4 random objectives from the list
         if (clientParametersChosen.isLOG2990) {
-            // TODO: pick the 4 random objectives from the list
+
         }
     }
 

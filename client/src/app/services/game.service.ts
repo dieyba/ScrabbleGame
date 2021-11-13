@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { PlaceParams } from '@app/classes/commands';
 import { ErrorType } from '@app/classes/errors';
-import { GameInitInfo, GameParameters, GameType } from '@app/classes/game-parameters';
+import { GameInitInfo, GameParameters, GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
 import { LetterStock } from '@app/classes/letter-stock';
+import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
@@ -10,6 +11,7 @@ import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { BoardUpdate, LettersUpdate } from '@app/classes/server-message';
 import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
+import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { BehaviorSubject, Observable } from 'rxjs';
 import * as io from 'socket.io-client';
@@ -31,8 +33,6 @@ export class GameService {
     game: GameParameters;
     isOpponentTurnObservable: Observable<boolean>;
     isOpponentTurnSubject: BehaviorSubject<boolean>;
-    localPlayerIndex: number; // TODO: create getLocalPlayer(), getOpponent() in game params instead?
-    opponentPlayerIndex: number;
     timer: string; // used for the ui timer?
     intervalValue: NodeJS.Timeout;
     private socket: io.Socket;
@@ -47,18 +47,7 @@ export class GameService {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
-        this.game = {
-            players: new Array<Player>(),
-            totalCountDown: 0,
-            timerMs: 0,
-            scrabbleBoard: new ScrabbleBoard(),
-            stock: new LetterStock(),
-            isEndGame: false,
-            gameMode: GameType.Solo,
-            isLOG2990: false,
-            isTurnPassed: false,
-            consecutivePassedTurns: 0,
-        };
+        this.game = new GameParameters();
     }
     socketOnConnect() {
         this.socket.on('turn changed', (isTurnPassed: boolean, consecutivePassedTurns: number) => {
@@ -66,7 +55,7 @@ export class GameService {
             this.game.consecutivePassedTurns = consecutivePassedTurns;
             if (!this.game.isEndGame) {
                 // if it is not already the endgame
-                const isLocalPlayerEndingGame = this.game.consecutivePassedTurns >= MAX_TURNS_PASSED && this.game.players[this.localPlayerIndex].isActive;
+                const isLocalPlayerEndingGame = this.game.consecutivePassedTurns >= MAX_TURNS_PASSED && this.game.getLocalPlayer().isActive;
                 if (isLocalPlayerEndingGame) {
                     this.endGame();
                 }
@@ -95,32 +84,46 @@ export class GameService {
             }
         });
     }
-    initializeGame(initInfo: GameInitInfo) {
-        this.game.gameMode = initInfo.gameMode;
-        this.game.totalCountDown = initInfo.totalCountDown;
-        this.game.timerMs = this.game.totalCountDown;
+    initializeSoloGame(initInfo: WaitingAreaGameParameters, virtualPlayerDifficulty: Difficulty) {
         if (initInfo.gameMode === GameType.Solo) {
-            // TODO: add creating a dictionary if solo mode (go put the class back to how it was)
-            this.game.scrabbleBoard = new ScrabbleBoard(initInfo.scrabbleBoard);
-            this.game.stock = new LetterStock(initInfo.stock);
-
-        } else if (initInfo.gameMode === GameType.MultiPlayer) {
-            this.localPlayerIndex = this.socket.id === initInfo.players[0].socketId ? 0 : 1;
-            this.opponentPlayerIndex = this.socket.id === initInfo.players[0].socketId ? 1 : 0;
-            this.game.players[this.localPlayerIndex] = initInfo.players[this.localPlayerIndex];
-            this.game.players[this.opponentPlayerIndex] = initInfo.players[this.opponentPlayerIndex];
-            this.game.scrabbleBoard = new ScrabbleBoard(initInfo.scrabbleBoard);
-            this.game.stock = new LetterStock(initInfo.stock);
+            this.game.scrabbleBoard = new ScrabbleBoard(initInfo.isRandomBonus);
+            this.game.stock = new LetterStock();
+            this.game.totalCountDown = initInfo.totalCountDown;
+            this.game.timerMs = this.game.totalCountDown;
+            this.game.gameMode = initInfo.gameMode;
+            this.game.setLocalPlayer(new LocalPlayer(initInfo.creatorName));
+            this.game.setOpponent(new VirtualPlayer(initInfo.joinerName, virtualPlayerDifficulty));
+            this.game.getLocalPlayer().letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+            this.game.getOpponent().letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+            const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
+            this.game.players[starterPlayerIndex].isActive = true;
+            // TODO: set objectives to initialize here
+            // TODO: add creating a dictionary in client validation service (go put dictionary class back to how it was)
+            console.log('init solo done:', this.game.players);
         }
-
+    }
+    initializeMultiplayerGame(initInfo: GameInitInfo) {
+        if (initInfo.gameMode === GameType.MultiPlayer) {
+            const localPlayerIndex = this.socket.id === initInfo.players[0].socketId ? 0 : 1;
+            const opponentPlayerIndex = this.socket.id === initInfo.players[0].socketId ? 1 : 0;
+            this.game.setLocalAndOpponentId(localPlayerIndex, opponentPlayerIndex);
+            this.game.setLocalPlayer(initInfo.players[localPlayerIndex]);
+            this.game.setOpponent(initInfo.players[opponentPlayerIndex]);
+            this.game.scrabbleBoard = new ScrabbleBoard(initInfo.scrabbleBoard); // stock and board not init properly
+            this.game.stock = new LetterStock(initInfo.stockLetters);
+            this.game.totalCountDown = initInfo.totalCountDown;
+            this.game.timerMs = this.game.totalCountDown;
+            this.game.gameMode = initInfo.gameMode;
+            // TODO:set objectives initialized in server
+        }
     }
     startNewGame() {
-        this.isOpponentTurnSubject = new BehaviorSubject<boolean>(this.game.players[this.opponentPlayerIndex].isActive);
+        this.isOpponentTurnSubject = new BehaviorSubject<boolean>(this.game.getOpponent().isActive);
         this.isOpponentTurnObservable = this.isOpponentTurnSubject.asObservable();
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
-        this.chatDisplayService.initialize(this.game.players[this.localPlayerIndex].name);
-        this.addRackLetters(this.game.players[this.localPlayerIndex].letters);
+        this.chatDisplayService.initialize(this.game.getLocalPlayer().name);
+        this.addRackLetters(this.game.getLocalPlayer().letters);
         this.startCountdown();
     }
     resetTimer() {
@@ -157,8 +160,8 @@ export class GameService {
             // this.updateConsecutivePassedTurns(); TODO: copy this from solo game service
             this.updateActivePlayer();
             this.resetTimer();
-            if (this.game.players[this.opponentPlayerIndex].isActive) {
-                this.isOpponentTurnSubject.next(this.game.players[this.opponentPlayerIndex].isActive);
+            if (this.game.getOpponent().isActive) {
+                this.isOpponentTurnSubject.next(this.game.getOpponent().isActive);
             }
             this.game.isTurnPassed = false; // reset isTurnedPassed when new turn starts
         }
@@ -224,8 +227,8 @@ export class GameService {
     displayEndGameMessage() {
         const endGameMessages = this.chatDisplayService.createEndGameMessages(
             this.game.stock.letterStock,
-            this.game.players[this.localPlayerIndex],
-            this.game.players[this.opponentPlayerIndex],
+            this.game.getLocalPlayer(),
+            this.game.getOpponent(),
         );
         endGameMessages.forEach((message) => {
             this.chatDisplayService.addEntry(message);
@@ -238,25 +241,25 @@ export class GameService {
     }
 
     endLocalGame() {
-        const localPlayerPoints = this.calculateRackPoints(this.game.players[this.localPlayerIndex]);
-        const oppnentPlayerPoints = this.calculateRackPoints(this.game.players[this.opponentPlayerIndex]);
+        const localPlayerPoints = this.calculateRackPoints(this.game.getLocalPlayer());
+        const oppnentPlayerPoints = this.calculateRackPoints(this.game.getOpponent());
 
-        if (this.game.players[this.localPlayerIndex].isWinner === true) {
-            this.game.players[this.localPlayerIndex].score += oppnentPlayerPoints;
-            this.game.players[this.opponentPlayerIndex].score -= oppnentPlayerPoints;
-        } else if (this.game.players[this.opponentPlayerIndex].isWinner === true) {
-            this.game.players[this.opponentPlayerIndex].score += localPlayerPoints;
-            this.game.players[this.localPlayerIndex].score -= localPlayerPoints;
+        if (this.game.getLocalPlayer().isWinner === true) {
+            this.game.getLocalPlayer().score += oppnentPlayerPoints;
+            this.game.getOpponent().score -= oppnentPlayerPoints;
+        } else if (this.game.getOpponent().isWinner === true) {
+            this.game.getOpponent().score += localPlayerPoints;
+            this.game.getLocalPlayer().score -= localPlayerPoints;
         } else {
-            this.game.players[this.localPlayerIndex].score -= localPlayerPoints;
-            this.game.players[this.opponentPlayerIndex].score -= oppnentPlayerPoints;
-            if (this.game.players[this.localPlayerIndex].score > this.game.players[this.opponentPlayerIndex].score) {
-                this.game.players[this.localPlayerIndex].isWinner = true;
-            } else if (this.game.players[this.localPlayerIndex].score < this.game.players[this.opponentPlayerIndex].score) {
-                this.game.players[this.opponentPlayerIndex].isWinner = true;
+            this.game.getLocalPlayer().score -= localPlayerPoints;
+            this.game.getOpponent().score -= oppnentPlayerPoints;
+            if (this.game.getLocalPlayer().score > this.game.getOpponent().score) {
+                this.game.getLocalPlayer().isWinner = true;
+            } else if (this.game.getLocalPlayer().score < this.game.getOpponent().score) {
+                this.game.getOpponent().isWinner = true;
             } else {
-                this.game.players[this.localPlayerIndex].isWinner = true;
-                this.game.players[this.opponentPlayerIndex].isWinner = true;
+                this.game.getLocalPlayer().isWinner = true;
+                this.game.getOpponent().isWinner = true;
             }
         }
         clearInterval(this.intervalValue);
@@ -267,24 +270,24 @@ export class GameService {
 
     updateActivePlayer() {
         // Switch the active player
-        if (this.game.players[this.localPlayerIndex].isActive) {
+        if (this.game.getLocalPlayer().isActive) {
             // If the rack is empty, end game + player won
-            if (this.game.players[this.localPlayerIndex].letters.length === 0 && this.game.stock.letterStock.length !== 0) {
-                this.game.players[this.localPlayerIndex].isWinner = true;
+            if (this.game.getLocalPlayer().letters.length === 0 && this.game.stock.letterStock.length !== 0) {
+                this.game.getLocalPlayer().isWinner = true;
                 this.endGame();
                 return;
             }
-            this.game.players[this.localPlayerIndex].isActive = false;
-            this.game.players[this.opponentPlayerIndex].isActive = true;
+            this.game.getLocalPlayer().isActive = false;
+            this.game.getOpponent().isActive = true;
         } else {
             // If the rack is empty, end game + player won
-            if (this.game.players[this.opponentPlayerIndex].letters.length === 0 && this.game.stock.letterStock.length !== 0) {
-                this.game.players[this.opponentPlayerIndex].isWinner = true;
+            if (this.game.getOpponent().letters.length === 0 && this.game.stock.letterStock.length !== 0) {
+                this.game.getOpponent().isWinner = true;
                 this.endGame();
                 return;
             }
-            this.game.players[this.opponentPlayerIndex].isActive = false;
-            this.game.players[this.localPlayerIndex].isActive = true;
+            this.game.getOpponent().isActive = false;
+            this.game.getLocalPlayer().isActive = true;
         }
     }
 
@@ -298,7 +301,7 @@ export class GameService {
     }
     removeRackLetter(scrabbleLetter: ScrabbleLetter): void {
         const i = this.rackService.removeLetter(scrabbleLetter);
-        this.game.players[this.localPlayerIndex].letters.splice(i, 1);
+        this.game.getLocalPlayer().letters.splice(i, 1);
     }
 
     drawRack(newWords: ScrabbleWord[]): void {

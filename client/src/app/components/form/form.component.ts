@@ -57,10 +57,10 @@ export class FormComponent implements OnInit {
             this.level = new FormControl('', [Validators.required]);
         } else {
             this.level = new FormControl('');
+            this.socketOnConnect(); // only need to listen for the server in the multiplayer game form
         }
         this.dictionaryList = Object.values(DictionaryType);
         this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
-        this.socketOnConnect();
     }
 
     ngOnInit() {
@@ -137,8 +137,9 @@ export class FormComponent implements OnInit {
             if (gameMode === GameType.Solo) {
                 this.closeDialog();
                 gameParams.joinerName = this.opponent.value;
-                this.gameService.game.gameMode = GameType.Solo; // TODO: to make sure the service is constructed prior to initialization. is this needed?
-                this.socket.emit('initializeSoloGame', gameParams);
+                this.dialogRef.close();
+                this.router.navigate(['/game']);
+                this.gameService.initializeSoloGame(gameParams, this.level.value);
             } else {
                 this.closeDialog();
                 this.gameList.createRoom(gameParams);
@@ -150,7 +151,7 @@ export class FormComponent implements OnInit {
         this.socket.on('initClientGame', (gameParams: GameInitInfo) => {
             this.dialogRef.close();
             this.router.navigate(['/game']);
-            this.gameService.initializeGame(gameParams);
+            this.gameService.initializeMultiplayerGame(gameParams);
 
         });
     }

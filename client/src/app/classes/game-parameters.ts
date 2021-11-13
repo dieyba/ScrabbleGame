@@ -1,3 +1,4 @@
+import { GAME_CAPACITY } from '@app/components/form/form.component';
 import { DictionaryType } from './dictionary';
 import { LetterStock } from './letter-stock';
 import { Player } from './player';
@@ -62,12 +63,12 @@ export interface GameInitInfo {
     players: Player[];
     totalCountDown: number;
     scrabbleBoard: Square[][];
-    stock: ScrabbleLetter[];
+    stockLetters: ScrabbleLetter[];
     gameMode: GameType;
     isRandomBonus?: boolean; // to randomize bonus tile position when creating the board
 }
 
-export interface GameParameters {
+export class GameParameters {
     consecutivePassedTurns: number;
     isTurnPassed: boolean;
     players: Player[];
@@ -78,22 +79,59 @@ export interface GameParameters {
     isEndGame: boolean;
     gameMode: GameType;
     isLOG2990: boolean;
+    private localPlayerIndex: number; // by default, in solo games, the local player is the first player
+    private opponentPlayerIndex: number;
+
+    constructor() {
+        this.consecutivePassedTurns = 0;
+        this.isTurnPassed = false;
+        this.players = new Array<Player>();
+        this.totalCountDown = 0;
+        this.timerMs = this.totalCountDown;
+        this.isEndGame = false;
+        this.gameMode = GameType.Solo;
+        this.isLOG2990 = false;
+        this.localPlayerIndex = 0; // by default, in solo games, the local player is the first player
+        this.opponentPlayerIndex = 1;
+
+    }
+
+    setLocalAndOpponentId(localPlayerIndex: number, opponentPlayerIndex: number) {
+        this.localPlayerIndex = localPlayerIndex;
+        this.opponentPlayerIndex = opponentPlayerIndex;
+    }
+    getLocalPlayer(): Player {
+        return this.players[this.localPlayerIndex];
+    }
+    getOpponent(): Player {
+        return this.players[this.opponentPlayerIndex];
+    }
+    setLocalPlayer(localPlayer: Player) {
+        if (this.localPlayerIndex >= 0 && this.localPlayerIndex < GAME_CAPACITY) {
+            this.players[this.localPlayerIndex] = localPlayer;
+        }
+    }
+    setOpponent(opponent: Player) {
+        if (this.opponentPlayerIndex >= 0 && this.opponentPlayerIndex < GAME_CAPACITY) {
+            this.players[this.opponentPlayerIndex] = opponent;
+        }
+    }
 }
 
 // TODO: method is a work in progress, to adapt as needed and see if the method works.
-    // See where to move in client and see how synchronization with server will work
-    // convertToVirtualPlayer(previousPlayerIndex: number, virtualPlayerName: string): VirtualPlayer | undefined {
-    //     let newVirtualPlayer = undefined;
-    //     const isValidIndex = previousPlayerIndex > -1 && previousPlayerIndex < this.players.length;
-    //     if (isValidIndex) {
-    //         const previousPlayer = this.players[previousPlayerIndex];
-    //         newVirtualPlayer = new VirtualPlayer(virtualPlayerName, scrabbleLetterstoString(previousPlayer.letters), Difficulty.Easy);
-    //         newVirtualPlayer.isActive = previousPlayer.isActive;
-    //         newVirtualPlayer.score = previousPlayer.score;
-    //         newVirtualPlayer.isWinner = previousPlayer.isWinner; // probably wouldn't need that line
-    //         newVirtualPlayer.roomId = previousPlayer.roomId; // does a vp need a room id?
-    //         this.players[previousPlayerIndex] = newVirtualPlayer;
-    //         this.gameMode = GameType.Solo;
-    //     }
-    //     return newVirtualPlayer;
-    // }
+// See where to move in client and see how synchronization with server will work
+// convertToVirtualPlayer(previousPlayerIndex: number, virtualPlayerName: string): VirtualPlayer | undefined {
+//     let newVirtualPlayer = undefined;
+//     const isValidIndex = previousPlayerIndex > -1 && previousPlayerIndex < this.players.length;
+//     if (isValidIndex) {
+//         const previousPlayer = this.players[previousPlayerIndex];
+//         newVirtualPlayer = new VirtualPlayer(virtualPlayerName, scrabbleLetterstoString(previousPlayer.letters), Difficulty.Easy);
+//         newVirtualPlayer.isActive = previousPlayer.isActive;
+//         newVirtualPlayer.score = previousPlayer.score;
+//         newVirtualPlayer.isWinner = previousPlayer.isWinner; // probably wouldn't need that line
+//         newVirtualPlayer.roomId = previousPlayer.roomId; // does a vp need a room id?
+//         this.players[previousPlayerIndex] = newVirtualPlayer;
+//         this.gameMode = GameType.Solo;
+//     }
+//     return newVirtualPlayer;
+// }

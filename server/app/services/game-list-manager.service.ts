@@ -29,6 +29,15 @@ export class GameListManager {
         this.currentId++;
         return game;
     }
+    addJoinerPlayer(game: WaitingAreaGameParameters, joinerName: string, joinerSocketId: string): boolean {
+        if (game.gameRoom.playersName.length < game.gameRoom.capacity) {
+            game.joinerName = joinerName;
+            game.gameRoom.joinerId = joinerSocketId;
+            game.gameRoom.playersName = [game.creatorName, joinerName];
+            return true;
+        }
+        return false;
+    }
     deleteWaitingAreaGame(roomId: number): void {
         const index = this.waitingAreaGames.findIndex((r) => r.gameRoom.idGame === roomId);
         if (index > ERROR_NUMBER) {

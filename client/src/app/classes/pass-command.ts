@@ -22,7 +22,7 @@ export class PassTurnCmd extends Command {
             executionMessages.push(createErrorEntry(executionResult, commandMessage));
         } else if (executionResult === ErrorType.NoError) {
             this.isExecuted = true;
-            const localPlayerName = this.gameService.game.players[this.gameService.localPlayerIndex].name;
+            const localPlayerName = this.gameService.game.getLocalPlayer().name;
             const color = this.player.name === localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
             executionMessages.push({ color, message: this.player.name + ' >> ' + commandMessage });
         }

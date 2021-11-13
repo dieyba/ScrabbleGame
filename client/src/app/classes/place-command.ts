@@ -33,8 +33,8 @@ export class PlaceCmd extends Command {
                 executionMessages.push(createErrorEntry(executionResult, commandMessage));
             } else {
                 this.isExecuted = true;
-                const localPlayerName = this.gameService.game.players[this.gameService.localPlayerIndex].name;
-                const opponentPlayerName = this.gameService.game.players[this.gameService.opponentPlayerIndex].name;
+                const localPlayerName = this.gameService.game.getLocalPlayer().name;
+                const opponentPlayerName = this.gameService.game.getOpponent().name;
                 const playerName = this.player.name === localPlayerName ? localPlayerName : opponentPlayerName;
                 const color = this.player.name === localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
                 executionMessages.push({ color, message: playerName + ' >> ' + commandMessage });

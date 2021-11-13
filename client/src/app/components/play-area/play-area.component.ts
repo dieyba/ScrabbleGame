@@ -83,7 +83,7 @@ export class PlayAreaComponent implements AfterViewInit {
                 // if the opponent player is a virtual player and not a human player, play virtual player turn
                 let isVirtualPlayerCanPlay =
                     this.gameService.game.gameMode === GameType.Solo &&
-                    this.gameService.game.players[this.gameService.opponentPlayerIndex] instanceof VirtualPlayer &&
+                    this.gameService.game.getOpponent() instanceof VirtualPlayer &&
                     !this.gameService.game.isEndGame;
                 if (isVirtualPlayerCanPlay) {
                     this.virtualPlayerService.playTurn();
@@ -94,7 +94,7 @@ export class PlayAreaComponent implements AfterViewInit {
 
     passTurn() {
         const defaultParams: DefaultCommandParams = {
-            player: this.gameService.game.players[this.gameService.localPlayerIndex],
+            player: this.gameService.game.getLocalPlayer(),
             serviceCalled: this.gameService,
         };
         const command = new PassTurnCmd(defaultParams);
@@ -102,7 +102,7 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     isLocalPlayerActive(): boolean {
-        return this.gameService.game.players[this.gameService.localPlayerIndex].isActive;
+        return this.gameService.game.getLocalPlayer().isActive;
     }
 
     isEndGame(): boolean {

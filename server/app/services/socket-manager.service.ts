@@ -109,7 +109,7 @@ export class SocketManagerService {
         let newRoom = this.gameListMan.createWaitingAreaGame(gameParams, socket.id);
         let creatorPlayer = this.playerMan.getPlayerBySocketID(socket.id);
         if (creatorPlayer !== undefined) {
-            //TODO: see if necessary update player info in the player manager
+            // update player info in the player manager
             creatorPlayer.name = newRoom.creatorName;
             creatorPlayer.roomId = newRoom.gameRoom.idGame;
             socket.join(newRoom.gameRoom.idGame.toString());
@@ -165,8 +165,8 @@ export class SocketManagerService {
         if (waitingAreaGame === undefined) {
             return;
         }
-        if (waitingAreaGame.addJoinerPlayer(joinerName, socket.id)) {
-            //TODO: see if necessary update player info in the player manager
+        if (this.gameListMan.addJoinerPlayer(waitingAreaGame, joinerName, socket.id)) {
+            // update player info in the player manager
             joiner.name = joinerName;
             joiner.roomId = waitingAreaGame.gameRoom.idGame;
             socket.join(waitingAreaGame.gameRoom.idGame.toString());
