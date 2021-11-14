@@ -138,8 +138,11 @@ export class ValidationService {
                     }
                 }
                 wordsHaveBeenValidated = true;
-                resolve(this.areWordsValid);
-                clearTimeout(validationTimer);
+                // return true if words are valid, wait till the end of timeout if not
+                if (this.areWordsValid) {
+                    resolve(this.areWordsValid);
+                    clearTimeout(validationTimer);
+                }
 
                 validationTimer = setTimeout(() => {
                     if (!wordsHaveBeenValidated || !this.areWordsValid) {
