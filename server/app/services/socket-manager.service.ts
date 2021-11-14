@@ -190,7 +190,7 @@ export class SocketManagerService {
             return;
         }
         let clientInitParams = this.gameListMan.createGameInPlay(waitingAreaGame);
-        // // TODO: Normally this should be done before, go see if it is done. And check game room id too ig
+        // // TODO: Normally this should be done before, go see if it is done. And check game room id too?
         // if (newGame.players[0].name === waitingAreaGame.creatorName) {
         //     newGame.players[0].socketId = waitingAreaGame.gameRoom.creatorId;
         //     newGame.players[1].socketId = waitingAreaGame.gameRoom.joinerId;
@@ -255,9 +255,8 @@ export class SocketManagerService {
         }
     }
     private validateWords(socket: io.Socket, newWords: string[]) {
-        console.log("to validate:", newWords);
         const result = this.validationService.validateWords(newWords);
-        console.log('result:', result);
+        console.log(newWords, ' is valid:', result);
         this.sio.to(socket.id).emit('areWordsValid', result);
     }
     private changeTurn(socket: io.Socket, isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) {

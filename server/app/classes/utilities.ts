@@ -1,8 +1,5 @@
-// TODO: do we need some things from here on the server? delete the rest
 
 import { ScrabbleLetter } from "./scrabble-letter";
-
-// TODO: see if we need all those in server version of utilities
 
 export const ERROR_NUMBER = -1;
 
@@ -28,3 +25,11 @@ export interface LettersUpdate {
     newLetters: ScrabbleLetter[];
     newScore: number;
 }
+
+export const isAllLowerLetters = (letters: string): boolean => {
+    return letters.toLowerCase() === letters;
+};
+
+export const removeAccents = (letters: string): string => {
+    return letters.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+};

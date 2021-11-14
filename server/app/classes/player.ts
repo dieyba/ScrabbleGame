@@ -19,7 +19,7 @@ export class Player {
         this.letters = [];
     }
 
-    // TODO: To delete, shouldn't need to use add remove letter on server
+    // TODO: See if need to delete (see client player class)
     // addLetter(letterToAdd: ScrabbleLetter): void {
     //     this.letters.push(letterToAdd);
     // }

@@ -8,7 +8,7 @@ import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { BoardUpdate, LettersUpdate } from '@app/classes/server-message';
-import { Axis, scrabbleLetterstoString } from '@app/classes/utilities';
+import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
@@ -81,14 +81,6 @@ export class GameService {
             this.game.stock.letterStock = update.newStock;
             this.game.getOpponent().letters = update.newLetters;
             this.game.getOpponent().score = update.newScore;
-            console.log(scrabbleLetterstoString(this.game.stock.letterStock));
-            console.log(
-                'exchangeletters: ',
-                this.game.getLocalPlayer().name,
-                ' letters:',
-                scrabbleLetterstoString(this.game.getLocalPlayer().letters),
-            );
-            console.log('exchangeletters: ', this.game.getOpponent().name, ' letters:', scrabbleLetterstoString(this.game.getOpponent().letters));
         });
     }
     initializeSoloGame(initInfo: WaitingAreaGameParameters, virtualPlayerDifficulty: Difficulty) {
@@ -190,7 +182,6 @@ export class GameService {
         }
         activePlayer.isActive = false;
         inactivePlayer.isActive = true;
-        console.log(this.game.players);
     }
     // TODO: see if can refactor this and endgame to prevent code duplication
     changeTurn() {

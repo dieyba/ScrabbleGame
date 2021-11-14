@@ -1,5 +1,5 @@
 
-// TODO: to delete if we initalize virtual players only in client (so for solo games not needing the server)
+// TODO: see if needed to convert a game to solo, but i doubt it
 
 // import { Player } from './player';
 

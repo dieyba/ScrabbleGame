@@ -1,4 +1,5 @@
 import { Square, SquareColor } from './square';
+import { isAllLowerLetters, removeAccents } from './utilities';
 
 export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;
@@ -16,20 +17,18 @@ export class ScrabbleLetter {
         this.tile = new Square(UNPLACED, UNPLACED); // -1, -1 means it is not placed yet
         this.setLetter(letter);
         this.setDefaultValue(letter);
-        // TODO: this overrides default value, is there a situation where we do that?
         if (value !== undefined) {
             this.value = value;
         }
     }
 
     setLetter(character: string): void {
-        this.character = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        // if a captial letter is passed in, represents a blank piece, meaning a '*'
+        this.character = isAllLowerLetters(character) ? removeAccents(character) : '*';
     }
     setDefaultValue(character: string) {
         // set the letter's default value
-        if (character === '*') {
-            this.value = 0;
-        } else if ('aeilnorstu'.includes(character)) {
+        if ('aeilnorstu'.includes(character)) {
             this.value = 1;
         } else if ('dgm'.includes(character)) {
             this.value = 2;
@@ -41,6 +40,8 @@ export class ScrabbleLetter {
             this.value = 8;
         } else if ('kwxyz'.includes(character)) {
             this.value = 10;
+        } else {
+            this.value = 0; // case where it is a * or capital letter
         }
     }
 }
