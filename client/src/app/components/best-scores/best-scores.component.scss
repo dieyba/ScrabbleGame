@@ -3,7 +3,6 @@ td {
     border: 1px solid #dddddd;
     text-align: center;
     padding: 18px;
-    // padding-left: 200px;
     width: 100px;
     background-color: white;
 }
@@ -19,15 +18,11 @@ h1 {
     position: absolute;
     left: 650px;
 }
-// table {
-//     align-items: center;
-//     display: flex;
-// }
-body {
-    min-height: 100vh;
-    line-height: 1;
-    margin: 0;
-    padding: 0;
+.container {
+    display: block;
+    width: 1000px;
+    height: 900px;
+
     background-color: #dcecff;
 }
 .image {
@@ -38,14 +33,29 @@ body {
     filter: grayscale(100%);
 }
 .classic {
-    // margin-left: auto;
-    position: absolute;
+    position: fixed;
     left: 400px;
     top: 297px;
 }
 .log2990 {
-    // margin-right: 500px;
-    position: absolute;
+    position: fixed;
     left: 800px;
     top: 300px;
+}
+button {
+    border: 1px solid black;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: xx-large;
+    background-color: #6aa0e0;
+    border-width: 10px;
+    border-style: double;
+    text-align: center;
+    flex-direction: column;
+    top: 600px;
+    position: relative;
 }

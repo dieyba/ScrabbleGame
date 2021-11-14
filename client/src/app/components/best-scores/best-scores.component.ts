@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import { BestScores, BestScoresService } from '@app/services/best-scores.service';
 
 @Component({
@@ -10,7 +11,7 @@ export class BestScoresComponent implements OnInit {
   classicModeBestScores: BestScores[];
   log2990ModeBestScores: BestScores[];
 
-  constructor(private bestScoresService: BestScoresService) {
+  constructor(private bestScoresService: BestScoresService, private dialogRef: MatDialogRef<BestScoresComponent>) {
     this.classicModeBestScores = [];
     this.log2990ModeBestScores = [];
   }
@@ -25,5 +26,7 @@ export class BestScoresComponent implements OnInit {
   getLog2990ModeBestScores() {
     this.bestScoresService.getLog2990ModeBestScores().subscribe(log2990ModeBestScore => (this.log2990ModeBestScores = log2990ModeBestScore));
   }
-
+  closeDialog() {
+    this.dialogRef.close();
+  }
 }

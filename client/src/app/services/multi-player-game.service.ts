@@ -10,6 +10,7 @@ import { Vec2 } from '@app/classes/vec2';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import { BestScoresService } from './best-scores.service';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { LetterStock } from './letter-stock.service';
@@ -35,8 +36,10 @@ export class MultiPlayerGameService extends SoloGameService {
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
         protected placeService: PlaceService,
+        protected bestScoresService: BestScoresService,
+
     ) {
-        super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService);
+        super(gridService, rackService, chatDisplayService, validationService, wordBuilder, placeService, bestScoresService);
         // this.server = 'http://' + window.location.hostname + ':3000';
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);

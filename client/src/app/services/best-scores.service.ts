@@ -5,7 +5,7 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 export interface BestScores {
-  idScore: string;
+  _id: string;
   playerName: string;
   score: number;
   // idGame: number;
@@ -42,10 +42,10 @@ export class BestScoresService {
   }
 
 
-  postScores(player: LocalPlayer) {
+  postClassicBestScore(player: LocalPlayer) {
     return this.http.post<BestScores>(this.classicModeUrl, { player })
       .pipe(
-        catchError(this.handleError('getClassicModeBestScores', []))
+        catchError(this.handleError('postClassicBestScore', []))
       );
   }
 }

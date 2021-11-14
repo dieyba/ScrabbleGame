@@ -79,27 +79,27 @@ export class BestScoresService {
                 {
                     idScore: "1",
                     playerName: "erika",
-                    score: 180,
+                    score: 10,
                 },
                 {
                     idScore: "2",
                     playerName: "Sara",
-                    score: 208,
+                    score: 8,
                 },
                 {
                     idScore: "3",
                     playerName: "Etienne",
-                    score: 220,
+                    score: 2,
                 },
                 {
                     idScore: "4",
                     playerName: "Kevin",
-                    score: 85,
+                    score: 1,
                 },
                 {
                     idScore: "5",
                     playerName: "Ariane",
-                    score: 347,
+                    score: 20,
                 },
             ];
             console.log("THIS ADDS DATA TO THE DATABASE, DO NOT USE OTHERWISE");
@@ -114,7 +114,7 @@ export class BestScoresService {
                 {
                     idScore: "1",
                     playerName: "Dieyba",
-                    score: 520,
+                    score: 4,
                 },
                 {
                     idScore: "2",
@@ -124,7 +124,7 @@ export class BestScoresService {
                 {
                     idScore: "3",
                     playerName: "Nikolay",
-                    score: 175,
+                    score: 8,
                 },
                 {
                     idScore: "4",
