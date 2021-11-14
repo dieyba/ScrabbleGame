@@ -20,6 +20,7 @@ import { GridService } from './grid.service';
 import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
 import { ValidationService } from './validation.service';
+import { WordBuilderService } from './word-builder.service';
 
 export const TIMER_INTERVAL = 1000;
 export const DEFAULT_LETTER_COUNT = 7;
@@ -47,6 +48,7 @@ export class GameService {
         protected chatDisplayService: ChatDisplayService,
         protected placeService: PlaceService,
         protected validationService: ValidationService,
+        protected wordBuilder: WordBuilderService,
     ) {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
@@ -65,21 +67,18 @@ export class GameService {
                 this.updateActivePlayer();
                 this.resetTimer();
                 this.game.isTurnPassed = false;
-            } else {
-                this.resetTimer();
             }
         });
         this.socket.on('gameEnded', () => {
-            this.displayEndGameMessage();
+            this.chatDisplayService.displayEndGameMessage(this.game.stock.letterStock, this.game.getLocalPlayer(), this.game.getOpponent());
             this.endLocalGame();
-            this.resetTimer(); // basically we just want to stop the timer tbh
+            this.resetTimer(); // basically we just want to stop the timer here
         });
         // updates board after a new word was placed
         this.socket.on('update board', (boardUpdate: BoardUpdate) => {
             this.gridService.updateBoard(boardUpdate.word, boardUpdate.orientation, new Vec2(boardUpdate.positionX, boardUpdate.positionY));
         });
         // updates the stock and the letters of the player who placed or exchanged letters
-        // TODO: see why cant' emit to client with LettersUpdate
         this.socket.on('update letters', (update: LettersUpdate) => {
             this.game.stock.letterStock = update.newStock;
             this.game.getOpponent().letters = update.newLetters;
@@ -205,9 +204,7 @@ export class GameService {
         if (this.game.isEndGame) {
             return;
         }
-        if (this.game.gameMode === GameType.MultiPlayer) {
-            this.socket.emit('change turn', this.game.isTurnPassed, this.game.consecutivePassedTurns);
-        } else {
+        if (this.game.gameMode === GameType.Solo) {
             this.updateConsecutivePassedTurns();
             this.updateActivePlayer();
             this.resetTimer();
@@ -215,6 +212,8 @@ export class GameService {
                 this.isOpponentTurnSubject.next(this.game.getOpponent().isActive);
             }
             this.game.isTurnPassed = false; // reset isTurnedPassed when new turn starts
+        } else {
+            this.socket.emit('change turn', this.game.isTurnPassed, this.game.consecutivePassedTurns);
         }
     }
     passTurn(player: Player): ErrorType {
@@ -226,9 +225,55 @@ export class GameService {
         }
         return errorResult;
     }
+    // TODO: to refactor, put blocs of code in methods
     async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
-        const errorResult = ErrorType.NoError; // const errorResult = await super.place(player, placeParams); 
+        if (!player.isActive) {
+            return ErrorType.ImpossibleCommand;
+        }
+        let errorResult = this.placeService.place(player, placeParams);
         if (errorResult === ErrorType.NoError) {
+            // Generate all words created
+            let tempScrabbleWords: ScrabbleWord[];
+            if (placeParams.orientation === Axis.H) {
+                tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
+            } else {
+                tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
+            }
+            const strWords: string[] = [];
+            tempScrabbleWords.forEach((scrabbleWord) => {
+                strWords.push(scrabbleWord.stringify().toLowerCase());
+            });
+            // validate words waits 3sec if the words are invalid or the server doesn't answer.
+            await this.validationService.validateWords(tempScrabbleWords, this.game.gameMode).then((isValidWordsResult: boolean) => {
+                errorResult = isValidWordsResult ? ErrorType.NoError : ErrorType.ImpossibleCommand;
+                let lettersToAddToRack;
+                if (!this.validationService.areWordsValid) {
+                    // Retake letters
+                    lettersToAddToRack = this.gridService.removeInvalidLetters(
+                        placeParams.position,
+                        placeParams.word.length,
+                        placeParams.orientation,
+                    );
+                } else {
+                    // Take new letters
+                    this.validationService.updatePlayerScore(tempScrabbleWords, player);
+                    lettersToAddToRack = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+                }
+                this.addRackLetters(lettersToAddToRack);
+                lettersToAddToRack.forEach((letter) => {
+                    player.letters.push(letter);
+                });
+                this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
+                this.game.isTurnPassed = false;
+                this.changeTurn();
+            });
+            return errorResult;
+        }
+        return errorResult;
+    }
+    // TODO : could be moved somewhere else if too many lines
+    synchronizeAfterPlaceCommand(errorResult: ErrorType, placeParams: PlaceParams, player: Player) {
+        if (errorResult === ErrorType.NoError && this.game.gameMode === GameType.MultiPlayer) {
             this.socket.emit('word placed', {
                 word: placeParams.word,
                 orientation: placeParams.orientation,
@@ -237,7 +282,6 @@ export class GameService {
             });
             this.socket.emit('place word', { stock: this.game.stock.letterStock, newLetters: player.letters, newScore: player.score });
         }
-        return errorResult;
     }
     exchangeLetters(player: Player, letters: string): ErrorType {
         if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
@@ -256,9 +300,6 @@ export class GameService {
                     const lettersUpdate: LettersUpdate = { newStock: this.game.stock.letterStock, newLetters: player.letters, newScore: player.score };
                     this.socket.emit('exchange letters', lettersUpdate);
                 }
-                console.log('exchangeletters: ', player.name, ' letters:', scrabbleLetterstoString(player.letters));
-                console.log('exchangeletters: ', this.game.getOpponent().name, ' letters:', scrabbleLetterstoString(this.game.getOpponent().letters));
-
                 this.game.isTurnPassed = false;
                 this.changeTurn();
                 return ErrorType.NoError;
@@ -266,19 +307,14 @@ export class GameService {
         }
         return ErrorType.ImpossibleCommand;
     }
-    displayEndGameMessage() {
-        const endGameMessages = this.chatDisplayService.createEndGameMessages(
-            this.game.stock.letterStock,
-            this.game.getLocalPlayer(),
-            this.game.getOpponent(),
-        );
-        endGameMessages.forEach((message) => {
-            this.chatDisplayService.addEntry(message);
-        });
-    }
-    // TODO: check what was in multi 
     endGame() {
-        this.socket.emit('endGame');
+        if (this.game.gameMode === GameType.Solo) {
+            this.chatDisplayService.displayEndGameMessage(this.game.stock.letterStock, this.game.getLocalPlayer(), this.game.getOpponent());
+            this.endLocalGame();
+            this.resetTimer();
+        } else if (this.game.gameMode === GameType.MultiPlayer) {
+            this.socket.emit('endGame');
+        }
     }
     endLocalGame() {
         const localPlayerPoints = this.calculateRackPoints(this.game.getLocalPlayer());

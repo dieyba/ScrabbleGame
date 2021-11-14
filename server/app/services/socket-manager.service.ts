@@ -16,6 +16,7 @@ export class SocketManagerService {
     ) {
         this.gameListMan = new GameListManager();
         this.playerMan = new PlayerManagerService();
+        this.validationService = new ValidationService();
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
     }
     public handleSockets(): void {
@@ -254,7 +255,9 @@ export class SocketManagerService {
         }
     }
     private validateWords(socket: io.Socket, newWords: string[]) {
+        console.log("to validate:", newWords);
         const result = this.validationService.validateWords(newWords);
+        console.log('result:', result);
         this.sio.to(socket.id).emit('areWordsValid', result);
     }
     private changeTurn(socket: io.Socket, isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) {

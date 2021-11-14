@@ -1,6 +1,7 @@
 
 import { Injectable } from '@angular/core';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
+import { GameType } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { ERROR_NUMBER } from '@app/classes/utilities';
@@ -32,11 +33,9 @@ export class ValidationService {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.areWordsValid = false;
-        this.wordsValid();
+        this.socketOnConnect();
     }
-
-
-    wordsValid() {
+    socketOnConnect() {
         this.socket.on('areWordsValid', (result: boolean) => {
             this.areWordsValid = result;
         });
@@ -101,7 +100,7 @@ export class ValidationService {
     // Calls the server to validate the words passed in.
     // If the words were not valid, wait 3 seconds before returning result.
     // If the server doesnt answer after 3 sec, validation result is false by default
-    async validateWords(newWords: ScrabbleWord[]) {
+    async validateWords(newWords: ScrabbleWord[], gameMode: GameType) {
         const strWords: string[] = [];
         newWords?.forEach((newWord) => {
             strWords.push(newWord.stringify().toLowerCase());
@@ -109,22 +108,49 @@ export class ValidationService {
         this.areWordsValid = false;
         let wordsHaveBeenValidated = false;
         let validationTimer: NodeJS.Timeout;
-        return new Promise<boolean>((resolve) => {
-            this.socket.emit('validateWords', strWords);
+        if (gameMode === GameType.MultiPlayer) {
+            // server validation
+            return new Promise<boolean>((resolve) => {
+                this.socket.emit('validateWords', strWords);
 
-            this.socket.once('areWordsValid', (areWordsValid) => {
-                this.areWordsValid = areWordsValid;
-                wordsHaveBeenValidated = true;
-                if (areWordsValid) {
-                    resolve(areWordsValid);
-                    clearTimeout(validationTimer);
-                }
+                this.socket.once('areWordsValid', (areWordsValid) => {
+                    this.areWordsValid = areWordsValid;
+                    wordsHaveBeenValidated = true;
+                    if (areWordsValid) {
+                        resolve(areWordsValid);
+                        clearTimeout(validationTimer);
+                    }
+                });
+                validationTimer = setTimeout(() => {
+                    if (!wordsHaveBeenValidated || !this.areWordsValid) {
+                        resolve(false);
+                    }
+                }, WAIT_TIME);
             });
-            validationTimer = setTimeout(() => {
-                if (!wordsHaveBeenValidated || !this.areWordsValid) {
-                    resolve(false);
+        } else {
+            // local validation
+            return new Promise<boolean>((resolve) => {
+                this.areWordsValid = true;
+                for (const word of strWords) {
+                    if (!this.isWordValid(word)) {
+                        this.areWordsValid = false;
+                        break;
+                    }
                 }
-            }, WAIT_TIME);
-        });
+                wordsHaveBeenValidated = true;
+                resolve(this.areWordsValid);
+                clearTimeout(validationTimer);
+
+                validationTimer = setTimeout(() => {
+                    if (!wordsHaveBeenValidated || !this.areWordsValid) {
+                        resolve(this.areWordsValid);
+                    }
+                }, WAIT_TIME);
+            });
+        }
+    }
+    // TODO: see if some functions already exist for letter validation
+    isWordValid(word: string): boolean {
+        return this.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
     }
 }
