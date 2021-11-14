@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { createExchangeCmd, ExchangeCmd } from '@app/classes/exchange-command';
-import { LocalPlayer } from '@app/classes/local-player';
 import { GameService } from '@app/services/game.service';
 import { SoloGameService } from '@app/services/solo-game.service';
 import { ChatEntryColor, createErrorEntry } from './chat-display-entry';

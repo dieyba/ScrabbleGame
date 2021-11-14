@@ -1,4 +1,3 @@
-import { LocalPlayer } from '@app/classes/local-player';
 import { ChatDisplayService } from '@app/services/chat-display.service';
 import { ChatDisplayEntry, ChatEntryColor } from './chat-display-entry';
 import { DefaultCommandParams } from './commands';

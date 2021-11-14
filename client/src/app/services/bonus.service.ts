@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { DARK_BLUE_FACTOR, PALE_BLUE_FACTOR, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';

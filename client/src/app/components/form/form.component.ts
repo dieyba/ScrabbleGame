@@ -1,10 +1,10 @@
-
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DictionaryType } from '@app/classes/dictionary';
-import { GameInitInfo, GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
+import { GameInitInfo, GameType } from '@app/classes/game-parameters';
+import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
@@ -57,7 +57,7 @@ export class FormComponent implements OnInit {
             this.level = new FormControl('', [Validators.required]);
         } else {
             this.level = new FormControl('');
-            this.socketOnConnect(); // only need to listen for the server in the multiplayer game form
+            this.socketOnConnect(); // form only needs to listen to the server for the multiplayer game form
         }
         this.dictionaryList = Object.values(DictionaryType);
         this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
@@ -97,7 +97,7 @@ export class FormComponent implements OnInit {
     }
 
     randomPlayer(list: string[]): void {
-        let showOpponents = document.getElementById('opponents'); // make sure it is not null
+        const showOpponents = document.getElementById('opponents'); // TODO: to remove lint error did it work?
         if (showOpponents instanceof HTMLElement) {
             showOpponents.style.visibility = 'visible';
         }
@@ -125,7 +125,7 @@ export class FormComponent implements OnInit {
     submit(): void {
         if (this.myForm.valid) {
             const gameMode = this.isSolo ? GameType.Solo : GameType.MultiPlayer;
-            let gameParams = new WaitingAreaGameParameters(
+            const gameParams = new WaitingAreaGameParameters(
                 gameMode,
                 GAME_CAPACITY,
                 this.dictionaryForm.value,
@@ -152,7 +152,6 @@ export class FormComponent implements OnInit {
             this.dialogRef.close();
             this.router.navigate(['/game']);
             this.gameService.initializeMultiplayerGame(gameParams);
-
         });
     }
 }

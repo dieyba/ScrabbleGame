@@ -8,7 +8,7 @@ export class VirtualPlayer extends Player {
     type: Difficulty;
 
     constructor(name: string, difficulty?: Difficulty) {
-        super(name)
+        super(name);
         this.type = difficulty !== undefined ? difficulty : Difficulty.Easy; // by default, the difficulty is easy
     }
 }

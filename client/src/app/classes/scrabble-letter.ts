@@ -1,5 +1,3 @@
-// TODO: see what will be needed in client version of scrabble letters
-
 import { Square, SquareColor } from './square';
 import { isAllLowerLetters, removeAccents } from './utilities';
 
@@ -19,13 +17,13 @@ export class ScrabbleLetter {
         this.tile = new Square(UNPLACED, UNPLACED); // -1, -1 means it is not placed yet
         this.setLetter(letter);
         this.setDefaultValue(letter);
-        // TODO: this overrides default value, is there a situation where we do that?
         if (value !== undefined) {
             this.value = value;
         }
     }
 
     setLetter(character: string): void {
+        // if a captial letter is passed in, represents a blank piece, meaning a '*'
         this.character = isAllLowerLetters(character) ? removeAccents(character) : '*';
     }
     setDefaultValue(character: string) {

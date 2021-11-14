@@ -1,6 +1,3 @@
-// TODO: see if create a grid-service (well board-service ig) on the server and move relevant methods there
-
-
 import { Injectable } from '@angular/core';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter, UNPLACED } from '@app/classes/scrabble-letter';

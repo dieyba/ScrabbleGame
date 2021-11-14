@@ -41,12 +41,7 @@ export class MouseWordPlacerService {
         this.wordString = '';
     }
     onMouseClick(e: MouseEvent) {
-        if (
-            !this.gameService.game.getLocalPlayer().isActive ||
-            this.currentWord.length > 0 ||
-            this.gameService.game.isEndGame
-        )
-            return;
+        if (!this.gameService.game.getLocalPlayer().isActive || this.currentWord.length > 0 || this.gameService.game.isEndGame) return;
         this.clearOverlay();
         if (this.initialPosition.x !== 0 && this.initialPosition.y !== 0) {
             this.drawArrow(this.initialPosition, this.currentAxis);

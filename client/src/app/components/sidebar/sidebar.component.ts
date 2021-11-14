@@ -18,7 +18,6 @@ export class SidebarComponent {
     private readonly server: string;
 
     constructor(public router: Router, public dialog: MatDialog, private gameService: GameService) {
-        // this.server = 'http://' + window.location.hostname + ':3000';
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.winnerName = '';
@@ -89,8 +88,7 @@ export class SidebarComponent {
 
     getWinnerName() {
         if (this.isDrawnGame()) {
-            this.winnerName =
-                this.gameService.game.getLocalPlayer().name + ' et ' + this.gameService.game.getOpponent().name;
+            this.winnerName = this.gameService.game.getLocalPlayer().name + ' et ' + this.gameService.game.getOpponent().name;
         } else if (this.gameService.game.getLocalPlayer().isWinner) {
             this.winnerName = this.gameService.game.getLocalPlayer().name;
         } else if (this.gameService.game.getOpponent().isWinner) {
@@ -98,6 +96,7 @@ export class SidebarComponent {
         }
     }
 
+    // TODO: test if quit game still works (on the server too)
     quitGame(): void {
         // User confirmation popup
         this.dialogRef = this.dialog.open(EndGamePopupComponent);

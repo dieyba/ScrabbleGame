@@ -1,6 +1,5 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
-import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';

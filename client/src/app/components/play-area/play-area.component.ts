@@ -12,13 +12,11 @@ import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service'
 import { RackService } from '@app/services/rack.service';
 import { VirtualPlayerService } from '@app/services/virtual-player.service';
 
-// TODO : Avoir un fichier séparé pour les constantes!
+// TODO : See if needed elsewhere, else no need to move these constants
 export const DEFAULT_WIDTH = 640;
 export const DEFAULT_HEIGHT = 640;
 export const RACK_WIDTH = 500;
 export const RACK_HEIGHT = 60;
-
-// TODO : Déplacer ça dans un fichier séparé accessible par tous
 export enum MouseButton {
     Left = 0,
     Middle = 1,
@@ -78,10 +76,10 @@ export class PlayAreaComponent implements AfterViewInit {
 
         this.gameService.isOpponentTurnObservable.subscribe((isActive: boolean) => {
             if (isActive) {
-                // put back the letters from the board to the rack in they weren't placed
+                // put back the letters from the board to the rack if they weren't placed
                 this.mouseWordPlacerService.onBlur();
-                // if the opponent player is a virtual player and not a human player, play virtual player turn
-                let isVirtualPlayerCanPlay =
+                // if the opponent player is a virtual player, play virtual player turn
+                const isVirtualPlayerCanPlay =
                     this.gameService.game.gameMode === GameType.Solo &&
                     this.gameService.game.getOpponent() instanceof VirtualPlayer &&
                     !this.gameService.game.isEndGame;

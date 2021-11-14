@@ -27,13 +27,9 @@ export class CommandInvokerService {
         }
     }
     displayExecutionResultMessages(commandResult: CommandResult, isExchangeCmd: boolean, isToDisplayRemotely: boolean) {
-        const isSendToServer =
-            this.gameService.game.gameMode === GameType.MultiPlayer &&
-            isToDisplayRemotely &&
-            commandResult.isExecuted;
+        const isSendToServer = this.gameService.game.gameMode === GameType.MultiPlayer && isToDisplayRemotely && commandResult.isExecuted;
         const isFromVirtualPlayer =
-            this.gameService.game.gameMode === GameType.Solo &&
-            commandResult.executionMessages[0].color === ChatEntryColor.RemotePlayer;
+            this.gameService.game.gameMode === GameType.Solo && commandResult.executionMessages[0].color === ChatEntryColor.RemotePlayer;
 
         if (isSendToServer) {
             this.displayExecutionWithServer(isExchangeCmd, commandResult);
@@ -52,20 +48,20 @@ export class CommandInvokerService {
                 this.chatDisplayService.sendMessageToServer(chatEntry.message);
             });
         }
-    };
+    }
     displayExecutionLocally(isFromVirtualPlayer: boolean, isExchangeCmd: boolean, commandResult: CommandResult) {
         if (isFromVirtualPlayer) {
+            // TODO: see how exactly debug messages will be added in command invoker
             const commandMessage = commandResult.executionMessages[0].message;
             const debugMessages = ['some debug message', 'some other debug message'];
             this.chatDisplayService.addVirtalPlayerEntry(commandMessage, debugMessages);
-        }
-        // extract command returns both players message, but solo game only displays the local message
-        else if (isExchangeCmd) {
+        } else if (isExchangeCmd) {
+            // extract command returns both players message, but solo game only displays the local message
             this.chatDisplayService.addEntry(commandResult.executionMessages[0]);
         } else {
             commandResult.executionMessages.forEach((chatEntry) => {
                 this.chatDisplayService.addEntry(chatEntry);
             });
         }
-    };
+    }
 }

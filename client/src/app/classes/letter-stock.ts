@@ -1,5 +1,3 @@
-// TODO: see if things are missing from sprint2
-
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 
 enum LetterQuantity {

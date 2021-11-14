@@ -18,7 +18,7 @@ import {
     isValidLetter,
     removeAccents,
     scrabbleLetterstoString,
-    trimSpaces
+    trimSpaces,
 } from '@app/classes/utilities';
 import { ChatDisplayService } from './chat-display.service';
 import { CommandInvokerService } from './command-invoker.service';
@@ -91,7 +91,6 @@ export class TextEntryService {
                 this.chatDisplayService.addEntry(createErrorEntry(commandCreationResult as ErrorType, userInput));
             }
         }
-
     }
 
     createCommand(commandInput: string, player: Player): CommandCreationResult {

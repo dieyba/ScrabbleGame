@@ -1,18 +1,22 @@
-
-// TODO: finish adapting to isLOG2990 choice selection in form 
+// TODO: finish adapting to isLOG2990 choice selection in form
 
 import { Component, HostListener, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DictionaryType } from '@app/classes/dictionary';
-import { GameInitInfo, GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
+import { GameInitInfo, GameType } from '@app/classes/game-parameters';
+import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
 import { FormComponent, GAME_CAPACITY } from '@app/components/form/form.component';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+
+const MAX_NAME_LENGHT = 12;
+const MIN_NAME_LENGHT = 3;
+const LIST_UPDATE_TIMEOUT = 500;
 
 @Component({
     selector: 'app-waiting-area',
@@ -37,7 +41,7 @@ export class WaitingAreaComponent {
     gameCancelled: boolean;
 
     private readonly server: string;
-    private timer: any;
+    private timer: NodeJS.Timeout;
     private socket: io.Socket;
 
     constructor(
@@ -55,20 +59,12 @@ export class WaitingAreaComponent {
         this.name = false;
         this.isStarting = false;
         if (isGameSelected) {
-            this.selectedGame = new WaitingAreaGameParameters(
-                GameType.MultiPlayer,
-                GAME_CAPACITY,
-                DictionaryType.Default,
-                0,
-                false,
-                false,
-                '',
-            );
+            this.selectedGame = new WaitingAreaGameParameters(GameType.MultiPlayer, GAME_CAPACITY, DictionaryType.Default, 0, false, false, '');
             this.playerName = new FormControl('', [
                 Validators.required,
                 Validators.pattern('[a-zA-ZÉé]*'),
-                Validators.maxLength(12),
-                Validators.minLength(3),
+                Validators.maxLength(MAX_NAME_LENGHT),
+                Validators.minLength(MIN_NAME_LENGHT),
             ]);
         }
         this.full = false;
@@ -76,7 +72,7 @@ export class WaitingAreaComponent {
         this.nameValid = false;
         this.timer = setInterval(() => {
             this.pendingGameslist = this.gameList.getList();
-        }, 500);
+        }, LIST_UPDATE_TIMEOUT);
         this.socketOnConnect();
     }
     @HostListener('window:beforeunload', ['$event'])

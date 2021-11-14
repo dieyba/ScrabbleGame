@@ -1,5 +1,6 @@
-import { LetterStock } from '@app/classes/letter-stock';
+
 import { DictionaryType } from './dictionary';
+import { LetterStock } from './letter-stock';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
@@ -20,7 +21,7 @@ export interface GameRoom {
     creatorId: string;
     joinerId: string;
 }
-export class WaitingAreaGameParameters {
+export interface WaitingAreaGameParameters {
     gameRoom: GameRoom;
     creatorName: string;
     joinerName: string;

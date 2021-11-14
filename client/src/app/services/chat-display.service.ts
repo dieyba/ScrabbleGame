@@ -21,7 +21,6 @@ export class ChatDisplayService {
     private socket: io.Socket;
 
     constructor() {
-        // this.server = 'http://' + window.location.hostname + ':3000';
         this.server = environment.socketUrl;
         this.isActiveDebug = false;
         this.entries = [];

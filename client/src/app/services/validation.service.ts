@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { GameType } from '@app/classes/game-parameters';
@@ -55,7 +54,7 @@ export class ValidationService {
                         newWord.content.forEach((letter) => {
                             letter.tile.isValidated = true;
                         });
-                        // if change the isvalidated = true here, change how its used in solo game service
+                        // TODO: if change the isvalidated = true here, change how its used in solo game service
                         this.bonusService.useBonus(newWord);
                     }
                 });
@@ -138,7 +137,7 @@ export class ValidationService {
                     }
                 }
                 wordsHaveBeenValidated = true;
-                // return true if words are valid, wait till the end of timeout if not
+                // return true if words are valid, wait untill the end of timeout if not
                 if (this.areWordsValid) {
                     resolve(this.areWordsValid);
                     clearTimeout(validationTimer);

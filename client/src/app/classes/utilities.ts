@@ -100,3 +100,9 @@ export const isValidLetter = (letter: string): boolean => {
     }
     return false;
 };
+
+export const isCoordInsideBoard = (coord: Vec2) => {
+    const isValidColumn = coord.x >= Column.One && coord.x <= Column.Fifteen;
+    const isValidRow = coord.y >= Row.A && coord.y <= Row.O;
+    return isValidColumn && isValidRow;
+};

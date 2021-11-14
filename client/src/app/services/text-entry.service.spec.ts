@@ -2,7 +2,7 @@
 // import { createErrorEntry } from '@app/classes/chat-display-entry';
 // import { ErrorType } from '@app/classes/errors';
 // import { GameParameters } from '@app/classes/game-parameters';
-// import { LocalPlayer } from '@app/classes/local-player';
+// import { Player } from "@app/classes/player";
 // import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 // import { ChatDisplayService } from './chat-display.service';
 // import { CommandInvokerService } from './command-invoker.service';
@@ -23,7 +23,6 @@
 //     let gameServiceSpy: jasmine.SpyObj<GameService>;
 //     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
 //     const localPlayer = new LocalPlayer(LOCAL_PLAYER_NAME);
-
 
 //     beforeEach(() => {
 //         chatDisplayServiceSpy = jasmine.createSpyObj('ChatDisplayService', [

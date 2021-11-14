@@ -1,4 +1,5 @@
 import { ColorQuantity, Square, SquareColor } from './square';
+import { isCoordInsideBoard } from './utilities';
 import { Vec2 } from './vec2';
 
 export const BOARD_SIZE = 15;
@@ -47,7 +48,7 @@ export class ScrabbleBoard {
     colorStock: SquareColor[];
 
     constructor(initParam?: boolean | Square[][]) {
-        // Solo game initializes board on the client, initParam tells if the board has random bonus tile
+        // in solo mode, game service initializes the board on the client, initParam tells if the board has random bonus tile
         if (typeof initParam === 'boolean') {
             this.squares = [];
             this.colorStock = [];
@@ -62,9 +63,7 @@ export class ScrabbleBoard {
                 }
             }
             this.generateBoard(initParam);
-        }
-        // TODO: see if this works
-        else if (initParam instanceof Array) {
+        } else if (initParam instanceof Array) {
             // Multiplayer game already has the board initialized in the server, initParam is the squares matrix
             this.squares = initParam;
         }
@@ -156,16 +155,9 @@ export class ScrabbleBoard {
             this.setSquareColor(i, j, SquareColor.Teal, isRandom);
         }
     }
-
-    isCoordInsideBoard(coord: Vec2): boolean {
-        const isValidColumn = coord.x >= Column.One && coord.x <= Column.Fifteen;
-        const isValidRow = coord.y >= Row.A && coord.y <= Row.O;
-        return isValidColumn && isValidRow;
-    }
-
     isWordInsideBoard(word: string, coord: Vec2, orientation: string): boolean {
         // Verifying if coordinates are good
-        if (!this.isCoordInsideBoard(coord)) {
+        if (!isCoordInsideBoard(coord)) {
             return false;
         }
         // Verifying if word is too long to stay inside board
@@ -241,12 +233,12 @@ export class ScrabbleBoard {
             coordAfterWord.x = coord.x + word.length;
         }
 
-        if (this.isCoordInsideBoard(coordBeforeWord)) {
+        if (isCoordInsideBoard(coordBeforeWord)) {
             if (this.squares[coordBeforeWord.x][coordBeforeWord.y].occupied) {
                 return true;
             }
         }
-        if (this.isCoordInsideBoard(coordBeforeWord)) {
+        if (isCoordInsideBoard(coordBeforeWord)) {
             if (this.squares[coordAfterWord.x][coordAfterWord.y].occupied) {
                 return true;
             }
@@ -261,7 +253,7 @@ export class ScrabbleBoard {
                 tempCoord.y = coord.y + 1;
                 tempCoord.x = coord.x + i;
             }
-            if (this.isCoordInsideBoard(tempCoord) && this.squares[tempCoord.x][tempCoord.y].occupied) {
+            if (isCoordInsideBoard(tempCoord) && this.squares[tempCoord.x][tempCoord.y].occupied) {
                 return true;
             }
         }
@@ -275,7 +267,7 @@ export class ScrabbleBoard {
                 tempCoord.y = coord.y - 1;
                 tempCoord.x = coord.x + i;
             }
-            if (this.isCoordInsideBoard(tempCoord) && this.squares[tempCoord.x][tempCoord.y].occupied) {
+            if (isCoordInsideBoard(tempCoord) && this.squares[tempCoord.x][tempCoord.y].occupied) {
                 return true;
             }
         }

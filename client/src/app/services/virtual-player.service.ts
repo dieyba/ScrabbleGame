@@ -342,8 +342,6 @@ export class VirtualPlayerService {
     isWordValid(word: string): boolean {
         // TODO: see where to access dictionary downloaded
         const dictionary: Dictionary = new Dictionary(DictionaryType.Default);
-        return dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'")
-            ? true
-            : false;
+        return dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
     }
 }

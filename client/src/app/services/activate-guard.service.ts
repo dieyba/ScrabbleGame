@@ -9,8 +9,8 @@ import { GameService } from './game.service';
 export class ActivateGuard implements CanActivate {
     constructor(private gameService: GameService) {}
 
-    /* eslint-disable no-unused-vars */
     canActivate(
+        // TODO: are those needed?
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot,
     ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
