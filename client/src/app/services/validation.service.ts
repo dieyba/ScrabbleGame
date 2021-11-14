@@ -35,6 +35,7 @@ export class ValidationService {
         this.wordsValid();
     }
 
+
     wordsValid() {
         this.socket.on('areWordsValid', (result: boolean) => {
             this.areWordsValid = result;

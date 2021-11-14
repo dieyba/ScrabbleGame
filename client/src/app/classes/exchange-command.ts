@@ -13,11 +13,10 @@ export class ExchangeCmd extends Command {
         this.letters = letters;
     }
 
-    // TODO: might need to make it async
-    async execute(): Promise<CommandResult> {
+    execute(): CommandResult {
         const executionMessages: ChatDisplayEntry[] = [];
         const commandMessage = '!' + CommandName.ExchangeCmd;
-        const executionResult = await this.gameService.exchangeLetters(this.player, this.letters);
+        const executionResult = this.gameService.exchangeLetters(this.player, this.letters);
 
         if (executionResult === ErrorType.ImpossibleCommand) {
             const commandAndLetters = commandMessage + ' ' + this.letters;

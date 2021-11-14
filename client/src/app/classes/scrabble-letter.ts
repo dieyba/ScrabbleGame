@@ -1,7 +1,7 @@
 // TODO: see what will be needed in client version of scrabble letters
 
 import { Square, SquareColor } from './square';
-import { removeAccents } from './utilities';
+import { isAllLowerLetters, removeAccents } from './utilities';
 
 export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;
@@ -26,13 +26,11 @@ export class ScrabbleLetter {
     }
 
     setLetter(character: string): void {
-        this.character = removeAccents(character);
+        this.character = isAllLowerLetters(character) ? removeAccents(character) : '*';
     }
     setDefaultValue(character: string) {
         // set the letter's default value
-        if (character === '*') {
-            this.value = 0;
-        } else if ('aeilnorstu'.includes(character)) {
+        if ('aeilnorstu'.includes(character)) {
             this.value = 1;
         } else if ('dgm'.includes(character)) {
             this.value = 2;
@@ -44,6 +42,8 @@ export class ScrabbleLetter {
             this.value = 8;
         } else if ('kwxyz'.includes(character)) {
             this.value = 10;
+        } else {
+            this.value = 0; // default value for *
         }
     }
 }

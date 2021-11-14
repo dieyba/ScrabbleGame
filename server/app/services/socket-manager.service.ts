@@ -1,5 +1,5 @@
 import { WaitingAreaGameParameters } from '@app/classes/game-parameters';
-import { ERROR_NUMBER } from '@app/classes/utilities';
+import { BoardUpdate, ERROR_NUMBER, LettersUpdate } from '@app/classes/utilities';
 import * as http from 'http';
 import * as io from 'socket.io';
 import { GameListManager } from './game-list-manager.service';
@@ -65,14 +65,14 @@ export class SocketManagerService {
             socket.on('disconnect', () => {
                 this.disconnect(socket)
             });
-            socket.on('exchange letters', (update: any) => {
+            socket.on('exchange letters', (update: LettersUpdate) => {
                 let sender = this.playerMan.getPlayerBySocketID(socket.id);
                 if (sender === undefined) {
                     return;
                 }
                 const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.getOtherPlayerInRoom(sender.socketId)
                 if (opponent !== undefined) {
-                    this.sio.to(opponent.socketId).emit('letters exchange', update);
+                    this.sio.to(opponent.socketId).emit('update letters', update);
                 }
             });
             socket.on('validateWords', (newWords: string[]) => {
@@ -88,10 +88,15 @@ export class SocketManagerService {
                     this.sio.to(opponent.socketId).emit('update board', word);
                 }
             });
-            socket.on('place word', (update: any) => {
-                // let sender = this.playerMan.getPlayerBySocketID(socket.id) as Player;
-                // const opponent = this.gameListMan.getOtherPlayerInRoom(sender.socketId, sender.roomId) as Player;
-                // this.sio.to(opponent.socketId).emit('update place', update);
+            socket.on('place word', (update: BoardUpdate) => {
+                let sender = this.playerMan.getPlayerBySocketID(socket.id);
+                if (sender === undefined) {
+                    return;
+                }
+                const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.getOtherPlayerInRoom(sender.socketId)
+                if (opponent !== undefined) {
+                    this.sio.to(opponent.socketId).emit('update place', update);
+                }
             });
             socket.on('change turn', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
                 this.changeTurn(socket, isCurrentTurnedPassed, consecutivePassedTurns);

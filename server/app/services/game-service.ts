@@ -37,10 +37,6 @@
 //             stock: this.game.stock.letterStock,
 //             gameMode: this.game.gameMode,
 //         }
-//         // console.log('creator:', this.game.players[0].name);
-//         // console.log('opponent:', this.game.players[1].name);
-//         // console.log('creator is normal player:', this.game.players[0] instanceof Player);
-//         // console.log('opponent is a jv:', this.game.players[1] instanceof VirtualPlayer, '\n');
 //         return clientInitParams;
 //     }
 // }

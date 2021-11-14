@@ -93,7 +93,6 @@ export class GameParameters {
         this.isLOG2990 = false;
         this.localPlayerIndex = 0; // by default, in solo games, the local player is the first player
         this.opponentPlayerIndex = 1;
-
     }
 
     setLocalAndOpponentId(localPlayerIndex: number, opponentPlayerIndex: number) {

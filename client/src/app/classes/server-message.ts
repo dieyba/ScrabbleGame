@@ -9,9 +9,8 @@ export interface BoardUpdate {
 }
 
 export interface LettersUpdate {
-    playerIndex: number, // players[] index of the player who exchanged letters
     newStock: ScrabbleLetter[],
     newLetters: ScrabbleLetter[];
-    newScore?: number;
+    newScore: number;
 }
 

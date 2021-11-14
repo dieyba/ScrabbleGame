@@ -3,13 +3,12 @@ import { PlaceParams } from '@app/classes/commands';
 import { ErrorType } from '@app/classes/errors';
 import { GameInitInfo, GameParameters, GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
 import { LetterStock } from '@app/classes/letter-stock';
-import { LocalPlayer } from '@app/classes/local-player';
-import { Player } from '@app/classes/player';
+import { Player, removePlayerLetters } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { BoardUpdate, LettersUpdate } from '@app/classes/server-message';
-import { Axis } from '@app/classes/utilities';
+import { Axis, scrabbleLetterstoString } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { SocketHandler } from '@app/modules/socket-handler';
@@ -20,12 +19,16 @@ import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
+import { ValidationService } from './validation.service';
 
 export const TIMER_INTERVAL = 1000;
 export const DEFAULT_LETTER_COUNT = 7;
 export const MAX_TURNS_PASSED = 6;
 const DOUBLE_DIGIT = 10;
 const MINUTE_IN_SEC = 60;
+const DEFAULT_LOCAL_PLAYER_ID = 0;
+const DEFAULT_OPPONENT_ID = 1;
+
 @Injectable({
     providedIn: 'root',
 })
@@ -43,6 +46,7 @@ export class GameService {
         protected rackService: RackService,
         protected chatDisplayService: ChatDisplayService,
         protected placeService: PlaceService,
+        protected validationService: ValidationService,
     ) {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
@@ -54,7 +58,6 @@ export class GameService {
             this.game.isTurnPassed = isTurnPassed;
             this.game.consecutivePassedTurns = consecutivePassedTurns;
             if (!this.game.isEndGame) {
-                // if it is not already the endgame
                 const isLocalPlayerEndingGame = this.game.consecutivePassedTurns >= MAX_TURNS_PASSED && this.game.getLocalPlayer().isActive;
                 if (isLocalPlayerEndingGame) {
                     this.endGame();
@@ -73,15 +76,17 @@ export class GameService {
         });
         // updates board after a new word was placed
         this.socket.on('update board', (boardUpdate: BoardUpdate) => {
-            this.updateBoard(boardUpdate.word, boardUpdate.orientation, new Vec2(boardUpdate.positionX, boardUpdate.positionY));
+            this.gridService.updateBoard(boardUpdate.word, boardUpdate.orientation, new Vec2(boardUpdate.positionX, boardUpdate.positionY));
         });
         // updates the stock and the letters of the player who placed or exchanged letters
+        // TODO: see why cant' emit to client with LettersUpdate
         this.socket.on('update letters', (update: LettersUpdate) => {
             this.game.stock.letterStock = update.newStock;
-            this.game.players[update.playerIndex].letters = update.newLetters;
-            if (update.newScore !== undefined) {
-                this.game.players[update.playerIndex].score = update.newScore;
-            }
+            this.game.getOpponent().letters = update.newLetters;
+            this.game.getOpponent().score = update.newScore;
+            console.log(scrabbleLetterstoString(this.game.stock.letterStock));
+            console.log('exchangeletters: ', this.game.getLocalPlayer().name, ' letters:', scrabbleLetterstoString(this.game.getLocalPlayer().letters));
+            console.log('exchangeletters: ', this.game.getOpponent().name, ' letters:', scrabbleLetterstoString(this.game.getOpponent().letters));
         });
     }
     initializeSoloGame(initInfo: WaitingAreaGameParameters, virtualPlayerDifficulty: Difficulty) {
@@ -91,15 +96,18 @@ export class GameService {
             this.game.totalCountDown = initInfo.totalCountDown;
             this.game.timerMs = this.game.totalCountDown;
             this.game.gameMode = initInfo.gameMode;
-            this.game.setLocalPlayer(new LocalPlayer(initInfo.creatorName));
+            this.game.consecutivePassedTurns = 0;
+            this.game.isTurnPassed = false;
+            this.game.isEndGame = false;
+            this.game.setLocalAndOpponentId(DEFAULT_LOCAL_PLAYER_ID, DEFAULT_OPPONENT_ID);
+            this.game.setLocalPlayer(new Player(initInfo.creatorName));
             this.game.setOpponent(new VirtualPlayer(initInfo.joinerName, virtualPlayerDifficulty));
             this.game.getLocalPlayer().letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
             this.game.getOpponent().letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
             const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
             this.game.players[starterPlayerIndex].isActive = true;
+            this.validationService.dictionary.selectDictionary(initInfo.dictionaryType); // TODO: see how selecting and loading dictionary on client in solo mode will work
             // TODO: set objectives to initialize here
-            // TODO: add creating a dictionary in client validation service (go put dictionary class back to how it was)
-            console.log('init solo done:', this.game.players);
         }
     }
     initializeMultiplayerGame(initInfo: GameInitInfo) {
@@ -114,6 +122,9 @@ export class GameService {
             this.game.totalCountDown = initInfo.totalCountDown;
             this.game.timerMs = this.game.totalCountDown;
             this.game.gameMode = initInfo.gameMode;
+            this.game.consecutivePassedTurns = 0;
+            this.game.isTurnPassed = false;
+            this.game.isEndGame = false;
             // TODO:set objectives initialized in server
         }
     }
@@ -126,6 +137,7 @@ export class GameService {
         this.addRackLetters(this.game.getLocalPlayer().letters);
         this.startCountdown();
     }
+    // TODO: create a timer class
     resetTimer() {
         this.game.timerMs = +this.game.totalCountDown;
         this.secondsToMinutes();
@@ -147,7 +159,7 @@ export class GameService {
             this.intervalValue = setInterval(() => {
                 this.game.timerMs--;
                 if (this.game.timerMs < 0) {
-                    this.game.timerMs = 0; // to prevent timer from going into negative values?
+                    this.game.timerMs = 0; // TODO: to prevent timer from going into negative values? does it work?
                     this.game.isTurnPassed = true;
                     this.changeTurn();
                 }
@@ -155,9 +167,48 @@ export class GameService {
             }, TIMER_INTERVAL);
         }
     }
+    // TODO: create a turn manager service or something?
+    // Check if last 5 turns have been passed(by the command or the timer running out)(current turn is the 6th)
+    updateConsecutivePassedTurns() {
+        if (this.game.isTurnPassed) {
+            this.game.consecutivePassedTurns++;
+        } else {
+            this.game.consecutivePassedTurns = 0;
+        }
+        if (this.game.consecutivePassedTurns >= MAX_TURNS_PASSED) {
+            this.endGame();
+        }
+    }
+    updateActivePlayer() {
+        // Switch the active player
+        if (this.game.getLocalPlayer().isActive) {
+            // If the rack is empty, end game + player won
+            if (this.game.getLocalPlayer().letters.length === 0 && this.game.stock.letterStock.length !== 0) {
+                this.game.getLocalPlayer().isWinner = true;
+                this.endGame();
+                return;
+            }
+            this.game.getLocalPlayer().isActive = false;
+            this.game.getOpponent().isActive = true;
+        } else {
+            // If the rack is empty, end game + player won
+            if (this.game.getOpponent().letters.length === 0 && this.game.stock.letterStock.length !== 0) {
+                this.game.getOpponent().isWinner = true;
+                this.endGame();
+                return;
+            }
+            this.game.getOpponent().isActive = false;
+            this.game.getLocalPlayer().isActive = true;
+        }
+    }
     changeTurn() {
-        if (!this.game.isEndGame) {
-            // this.updateConsecutivePassedTurns(); TODO: copy this from solo game service
+        if (this.game.isEndGame) {
+            return;
+        }
+        if (this.game.gameMode === GameType.MultiPlayer) {
+            this.socket.emit('change turn', this.game.isTurnPassed, this.game.consecutivePassedTurns);
+        } else {
+            this.updateConsecutivePassedTurns();
             this.updateActivePlayer();
             this.resetTimer();
             if (this.game.getOpponent().isActive) {
@@ -166,10 +217,16 @@ export class GameService {
             this.game.isTurnPassed = false; // reset isTurnedPassed when new turn starts
         }
     }
-
+    passTurn(player: Player): ErrorType {
+        let errorResult = ErrorType.ImpossibleCommand;
+        if (player.isActive) {
+            this.game.isTurnPassed = true;
+            this.changeTurn();
+            errorResult = ErrorType.NoError;
+        }
+        return errorResult;
+    }
     async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
-        // TODO: add what place was in solo game service to call here
-        // if solo mode use validation from client else call server
         const errorResult = ErrorType.NoError; // const errorResult = await super.place(player, placeParams); 
         if (errorResult === ErrorType.NoError) {
             this.socket.emit('word placed', {
@@ -183,47 +240,32 @@ export class GameService {
         return errorResult;
     }
     exchangeLetters(player: Player, letters: string): ErrorType {
-        // TODO: add call to exchange method that was in solo
-        const errorResult = ErrorType.NoError; // const errorResult = super.exchangeLetters(player, letters); 
-        if (errorResult === ErrorType.NoError) {
-            this.socket.emit('exchange letters', { stock: this.game.stock.letterStock, newLetters: player.letters, newScore: player.score });
-        }
-        return errorResult;
-    }
-    passTurn(player: Player): ErrorType {
-        let errorResult = ErrorType.ImpossibleCommand;
-        if (player.isActive) {
-            this.game.isTurnPassed = true;
-            this.changeTurn();
-            errorResult = ErrorType.NoError;
-        }
-        return errorResult;
-    }
+        if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
+            const lettersToRemove: ScrabbleLetter[] = [];
+            if (removePlayerLetters(letters, player) === true) {
+                for (let i = 0; i < letters.length; i++) {
+                    lettersToRemove[i] = new ScrabbleLetter(letters[i]);
+                }
+                const lettersToAdd: ScrabbleLetter[] = this.game.stock.exchangeLetters(lettersToRemove);
+                for (let i = 0; i < lettersToAdd.length; i++) {
+                    this.rackService.removeLetter(lettersToRemove[i]);
+                    this.rackService.addLetter(lettersToAdd[i]);
+                    player.letters.push(lettersToAdd[i]);
+                }
+                if (this.game.gameMode === GameType.MultiPlayer) {
+                    const lettersUpdate: LettersUpdate = { newStock: this.game.stock.letterStock, newLetters: player.letters, newScore: player.score };
+                    this.socket.emit('exchange letters', lettersUpdate);
+                }
+                console.log('exchangeletters: ', player.name, ' letters:', scrabbleLetterstoString(player.letters));
+                console.log('exchangeletters: ', this.game.getOpponent().name, ' letters:', scrabbleLetterstoString(this.game.getOpponent().letters));
 
-    updateBoard(word: string, orientation: string, position: Vec2) {
-        if (orientation === 'h') {
-            for (const letter of word) {
-                const character = new ScrabbleLetter(letter);
-                character.tile.position.x = position.x;
-                character.tile.position.y = position.y;
-                this.gridService.drawLetter(character, position.x, position.y);
-                this.gridService.scrabbleBoard.squares[position.x][position.y].isValidated = true;
-                this.gridService.scrabbleBoard.squares[position.x][position.y].isBonusUsed = true;
-                position.x++;
-            }
-        } else {
-            for (const letter of word) {
-                const character = new ScrabbleLetter(letter);
-                character.tile.position.x = position.x;
-                character.tile.position.y = position.y;
-                this.gridService.drawLetter(character, position.x, position.y);
-                this.gridService.scrabbleBoard.squares[position.x][position.y].isBonusUsed = true;
-                this.gridService.scrabbleBoard.squares[position.x][position.y].isValidated = true;
-                position.y++;
+                this.game.isTurnPassed = false;
+                this.changeTurn();
+                return ErrorType.NoError;
             }
         }
+        return ErrorType.ImpossibleCommand;
     }
-
     displayEndGameMessage() {
         const endGameMessages = this.chatDisplayService.createEndGameMessages(
             this.game.stock.letterStock,
@@ -234,12 +276,10 @@ export class GameService {
             this.chatDisplayService.addEntry(message);
         });
     }
-
     // TODO: check what was in multi 
     endGame() {
         this.socket.emit('endGame');
     }
-
     endLocalGame() {
         const localPlayerPoints = this.calculateRackPoints(this.game.getLocalPlayer());
         const oppnentPlayerPoints = this.calculateRackPoints(this.game.getOpponent());
@@ -267,54 +307,26 @@ export class GameService {
         this.secondsToMinutes();
         this.game.isEndGame = true;
     }
-
-    updateActivePlayer() {
-        // Switch the active player
-        if (this.game.getLocalPlayer().isActive) {
-            // If the rack is empty, end game + player won
-            if (this.game.getLocalPlayer().letters.length === 0 && this.game.stock.letterStock.length !== 0) {
-                this.game.getLocalPlayer().isWinner = true;
-                this.endGame();
-                return;
-            }
-            this.game.getLocalPlayer().isActive = false;
-            this.game.getOpponent().isActive = true;
-        } else {
-            // If the rack is empty, end game + player won
-            if (this.game.getOpponent().letters.length === 0 && this.game.stock.letterStock.length !== 0) {
-                this.game.getOpponent().isWinner = true;
-                this.endGame();
-                return;
-            }
-            this.game.getOpponent().isActive = false;
-            this.game.getLocalPlayer().isActive = true;
-        }
-    }
-
     addRackLetters(letters: ScrabbleLetter[]): void {
         for (const letter of letters) {
-            this.addRackLetter(letter);
+            this.rackService.addLetter(letter);
         }
-    }
-    addRackLetter(letter: ScrabbleLetter): void {
-        this.rackService.addLetter(letter);
     }
     removeRackLetter(scrabbleLetter: ScrabbleLetter): void {
         const i = this.rackService.removeLetter(scrabbleLetter);
         this.game.getLocalPlayer().letters.splice(i, 1);
     }
-
     drawRack(newWords: ScrabbleWord[]): void {
         newWords.forEach((newWord) => {
             for (let j = 0; j < newWord.content.length; j++) {
                 if (newWord.orientation === Axis.V) {
                     if (this.gridService.scrabbleBoard.squares[newWord.startPosition.x][newWord.startPosition.y + j].isValidated !== true) {
-                        this.addRackLetter(newWord.content[j]);
+                        this.rackService.addLetter(newWord.content[j]);
                     }
                 }
                 if (newWord.orientation === Axis.H) {
                     if (this.gridService.scrabbleBoard.squares[newWord.startPosition.x + j][newWord.startPosition.y].isValidated !== true) {
-                        this.addRackLetter(newWord.content[j]);
+                        this.rackService.addLetter(newWord.content[j]);
                     }
                 }
             }
