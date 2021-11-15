@@ -18,11 +18,8 @@ const routes: Routes = [
     { path: 'game', component: GamePageComponent, canActivate: [ActivateGuard] },
     { path: 'wait', component: WaitingAreaComponent },
     { path: 'material', component: MaterialPageComponent },
-<<<<<<< HEAD
     { path: 'admin', component: AdminPageComponent },
-=======
     { path: 'bestScores', component: BestScoresComponent },
->>>>>>> feature/meilleurs-scores
     { path: '**', redirectTo: '/start' },
 ];
 
