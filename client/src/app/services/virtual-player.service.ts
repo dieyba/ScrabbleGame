@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Injectable } from '@angular/core';
 import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
 import { ExchangeCmd } from '@app/classes/exchange-command';
@@ -5,10 +6,10 @@ import { PassTurnCmd } from '@app/classes/pass-command';
 import { PlaceCmd } from '@app/classes/place-command';
 import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleRack } from '@app/classes/scrabble-rack';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis, ERROR_NUMBER } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
+import { Difficulty } from '@app/classes/virtual-player';
 import { BonusService } from './bonus.service';
 import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
@@ -18,9 +19,9 @@ import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
-    EndTurn = 100, // TODO: put the right probability settings after testing
-    ExchangeTile = 0,
-    MakeAMove = 0,
+    EndTurn = 10, // TODO: put the right probability settings after testing
+    ExchangeTile = 10,
+    MakeAMove = 80,
     MaxValue1 = 40,
     MaxValue2 = 30,
     MaxValue3 = 30,
@@ -41,9 +42,10 @@ const POSITION_ERROR = -1;
     providedIn: 'root',
 })
 export class VirtualPlayerService {
-    rack: ScrabbleRack;
+    rack: ScrabbleLetter[];
     orientation: Axis;
     player: Player;
+    type: Difficulty;
 
     constructor(
         private validationService: ValidationService,
@@ -54,11 +56,11 @@ export class VirtualPlayerService {
         private gameService: GameService,
         private commandInvoker: CommandInvokerService,
     ) {
-        this.rack = new ScrabbleRack();
+        this.player = this.gameService.currentGameService.game.opponentPlayer;
+        this.rack = this.player.letters;
     }
     playTurn(): void {
         // Next sprint: implement difficult player type logic by separating here and in virtualPlayerService.makeMoves().
-        this.player = this.gameService.currentGameService.game.opponentPlayer;
         const defaultParams: DefaultCommandParams = {
             player: this.player,
             serviceCalled: this.gameService,
@@ -74,6 +76,11 @@ export class VirtualPlayerService {
             setTimeout(() => {
                 const chosenTiles = this.chooseTilesFromRack(); // 10% chance to exchange tiles
                 // Converts chosen word to string
+                if (chosenTiles.length === 0) {
+                    const emptyRackPass = new PassTurnCmd(defaultParams);
+                    this.commandInvoker.executeCommand(emptyRackPass);
+                    return;
+                }
                 const chosenTilesString = chosenTiles.map((tile) => tile.character).join(''); // TEST THIS, may not work.
                 const command = new ExchangeCmd(defaultParams, chosenTilesString);
                 this.commandInvoker.executeCommand(command);
@@ -81,15 +88,17 @@ export class VirtualPlayerService {
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
             let moveMade = new ScrabbleWord();
             moveMade = this.makeMoves(); // 80% chance to make a move
+            console.log('moveMade: ', moveMade);
+            moveMade.value = moveMade.calculateValue();
+            const movePosition = this.findPosition(moveMade, this.orientation);
+            const params: PlaceParams = {
+                position: movePosition,
+                orientation: this.orientation,
+                word: moveMade.stringify(),
+            };
             setTimeout(() => {
                 // waits 3 second to try and find a word to place
-                if (moveMade.value !== 0) {
-                    const movePosition = this.findPosition(moveMade, this.orientation);
-                    const params: PlaceParams = {
-                        position: movePosition,
-                        orientation: this.orientation,
-                        word: moveMade.stringify(),
-                    };
+                if (moveMade.value !== 0 && moveMade.content.length > 1 && this.placeService.canPlaceWord(params)) {
                     const command = new PlaceCmd(defaultParams, params);
                     this.commandInvoker.executeCommand(command);
                 } else {
@@ -125,16 +134,16 @@ export class VirtualPlayerService {
         const lettersAvailable: ScrabbleLetter[] = [];
         lettersAvailable[0] = letter;
         const lettersInArray: boolean[] = [false, false, false, false, false, false, false];
-        for (let i = 1; i < this.getRandomIntInclusive(2, this.rack.letters.length); i++) {
+        for (let i = 1; i < this.getRandomIntInclusive(2, this.rack.length); i++) {
             // Randomize length of word
-            let index = this.getRandomIntInclusive(0, this.rack.letters.length - 1);
+            let index = this.getRandomIntInclusive(0, this.rack.length - 1);
             while (lettersInArray[index] === true) {
                 // If we've already generated this number before
                 if (index !== lettersInArray.length - 1) {
                     index++;
                 } else index = 0; // Code coverage on this line
             }
-            lettersAvailable[i] = this.rack.letters[index];
+            lettersAvailable[i] = this.rack[index];
             lettersInArray[index] = true;
         }
         // check all possible permutations. Maximum of O(8!)
@@ -145,7 +154,7 @@ export class VirtualPlayerService {
         for (const j of permutations) {
             let index = 0;
             for (const char of j) {
-                charArray[index] = char.character;
+                if (char) charArray[index] = char.character;
                 index++;
             }
             if (this.isWordValid(charArray.join(''))) {
@@ -155,7 +164,7 @@ export class VirtualPlayerService {
         }
         return possibleMoves;
     }
-    // I have to do this, sorry everyone. If it wasn't for the randomizing we wouldn't have to go this far. Current complexity: 16
+    // I have to do this, sorry everyone. If it wasn't for the randomizing we wouldn't have to go this far. Current complexity: 17
     // eslint-disable-next-line complexity
     possibleMoves(points: number, axis: Axis): ScrabbleWord[] {
         const listLength = 4; // How many words we should aim for
@@ -163,6 +172,7 @@ export class VirtualPlayerService {
         // Board analysis
         let movesFound = 0;
         let loopsDone = 0;
+        let atLeastOneLetterFound = false;
         while (movesFound < listLength && loopsDone < listLength) {
             // Arbitrarily do a maximum of [loopsDone] checks for words. We don't want an infinite loop.
             let j = this.getRandomIntInclusive(0, 1);
@@ -191,6 +201,7 @@ export class VirtualPlayerService {
                 }
                 for (k; k !== iteratorMaxK + incrementK; k = k + incrementK) {
                     if (this.gridService.scrabbleBoard.squares[j][k].occupied) {
+                        atLeastOneLetterFound = true;
                         const newWords = this.movesWithGivenLetter(this.gridService.scrabbleBoard.squares[j][k].letter);
                         for (const newWord of newWords) {
                             if (!list.includes(newWord)) {
@@ -206,6 +217,9 @@ export class VirtualPlayerService {
                             position: pos,
                             orientation: axis,
                         };
+                        list[l].orientation = axis;
+                        list[l].startPosition = pos;
+                        list[l].value = list[l].calculateValue();
                         if (this.placeService.canPlaceWord(placeParams)) {
                             if (this.bonusService.totalValue(list[l]) > points || this.bonusService.totalValue(list[l]) < points - POINTS_INTERVAL) {
                                 list.splice(l);
@@ -227,13 +241,33 @@ export class VirtualPlayerService {
 
             loopsDone++;
         }
-        return list; // list contains movesFound elements
+        if (atLeastOneLetterFound) {
+            return list; // list contains movesFound elements
+        } else {
+            // It is the first turn of the game
+            const wordsFirstTurn = this.movesWithRack(points);
+            return wordsFirstTurn;
+        }
+    }
+    movesWithRack(points: number): ScrabbleWord[] {
+        const possibleMoves: ScrabbleWord[] = [];
+        for (const letter of this.rack) {
+            const newWords = this.movesWithGivenLetter(letter);
+            for (const newWord of newWords) {
+                if (!possibleMoves.includes(newWord)) {
+                    if (newWord.value < points || newWord.value > 0) {
+                        possibleMoves.push(newWord);
+                    }
+                }
+            }
+        }
+        return possibleMoves;
     }
     makeMoves(): ScrabbleWord {
-        this.orientation = Axis.V;
+        this.orientation = Axis.H;
         if (this.getRandomIntInclusive(0, 1) === 1) {
             // coin flip to determine starting axis
-            this.orientation = Axis.H;
+            this.orientation = Axis.V;
         }
         const pointTarget = this.getRandomIntInclusive(1, PERCENTAGE);
         let movesList = [];
@@ -249,6 +283,7 @@ export class VirtualPlayerService {
         }
         const moveToMake = movesList[this.getRandomIntInclusive(0, movesList.length - 1)];
         if (moveToMake) {
+            moveToMake.value = moveToMake.calculateValue();
             return moveToMake;
         }
         return new ScrabbleWord(); // randomize move to make
@@ -305,11 +340,10 @@ export class VirtualPlayerService {
             }
         }
         if (index === word.content.length) {
-            // ERROR
-            const errorVec = new Vec2();
-            errorVec.x = -1;
-            errorVec.y = -1;
-            return errorVec;
+            // It is the first turn, so we place it in the center.
+            const middleIndex = 7;
+            const middleVec = new Vec2(middleIndex, middleIndex);
+            return middleVec;
         }
         const position = new Vec2();
         if (axis === Axis.V) {
@@ -322,7 +356,8 @@ export class VirtualPlayerService {
         return position;
     }
     chooseTilesFromRack(): ScrabbleLetter[] {
-        const numberOfTiles = this.getRandomIntInclusive(1, this.rack.letters.length);
+        if (this.rack.length === 0) return [];
+        const numberOfTiles = this.getRandomIntInclusive(1, this.rack.length);
         let tileReplaced = 0;
         const listOfTiles = [];
         for (let i = 0; i < numberOfTiles; i++) {
@@ -331,12 +366,12 @@ export class VirtualPlayerService {
         let currentLetter = 0;
         while (tileReplaced < numberOfTiles) {
             const replaced = this.getRandomIntInclusive(0, 1);
-            if (replaced === 1 && !listOfTiles.includes(this.rack.letters[currentLetter])) {
-                listOfTiles[tileReplaced] = this.rack.letters[currentLetter];
+            if (replaced === 1 && !listOfTiles.includes(this.rack[currentLetter])) {
+                listOfTiles[tileReplaced] = this.rack[currentLetter];
                 tileReplaced++;
             }
             currentLetter++;
-            if (currentLetter === this.rack.letters.length) currentLetter = 0;
+            if (currentLetter === this.rack.length) currentLetter = 0;
         }
         return listOfTiles;
     }

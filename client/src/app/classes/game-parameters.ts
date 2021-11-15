@@ -36,6 +36,7 @@ export class GameParameters {
     consecutivePassedTurns: number;
     isEndGame: boolean;
     newWords: ScrabbleWord[];
+    gameParameters: import('c:/Users/lazeb/Documents/log2990-304/client/src/app/classes/scrabble-letter').ScrabbleLetter[];
 
     constructor(creatorPlayerName: string, timer: number, isRandom: boolean) {
         this.gameRoom = { idGame: 0, capacity: 2, playersName: new Array<string>() };
