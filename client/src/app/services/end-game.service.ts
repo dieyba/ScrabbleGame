@@ -36,10 +36,7 @@ export class EndGameService {
     const isEmptyPlayerRack = this.gameService.game.getLocalPlayer().letters.length === 0 && this.gameService.game.getLocalPlayer().letters.length === 0;
     const isEndGameAfterPlacing = this.gameService.game.stock.isEmpty() && isEmptyPlayerRack;
     if (isEndGameAfterPlacing) {
-      let winnerPlayer = this.gameService.game.getLocalPlayer().letters.length === 0 ? this.gameService.game.getLocalPlayer() : this.gameService.game.getOpponent();
-      let loserPlayer = this.gameService.game.getLocalPlayer().letters.length === 0 ? this.gameService.game.getOpponent() : this.gameService.game.getLocalPlayer();
-      winnerPlayer.score += calculateRackPoints(loserPlayer);
-      loserPlayer.score -= calculateRackPoints(winnerPlayer);
+      this.endGameAfterPlace();
     } else {
       this.endGameAfterPassedTurns();
     }
@@ -48,10 +45,19 @@ export class EndGameService {
     this.gameService.game.gameTimer.secondsToMinutes();
     this.gameService.game.isEndGame = true;
   }
+  private endGameAfterPlace() {
+    let winnerPlayer = this.gameService.game.getLocalPlayer().letters.length === 0 ? this.gameService.game.getLocalPlayer() : this.gameService.game.getOpponent();
+    let loserPlayer = this.gameService.game.getLocalPlayer().letters.length === 0 ? this.gameService.game.getOpponent() : this.gameService.game.getLocalPlayer();
+    const loserRemainingLettersPoints = calculateRackPoints(loserPlayer);
+    winnerPlayer.score += loserRemainingLettersPoints;
+    loserPlayer.score -= loserRemainingLettersPoints;
+    winnerPlayer.isWinner = true;
+    loserPlayer.isWinner = false;
+  }
   private endGameAfterPassedTurns() {
-    let maxScore = 0;
-    // remove points for letters still in the player's rack and find the highest score
+    let maxScore = this.gameService.game.players[0].score - calculateRackPoints(this.gameService.game.players[0]);
     this.gameService.game.players.forEach(player => {
+      // remove points for letters still in the players' rack and find the highest score
       player.score -= calculateRackPoints(player);
       if (player.score > maxScore) {
         maxScore = player.score;

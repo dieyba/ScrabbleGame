@@ -78,8 +78,6 @@ export class GameParameters {
             newVirtualPlayer.letters = previousPlayer.letters;
             newVirtualPlayer.isActive = previousPlayer.isActive;
             newVirtualPlayer.score = previousPlayer.score;
-            newVirtualPlayer.isWinner = previousPlayer.isWinner; // probably wouldn't need that line
-            newVirtualPlayer.roomId = previousPlayer.roomId; // does a vp need a room id?
             this.players[previousPlayerIndex] = newVirtualPlayer;
             this.gameMode = GameType.Solo;
         }
