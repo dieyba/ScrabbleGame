@@ -21,12 +21,16 @@ export class TurnManagerService {
     this.consecutivePassedTurns = 0;
     this.server = environment.socketUrl;
     this.socket = SocketHandler.requestSocket(this.server);
-    this.socketOnConnect();
     this.gameService.game.gameTimer.isTimerEndObservable.subscribe((isTimerEnd: boolean) => {
       this.gameService.isTurnPassed = true;
       this.gameService.isTurnEndSubject.next(this.gameService.isTurnPassed);
     });
+    this.socketOnConnect();
   }
+  initalize() {
+    this.consecutivePassedTurns = 0;
+  }
+
   socketOnConnect() {
     this.socket.on('turn changed', (isTurnPassed: boolean, consecutivePassedTurns: number) => {
       this.gameService.isTurnPassed = isTurnPassed;
