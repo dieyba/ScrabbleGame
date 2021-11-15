@@ -12,7 +12,6 @@ export class ValidationService {
         this.isTimerElapsed = false;
     }
 
-    // TODO: implement using a different dictionary, dictionary type chosen passed in parameters?
     validateWords(newWords: string[]): boolean {
         // Word not valid, validation fails
         for (const word of newWords) {

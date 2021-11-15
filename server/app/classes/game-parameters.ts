@@ -58,7 +58,6 @@ export class GameInitInfo {
         });
         this.stockLetters = stock.letterStock; // stock with the two players' letters removed
 
-        // TODO: pick the 4 random objectives from the list
         if (clientParametersChosen.isLOG2990) {
 
         }
