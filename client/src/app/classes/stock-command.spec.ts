@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { LocalPlayer } from '@app/classes/local-player';
 import { ChatDisplayService } from '@app/services/chat-display.service';
 import { LetterStock } from '@app/services/letter-stock.service';
 import { ChatEntryColor, createErrorEntry } from './chat-display-entry';

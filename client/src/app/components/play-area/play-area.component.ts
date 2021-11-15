@@ -1,8 +1,9 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { DefaultCommandParams } from '@app/classes/commands';
+import { GameType } from '@app/classes/game-parameters';
 import { PassTurnCmd } from '@app/classes/pass-command';
-import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { Vec2 } from '@app/classes/vec2';
+import { VirtualPlayer } from '@app/classes/virtual-player';
 import { CommandInvokerService } from '@app/services/command-invoker.service';
 import { ExchangeService } from '@app/services/exchange.service';
 import { GameService } from '@app/services/game.service';
@@ -11,13 +12,11 @@ import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service'
 import { RackService } from '@app/services/rack.service';
 import { VirtualPlayerService } from '@app/services/virtual-player.service';
 
-// TODO : Avoir un fichier séparé pour les constantes!
+// TODO : See if needed elsewhere, else no need to move these constants
 export const DEFAULT_WIDTH = 640;
 export const DEFAULT_HEIGHT = 640;
 export const RACK_WIDTH = 500;
 export const RACK_HEIGHT = 60;
-
-// TODO : Déplacer ça dans un fichier séparé accessible par tous
 export enum MouseButton {
     Left = 0,
     Middle = 1,
@@ -70,36 +69,42 @@ export class PlayAreaComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.mouseWordPlacerService.overlayContext = this.overlayCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        this.gameService.currentGameService.createNewGame();
-        this.gridService.scrabbleBoard = new ScrabbleBoard(false);
-        this.gridService.scrabbleBoard.squares = this.gameService.currentGameService.game.scrabbleBoard.squares;
-        this.gridService.scrabbleBoard.colorStock = this.gameService.currentGameService.game.scrabbleBoard.colorStock;
+        this.gameService.startNewGame();
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
 
-        this.gameService.currentGameService.isVirtualPlayerObservable.subscribe((isActive: boolean) => {
+        this.gameService.isOpponentTurnObservable.subscribe((isActive: boolean) => {
             if (isActive) {
-                if (!this.gameService.isMultiplayerGame && !this.gameService.currentGameService.game.isEndGame) {
+                // put back the letters from the board to the rack if they weren't placed
+                this.mouseWordPlacerService.onBlur();
+                // if the opponent player is a virtual player, play virtual player turn
+                const isVirtualPlayerCanPlay =
+                    this.gameService.game.gameMode === GameType.Solo &&
+                    this.gameService.game.getOpponent() instanceof VirtualPlayer &&
+                    !this.gameService.game.isEndGame;
+                if (isVirtualPlayerCanPlay) {
                     this.virtualPlayerService.playTurn();
                 }
-                this.mouseWordPlacerService.onBlur();
             }
         });
     }
 
     passTurn() {
-        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.game.localPlayer, serviceCalled: this.gameService };
+        const defaultParams: DefaultCommandParams = {
+            player: this.gameService.game.getLocalPlayer(),
+            serviceCalled: this.gameService,
+        };
         const command = new PassTurnCmd(defaultParams);
         this.commandInvokerService.executeCommand(command);
     }
 
     isLocalPlayerActive(): boolean {
-        return this.gameService.currentGameService.game.localPlayer.isActive;
+        return this.gameService.game.getLocalPlayer().isActive;
     }
 
     isEndGame(): boolean {
-        return this.gameService.currentGameService.game.isEndGame;
+        return this.gameService.game.isEndGame;
     }
 
     get width(): number {
@@ -137,7 +142,7 @@ export class PlayAreaComponent implements AfterViewInit {
 
     lessThanSevenLettersInStock(): boolean {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        return this.gameService.currentGameService.stock.letterStock.length < 7;
+        return this.gameService.game.stock.letterStock.length < 7;
     }
 
     exchange() {

@@ -4,7 +4,6 @@ import { MatCardModule } from '@angular/material/card';
 import { Router, RouterModule } from '@angular/router';
 import { Dictionary } from '@app/classes/dictionary';
 import { GameParameters, GameType } from '@app/classes/game-parameters';
-import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { VirtualPlayer } from '@app/classes/virtual-player';

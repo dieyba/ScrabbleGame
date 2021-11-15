@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { LocalPlayer } from '@app/classes/local-player';
 import { createPassCmd, PassTurnCmd } from '@app/classes/pass-command';
 import { GameService } from '@app/services/game.service';
 import { SoloGameService } from '@app/services/solo-game.service';

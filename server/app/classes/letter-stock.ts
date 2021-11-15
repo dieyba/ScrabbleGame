@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 
 enum LetterQuantity {
@@ -61,14 +61,12 @@ export enum LetterValue {
     Star = 0,
 }
 
-@Injectable({
-    providedIn: 'root',
-})
 export class LetterStock {
     letterStock: ScrabbleLetter[];
 
     constructor() {
         this.letterStock = [];
+        // TODO: scrabble letter already gives the default letter value. so we dont need to specify it
         this.addLettersToStock(new ScrabbleLetter('a', LetterValue.A), LetterQuantity.A); // A
         this.addLettersToStock(new ScrabbleLetter('b', LetterValue.B), LetterQuantity.B); // B
         this.addLettersToStock(new ScrabbleLetter('c', LetterValue.C), LetterQuantity.C); // C
@@ -98,16 +96,6 @@ export class LetterStock {
         this.addLettersToStock(new ScrabbleLetter('*', LetterValue.Star), LetterQuantity.Star); // *
     }
 
-    takeLetter(letter: string): ScrabbleLetter {
-        for (let i = 0; i < this.letterStock.length; i++) {
-            if (this.letterStock[i].character === letter) {
-                this.letterStock.splice(i, 1);
-                return this.letterStock[i];
-            }
-        }
-        return new ScrabbleLetter('');
-    }
-
     isEmpty(): boolean {
         return this.letterStock.length === 0;
     }
@@ -129,15 +117,5 @@ export class LetterStock {
             }
         }
         return lettersRemovedFromStock;
-    }
-
-    exchangeLetters(playerLetters: ScrabbleLetter[]): ScrabbleLetter[] {
-        const randomLetters = this.takeLettersFromStock(playerLetters.length);
-
-        for (const letters of playerLetters) {
-            this.letterStock.push(letters);
-        }
-
-        return randomLetters;
     }
 }

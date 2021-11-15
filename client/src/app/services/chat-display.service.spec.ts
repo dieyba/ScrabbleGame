@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { ChatEntryColor, ServerChatEntry } from '@app/classes/chat-display-entry';
-import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import * as io from 'socket.io-client';

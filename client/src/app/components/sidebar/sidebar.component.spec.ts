@@ -3,7 +3,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GameParameters, GameType } from '@app/classes/game-parameters';
-import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { SidebarComponent } from '@app/components/sidebar/sidebar.component';

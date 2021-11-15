@@ -1,14 +1,8 @@
 import { Square, SquareColor } from './square';
+import { isAllLowerLetters, removeAccents } from './utilities';
 
 export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;
-
-export enum Direction {
-    North = 0,
-    East = 1,
-    South = 2,
-    West = 3,
-}
 
 export const UNPLACED = -1;
 
@@ -18,13 +12,36 @@ export class ScrabbleLetter {
     color: SquareColor;
     tile: Square;
 
-    constructor(letter: string, value: number) {
-        this.setLetter(letter);
-        this.value = value;
+    constructor(letter: string, value?: number) {
         this.color = SquareColor.None;
         this.tile = new Square(UNPLACED, UNPLACED); // -1, -1 means it is not placed yet
+        this.setLetter(letter);
+        this.setDefaultValue(letter);
+        if (value !== undefined) {
+            this.value = value;
+        }
     }
+
     setLetter(character: string): void {
-        this.character = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        // if a captial letter is passed in, represents a blank piece, meaning a '*'
+        this.character = isAllLowerLetters(character) ? removeAccents(character) : '*';
+    }
+    setDefaultValue(character: string) {
+        // set the letter's default value
+        if ('aeilnorstu'.includes(character)) {
+            this.value = 1;
+        } else if ('dgm'.includes(character)) {
+            this.value = 2;
+        } else if ('bcp'.includes(character)) {
+            this.value = 3;
+        } else if ('fhv'.includes(character)) {
+            this.value = 4;
+        } else if ('jq'.includes(character)) {
+            this.value = 8;
+        } else if ('kwxyz'.includes(character)) {
+            this.value = 10;
+        } else {
+            this.value = 0; // case where it is a * or capital letter
+        }
     }
 }

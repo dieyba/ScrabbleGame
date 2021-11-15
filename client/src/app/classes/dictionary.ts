@@ -1,9 +1,8 @@
-// TODO : Integrate other dictionnaries and choices
 import dict_path from 'src/assets/dictionnary.json';
 
 export enum DictionaryType {
-    Default = 0,
-    English = 1,
+    Default = 'Français',
+    English = 'Anglais',
     // Other dictionaries
 }
 
@@ -11,6 +10,7 @@ export class Dictionary {
     title: string;
     description: string;
     words: string[];
+
     constructor(type: DictionaryType) {
         this.selectDictionary(type);
     }

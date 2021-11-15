@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { Axis, invertAxis } from '@app/classes/utilities';
+import { Axis, invertAxis, isCoordInsideBoard } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from './grid.service';
 
@@ -16,6 +16,7 @@ const MIN_WORD_LENGHT = 2;
 export class WordBuilderService {
     constructor(private gridService: GridService) {}
 
+    // TODO: Handle -1 erro coordinates
     buildWordsOnBoard(word: string, coord: Vec2, axis: Axis): ScrabbleWord[] {
         const result: ScrabbleWord[] = [];
 
@@ -47,7 +48,7 @@ export class WordBuilderService {
 
     buildScrabbleWord(coord: Vec2, axis: Axis): ScrabbleWord {
         const word = new ScrabbleWord();
-        if (this.gridService.scrabbleBoard.isCoordInsideBoard(coord)) {
+        if (isCoordInsideBoard(coord)) {
             if (this.gridService.scrabbleBoard.squares[coord.x][coord.y].occupied) {
                 const startCoord = this.findWordEdge(coord, axis, TOWARD_START);
                 const endCoord = this.findWordEdge(coord, axis, TOWARD_END);
@@ -76,7 +77,7 @@ export class WordBuilderService {
 
     // out of range begining coordinates or unoccupied begining coordinates will return the begining coord
     findWordEdge(coord: Vec2, axis: Axis, isTowardStart: boolean): Vec2 {
-        if (!this.gridService.scrabbleBoard.isCoordInsideBoard(coord)) {
+        if (!isCoordInsideBoard(coord)) {
             return coord;
         }
         const step = isTowardStart ? BACKWARD_STEP : FORWARD_STEP;
@@ -91,7 +92,7 @@ export class WordBuilderService {
                 nextCoord.y += step;
             }
             // if at the board's boarder
-            if (!this.gridService.scrabbleBoard.isCoordInsideBoard(nextCoord)) {
+            if (!isCoordInsideBoard(nextCoord)) {
                 break;
             }
         } while (this.gridService.scrabbleBoard.squares[nextCoord.x][nextCoord.y].occupied);

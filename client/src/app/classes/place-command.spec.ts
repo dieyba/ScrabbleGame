@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { LocalPlayer } from '@app/classes/local-player';
 import { createPlaceCmd, PlaceCmd } from '@app/classes/place-command';
 import { GameService } from '@app/services/game.service';
 import { SoloGameService } from '@app/services/solo-game.service';

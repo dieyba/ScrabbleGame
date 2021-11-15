@@ -7,7 +7,6 @@ import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameParameters } from '@app/classes/game-parameters';
-import { LocalPlayer } from '@app/classes/local-player';
 import { GameListService } from '@app/services/game-list.service';
 import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
 import { Observable } from 'rxjs';

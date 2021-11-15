@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup } from '@angular/forms';
 import { GameParameters, GameType } from '@app/classes/game-parameters';
-// import { LocalPlayer } from '@app/classes/local-player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ExchangeService } from './exchange.service';
 import { GameService } from './game.service';

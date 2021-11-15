@@ -1,57 +1,65 @@
-import { GameParameters } from '@app/classes/game-parameters';
-import { Player } from '@app/classes/player';
+import { GameInitInfo, WaitingAreaGameParameters } from '@app/classes/game-parameters';
+import { ERROR_NUMBER } from '@app/classes/utilities';
 import { Service } from 'typedi';
-
 @Service()
 export class GameListManager {
-    existingRooms: GameParameters[];
-    currentGames: GameParameters[];
-    currentRoomID: number;
+    private currentId: number; //TODO: refactor how we give an id number to avoid going to the inifite with the numbers?
+    private waitingAreaGames: WaitingAreaGameParameters[];
+    private gamesInPlay: GameInitInfo[];
     constructor() {
-        this.existingRooms = new Array<GameParameters>();
-        this.currentGames = new Array<GameParameters>();
-        this.currentRoomID = this.existingRooms.length;
+        this.waitingAreaGames = new Array<WaitingAreaGameParameters>();
+        this.gamesInPlay = new Array<GameInitInfo>();
+        this.currentId = 0;
     }
-
-    getAllGames(): GameParameters[] {
-        return this.existingRooms;
+    getAllWaitingAreaGames(): WaitingAreaGameParameters[] {
+        return this.waitingAreaGames;
     }
-    getGameFromExistingRooms(roomID: number): GameParameters | undefined {
-        const game = this.existingRooms.find((r) => r.gameRoom.idGame === roomID);
+    getAWaitingAreaGame(roomID: number): WaitingAreaGameParameters | undefined {
+        const game = this.waitingAreaGames.find((r) => r.gameRoom.idGame === roomID);
         if (game) {
             return game;
         }
         return undefined;
     }
-    getCurrentGame(roomID: number): GameParameters | undefined {
-        const game = this.currentGames.find((r) => r.gameRoom.idGame === roomID);
-        if (game) {
-            return game;
-        }
-        return undefined;
-    }
-    getOtherPlayer(playerID: string, roomId: number): Player | undefined {
-        const game = this.getCurrentGame(roomId);
-        if (game) {
-            return game.players[0].socketId === playerID ? game.players[1] : game.players[0];
-        }
-        return undefined;
-    }
-
-    createRoom(game: GameParameters): GameParameters {
-        const room = this.addRoom(game);
-        return room;
-    }
-    addRoom(game: GameParameters): GameParameters {
-        game.creatorPlayer.roomId = game.gameRoom.idGame;
-        this.existingRooms.push(game);
+    createWaitingAreaGame(game: WaitingAreaGameParameters, creatorSocketId: string): WaitingAreaGameParameters {
+        game.gameRoom.idGame = this.currentId;
+        game.gameRoom.creatorId = creatorSocketId;
+        game.gameRoom.playersName = [game.creatorName];
+        this.waitingAreaGames.push(game);
+        this.currentId++;
         return game;
     }
-    deleteExistingRoom(roomId: number): void {
-        const index = this.existingRooms.findIndex((r) => r.gameRoom.idGame === roomId);
-        /* eslint-disable  @typescript-eslint/no-magic-numbers */
-        if (index > -1) {
-            this.existingRooms.splice(index, 1);
+    addJoinerPlayer(game: WaitingAreaGameParameters, joinerName: string, joinerSocketId: string): boolean {
+        if (game.gameRoom.playersName.length < game.gameRoom.capacity) {
+            game.joinerName = joinerName;
+            game.gameRoom.joinerId = joinerSocketId;
+            game.gameRoom.playersName = [game.creatorName, joinerName];
+            return true;
+        }
+        return false;
+    }
+    deleteWaitingAreaGame(roomId: number): void {
+        const index = this.waitingAreaGames.findIndex((r) => r.gameRoom.idGame === roomId);
+        if (index > ERROR_NUMBER) {
+            this.waitingAreaGames.splice(index, 1);
+        }
+    }
+    getGameInPlay(roomID: number): GameInitInfo | undefined {
+        const game = this.gamesInPlay.find((r) => r.gameRoomId === roomID);
+        if (game !== undefined) {
+            return game;
+        }
+        return undefined;
+    }
+    createGameInPlay(clientParametersChosen: WaitingAreaGameParameters): GameInitInfo {
+        const newGame = new GameInitInfo(clientParametersChosen);
+        this.gamesInPlay.push(newGame);
+        return newGame;
+    }
+    deleteGameInPlay(roomId: number): void {
+        const index = this.gamesInPlay.findIndex((r) => r.gameRoomId === roomId);
+        if (index !== ERROR_NUMBER) {
+            this.waitingAreaGames.splice(index, 1);
         }
     }
 }

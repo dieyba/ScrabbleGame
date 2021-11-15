@@ -1,15 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { createDebugCmd, DebugCmd } from '@app/classes/debug-command';
-import { LocalPlayer } from '@app/classes/local-player';
 import { ACTIVE_DEBUG_MESSAGE, ChatDisplayService, INACTIVE_DEBUG_MESSAGE } from '@app/services/chat-display.service';
 import { ChatEntryColor } from './chat-display-entry';
 import { DefaultCommandParams } from './commands';
-
+import { Player } from './player';
 const PLAYER_NAME = 'Sara';
 
 describe('DebugCmd', () => {
     let chatDisplayServiceSpy: jasmine.SpyObj<ChatDisplayService>;
-    const localPlayer = new LocalPlayer(PLAYER_NAME);
+    const localPlayer = new Player(PLAYER_NAME);
 
     beforeEach(() => {
         chatDisplayServiceSpy = jasmine.createSpyObj('ChatDisplayService', ['invertDebugState']);
