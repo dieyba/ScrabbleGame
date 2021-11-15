@@ -112,7 +112,7 @@ export class GameService {
             }, TIMER_INTERVAL);
         }
     }
-    resetTimer(isEndGame: boolean) {
+    resetTimer() {
         this.game.gameTimer.timerMs = +this.game.gameTimer.totalCountDown;
         this.game.gameTimer.secondsToMinutes();
         clearInterval(this.game.gameTimer.intervalValue);
@@ -184,7 +184,7 @@ export class GameService {
                     );
                 } else {
                     // Take new letters
-                    console.log('calling update plyer score after place');
+                    console.log('calling update player score after place');
                     this.validationService.updatePlayerScore(tempScrabbleWords, player);
                     lettersToAddToRack = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
                 }

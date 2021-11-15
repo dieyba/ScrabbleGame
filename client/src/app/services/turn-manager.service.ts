@@ -28,13 +28,15 @@ export class TurnManagerService {
   }
 
   socketOnConnect() {
-    this.socket.on('turn changed', (isTurnPassed: boolean, consecutivePassedTurns: number) => {
-      this.gameService.isTurnPassed = isTurnPassed;
+    this.socket.on('turn changed', (consecutivePassedTurns: number) => {
       this.consecutivePassedTurns = consecutivePassedTurns;
-      if (!this.gameService.game.isEndGame && this.consecutivePassedTurns >= MAX_TURNS_PASSED) {
-        this.endGameService.endGame();
+      if (!this.gameService.game.isEndGame) {
+        const isLocalPlayerEndingGame = this.consecutivePassedTurns >= MAX_TURNS_PASSED && this.gameService.game.getLocalPlayer().isActive;
+        if (isLocalPlayerEndingGame) {
+          this.endGameService.endGame();
+        }
         this.updateActivePlayer();
-        this.gameService.resetTimer(this.gameService.game.isEndGame);
+        this.gameService.resetTimer();
         this.gameService.isTurnPassed = false;
       }
     });
@@ -43,18 +45,17 @@ export class TurnManagerService {
     if (this.gameService.game.isEndGame) {
       return;
     }
-    // change turn
     if (this.gameService.game.gameMode === GameType.Solo) {
       this.updateConsecutivePassedTurns();
       this.updateActivePlayer();
-      this.gameService.resetTimer(this.gameService.game.isEndGame);
+      this.gameService.resetTimer();
       const isVirtualPlayerCanPlay =
         this.gameService.game.getOpponent() instanceof VirtualPlayer &&
         this.gameService.game.getOpponent().isActive;
       if (isVirtualPlayerCanPlay) {
         this.virtualPlayerService.playTurn();
       }
-      this.gameService.isTurnPassed = false; // reset isTurnedPassed when new turn starts
+      this.gameService.isTurnPassed = false; // reset isTurnedPassed when new human turn starts
     } else {
       this.socket.emit('change turn', this.gameService.isTurnPassed, this.consecutivePassedTurns);
     }
