@@ -21,10 +21,6 @@ export class TurnManagerService {
     this.consecutivePassedTurns = 0;
     this.server = environment.socketUrl;
     this.socket = SocketHandler.requestSocket(this.server);
-    this.gameService.game.gameTimer.isTimerEndObservable.subscribe((isTimerEnd: boolean) => {
-      this.gameService.isTurnPassed = true;
-      this.gameService.isTurnEndSubject.next(this.gameService.isTurnPassed);
-    });
     this.socketOnConnect();
   }
   initalize() {
@@ -38,7 +34,7 @@ export class TurnManagerService {
       if (!this.gameService.game.isEndGame && this.consecutivePassedTurns >= MAX_TURNS_PASSED) {
         this.endGameService.endGame();
         this.updateActivePlayer();
-        this.gameService.game.gameTimer.resetTimer(this.gameService.game.isEndGame);
+        this.gameService.resetTimer(this.gameService.game.isEndGame);
         this.gameService.isTurnPassed = false;
       }
     });
@@ -51,7 +47,7 @@ export class TurnManagerService {
     if (this.gameService.game.gameMode === GameType.Solo) {
       this.updateConsecutivePassedTurns();
       this.updateActivePlayer();
-      this.gameService.game.gameTimer.resetTimer(this.gameService.game.isEndGame);
+      this.gameService.resetTimer(this.gameService.game.isEndGame);
       const isVirtualPlayerCanPlay =
         this.gameService.game.getOpponent() instanceof VirtualPlayer &&
         this.gameService.game.getOpponent().isActive;
@@ -71,10 +67,15 @@ export class TurnManagerService {
     }
   }
   updateActivePlayer() {
+    if (this.gameService.game.isEndGame) {
+      this.gameService.game.getLocalPlayer().isActive = false;
+      this.gameService.game.getOpponent().isActive = false;
+      return;
+    }
     let activePlayer = this.gameService.game.getLocalPlayer().isActive ? this.gameService.game.getLocalPlayer() : this.gameService.game.getOpponent();
     let inactivePlayer = this.gameService.game.getLocalPlayer().isActive ? this.gameService.game.getOpponent() : this.gameService.game.getLocalPlayer();
-    // Call end game if a place command ended the game
     if (activePlayer.letters.length === 0 && this.gameService.game.stock.isEmpty()) {
+      // Call end game if a place command ended the game
       activePlayer.isWinner = true;
       this.endGameService.endGame();
       return;

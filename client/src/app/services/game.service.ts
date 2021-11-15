@@ -22,6 +22,8 @@ import { RackService } from './rack.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 export const DEFAULT_LETTER_COUNT = 7;
+const TIMER_INTERVAL = 1000;
+
 @Injectable({
     providedIn: 'root',
 })
@@ -94,7 +96,28 @@ export class GameService {
         this.rackService.rackLetters = [];
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
         this.addRackLetters(this.game.getLocalPlayer().letters);
-        this.game.gameTimer.startCountdown(this.game.isEndGame);
+        this.startCountdown();
+    }
+    startCountdown() {
+        if (!this.game.isEndGame) {
+            this.game.gameTimer.secondsToMinutes();
+            this.game.gameTimer.intervalValue = setInterval(() => {
+                this.game.gameTimer.timerMs--;
+                if (this.game.gameTimer.timerMs < 0) {
+                    this.game.gameTimer.timerMs = 0;
+                    this.isTurnPassed = true;
+                    this.isTurnEndSubject.next(this.isTurnPassed);
+                }
+                this.game.gameTimer.secondsToMinutes();
+            }, TIMER_INTERVAL);
+        }
+    }
+    // TODO: or check if is end game in the turn manager service
+    resetTimer(isEndGame: boolean) {
+        this.game.gameTimer.timerMs = +this.game.gameTimer.totalCountDown;
+        this.game.gameTimer.secondsToMinutes();
+        clearInterval(this.game.gameTimer.intervalValue);
+        this.startCountdown();
     }
     passTurn(player: Player): ErrorType {
         if (player.isActive) {

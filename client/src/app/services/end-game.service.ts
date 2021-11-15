@@ -20,14 +20,14 @@ export class EndGameService {
     this.socket.on('gameEnded', () => {
       this.chatDisplayService.displayEndGameMessage(this.gameService.game.stock.letterStock, this.gameService.game.getLocalPlayer(), this.gameService.game.getOpponent());
       this.endLocalGame();
-      this.gameService.game.gameTimer.resetTimer(this.gameService.game.isEndGame); // to stop the timer
+      this.gameService.resetTimer(this.gameService.game.isEndGame); // to stop the timer
     });
   }
   endGame() {
     if (this.gameService.game.gameMode === GameType.Solo) {
       this.chatDisplayService.displayEndGameMessage(this.gameService.game.stock.letterStock, this.gameService.game.getLocalPlayer(), this.gameService.game.getOpponent());
       this.endLocalGame();
-      this.gameService.game.gameTimer.resetTimer(this.gameService.game.isEndGame);
+      this.gameService.resetTimer(this.gameService.game.isEndGame);
     } else if (this.gameService.game.gameMode === GameType.MultiPlayer) {
       this.socket.emit('endGame');
     }
