@@ -9,6 +9,8 @@ import * as logger from 'morgan';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
+import { BestScoresController } from './controllers/best-scores.controller';
+import { VirtualPlayerNameController } from './controllers/virtual-player-name.controller';
 
 @Service()
 export class Application {
@@ -16,7 +18,10 @@ export class Application {
     private readonly internalError: number = StatusCodes.INTERNAL_SERVER_ERROR;
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
-    constructor(private readonly exampleController: ExampleController, private readonly dateController: DateController) {
+    constructor(private readonly exampleController: ExampleController,
+        private readonly dateController: DateController,
+        private readonly virtualPlayerNameController: VirtualPlayerNameController,
+        private readonly bestScoresController: BestScoresController) {
         this.app = express();
 
         this.swaggerOptions = {
@@ -39,6 +44,8 @@ export class Application {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/api/example', this.exampleController.router);
         this.app.use('/api/date', this.dateController.router);
+        this.app.use('/api/virtualPlayerName', this.virtualPlayerNameController.router);
+        this.app.use('/api/bestScores', this.bestScoresController.router);
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
         });

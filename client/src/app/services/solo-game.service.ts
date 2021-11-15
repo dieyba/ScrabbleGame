@@ -12,6 +12,7 @@ import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis } from '@app/classes/utilities';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { BestScoresService } from './best-scores.service';
 import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { LetterStock } from './letter-stock.service';
@@ -45,6 +46,7 @@ export class SoloGameService {
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
         protected placeService: PlaceService,
+        protected bestScoresService: BestScoresService,
     ) {
         this.stock = new LetterStock();
     }
@@ -268,6 +270,7 @@ export class SoloGameService {
                 this.game.localPlayer.isWinner = true;
                 this.game.opponentPlayer.isWinner = true;
             }
+            this.bestScoresService.postClassicBestScore(this.game.localPlayer)
         }
         clearInterval(this.intervalValue);
         this.game.timerMs = 0;

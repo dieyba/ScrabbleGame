@@ -26,7 +26,11 @@ import { TextEntryComponent } from './components/text-entry/text-entry.component
 import { WaitingAreaComponent } from './components/waiting-area/waiting-area.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
 import { EndGamePopupComponent } from './components/end-game-popup/end-game-popup.component';
+<<<<<<< HEAD
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
+=======
+import { BestScoresComponent } from './components/best-scores/best-scores.component';
+>>>>>>> feature/meilleurs-scores
 
 /**
  * Main module that is used in main.ts.
@@ -54,7 +58,11 @@ import { AdminPageComponent } from './pages/admin-page/admin-page.component';
         WaitingAreaComponent,
         RackComponent,
         EndGamePopupComponent,
+<<<<<<< HEAD
         AdminPageComponent,
+=======
+        BestScoresComponent,
+>>>>>>> feature/meilleurs-scores
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     imports: [

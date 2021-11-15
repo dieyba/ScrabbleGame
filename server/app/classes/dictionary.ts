@@ -5,6 +5,12 @@ export enum DictionaryType {
     English = 1,
     // Other dictionaries
 }
+export interface DictionaryInterface {
+    idDict: number;
+    title: string;
+    description: string;
+    words: string[];
+}
 
 export class Dictionary {
     title: string;

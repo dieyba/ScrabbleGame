@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { BestScoresComponent } from '@app/components/best-scores/best-scores.component';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
 import { AdminPageComponent } from '@app/pages/admin-page/admin-page.component';
 import { ClassicModeComponent } from '@app/pages/classic-mode/classic-mode.component';
@@ -17,7 +18,11 @@ const routes: Routes = [
     { path: 'game', component: GamePageComponent, canActivate: [ActivateGuard] },
     { path: 'wait', component: WaitingAreaComponent },
     { path: 'material', component: MaterialPageComponent },
+<<<<<<< HEAD
     { path: 'admin', component: AdminPageComponent },
+=======
+    { path: 'bestScores', component: BestScoresComponent },
+>>>>>>> feature/meilleurs-scores
     { path: '**', redirectTo: '/start' },
 ];
 

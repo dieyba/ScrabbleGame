@@ -1,0 +1,61 @@
+th,
+td {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 18px;
+    width: 100px;
+    background-color: white;
+}
+h3 {
+    text-align: center;
+}
+h1 {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 30px;
+    filter: grayscale(100%);
+    position: absolute;
+    left: 650px;
+}
+.container {
+    display: block;
+    width: 1000px;
+    height: 900px;
+
+    background-color: #dcecff;
+}
+.image {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 30px;
+    filter: grayscale(100%);
+}
+.classic {
+    position: fixed;
+    left: 400px;
+    top: 297px;
+}
+.log2990 {
+    position: fixed;
+    left: 800px;
+    top: 300px;
+}
+button {
+    border: 1px solid black;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: xx-large;
+    background-color: #6aa0e0;
+    border-width: 10px;
+    border-style: double;
+    text-align: center;
+    flex-direction: column;
+    top: 600px;
+    position: relative;
+}
