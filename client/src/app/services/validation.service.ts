@@ -42,25 +42,23 @@ export class ValidationService {
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
         const wordsValue = this.calculateScore(newWords);
         // Retirer lettres du board
-        setTimeout(() => {
-            if (this.areWordsValid) {
-                newWords.forEach((newWord) => {
-                    if (wordsValue === ERROR_NUMBER) {
-                        newWord.content.forEach((letter) => {
-                            this.gridService.removeSquare(letter.tile.position.x, letter.tile.position.y);
-                        });
-                    } else {
-                        player.score += wordsValue;
-                        newWord.content.forEach((letter) => {
-                            letter.tile.isValidated = true;
-                        });
-                        // TODO: if change the isvalidated = true here, change how its used in solo game service
-                        this.bonusService.useBonus(newWord);
-                    }
-                });
-            }
-            this.isTimerElapsed = true;
-        }, WAIT_TIME);
+        if (this.areWordsValid) {
+            newWords.forEach((newWord) => {
+                if (wordsValue === ERROR_NUMBER) {
+                    newWord.content.forEach((letter) => {
+                        this.gridService.removeSquare(letter.tile.position.x, letter.tile.position.y);
+                    });
+                } else {
+                    player.score += wordsValue;
+                    newWord.content.forEach((letter) => {
+                        letter.tile.isValidated = true;
+                    });
+                    // TODO: if change the isvalidated = true here, change how its used in solo game service
+                    this.bonusService.useBonus(newWord);
+                }
+            });
+        }
+        this.isTimerElapsed = true;
     }
 
     calculateScore(newWords: ScrabbleWord[]): number {

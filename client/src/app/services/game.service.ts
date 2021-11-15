@@ -112,7 +112,6 @@ export class GameService {
             }, TIMER_INTERVAL);
         }
     }
-    // TODO: or check if is end game in the turn manager service
     resetTimer(isEndGame: boolean) {
         this.game.gameTimer.timerMs = +this.game.gameTimer.totalCountDown;
         this.game.gameTimer.secondsToMinutes();
@@ -185,6 +184,7 @@ export class GameService {
                     );
                 } else {
                     // Take new letters
+                    console.log('calling update plyer score after place');
                     this.validationService.updatePlayerScore(tempScrabbleWords, player);
                     lettersToAddToRack = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
                 }
@@ -192,9 +192,9 @@ export class GameService {
                 lettersToAddToRack.forEach((letter) => {
                     player.letters.push(letter);
                 });
-                this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
                 this.isTurnPassed = false;
                 this.isTurnEndSubject.next(this.isTurnPassed);
+                this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
             });
             return errorResult;
         }
