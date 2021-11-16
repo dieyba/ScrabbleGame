@@ -1,5 +1,3 @@
-// import { GameParameters } from './game-parameters';
-
 // /* eslint-disable  @typescript-eslint/no-magic-numbers */
 // describe('GameParameters', () => {
 //     const gameParameters = new GameParameters('Bob', 60, false);

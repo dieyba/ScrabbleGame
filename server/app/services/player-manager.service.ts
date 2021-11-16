@@ -16,9 +16,8 @@ export class PlayerManagerService {
         }
         return undefined;
     }
-
-    addPlayer(socketId: string, playerName?: string,): Player | undefined {
-        let newPlayer = undefined;
+    addPlayer(socketId: string, playerName?: string): Player | undefined {
+        let newPlayer;
         if (this.getPlayerBySocketID(socketId) === undefined) {
             const name = playerName !== undefined ? playerName : '';
             newPlayer = new Player(name, socketId);
@@ -34,5 +33,4 @@ export class PlayerManagerService {
     //         this.allPlayers.splice(playerArrayIndex, 1);
     //     }
     // }
-
 }

@@ -97,7 +97,7 @@
 //         expect(board.isWordPartOfAnotherWord(motAPlacer, position, orientation)).toBeFalse();
 //     });
 
-//     it('isWordTouchingOtherWord should return true if the word touch another word on the board on the left or the right (word horizontale)', () => {
+//     it('isWordTouchingOtherWord should return true if the word touch another word on the board on left or right (word horizontale)', () => {
 //         const letterAlreadyPlaced = new ScrabbleLetter('a', 1);
 //         board.squares[0][0].letter = letterAlreadyPlaced;
 //         board.squares[0][0].occupied = true;

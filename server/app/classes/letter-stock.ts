@@ -1,4 +1,3 @@
-
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 
 enum LetterQuantity {
