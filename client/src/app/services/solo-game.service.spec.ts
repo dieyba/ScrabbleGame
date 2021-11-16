@@ -173,7 +173,7 @@
 //         expect(spy).toHaveBeenCalled();
 //     });
 
-//     it('exchangeLetter should call addLetter, removeLetter(rack service) and addLetter if the letters to exchange are removed with success', () => {
+//     it('should call addLetter, removeLetter(rack service) and addLetter if the letters to exchange are removed with success', () => {
 //         service.game.creatorPlayer.letters = [new ScrabbleLetter('a', 1)];
 //         service.game.creatorPlayer.isActive = true;
 //         service.game.opponentPlayer = new VirtualPlayer('Ariane', Difficulty.Easy);
