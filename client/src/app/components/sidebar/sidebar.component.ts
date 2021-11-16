@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { EndGamePopupComponent } from '@app/components/end-game-popup/end-game-popup.component';
+import { GAME_CAPACITY } from '@app/components/form/form.component';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
@@ -63,14 +64,20 @@ export class SidebarComponent {
     }
 
     isPlayer1Active(): boolean {
-        return this.gameService.game.getLocalPlayer().isActive;
+        if (this.gameService.game.players.length === GAME_CAPACITY) {
+            return this.gameService.game.getLocalPlayer().isActive;
+        }
+        return false;
     }
 
     isPlayer2Active(): boolean {
-        return this.gameService.game.getOpponent().isActive;
+        if (this.gameService.game.players.length === GAME_CAPACITY) {
+            return this.gameService.game.getOpponent().isActive;
+        }
+        return false;
     }
     getTimer(): string {
-        return this.gameService.timer;
+        return this.gameService.game.gameTimer.timer;
     }
 
     isEndGame(): boolean {

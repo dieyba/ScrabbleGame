@@ -1,4 +1,3 @@
-
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 
 enum LetterQuantity {
@@ -66,7 +65,6 @@ export class LetterStock {
 
     constructor() {
         this.letterStock = [];
-        // TODO: scrabble letter already gives the default letter value. so we dont need to specify it
         this.addLettersToStock(new ScrabbleLetter('a', LetterValue.A), LetterQuantity.A); // A
         this.addLettersToStock(new ScrabbleLetter('b', LetterValue.B), LetterQuantity.B); // B
         this.addLettersToStock(new ScrabbleLetter('c', LetterValue.C), LetterQuantity.C); // C

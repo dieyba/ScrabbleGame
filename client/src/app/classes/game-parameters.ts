@@ -1,4 +1,5 @@
 import { GAME_CAPACITY } from '@app/components/form/form.component';
+import { GameTimer } from './game-timer';
 import { LetterStock } from './letter-stock';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
@@ -26,11 +27,8 @@ export interface GameInitInfo {
 }
 
 export class GameParameters {
-    consecutivePassedTurns: number;
-    isTurnPassed: boolean;
     players: Player[];
-    totalCountDown: number;
-    timerMs: number;
+    gameTimer: GameTimer;
     scrabbleBoard: ScrabbleBoard;
     stock: LetterStock;
     isEndGame: boolean;
@@ -40,11 +38,8 @@ export class GameParameters {
     private opponentPlayerIndex: number;
 
     constructor() {
-        this.consecutivePassedTurns = 0;
-        this.isTurnPassed = false;
         this.players = new Array<Player>();
-        this.totalCountDown = 0;
-        this.timerMs = this.totalCountDown;
+        this.gameTimer = new GameTimer();
         this.isEndGame = false;
         this.gameMode = GameType.Solo;
         this.isLog2990 = false;
@@ -84,8 +79,6 @@ export class GameParameters {
             newVirtualPlayer.letters = previousPlayer.letters;
             newVirtualPlayer.isActive = previousPlayer.isActive;
             newVirtualPlayer.score = previousPlayer.score;
-            newVirtualPlayer.isWinner = previousPlayer.isWinner; // probably wouldn't need that line
-            newVirtualPlayer.roomId = previousPlayer.roomId; // does a vp need a room id?
             this.players[previousPlayerIndex] = newVirtualPlayer;
             this.gameMode = GameType.Solo;
         }

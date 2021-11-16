@@ -1,16 +1,15 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { DefaultCommandParams } from '@app/classes/commands';
-import { GameType } from '@app/classes/game-parameters';
 import { PassTurnCmd } from '@app/classes/pass-command';
 import { Vec2 } from '@app/classes/vec2';
-import { VirtualPlayer } from '@app/classes/virtual-player';
+import { ChatDisplayService } from '@app/services/chat-display.service';
 import { CommandInvokerService } from '@app/services/command-invoker.service';
 import { ExchangeService } from '@app/services/exchange.service';
-import { GameService } from '@app/services/game.service';
+import { DEFAULT_LETTER_COUNT, GameService } from '@app/services/game.service';
 import { GridService } from '@app/services/grid.service';
 import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service';
 import { RackService } from '@app/services/rack.service';
-import { VirtualPlayerService } from '@app/services/virtual-player.service';
+import { TurnManagerService } from '@app/services/turn-manager.service';
 
 // TODO : See if needed elsewhere, else no need to move these constants
 export const DEFAULT_WIDTH = 640;
@@ -44,7 +43,8 @@ export class PlayAreaComponent implements AfterViewInit {
         private readonly mouseWordPlacerService: MouseWordPlacerService,
         private readonly exchangeService: ExchangeService,
         private readonly commandInvokerService: CommandInvokerService,
-        private readonly virtualPlayerService: VirtualPlayerService,
+        private readonly turnManagerService: TurnManagerService,
+        private readonly chatDisplayService: ChatDisplayService,
     ) {
         this.mousePosition = new Vec2(0, 0);
         this.canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -73,20 +73,13 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
+        this.turnManagerService.initalize();
+        this.chatDisplayService.initialize(this.gameService.game.getLocalPlayer().name);
 
-        this.gameService.isOpponentTurnObservable.subscribe((isActive: boolean) => {
-            if (isActive) {
-                // put back the letters from the board to the rack if they weren't placed
-                this.mouseWordPlacerService.onBlur();
-                // if the opponent player is a virtual player, play virtual player turn
-                const isVirtualPlayerCanPlay =
-                    this.gameService.game.gameMode === GameType.Solo &&
-                    this.gameService.game.getOpponent() instanceof VirtualPlayer &&
-                    !this.gameService.game.isEndGame;
-                if (isVirtualPlayerCanPlay) {
-                    this.virtualPlayerService.playTurn();
-                }
-            }
+        this.gameService.isTurnEndObservable.subscribe(() => {
+            // put back the letters from the board to the rack if they weren't placed
+            this.mouseWordPlacerService.onBlur();
+            this.turnManagerService.changeTurn();
         });
     }
 
@@ -141,8 +134,7 @@ export class PlayAreaComponent implements AfterViewInit {
     }
 
     lessThanSevenLettersInStock(): boolean {
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        return this.gameService.game.stock.letterStock.length < 7;
+        return this.gameService.game.stock.letterStock.length < DEFAULT_LETTER_COUNT;
     }
 
     exchange() {

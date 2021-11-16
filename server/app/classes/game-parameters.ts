@@ -1,4 +1,3 @@
-
 import { DictionaryType } from './dictionary';
 import { LetterStock } from './letter-stock';
 import { Player } from './player';
@@ -75,13 +74,13 @@ export class GameInitInfo {
         this.scrabbleBoard = new ScrabbleBoard(clientParametersChosen.isRandomBonus).squares;
 
         // Initializing the players and their letters and the stock
-        let stock = new LetterStock();
+        const stock = new LetterStock();
         this.players = new Array<Player>();
         this.players.push(new Player(clientParametersChosen.creatorName, clientParametersChosen.gameRoom.creatorId, this.gameRoomId));
         this.players.push(new Player(clientParametersChosen.joinerName, clientParametersChosen.gameRoom.joinerId, this.gameRoomId));
         const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
         this.players[starterPlayerIndex].isActive = true;
-        this.players.forEach(player => {
+        this.players.forEach((player) => {
             player.letters = stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         });
         this.stockLetters = stock.letterStock; // stock with the two players' letters removed
@@ -106,7 +105,7 @@ export class GameInitInfo {
     }
 
     getPlayerBySocketId(playerId: string): Player | undefined {
-        let playerToFind = undefined;
+        let playerToFind;
         this.players.forEach((player) => {
             if (player.socketId === playerId) {
                 playerToFind = player;
@@ -124,4 +123,3 @@ export class GameInitInfo {
         return playerToRemove;
     }
 }
-

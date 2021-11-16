@@ -11,6 +11,7 @@ export class ActivateGuard implements CanActivate {
 
     canActivate(
         // TODO: are those needed?
+        /* eslint-disable no-unused-vars */
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot,
     ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {

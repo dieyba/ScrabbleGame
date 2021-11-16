@@ -35,7 +35,7 @@ describe('PlaceService', () => {
         });
         service = TestBed.inject(PlaceService);
 
-        playerMock = new LocalPlayer('name') as Player;
+        playerMock = new Player('name');
     });
 
     it('should be created', () => {

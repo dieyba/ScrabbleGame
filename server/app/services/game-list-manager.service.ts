@@ -3,7 +3,7 @@ import { ERROR_NUMBER } from '@app/classes/utilities';
 import { Service } from 'typedi';
 @Service()
 export class GameListManager {
-    private currentId: number; //TODO: refactor how we give an id number to avoid going to the inifite with the numbers?
+    private currentId: number; // TODO: refactor how we give an id number to avoid going to the inifite with the numbers?
     private waitingAreaGames: WaitingAreaGameParameters[];
     private gamesInPlay: GameInitInfo[];
     constructor() {
@@ -35,6 +35,7 @@ export class GameListManager {
         game.gameRoom.playersName = [game.creatorName];
         this.waitingAreaGames.push(game);
         this.currentId++;
+        // console.log('creating waiting room for game of ', game.creatorName)
         return game;
     }
     addJoinerPlayer(game: WaitingAreaGameParameters, joinerName: string, joinerSocketId: string, isLog2990: boolean): boolean {

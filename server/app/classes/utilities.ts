@@ -1,5 +1,4 @@
-
-import { ScrabbleLetter } from "./scrabble-letter";
+import { ScrabbleLetter } from './scrabble-letter';
 
 export const ERROR_NUMBER = -1;
 
@@ -14,14 +13,14 @@ export const invertAxis = {
 };
 
 export interface BoardUpdate {
-    word: string,
-    orientation: Axis, // or string?
-    positionX: number,
-    positionY: number,
+    word: string;
+    orientation: Axis; // or string?
+    positionX: number;
+    positionY: number;
 }
 
 export interface LettersUpdate {
-    newStock: ScrabbleLetter[],
+    newStock: ScrabbleLetter[];
     newLetters: ScrabbleLetter[];
     newScore: number;
 }

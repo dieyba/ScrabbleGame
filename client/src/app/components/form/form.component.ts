@@ -28,7 +28,7 @@ export class FormComponent implements OnInit {
     opponent: FormControl;
     dictionaryForm: FormControl;
 
-    debutantNameList: string[]; // TODO: and expert too
+    debutantNameList: string[];
     dictionaryList: string[];
     selectedPlayer: string;
     randomPlayerId: number;
@@ -96,7 +96,7 @@ export class FormComponent implements OnInit {
     }
 
     randomPlayer(list: string[]): void {
-        const showOpponents = document.getElementById('opponents'); // TODO: to remove lint error did it work?
+        const showOpponents = document.getElementById('opponents');
         if (showOpponents instanceof HTMLElement) {
             showOpponents.style.visibility = 'visible';
         }

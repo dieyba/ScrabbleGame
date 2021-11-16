@@ -16,7 +16,6 @@ export class ScrabbleWord {
         let string = '';
         for (const i of this.content) {
             string += i.character;
-            // TODO: Modify for blank pieces
         }
         return string;
     }

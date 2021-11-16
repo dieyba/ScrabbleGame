@@ -16,7 +16,7 @@ const MIN_WORD_LENGHT = 2;
 export class WordBuilderService {
     constructor(private gridService: GridService) {}
 
-    // TODO: Handle -1 erro coordinates
+    // TODO: Handle -1 error coordinates
     buildWordsOnBoard(word: string, coord: Vec2, axis: Axis): ScrabbleWord[] {
         const result: ScrabbleWord[] = [];
 

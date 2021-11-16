@@ -34,5 +34,4 @@ export class PlayerManagerService {
     //         this.allPlayers.splice(playerArrayIndex, 1);
     //     }
     // }
-
 }
