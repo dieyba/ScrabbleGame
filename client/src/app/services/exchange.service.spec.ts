@@ -28,7 +28,7 @@ describe('ExchangeService', () => {
             'removeRackLetter',
             'stock',
             'getLettersSelected',
-            'exchangeLetters ',
+            'exchangeLetters',
         ]);
         gameServiceSpy = jasmine.createSpyObj('GameService', ['currentGameService', 'initializeGameType']);
         TestBed.configureTestingModule({
