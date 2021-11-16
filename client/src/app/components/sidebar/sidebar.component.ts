@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { EndGamePopupComponent } from '@app/components/end-game-popup/end-game-popup.component';
+import { GAME_CAPACITY } from '@app/components/form/form.component';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { GAME_CAPACITY } from '../form/form.component';
 @Component({
     selector: 'app-sidebar',
     templateUrl: './sidebar.component.html',

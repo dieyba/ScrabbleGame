@@ -24,6 +24,7 @@ export class SocketManagerService {
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
             socket.on('addPlayer', () => {
                 this.playerMan.addPlayer(socket.id);
+                // console.log('added player:', this.playerMan.getPlayerBySocketID(socket.id));
                 this.getAllWaitingAreaGames(socket);
             });
             socket.on('createWaitingAreaRoom', (gameParams: WaitingAreaGameParameters) => {

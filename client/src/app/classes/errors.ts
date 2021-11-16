@@ -1,4 +1,3 @@
-
 export enum ErrorType {
     NoError,
     SyntaxError,

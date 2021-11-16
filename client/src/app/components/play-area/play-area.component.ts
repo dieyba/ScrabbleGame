@@ -76,10 +76,9 @@ export class PlayAreaComponent implements AfterViewInit {
         this.turnManagerService.initalize();
         this.chatDisplayService.initialize(this.gameService.game.getLocalPlayer().name);
 
-        this.gameService.isTurnEndObservable.subscribe((isTurnPassed: boolean) => {
+        this.gameService.isTurnEndObservable.subscribe(() => {
             // put back the letters from the board to the rack if they weren't placed
             this.mouseWordPlacerService.onBlur();
-            console.log(this.gameService.game.getLocalPlayer().name, ' ended their turn by passing:', this.gameService.isTurnPassed);
             this.turnManagerService.changeTurn();
         });
     }

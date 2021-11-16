@@ -184,7 +184,6 @@ export class GameService {
                     );
                 } else {
                     // Take new letters
-                    console.log('calling update player score after place');
                     this.validationService.updatePlayerScore(tempScrabbleWords, player);
                     lettersToAddToRack = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
                 }
@@ -207,7 +206,7 @@ export class GameService {
                 orientation: placeParams.orientation,
                 positionX: placeParams.position.x,
                 positionY: placeParams.position.y,
-            }
+            };
             this.socket.emit('word placed', boardUpdate);
             const lettersUpdate: LettersUpdate = {
                 newStock: this.game.stock.letterStock,
