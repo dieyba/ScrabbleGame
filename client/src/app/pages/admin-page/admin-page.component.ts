@@ -2,6 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { AdminService } from '@app/services/admin.service';
 import { of } from 'rxjs';
 
+export interface DictionaryInterface {
+    idDict: number;
+    title: string;
+    description: string;
+    words: string[];
+}
+
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
@@ -9,15 +16,21 @@ import { of } from 'rxjs';
 })
 export class AdminPageComponent implements OnInit {
     privateName: boolean;
-
+    dictionaries: DictionaryInterface[];
     constructor(public adminService: AdminService) {
         this.privateName = false;
+        this.dictionaries = [];
     }
 
     ngOnInit(): void {
+        this.getDictionaries();
+        // console.log(this.dictionaries);
     }
 
-
+    getDictionaries() {
+        // this.dynamicDownloadJson();
+        console.log(this.adminService.getDictionaries().subscribe(dictionary => (this.dictionaries = dictionary)));
+    }
 
     fakeValidateUserData() {
         return of({
@@ -27,7 +40,7 @@ export class AdminPageComponent implements OnInit {
     }
 
     dynamicDownloadJson() {
-        this.fakeValidateUserData().subscribe((res) => {
+        this.adminService.getDictionaries().subscribe((res) => {
             this.dyanmicDownloadByHtmlTag({
                 fileName: 'Pitie Seigneur.json',
                 text: JSON.stringify(res)

@@ -1,24 +1,97 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { ERROR_NUMBER } from '@app/classes/utilities';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+export interface DictionaryInterface {
+    idDict: number;
+    title: string;
+    description: string;
+    words: string[];
+}
+
+export interface VirtualPlayerName {
+    idName: string;
+    virtualPlayerName: string;
+}
 
 @Injectable({
     providedIn: 'root'
 })
 export class AdminService {
+    // dictionaries: Dictionary[];
+
     beginnerNameList: string[];
     expertNameList: string[];
     newName: FormControl;
     selectedName: string;
     private index: number;
 
-    constructor() {
+    beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
+    expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
+    dictionariesUrl = 'http://localhost:3000/api/Dictionary';
+
+    constructor(private http: HttpClient) {
         this.beginnerNameList = ['Érika', 'Étienne', 'Sara'];
         this.expertNameList = ['Dieyba', 'Kevin', 'Ariane'];
         this.newName = new FormControl('', [Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(12),
         Validators.minLength(3),]);
         this.selectedName = '';
         this.index = ERROR_NUMBER;
+        // console.log('get observable : ', this.getDictionaries());
+        // this.getDictionaries()
+        // this.getDictionaries().subscribe(res => (this.dictionaries = res));
+        // console.log('try : ', this.dictionaries);
+    }
+
+    private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
+        console.log('error');
+        return (error: Error): Observable<T> => {
+            return of(result as T);
+        };
+    }
+
+    getDictionaries(): Observable<DictionaryInterface[]> {
+        return this.http.get<DictionaryInterface[]>(this.dictionariesUrl)
+            .pipe(
+                catchError(this.handleError('getDictionaries', []))
+            );
+    }
+
+    postDictionaries(dico: DictionaryInterface) {
+        return this.http.post<DictionaryInterface>(this.dictionariesUrl, { dico })
+            .pipe(
+                catchError(this.handleError('postDictionaries', []))
+            );
+    }
+
+    getBeginnersVirtualPlayerNames(): Observable<VirtualPlayerName[]> {
+        return this.http.get<VirtualPlayerName[]>(this.beginnerNameUrl)
+            .pipe(
+                catchError(this.handleError('getBeginnersVirtualPlayerNames', []))
+            );
+    }
+
+    getExpertsVirtualPlayerNames(): Observable<VirtualPlayerName[]> {
+        return this.http.get<VirtualPlayerName[]>(this.expertNameUrl)
+            .pipe(
+                catchError(this.handleError('getExpertsVirtualPlayerNames', []))
+            );
+    }
+
+    postBeginnersVirtualPlayerNames(name: string) {
+        return this.http.post<VirtualPlayerName>(this.beginnerNameUrl, { name })
+            .pipe(
+                catchError(this.handleError('postBeginnersVirtualPlayerNames'))
+            );
+    }
+
+    postExpertsVirtualPlayerNames(name: string) {
+        return this.http.post<VirtualPlayerName>(this.expertNameUrl, { name })
+            .pipe(
+                catchError(this.handleError('postExpertsVirtualPlayerNames'))
+            );
     }
 
     untouchable(): boolean {
