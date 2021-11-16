@@ -21,6 +21,7 @@ export interface GameInitInfo {
     scrabbleBoard: Square[][];
     stockLetters: ScrabbleLetter[];
     gameMode: GameType;
+    isLog2990: boolean;
     isRandomBonus?: boolean; // to randomize bonus tile position when creating the board
 }
 
@@ -34,7 +35,7 @@ export class GameParameters {
     stock: LetterStock;
     isEndGame: boolean;
     gameMode: GameType;
-    isLOG2990: boolean;
+    isLog2990: boolean;
     private localPlayerIndex: number;
     private opponentPlayerIndex: number;
 
@@ -46,7 +47,7 @@ export class GameParameters {
         this.timerMs = this.totalCountDown;
         this.isEndGame = false;
         this.gameMode = GameType.Solo;
-        this.isLOG2990 = false;
+        this.isLog2990 = false;
         this.localPlayerIndex = DEFAULT_LOCAL_PLAYER_ID; // by default, in solo games, the local player is the first player
         this.opponentPlayerIndex = DEFAULT_OPPONENT_ID;
     }

@@ -123,6 +123,11 @@ export class GameService {
             // TODO:set objectives initialized in server
         }
     }
+    
+    initializeLog2990Game() {
+
+    }
+
     startNewGame() {
         this.isOpponentTurnSubject = new BehaviorSubject<boolean>(this.game.getOpponent().isActive);
         this.isOpponentTurnObservable = this.isOpponentTurnSubject.asObservable();

@@ -17,10 +17,12 @@ export class GameListService {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.waitingAreaGames = new Array<WaitingAreaGameParameters>();
-        this.socket.emit('addPlayer');
         this.socket.on('updateWaitingAreaGames', (game: WaitingAreaGameParameters[]) => {
             this.waitingAreaGames = game;
         });
+    }
+    addPlayer(isLog2990: boolean) {
+        this.socket.emit('addPlayer', isLog2990);
     }
     getList(): WaitingAreaGameParameters[] {
         return this.waitingAreaGames;
@@ -32,7 +34,7 @@ export class GameListService {
         this.socket.emit('deleteWaitingAreaRoom');
     }
     start(game: WaitingAreaGameParameters, name: string): void {
-        this.socket.emit('joinWaitingAreaRoom', name, game.gameRoom.idGame);
+        this.socket.emit('joinWaitingAreaRoom', name, game.gameRoom.idGame, game.isLog2990);
     }
     initializeMultiplayerGame() {
         this.socket.emit('initializeMultiPlayerGame');

@@ -8,6 +8,31 @@ import { Square } from './square';
 
 export const GAME_CAPACITY = 2;
 const DEFAULT_LETTER_COUNT = 7;
+const PUBLIC_GOALS_COUNT = 4;
+const TOTAL_GOALS_COUNT = 8;
+
+export enum Goals {
+    PlaceLetterWorthTenPts = 0, // Place a word containing a letter with a 10 pts value
+    FormTwoLettersStarsOnly = 1, // Form 2 letter word, both letters are *
+    FormWordWithLettersFromName = 2, /* Form a word containing at least 3 letters from the player's name
+        (can be same letter, but different occurence)*/
+    FormAnExistingWord = 3, // Form a word already on the board
+    FormThreeWords = 4, // Form three words at the same time 
+    PlaceLetterOnBoardCorner = 5, // Place a letter on one of the 4 boaard corners
+    ActivateTwoBonuses = 6, // Active 2 bonuses at the same time / place a word with 2 letters on a colour square
+    PlaceLetterOnColorSquare = 7,// Place letter x on a square of color y. x and y are randomly chosen at start of game
+}
+
+export enum GoalPoints {
+    PlaceLetterWorthTenPts = 20,
+    FormTwoLettersStarsOnly = 20,
+    FormWordWithLettersFromName = 30,
+    FormAnExistingWord = 20,
+    FormThreeWords = 50,
+    PlaceLetterOnBoardCorner = 30,
+    ActivateTwoBonuses = 30,
+    PlaceLetterOnColorSquare = 50,
+}
 
 export enum GameType {
     Solo = 0,
@@ -28,7 +53,7 @@ export interface WaitingAreaGameParameters {
     dictionaryType: DictionaryType;
     totalCountDown: number;
     isRandomBonus: boolean;
-    isLOG2990: boolean;
+    isLog2990: boolean;
     gameMode: GameType;
 }
 
@@ -38,11 +63,14 @@ export class GameInitInfo {
     totalCountDown: number;
     scrabbleBoard: Square[][];
     stockLetters: ScrabbleLetter[];
+    isLog2990: boolean;
     gameMode: GameType;
+    sharedGoals: Goals[];
 
     constructor(clientParametersChosen: WaitingAreaGameParameters) {
         this.gameRoomId = clientParametersChosen.gameRoom.idGame;
         this.gameMode = clientParametersChosen.gameMode;
+        this.isLog2990 = clientParametersChosen.isLog2990;
         this.totalCountDown = clientParametersChosen.totalCountDown;
         this.scrabbleBoard = new ScrabbleBoard(clientParametersChosen.isRandomBonus).squares;
 
@@ -57,11 +85,17 @@ export class GameInitInfo {
             player.letters = stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         });
         this.stockLetters = stock.letterStock; // stock with the two players' letters removed
-
-        // TODO: pick the 4 random objectives from the list
-        if (clientParametersChosen.isLOG2990) {
-
+        this.sharedGoals = [];
+        // TODO: pick the 4 public random objectives/goals from the list
+        if (clientParametersChosen.isLog2990) {
+            for (let i = 0; i < PUBLIC_GOALS_COUNT; i++) {
+                const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
+                if (!this.sharedGoals.includes(randomGoal)) {
+                    this.sharedGoals.push();
+                }
+            }
         }
+        console.log(this.sharedGoals);
     }
 
     getOtherPlayerInRoom(playerId: string): Player | undefined {

@@ -14,7 +14,7 @@ describe('ManipulationRackService', () => {
     beforeEach(() => {
         rackServiceSpy = jasmine.createSpyObj(
             'RackService',
-            ['drawRack', 'select', 'deselect', 'deselectAll', 'handleExchangeSelection', 'clearRack'],
+            ['drawRack', 'select', 'deselect', 'deselectAll', 'handleExchangeSelection', 'redrawRack'],
             {
                 ['exchangeSelected']: [false, false, false, false, false, false, false],
                 ['handlingSelected']: [false, false, false, false, false, false, false],
@@ -129,16 +129,16 @@ describe('ManipulationRackService', () => {
         expect(service.getLetterSelectedPosition).toEqual(6);
     });
 
-    it('switchLeft should call rackService clearRack and select if a letter is selected', () => {
+    it('switchLeft should call rackService redrawRack and select if a letter is selected', () => {
         service.switchLeft();
-        expect(rackServiceSpy.clearRack).not.toHaveBeenCalled();
+        expect(rackServiceSpy.redrawRack).not.toHaveBeenCalled();
         expect(rackServiceSpy.select).not.toHaveBeenCalled();
 
         rackServiceSpy.handlingSelected[2] = true;
         service.setLetterSelectedPosition = 2;
         service.switchLeft();
 
-        expect(rackServiceSpy.clearRack).toHaveBeenCalled();
+        expect(rackServiceSpy.redrawRack).toHaveBeenCalled();
         expect(rackServiceSpy.select).toHaveBeenCalled();
     });
 
@@ -158,16 +158,16 @@ describe('ManipulationRackService', () => {
         expect(service.getLetterSelectedPosition).toEqual(2);
     });
 
-    it('switchRight should call rackService clearRack and select if a letter is selected', () => {
+    it('switchRight should call rackService redrawRack and select if a letter is selected', () => {
         service.switchRight();
-        expect(rackServiceSpy.clearRack).not.toHaveBeenCalled();
+        expect(rackServiceSpy.redrawRack).not.toHaveBeenCalled();
         expect(rackServiceSpy.select).not.toHaveBeenCalled();
 
         rackServiceSpy.handlingSelected[2] = true;
         service.setLetterSelectedPosition = 2;
         service.switchRight();
 
-        expect(rackServiceSpy.clearRack).toHaveBeenCalled();
+        expect(rackServiceSpy.redrawRack).toHaveBeenCalled();
         expect(rackServiceSpy.select).toHaveBeenCalled();
     });
 

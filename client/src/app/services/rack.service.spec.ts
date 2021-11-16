@@ -80,12 +80,12 @@ describe('RackService', () => {
         expect(drawLetterSpy).not.toHaveBeenCalled();
     });
 
-    it('clearRack should call "gridContext.clearRack()", "drawRack" and "drawExistingLetters"', () => {
+    it('redrawRack should call "gridContext.redrawRack()", "drawRack" and "drawExistingLetters"', () => {
         const clearRectSpy = spyOn<any>(ctxStub, 'clearRect').and.stub();
         const drawRackSpy = spyOn<any>(service, 'drawRack').and.stub();
         const drawExistingLettersSpy = spyOn<any>(service, 'drawExistingLetters').and.stub();
 
-        service.clearRack();
+        service.redrawRack();
 
         expect(clearRectSpy).toHaveBeenCalled();
         expect(drawRackSpy).toHaveBeenCalled();

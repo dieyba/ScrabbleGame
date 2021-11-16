@@ -13,6 +13,11 @@
                 <div class="row" *ngIf="getPlayer1LetterCount() < 7">
                     <label class="info">Nombre de lettres: {{ getPlayer1LetterCount() }}</label>
                 </div>
+                <div class="row" *ngIf="isLog2990()">
+                    <label class="info">Objectifs:</label>
+                    <div class="column rectangle"></div>
+                    <div class="column rectangle"></div>
+                </div>
             </div>
         </mat-card-content>
     </mat-card>
@@ -28,6 +33,11 @@
                 <div class="row" *ngIf="getPlayer2LetterCount() < 7">
                     <label class="info">Nombre de lettres: {{ getPlayer2LetterCount() }}</label>
                 </div>
+                <div class="row" *ngIf="isLog2990()">
+                    <label class="info">Objectifs:</label>
+                    <div class="column rectangle"></div>
+                    <div class="column rectangle"></div>
+                </div>
             </div>
         </mat-card-content>
     </mat-card>
@@ -40,6 +50,17 @@
         <mat-card-title class="card-title" align="center">Temps restant</mat-card-title>
         <mat-card-content>
             <label class="values">{{ getTimer() }}</label>
+        </mat-card-content>
+    </mat-card>
+    <mat-card class="card">
+        <mat-card-title class="card-title" align="center">Objectifs</mat-card-title>
+        <mat-card-content>
+            <div class="row">
+                <div class="column rectangle"></div>
+                <div class="column rectangle"></div>
+                <div class="column rectangle"></div>
+                <div class="column rectangle"></div>
+            </div>
         </mat-card-content>
     </mat-card>
     <mat-card *ngIf="isEndGame() && hasWinner()">

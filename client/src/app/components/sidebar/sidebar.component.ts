@@ -30,6 +30,10 @@ export class SidebarComponent {
         });
     }
 
+    isLog2990(): boolean {
+        return this.gameService.game.isLog2990;
+    }
+
     getPlayer1Name(): string {
         return this.gameService.game.getLocalPlayer().name;
     }

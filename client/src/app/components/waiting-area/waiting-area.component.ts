@@ -50,7 +50,7 @@ export class WaitingAreaComponent {
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
         private dialog: MatDialog,
         public gameList: GameListService,
-        @Inject(MAT_DIALOG_DATA) public isGameSelected: boolean,
+        @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
@@ -58,7 +58,8 @@ export class WaitingAreaComponent {
         this.pendingGameslist = [];
         this.name = false;
         this.isStarting = false;
-        if (isGameSelected) {
+        this.gameList.addPlayer(data.isLog2990);
+        if (data.isGameSelected) {
             this.selectedGame = new WaitingAreaGameParameters(GameType.MultiPlayer, GAME_CAPACITY, DictionaryType.Default, 0, false, false, '');
             this.playerName = new FormControl('', [
                 Validators.required,
@@ -85,7 +86,7 @@ export class WaitingAreaComponent {
     }
 
     onSelect(game: WaitingAreaGameParameters): WaitingAreaGameParameters {
-        if (this.isGameSelected) {
+        if (this.data.isGameSelected) {
             this.selectedGame = game;
         }
         return this.selectedGame;
@@ -97,7 +98,7 @@ export class WaitingAreaComponent {
     }
 
     openName(selected: boolean): boolean {
-        if (this.isGameSelected) {
+        if (this.data.isGameSelected) {
             return (this.name = selected);
         }
         return false;
@@ -136,13 +137,13 @@ export class WaitingAreaComponent {
     }
 
     openForm() {
-        this.dialog.open(FormComponent, {});
+        this.dialog.open(FormComponent, { data: { isSolo: this.data.isSolo, isLog2990: this.data.isLog2990 } });
     }
 
     convert(isSolo: boolean) {
         this.name = false;
         this.closeDialog();
-        this.dialog.open(FormComponent, { data: isSolo });
+        this.dialog.open(FormComponent, { data: { isSolo: isSolo, isLog2990: this.data.isLog2990 } });
     }
 
     closeDialog() {

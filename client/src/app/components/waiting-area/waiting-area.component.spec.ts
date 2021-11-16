@@ -79,15 +79,15 @@ describe('WaitingAreaComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('onSelect should set selectedGame if gameSelected is true', () => {
-        component.gameSelected = true;
+    it('onSelect should set selectedGame if isGameSelected is true', () => {
+        component.isGameSelected = true;
         const game = new GameParameters('Ari', 60, false);
         component.onSelect(game);
         expect(component.selectedGame.localPlayer.name).toEqual('Ari');
     });
 
-    it('onSelect should not set selectedGame if gameSelected is false', () => {
-        component.gameSelected = false;
+    it('onSelect should not set selectedGame if isGameSelected is false', () => {
+        component.isGameSelected = false;
         const selectedGame = new GameParameters('', 0, false);
         const game = new GameParameters('Ari', 60, false);
         component.onSelect(game);
@@ -95,12 +95,12 @@ describe('WaitingAreaComponent', () => {
     });
 
     it('openName should return true if game is selected and parameter is true', () => {
-        component.gameSelected = true;
+        component.isGameSelected = true;
         expect(component.openName(true)).toEqual(true);
     });
 
     it('openName should return true if game is not selected', () => {
-        component.gameSelected = false;
+        component.isGameSelected = false;
         expect(component.openName(true)).toEqual(false);
     });
 

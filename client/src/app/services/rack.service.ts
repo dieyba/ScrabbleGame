@@ -69,10 +69,18 @@ export class RackService {
         return pos;
     }
 
-    clearRack() {
+    redrawRack() {
         this.gridContext.clearRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
         this.drawRack();
         this.drawExistingLetters();
+    }
+
+    clearRack() {
+        this.gridContext.clearRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
+        this.drawRack();
+        for (let i = 0; i < this.rackLetters.length; i++) {
+            this.rackLetters.splice(i, 1);
+        }
     }
 
     drawExistingLetters() {
