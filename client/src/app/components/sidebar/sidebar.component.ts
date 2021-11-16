@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { EndGamePopupComponent } from '@app/components/end-game-popup/end-game-popup.component';
@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
     templateUrl: './sidebar.component.html',
     styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
     winnerName: string;
     private dialogRef: MatDialogRef<EndGamePopupComponent>;
     private socket: io.Socket;
@@ -22,15 +22,11 @@ export class SidebarComponent {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.winnerName = '';
-        this.roomLeft();
     }
-    roomLeft() {
-        this.socket.on('roomLeft', () => {
-            this.gameService.game.getLocalPlayer().isWinner = true;
-            this.gameService.game.isEndGame = true;
-        });
+    ngOnInit(): void {
+        // TODO: this should have fixed the double timer problem when re creating a game
+        clearTimeout(this.gameService.game.gameTimer.intervalValue);
     }
-
     getPlayer1Name(): string {
         return this.gameService.game.getLocalPlayer().name;
     }
@@ -103,7 +99,6 @@ export class SidebarComponent {
         }
     }
 
-    // TODO: test if quit game still works (on the server too)
     quitGame(): void {
         // User confirmation popup
         this.dialogRef = this.dialog.open(EndGamePopupComponent);
@@ -112,9 +107,6 @@ export class SidebarComponent {
         this.dialogRef.afterClosed().subscribe((confirmQuit) => {
             if (confirmQuit) {
                 this.socket.emit('leaveRoom');
-                // this.socket = SocketHandler.disconnectSocket();
-                // calls server to display message in opponent's chat box
-                // this.socket.emit('playerQuit');
                 this.router.navigate(['/start']);
             }
         });

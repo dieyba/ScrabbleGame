@@ -8,7 +8,7 @@ import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { BoardUpdate, LettersUpdate } from '@app/classes/server-message';
-import { Axis } from '@app/classes/utilities';
+import { Axis, ERROR_NUMBER } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
@@ -56,6 +56,20 @@ export class GameService {
             this.game.stock.letterStock = update.newStock;
             this.game.getOpponent().letters = update.newLetters;
             this.game.getOpponent().score = update.newScore;
+        });
+        // TODO: test if this works (solo mode means local word validation, no synchronization with server and virtual player turns)
+        this.socket.on('convert to solo', (previousPlayerSocketId: string, virtualPlayerName: string) => {
+            let newVirtualPlayer;
+            const playerArrayIndex = this.game.players.findIndex((p) => p.socketId === previousPlayerSocketId);
+            if (playerArrayIndex !== ERROR_NUMBER) {
+                const previousPlayer = this.game.players[playerArrayIndex];
+                newVirtualPlayer = new VirtualPlayer(virtualPlayerName, Difficulty.Easy);
+                newVirtualPlayer.letters = previousPlayer.letters;
+                newVirtualPlayer.isActive = previousPlayer.isActive; // TODO: see if that will synchronize properly
+                newVirtualPlayer.score = previousPlayer.score;
+                this.game.players[playerArrayIndex] = newVirtualPlayer;
+                this.game.gameMode = GameType.Solo;
+            }
         });
     }
     initializeSoloGame(initInfo: WaitingAreaGameParameters, virtualPlayerDifficulty: Difficulty) {

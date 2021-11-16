@@ -60,7 +60,7 @@ export class GameListManager {
     deleteGameInPlay(roomId: number): void {
         const index = this.gamesInPlay.findIndex((r) => r.gameRoomId === roomId);
         if (index !== ERROR_NUMBER) {
-            this.waitingAreaGames.splice(index, 1);
+            this.gamesInPlay.splice(index, 1);
         }
     }
 }

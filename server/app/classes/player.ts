@@ -18,4 +18,12 @@ export class Player {
         this.score = 0;
         this.letters = [];
     }
+    // to be used when leaving a room (after abandon or quit). Only the socket id should remain
+    resetPlayer() {
+        this.name = '';
+        this.roomId = ERROR_NUMBER;
+        this.isActive = false;
+        this.score = 0;
+        this.letters = [];
+    }
 }
