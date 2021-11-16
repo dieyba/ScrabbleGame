@@ -79,7 +79,7 @@ export class SocketManagerService {
             socket.on('validateWords', (newWords: string[]) => {
                 this.validateWords(socket, newWords);
             });
-            socket.on('word placed', (word: any) => {
+            socket.on('word placed', (word: BoardUpdate) => {
                 let sender = this.playerMan.getPlayerBySocketID(socket.id);
                 if (sender === undefined) {
                     return;
@@ -89,14 +89,14 @@ export class SocketManagerService {
                     this.sio.to(opponent.socketId).emit('update board', word);
                 }
             });
-            socket.on('place word', (update: BoardUpdate) => {
+            socket.on('place word', (update: LettersUpdate) => {
                 let sender = this.playerMan.getPlayerBySocketID(socket.id);
                 if (sender === undefined) {
                     return;
                 }
                 const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.getOtherPlayerInRoom(sender.socketId)
                 if (opponent !== undefined) {
-                    this.sio.to(opponent.socketId).emit('update place', update);
+                    this.sio.to(opponent.socketId).emit('update letters', update);
                 }
             });
             socket.on('change turn', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
