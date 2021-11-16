@@ -9,6 +9,7 @@ const DATABASE_COLLECTION = 'Dictionary';
 
 @injectable()
 export class DatabaseService {
+    // TODO change name
     private db: Db;
     private client: MongoClient;
 
