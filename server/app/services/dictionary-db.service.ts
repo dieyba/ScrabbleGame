@@ -1,60 +1,103 @@
 import { DictionaryInterface } from '@app/classes/dictionary';
-import { Db, MongoClient } from 'mongodb';
-import 'reflect-metadata';
+import { Collection, MongoClient } from 'mongodb';
+import { Service } from 'typedi';
 
 // CHANGE the URL for your database information
 const DATABASE_URL = 'mongodb+srv://Scrabble304:Scrabble304@cluster0.bvwkn.mongodb.net/database?retryWrites=true&w=majority';
 const DATABASE_NAME = 'Dictionary';
-const DATABASE_COLLECTION = 'Dictionary';
+const DATABASE_COLLECTION = ['Dictionary'];
 
-@injectable()
-export class DatabaseService {
-    // TODO change name
-    private db: Db;
-    private client: MongoClient;
+@Service()
+export class DictionaryDBService {
+    client: MongoClient;
+    dictionaryCollection: Collection<DictionaryInterface>;
 
-    async start(url: string = DATABASE_URL): Promise<MongoClient | null> {
-        try {
-            const client = await MongoClient.connect(url);
-            this.client = client;
-            this.db = client.db(DATABASE_NAME);
-        } catch {
-            throw new Error('Database connection error');
+    constructor(url = DATABASE_URL) {
+        MongoClient.connect(url)
+            .then((client: MongoClient) => {
+                this.client = client;
+                this.dictionaryCollection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]);
+                this.populateClassicDB();
+            })
+            .catch((error) => {
+                throw error;
+            });
+    }
+
+    // async getClassicBestScore(): Promise<BestScores[]> {
+    //     return this.classicCollection
+    //         .find({})
+    //         .toArray()
+    //         .then((classicBestScores: BestScores[]) => {
+    //             return classicBestScores;
+    //         })
+    //         .catch((error: Error) => {
+    //             throw error;
+    //         });
+
+    // }
+    // async getLog2990BestScore(): Promise<BestScores[]> {
+    //     return this.log2990Collection
+    //         .find({})
+    //         .toArray()
+    //         .then((log2990BestScores: BestScores[]) => {
+    //             return log2990BestScores;
+    //         })
+    //         .catch((error: Error) => {
+    //             throw error;
+    //         });
+
+    // }
+
+    // async postClassicBestScore(classicBestScore: BestScores): Promise<void> {
+    //     this.classicCollection
+    //         .insertOne(classicBestScore)
+    //         .then(() => {
+    //             /* do nothing */
+    //         })
+    //         .catch((error: Error) => {
+    //             throw error;
+    //         });
+    // }
+    // async postLog2990BestScore(log2990BestScore: BestScores): Promise<void> {
+    //     this.classicCollection
+    //         .insertOne(log2990BestScore)
+    //         .then(() => {
+    //             /* do nothing */
+    //         })
+    //         .catch((error: Error) => {
+    //             throw error;
+    //         });
+    // }
+
+    async populateClassicDB(): Promise<void> {
+        if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments()) === 0) {
+            const dictionaries: DictionaryInterface[] = [
+                {
+                    idDict: 1,
+                    title: 'erika',
+                    description: 'assiette de patates frites à erika',
+                    words: ['patates frites #1', 'patates frites #2', 'patates frites #3', 'patates frites #4', 'patates frites #5'],
+                },
+            ];
+            console.log('THIS ADDS DATA TO THE DATABASE, DO NOT USE OTHERWISE');
+            for (const course of dictionaries) {
+                await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(course);
+            }
         }
-
-        if ((await this.db.collection(DATABASE_COLLECTION).countDocuments()) === 0) {
-            await this.populateDB();
-        }
-        return this.client;
     }
 
-    async closeConnection(): Promise<void> {
-        return this.client.close();
-    }
+    // async checkBestScore() {
 
-    async populateDB(): Promise<void> {
-        const dictionary: DictionaryInterface[] = [
-            {
-                idDict: 1,
-                title: 'potato',
-                description: 'potato',
-                words: ['potato1', 'potato2', 'potato3'],
-            },
-            {
-                idDict: 2,
-                title: 'banana',
-                description: 'banana',
-                words: ['banana1', 'banana2', 'banana3'],
-            },
-        ];
-
-        console.log('THIS ADDS DATA TO THE DATABASE, DO NOT USE OTHERWISE');
-        for (const course of dictionary) {
-            await this.db.collection(DATABASE_COLLECTION).insertOne(course);
-        }
-    }
-
-    get database(): Db {
-        return this.db;
-    }
+    // }
+    // async deleteVirtualPlayerName(idName: string): Promise<void> {
+    //     this.collection
+    //         .findOneAndDelete({ _id: idName })
+    //         .then(() => {
+    //             /* do nothing */
+    //         })
+    //         .catch((error: Error) => {
+    //             throw error;
+    //         });
+    // }
 }
