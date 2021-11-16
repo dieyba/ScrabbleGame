@@ -149,7 +149,6 @@ export class ValidationService {
             });
         }
     }
-    // TODO: see if some functions already exist for letter validation
     isWordValid(word: string): boolean {
         return this.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
     }

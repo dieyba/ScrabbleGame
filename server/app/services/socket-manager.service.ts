@@ -190,7 +190,7 @@ export class SocketManagerService {
             return;
         }
         let clientInitParams = this.gameListMan.createGameInPlay(waitingAreaGame);
-        // // TODO: Normally this should be done before, go see if it is done. And check game room id too?
+        // // TODO: Normally this is already be done before, go see if it is done. And check game room id too?
         // if (newGame.players[0].name === waitingAreaGame.creatorName) {
         //     newGame.players[0].socketId = waitingAreaGame.gameRoom.creatorId;
         //     newGame.players[1].socketId = waitingAreaGame.gameRoom.joinerId;

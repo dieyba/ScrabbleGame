@@ -27,6 +27,7 @@ export class GameListManager {
         game.gameRoom.playersName = [game.creatorName];
         this.waitingAreaGames.push(game);
         this.currentId++;
+        console.log('creating waiting room for game of ', game.creatorName)
         return game;
     }
     addJoinerPlayer(game: WaitingAreaGameParameters, joinerName: string, joinerSocketId: string): boolean {

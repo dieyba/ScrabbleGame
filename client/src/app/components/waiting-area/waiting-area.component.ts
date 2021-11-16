@@ -1,4 +1,3 @@
-// TODO: finish adapting to isLOG2990 choice selection in form
 
 import { Component, HostListener, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
