@@ -118,8 +118,6 @@ export class SocketManagerService {
         setTimeout(() => {
             this.leaveRoom(socket);
             this.playerMan.removePlayer(socket.id);
-            // eslint-disable-next-line no-console
-            console.log('deconnexion de ', socket.id);
         }, DISCONNECT_TIME_INTERVAL);
     }
     private leaveRoom(socket: io.Socket) {
@@ -140,12 +138,9 @@ export class SocketManagerService {
     }
     private leaveGameInPlay(socket: io.Socket, roomGame: GameInitInfo) {
         roomGame.removePlayer(socket.id);
-        if (roomGame.players.length === 0) {
-            this.gameListMan.deleteGameInPlay(roomGame.gameRoomId);
-        } else {
-            this.displayPlayerQuitMessage(socket);
-            this.sio.to(roomGame.gameRoomId.toString()).emit('convert to solo', socket.id, 'SomeVPName');
-        }
+        this.displayPlayerQuitMessage(socket);
+        this.sio.to(roomGame.gameRoomId.toString()).emit('convert to solo', socket.id);
+        this.gameListMan.deleteGameInPlay(roomGame.gameRoomId);
     }
     private leaveWaitingAreaRoom(socket: io.Socket, waitingAreaRoom: WaitingAreaGameParameters) {
         const roomId = waitingAreaRoom.gameRoom.idGame;

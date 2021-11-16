@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { createSystemEntry } from '@app/classes/chat-display-entry';
 import { PlaceParams } from '@app/classes/commands';
 import { ErrorType } from '@app/classes/errors';
 import { DEFAULT_LOCAL_PLAYER_ID, DEFAULT_OPPONENT_ID, GameInitInfo, GameParameters, GameType } from '@app/classes/game-parameters';
@@ -16,6 +17,7 @@ import { SocketHandler } from '@app/modules/socket-handler';
 import { BehaviorSubject, Observable } from 'rxjs';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import { ChatDisplayService } from './chat-display.service';
 import { GridService } from './grid.service';
 import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
@@ -41,6 +43,7 @@ export class GameService {
         protected placeService: PlaceService,
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
+        protected chatDisplayService: ChatDisplayService,
     ) {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
@@ -57,17 +60,20 @@ export class GameService {
             this.game.getOpponent().letters = update.newLetters;
             this.game.getOpponent().score = update.newScore;
         });
-        this.socket.on('convert to solo', (previousPlayerSocketId: string, virtualPlayerName: string) => {
+        this.socket.on('convert to solo', (previousPlayerSocketId: string) => {
             let newVirtualPlayer;
             const playerArrayIndex = this.game.players.findIndex((p) => p.socketId === previousPlayerSocketId);
-            if (playerArrayIndex !== ERROR_NUMBER) {
+            if (playerArrayIndex !== ERROR_NUMBER && !this.game.isEndGame) {
                 const previousPlayer = this.game.players[playerArrayIndex];
-                newVirtualPlayer = new VirtualPlayer(virtualPlayerName, Difficulty.Easy);
+                // TODO: see how to go get a random beginner vp name from the database
+                const newVpName = 'SomeBeginnerVP';
+                newVirtualPlayer = new VirtualPlayer(newVpName, Difficulty.Easy);
                 newVirtualPlayer.letters = previousPlayer.letters;
                 newVirtualPlayer.isActive = previousPlayer.isActive;
                 newVirtualPlayer.score = previousPlayer.score;
                 this.game.players[playerArrayIndex] = newVirtualPlayer;
                 this.game.gameMode = GameType.Solo;
+                this.chatDisplayService.addEntry(createSystemEntry('Conversion en mode solo'));
             }
         });
     }
