@@ -202,13 +202,19 @@ export class GameService {
     }
     synchronizeAfterPlaceCommand(errorResult: ErrorType, placeParams: PlaceParams, player: Player) {
         if (errorResult === ErrorType.NoError && this.game.gameMode === GameType.MultiPlayer) {
-            this.socket.emit('word placed', {
+            const boardUpdate: BoardUpdate = {
                 word: placeParams.word,
                 orientation: placeParams.orientation,
                 positionX: placeParams.position.x,
                 positionY: placeParams.position.y,
-            });
-            this.socket.emit('place word', { stock: this.game.stock.letterStock, newLetters: player.letters, newScore: player.score });
+            }
+            this.socket.emit('word placed', boardUpdate);
+            const lettersUpdate: LettersUpdate = {
+                newStock: this.game.stock.letterStock,
+                newLetters: player.letters,
+                newScore: player.score,
+            };
+            this.socket.emit('place word', lettersUpdate);
         }
     }
     addRackLetters(letters: ScrabbleLetter[]): void {
