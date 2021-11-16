@@ -1,4 +1,4 @@
-import { WaitingAreaGameParameters } from '@app/classes/game-parameters';
+import { GameInitInfo, WaitingAreaGameParameters } from '@app/classes/game-parameters';
 import { BoardUpdate, ERROR_NUMBER, LettersUpdate } from '@app/classes/utilities';
 import * as http from 'http';
 import * as io from 'socket.io';
@@ -117,31 +117,46 @@ export class SocketManagerService {
     private disconnect(socket: io.Socket) {
         setTimeout(() => {
             this.leaveRoom(socket);
+            this.playerMan.removePlayer(socket.id);
+            // eslint-disable-next-line no-console
+            console.log('deconnexion de ', socket.id);
         }, DISCONNECT_TIME_INTERVAL);
     }
     private leaveRoom(socket: io.Socket) {
-        const player = this.playerMan.getPlayerBySocketID(socket.id);
-        if (player === undefined) {
+        const leavingPlayer = this.playerMan.getPlayerBySocketID(socket.id);
+        if (leavingPlayer === undefined) {
             return;
         }
-        const roomGame = this.gameListMan.getGameInPlay(player.roomId);
+        const leavingPlayerRoomId = leavingPlayer.roomId;
+        const waitingAreaRoom = this.gameListMan.getAWaitingAreaGame(leavingPlayerRoomId);
+        const roomGame = this.gameListMan.getGameInPlay(leavingPlayerRoomId);
         if (roomGame !== undefined) {
-            // the room to leave is a game in play
-            roomGame.removePlayer(socket.id);
-            if (roomGame.players.length === 0) {
-                // if no one is left in the room, delete it from the game list manager
-                this.gameListMan.deleteGameInPlay(roomGame.gameRoomId);
-            } else {
-                // if one player left, send notice message to the remaining player and make them the winner
-                this.displayPlayerQuitMessage(socket);
-                this.sio.to(roomGame.gameRoomId.toString()).emit('roomLeft', roomGame);
-            }
-        } else {
-            // the room to leave is a waiting area game
-            this.deleteWaitingAreaRoom(socket);
-            this.getAllWaitingAreaGames(); // updates the clients' waiting area's game list
+            this.leaveGameInPlay(socket, roomGame);
+        } else if (waitingAreaRoom !== undefined) {
+            this.leaveWaitingAreaRoom(socket, waitingAreaRoom);
         }
-        socket.leave(player.roomId.toString());
+        leavingPlayer.resetPlayer();
+        socket.leave(leavingPlayerRoomId.toString());
+    }
+    private leaveGameInPlay(socket: io.Socket, roomGame: GameInitInfo) {
+        roomGame.removePlayer(socket.id);
+        if (roomGame.players.length === 0) {
+            this.gameListMan.deleteGameInPlay(roomGame.gameRoomId);
+        } else {
+            this.displayPlayerQuitMessage(socket);
+            this.sio.to(roomGame.gameRoomId.toString()).emit('convert to solo', socket.id, 'SomeVPName');
+        }
+    }
+    private leaveWaitingAreaRoom(socket: io.Socket, waitingAreaRoom: WaitingAreaGameParameters) {
+        const roomId = waitingAreaRoom.gameRoom.idGame;
+        if (socket.id === waitingAreaRoom.gameRoom.joinerId) {
+            this.gameListMan.removeJoinerPlayer(roomId);
+        } else {
+            this.deleteWaitingAreaRoom(socket);
+        }
+        const waitingAreaRoomUpdate = this.gameListMan.getAWaitingAreaGame(roomId);
+        this.getAllWaitingAreaGames();
+        this.sio.to(waitingAreaRoom.gameRoom.idGame.toString()).emit('roomLeft', waitingAreaRoomUpdate);
     }
     // Only removes the waiting area room from the waiting area rooms list in game manager service
     private deleteWaitingAreaRoom(socket: io.Socket): void {
@@ -154,20 +169,6 @@ export class SocketManagerService {
             const roomId = roomGame.gameRoom.idGame;
             this.gameListMan.deleteWaitingAreaGame(roomId);
             this.sio.emit('waitingAreaRoomDeleted', roomGame);
-        }
-    }
-    private displayPlayerQuitMessage(socket: io.Socket) {
-        const sender = this.playerMan.getPlayerBySocketID(socket.id);
-        if (sender === undefined) {
-            return;
-        }
-        const gameRoom = this.gameListMan.getGameInPlay(sender.roomId);
-        if (gameRoom === undefined) {
-            return;
-        }
-        if (gameRoom.gameRoomId !== ERROR_NUMBER) {
-            const message = sender.name + ' a quitté le jeu';
-            this.sio.to(gameRoom.gameRoomId.toString()).emit('addSystemChatEntry', message);
         }
     }
     private getAllWaitingAreaGames() {
@@ -238,6 +239,20 @@ export class SocketManagerService {
         }
         if (player.roomId !== ERROR_NUMBER) {
             this.sio.in(player.roomId.toString()).emit('addSystemChatEntry', message);
+        }
+    }
+    private displayPlayerQuitMessage(socket: io.Socket) {
+        const sender = this.playerMan.getPlayerBySocketID(socket.id);
+        if (sender === undefined) {
+            return;
+        }
+        const gameRoom = this.gameListMan.getGameInPlay(sender.roomId);
+        if (gameRoom === undefined) {
+            return;
+        }
+        if (gameRoom.gameRoomId !== ERROR_NUMBER) {
+            const message = sender.name + ' a quitté le jeu';
+            this.sio.to(gameRoom.gameRoomId.toString()).emit('addSystemChatEntry', message);
         }
     }
     private validateWords(socket: io.Socket, newWords: string[]) {

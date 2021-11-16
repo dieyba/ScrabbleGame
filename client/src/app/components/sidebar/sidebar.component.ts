@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { EndGamePopupComponent } from '@app/components/end-game-popup/end-game-popup.component';
@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
     templateUrl: './sidebar.component.html',
     styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements AfterViewInit {
     winnerName: string;
     private dialogRef: MatDialogRef<EndGamePopupComponent>;
     private socket: io.Socket;
@@ -23,8 +23,7 @@ export class SidebarComponent implements OnInit {
         this.socket = SocketHandler.requestSocket(this.server);
         this.winnerName = '';
     }
-    ngOnInit(): void {
-        // TODO: this should have fixed the double timer problem when re creating a game
+    ngAfterViewInit(): void {
         clearTimeout(this.gameService.game.gameTimer.intervalValue);
     }
     getPlayer1Name(): string {

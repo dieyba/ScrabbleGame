@@ -57,7 +57,6 @@ export class GameService {
             this.game.getOpponent().letters = update.newLetters;
             this.game.getOpponent().score = update.newScore;
         });
-        // TODO: test if this works (solo mode means local word validation, no synchronization with server and virtual player turns)
         this.socket.on('convert to solo', (previousPlayerSocketId: string, virtualPlayerName: string) => {
             let newVirtualPlayer;
             const playerArrayIndex = this.game.players.findIndex((p) => p.socketId === previousPlayerSocketId);
@@ -65,7 +64,7 @@ export class GameService {
                 const previousPlayer = this.game.players[playerArrayIndex];
                 newVirtualPlayer = new VirtualPlayer(virtualPlayerName, Difficulty.Easy);
                 newVirtualPlayer.letters = previousPlayer.letters;
-                newVirtualPlayer.isActive = previousPlayer.isActive; // TODO: see if that will synchronize properly
+                newVirtualPlayer.isActive = previousPlayer.isActive;
                 newVirtualPlayer.score = previousPlayer.score;
                 this.game.players[playerArrayIndex] = newVirtualPlayer;
                 this.game.gameMode = GameType.Solo;

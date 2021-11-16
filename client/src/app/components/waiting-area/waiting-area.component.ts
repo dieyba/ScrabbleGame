@@ -174,11 +174,13 @@ export class WaitingAreaComponent {
             this.playerList = this.gameList.localPlayerRoomInfo.gameRoom.playersName;
         });
         this.socket.on('roomLeft', (game: WaitingAreaGameParameters) => {
-            this.gameList.localPlayerRoomInfo = game;
-            this.playerList = this.gameList.localPlayerRoomInfo.gameRoom.playersName;
-            this.joindre = false;
-            this.nameValid = false;
-            this.gameCancelled = true;
+            if (game !== undefined) {
+                this.gameList.localPlayerRoomInfo = game;
+                this.playerList = this.gameList.localPlayerRoomInfo.gameRoom.playersName;
+                this.joindre = false;
+                this.nameValid = false;
+                this.gameCancelled = true;
+            }
         });
     }
 }
