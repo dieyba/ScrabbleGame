@@ -4,7 +4,7 @@
 // import * as chaiAsPromised from "chai-as-promised";
 // import { describe } from "mocha";
 // import { MongoClient } from "mongodb";
-// import { MongoMemoryServer } from "mongodb-memory-server";
+// import { MongoMemoryServer } from "mongodb-memory-server"; // TODO keep this one for testing
 // import { DatabaseService } from "./database.service";
 // chai.use(chaiAsPromised); // this allows us to test for rejection
 

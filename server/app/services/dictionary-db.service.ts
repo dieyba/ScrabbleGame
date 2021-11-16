@@ -13,11 +13,12 @@ export class DictionaryDBService {
     dictionaryCollection: Collection<DictionaryInterface>;
 
     constructor(url = DATABASE_URL) {
+        console.log('here!');
         MongoClient.connect(url)
             .then((client: MongoClient) => {
                 this.client = client;
                 this.dictionaryCollection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]);
-                this.populateClassicDB();
+                this.populateDictionaryDB();
             })
             .catch((error) => {
                 throw error;
@@ -70,7 +71,7 @@ export class DictionaryDBService {
     //         });
     // }
 
-    async populateClassicDB(): Promise<void> {
+    async populateDictionaryDB(): Promise<void> {
         if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments()) === 0) {
             const dictionaries: DictionaryInterface[] = [
                 {
