@@ -30,6 +30,8 @@ export class BestScoresService {
     async getClassicBestScore(): Promise<BestScores[]> {
         return this.classicCollection
             .find({})
+            .sort({ score: -1 })
+            .limit(5)
             .toArray()
             .then((classicBestScores: BestScores[]) => {
                 return classicBestScores;
@@ -42,6 +44,8 @@ export class BestScoresService {
     async getLog2990BestScore(): Promise<BestScores[]> {
         return this.log2990Collection
             .find({})
+            .sort({ score: -1 })
+            .limit(5)
             .toArray()
             .then((log2990BestScores: BestScores[]) => {
                 return log2990BestScores;
@@ -53,51 +57,85 @@ export class BestScoresService {
     }
 
     async postClassicBestScore(classicBestScore: BestScores): Promise<void> {
-        this.classicCollection
-            .insertOne(classicBestScore)
-            .then(() => {
-                /* do nothing */
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
+        if (this.canSetScoreInDb(this.classicCollection, classicBestScore)) {
+            this.classicCollection.insertOne(classicBestScore)
+                .then(() => {
+                    /* do nothing */
+                })
+                .catch((error: Error) => {
+                    throw error;
+                });
+        }
     }
+
     async postLog2990BestScore(log2990BestScore: BestScores): Promise<void> {
-        this.classicCollection
-            .insertOne(log2990BestScore)
-            .then(() => {
-                /* do nothing */
-            })
-            .catch((error: Error) => {
-                throw error;
+        if (this.canSetScoreInDb(this.log2990Collection, log2990BestScore)) {
+            this.log2990Collection
+                .insertOne(log2990BestScore)
+                .then(() => {
+                    /* do nothing */
+                })
+                .catch((error: Error) => {
+                    throw error;
+                });
+        }
+    }
+    checkingIfAlreadyInDb(tabScore: Collection<BestScores>, newScore: BestScores): boolean {
+        let noChanges = true;
+        tabScore.find({}).forEach((score) => {
+            if (score.score === newScore.score && score.playerName === newScore.playerName) {
+                noChanges = true;
+            }
+            else {
+                noChanges = false;
+            }
+        })
+        return noChanges;
+    }
+
+    canSetScoreInDb(tabScore: Collection<BestScores>, newScore: BestScores): boolean {
+        let valid: boolean = true;
+        let deleteMinScore: BestScores = { playerName: '', score: 100000000000 };
+        if (!this.checkingIfAlreadyInDb(tabScore, newScore)) {
+            tabScore.find({}).forEach((score) => {
+                if (score.score < deleteMinScore.score) {
+                    deleteMinScore.playerName = score.playerName
+                    deleteMinScore.score = score.score;
+                }
+            }).then(() => {
+                if (deleteMinScore.score < newScore.score) {
+                    tabScore.findOneAndDelete(deleteMinScore);
+                    valid = true;
+                }
+                else {
+                    valid = false;
+                }
             });
+        }
+        return valid;
+
     }
 
     async populateClassicDB(): Promise<void> {
         if (await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments() === 0) {
             let classicBestScores: BestScores[] = [
                 {
-                    idScore: "1",
                     playerName: "erika",
                     score: 10,
                 },
                 {
-                    idScore: "2",
                     playerName: "Sara",
                     score: 8,
                 },
                 {
-                    idScore: "3",
                     playerName: "Etienne",
                     score: 2,
                 },
                 {
-                    idScore: "4",
                     playerName: "Kevin",
                     score: 1,
                 },
                 {
-                    idScore: "5",
                     playerName: "Ariane",
                     score: 20,
                 },
@@ -112,52 +150,54 @@ export class BestScoresService {
         if (await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]).countDocuments() === 0) {
             let log2990BestScores: BestScores[] = [
                 {
-                    idScore: "1",
                     playerName: "Dieyba",
                     score: 4,
                 },
                 {
-                    idScore: "2",
                     playerName: "Lévis",
                     score: 14,
                 },
                 {
-                    idScore: "3",
                     playerName: "Nikolay",
                     score: 8,
                 },
                 {
-                    idScore: "4",
                     playerName: "Guillaume",
                     score: 1,
                 },
                 {
-                    idScore: "5",
                     playerName: "Augustin",
                     score: 3,
                 },
             ];
-            console.log("THIS ADDS DATA TO THE DATABASE, DO NOT USE OTHERWISE");
             for (const course of log2990BestScores) {
                 await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]).insertOne(course);
             }
         }
     }
-
-
-    async checkBestScore() {
-
+    async resetClassicCollectionDb(): Promise<void> {
+        this.classicCollection
+            .deleteMany({})
+            .then(() => {
+                this.populateClassicDB();
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
     }
-    // async deleteVirtualPlayerName(idName: string): Promise<void> {
-    //     this.collection
-    //         .findOneAndDelete({ _id: idName })
-    //         .then(() => {
-    //             /* do nothing */
-    //         })
-    //         .catch((error: Error) => {
-    //             throw error;
-    //         });
-    // }
+    async resetLog2990CollectionDb(): Promise<void> {
+        this.log2990Collection
+            .deleteMany({})
+            .then(() => {
+                this.populateLog2990DB();
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
 
-
+    async resetDataBase() {
+        await this.resetClassicCollectionDb();
+        await this.resetLog2990CollectionDb();
+    }
 }

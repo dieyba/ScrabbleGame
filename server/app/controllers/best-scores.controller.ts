@@ -19,7 +19,7 @@ export enum HttpStatus {
 export class BestScoresController {
     router: Router;
 
-    constructor(private readonly bestScoresSrvice: BestScoresService) {
+    constructor(private bestScoresSrvice: BestScoresService) {
         this.configureRouter();
     }
 
@@ -47,7 +47,7 @@ export class BestScoresController {
                 });
         });
 
-        this.router.post('/classicMode', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.post('/classicMode/send', async (req: Request, res: Response) => {
             this.bestScoresSrvice
                 .postClassicBestScore(req.body)
                 .then(() => {
@@ -57,7 +57,7 @@ export class BestScoresController {
                     res.status(HttpStatus.BAD_REQUEST).send(error.message);
                 });
         });
-        this.router.post('/log2990Mode', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.post('/log2990Mode/send', async (req: Request, res: Response, next: NextFunction) => {
             this.bestScoresSrvice
                 .postLog2990BestScore(req.body)
                 .then(() => {
@@ -68,19 +68,15 @@ export class BestScoresController {
                 });
         });
 
-        // this.router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
-        //     this.virtualPlayerNameService
-        //         .deleteVirtualPlayerName(req.params.id)
-        //         .then(() => {
-        //             res.sendStatus(HttpStatus.NO_CONTENT).send();
-        //         })
-        //         .catch((error: Error) => {
-        //             if (error.message === 'Cannot remove headers after they are sent to the client') {
-        //                 // do nothing
-        //             } else {
-        //                 res.status(HttpStatus.NOT_FOUND).send(error.message);
-        //             }
-        //         });
-        // });
+        this.router.delete('/', async (req: Request, res: Response, next: NextFunction) => {
+            this.bestScoresSrvice
+                .resetDataBase()
+                .then(() => {
+                    res.sendStatus(HttpStatus.OK).send();
+                })
+                .catch((error: Error) => {
+                    res.status(HttpStatus.NOT_FOUND).send(error.message);
+                });
+        });
     }
 }

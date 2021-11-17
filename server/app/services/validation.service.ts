@@ -5,6 +5,7 @@ import { Service } from 'typedi';
 export class ValidationService {
     dictionary: Dictionary;
     isTimerElapsed: boolean;
+    areWordsValid: boolean;
 
     constructor() {
         this.dictionary = new Dictionary(DictionaryType.Default);
@@ -18,7 +19,6 @@ export class ValidationService {
                 return false;
             }
         }
-
         return true;
     }
 

@@ -21,7 +21,6 @@ export class ChatDisplayService {
     private socket: io.Socket;
 
     constructor() {
-        // this.server = 'http://' + window.location.hostname + ':3000';
         this.server = environment.socketUrl;
         this.isActiveDebug = false;
         this.entries = [];
@@ -69,24 +68,27 @@ export class ChatDisplayService {
         }
     }
 
-    createEndGameMessages(remainingLetters: ScrabbleLetter[], firstPlayer: Player, secondPlayer: Player): ChatDisplayEntry[] {
+    displayEndGameMessage(remainingLetters: ScrabbleLetter[], firstPlayer: Player, secondPlayer: Player) {
         const remainingLettersMessage = 'Fin de partie - ' + scrabbleLetterstoString(remainingLetters);
         const firstPlayerMessage = firstPlayer.name + ' : ' + scrabbleLetterstoString(firstPlayer.letters);
         const secondPlayerMessage = secondPlayer.name + ' : ' + scrabbleLetterstoString(secondPlayer.letters);
-        const endGameMessage: ChatDisplayEntry[] = [];
-        endGameMessage.push({
+        const endGameMessages: ChatDisplayEntry[] = [];
+        endGameMessages.push({
             color: ChatEntryColor.SystemColor,
             message: remainingLettersMessage,
         });
-        endGameMessage.push({
+        endGameMessages.push({
             color: ChatEntryColor.SystemColor,
             message: firstPlayerMessage,
         });
-        endGameMessage.push({
+        endGameMessages.push({
             color: ChatEntryColor.SystemColor,
             message: secondPlayerMessage,
         });
-        return endGameMessage;
+
+        endGameMessages.forEach((message) => {
+            this.addEntry(message);
+        });
     }
 
     invertDebugState(): string {

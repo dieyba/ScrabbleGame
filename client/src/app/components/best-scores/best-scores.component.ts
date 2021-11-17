@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BestScores, BestScoresService } from '@app/services/best-scores.service';
@@ -21,10 +22,19 @@ export class BestScoresComponent implements OnInit {
     this.getLog2990ModeBestScores();
   }
   getClassicModeBestScores(): void {
-    this.bestScoresService.getClassicModeBestScores().subscribe(classicModeBestScore => (this.classicModeBestScores = classicModeBestScore));
+    this.bestScoresService.getClassicModeBestScores().subscribe(classicModeBestScore => { (this.classicModeBestScores = classicModeBestScore) },
+      (error: HttpErrorResponse) => {
+        this.bestScoresService.handleErrorSnackBar(error);
+      },
+    );
   }
   getLog2990ModeBestScores() {
-    this.bestScoresService.getLog2990ModeBestScores().subscribe(log2990ModeBestScore => (this.log2990ModeBestScores = log2990ModeBestScore));
+    this.bestScoresService.getLog2990ModeBestScores().subscribe(log2990ModeBestScore => { (this.log2990ModeBestScores = log2990ModeBestScore) },
+      (error: HttpErrorResponse) => {
+        this.bestScoresService.handleErrorSnackBar(error);
+      },
+
+    );
   }
   closeDialog() {
     this.dialogRef.close();

@@ -1,51 +1,58 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { LocalPlayer } from '@app/classes/local-player';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Observable } from 'rxjs';
+
+// export enum HttpStatus {
+export const HttpStatus_OK = 200;
+// CREATED = 201,
+// NO_CONTENT = 204,
+// BAD_REQUEST = 400,
+// FORBIDDEN = 403,
+// NOT_FOUND = 404,
+// UNPROCESSABLE = 422,
+// TOO_MANY = 429,
+// INTERNAL_ERROR = 500,
+// }
 
 export interface BestScores {
-  _id: string;
   playerName: string;
   score: number;
-  // idGame: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class BestScoresService {
-
-  constructor(private http: HttpClient) {}
-
-  classicModeUrl = 'http://localhost:3000/api/bestScores/classicMode';
-  log2990ModeUrl = 'http://localhost:3000/api/bestScores/log2990Mode';
+  private baseUrl: string;
+  constructor(private http: HttpClient, private snack: MatSnackBar,) {
+    this.baseUrl = 'http://localhost:3000/api/bestScores'
+  }
 
   getClassicModeBestScores(): Observable<BestScores[]> {
-    return this.http.get<BestScores[]>(this.classicModeUrl)
-      .pipe(
-        catchError(this.handleError('getClassicModeBestScores', []))
-      );
+    return this.http.get<BestScores[]>(this.baseUrl + '/classicMode');
   }
 
   getLog2990ModeBestScores(): Observable<BestScores[]> {
-    return this.http.get<BestScores[]>(this.log2990ModeUrl)
-      .pipe(
-        catchError(this.handleError('getClassicModeBestScores', []))
-      );
+    return this.http.get<BestScores[]>(this.baseUrl + '/log2990Mode');
   }
 
-  private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
-    return (error: Error): Observable<T> => {
-      return of(result as T);
-    };
+  postClassicBestScore(playerName: string, playerScore: number): Observable<BestScores> {
+    // const bestScore: BestScores = { playerName: playerName, score: playerScore };
+    return this.http.post<BestScores>(this.baseUrl + '/classicMode/send', { playerName: playerName, score: playerScore })
   }
 
+  postLog2990BestScore(playerName: string, playerScore: number): Observable<BestScores> {
+    // const bestScore: BestScores = { playerName: playerName, score: playerScore };
+    return this.http.post<BestScores>(this.baseUrl + '/log2990Mode/send', { playerName: playerName, score: playerScore })
+  }
 
-  postClassicBestScore(player: LocalPlayer) {
-    return this.http.post<BestScores>(this.classicModeUrl, { player })
-      .pipe(
-        catchError(this.handleError('postClassicBestScore', []))
-      );
+  resetDbBestScores() {
+    return this.http.delete<BestScores>(this.baseUrl);
+  }
+  handleErrorSnackBar(error: HttpErrorResponse): void {
+    if (error.status !== HttpStatus_OK) {
+      this.snack.open("La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!", 'close');
+    }
   }
 }
