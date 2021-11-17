@@ -30,9 +30,9 @@ export class VirtualPlayerNameController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.get('/beginners', async (req: Request, res: Response, next: NextFunction) => {
             this.virtualPlayerNameService
-                .getVirtualPlayerNames()
+                .getBeginnersVirtualPlayerNames()
                 .then((virtualPlayerNames: VirtualPlayerName[]) => {
                     res.json(virtualPlayerNames);
                 })
@@ -41,9 +41,20 @@ export class VirtualPlayerNameController {
                 });
         });
 
-        this.router.post('/', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.get('/experts', async (req: Request, res: Response, next: NextFunction) => {
             this.virtualPlayerNameService
-                .postVirtualPlayerName(req.body)
+                .getExpertsVirtualPlayerNames()
+                .then((virtualPlayerNames: VirtualPlayerName[]) => {
+                    res.json(virtualPlayerNames);
+                })
+                .catch((error: Error) => {
+                    res.status(HttpStatus.NOT_FOUND).send(error.message);
+                });
+        });
+
+        this.router.post('/beginners', async (req: Request, res: Response, next: NextFunction) => {
+            this.virtualPlayerNameService
+                .postBeginnersVirtualPlayerName(req.body)
                 .then(() => {
                     res.sendStatus(HttpStatus.OK).send();
                 })
@@ -52,19 +63,30 @@ export class VirtualPlayerNameController {
                 });
         });
 
-        this.router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.post('/experts', async (req: Request, res: Response, next: NextFunction) => {
             this.virtualPlayerNameService
-                .deleteVirtualPlayerName(req.params.id)
+                .postExpertsVirtualPlayerName(req.body)
                 .then(() => {
-                    res.sendStatus(HttpStatus.NO_CONTENT).send();
+                    res.sendStatus(HttpStatus.OK).send();
                 })
                 .catch((error: Error) => {
-                    if (error.message === 'Cannot remove headers after they are sent to the client') {
-                        // do nothing
-                    } else {
-                        res.status(HttpStatus.NOT_FOUND).send(error.message);
-                    }
+                    res.status(HttpStatus.BAD_REQUEST).send(error.message);
                 });
         });
+
+        // this.router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
+        //     this.virtualPlayerNameService
+        //         .deleteVirtualPlayerName(req.params.id)
+        //         .then(() => {
+        //             res.sendStatus(HttpStatus.NO_CONTENT).send();
+        //         })
+        //         .catch((error: Error) => {
+        //             if (error.message === 'Cannot remove headers after they are sent to the client') {
+        //                 // do nothing
+        //             } else {
+        //                 res.status(HttpStatus.NOT_FOUND).send(error.message);
+        //             }
+        //         });
+        // });
     }
 }
