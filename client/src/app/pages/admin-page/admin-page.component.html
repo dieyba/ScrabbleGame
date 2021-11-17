@@ -1,45 +1,74 @@
 <body>
     <img class="image" src="https://bit.ly/3m206ss" width="600" height="100" alt="Logo Scrabble" />
-    <div class="virtualPlayers">
-        <div class="lists">
-            <h2>Joueurs débutants</h2>
-            <div class="names">
-                <div class="beginnerNames" *ngFor="let name of adminService.beginnerNameList">
-                    <button class="name-btn" (click)="onSelect(name)">{{ name }}</button>
+    <div class="page">
+        <div class="virtualPlayers">
+            <div class="lists">
+                <h2>Joueurs débutants</h2>
+                <div class="names">
+                    <div class="beginnerNames" *ngFor="let name of adminService.beginnerNameList">
+                        <button class="name-btn" (click)="onSelect(name)">{{ name }}</button>
+                    </div>
+                </div>
+
+                <h2>Joueurs experts</h2>
+                <div class="names">
+                    <div class="expertNames" *ngFor="let name of adminService.expertNameList">
+                        <button class="name-btn" (click)="onSelect(name)">{{ name }}</button>
+                    </div>
                 </div>
             </div>
 
-            <h2>Joueurs experts</h2>
-            <div class="names">
-                <div class="expertNames" *ngFor="let name of adminService.expertNameList">
-                    <button class="name-btn" (click)="onSelect(name)">{{ name }}</button>
-                </div>
-            </div>
-        </div>
-
-        <mat-form-field class="input" hintLabel="characters min: 3 max: 10" appearance="fill">
-            <mat-label>Entrez le nom que vous souhaitez ajouter à la liste</mat-label>
-            <input matInput #input maxlength="10" #input2 minlength="3" placeholder="Ex : Riri" [formControl]="adminService.newName" />
-            <div *ngIf="adminService.newName.errors?.pattern">Le nom ne doit pas contenir des chiffres ou des caractères spéciaux</div>
-        </mat-form-field>
-
-        <div class="addName">
-            <button class="btn" (click)="addBeginnerName(); adminService.newName.setValue('')">Ajouter joueur débutant</button>
-            <button class="btn" (click)="addExpertName(); adminService.newName.setValue('')">Ajouter joueur expert</button>
-        </div>
-        <div class="deletUpdate">
-            <div class="deleteName">
-                <button class="btn" *ngIf="isUntouchable()" disabled="true">Supprimer le nom</button>
-                <button class="btn" *ngIf="!isUntouchable()" (click)="deleteName()">Supprimer le nom</button>
-                <span class="toolTipText">Sélectionner un joueur pour le modifier.</span>
-            </div>
             <div>
-                <button class="btn" *ngIf="isUntouchable()" (click)="updateName()" disabled="true">Modifier le nom</button>
-                <button class="btn" *ngIf="adminService.selectedName !== '' && !isUntouchable()" (click)="updateName()">Modifier le nom</button>
+                <p *ngIf="adminService.nameAlreadyExist">Ce nom existe déjà dans cette liste</p>
+                <p>Veuillez sélectionner un nom pour le modifier/supprimer</p>
+                <p>NB : Vous ne pouvez ni supprimer ni modifer les 3 premiers noms de ces deux listes</p>
             </div>
-        </div>
-        <p>{{ adminService.selectedName }}</p>
-    </div>
 
-    <div class="dictionnary"></div>
+            <mat-form-field class="input" hintLabel="characters min: 3 max: 10" appearance="fill">
+                <mat-label>Entrez le nom que vous souhaitez ajouter à la liste</mat-label>
+                <input matInput #input maxlength="10" #input2 minlength="3" placeholder="Ex : Riri" [formControl]="adminService.newName" />
+                <div *ngIf="adminService.newName.errors?.pattern">Le nom ne doit pas contenir des chiffres ou des caractères spéciaux</div>
+            </mat-form-field>
+
+            <div class="addName">
+                <button class="btn" (click)="addBeginnerName(); adminService.newName.setValue('')">Ajouter joueur débutant</button>
+                <button class="btn" (click)="addExpertName(); adminService.newName.setValue('')">Ajouter joueur expert</button>
+            </div>
+            <div class="deletUpdate">
+                <div class="deleteName">
+                    <button class="btn" *ngIf="isUntouchable()" disabled="true">Supprimer</button>
+                    <button class="btn" *ngIf="!isUntouchable()" (click)="deleteName()">Supprimer {{ adminService.selectedName }}</button>
+                    <span class="toolTipDelete">Sélectionner un nom puis cliquer sur Supprimer. </span>
+                </div>
+                <div>
+                    <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill" *ngIf="adminService.editName.value !== ''">
+                        <mat-label>Modifiez le nom</mat-label>
+                        <input
+                            matInput
+                            #input
+                            maxlength="10"
+                            #input2
+                            minlength="3"
+                            placeholder="Ex : Riri"
+                            [formControl]="adminService.editName"
+                            (keyup.enter)="updateName()"
+                        />
+                        <div *ngIf="adminService.newName.errors?.pattern">Le nom ne doit pas contenir des chiffres ou des caractères spéciaux</div>
+                    </mat-form-field>
+                    <div class="updateName">
+                        <button class="btn" *ngIf="isUntouchable()" (click)="updateName()" disabled="true">Modifier le nom</button>
+                        <button class="btn" *ngIf="adminService.selectedName !== '' && !isUntouchable()" (click)="updateName()">
+                            Modifier {{ adminService.selectedName }}
+                        </button>
+                        <span class="toolTipUpdate">Sélectionner un nom pour le modifer. </span>
+                    </div>
+                </div>
+            </div>
+            <p>{{ adminService.selectedName }}</p>
+        </div>
+
+        <div class="dictionaries">
+            <p>Partie dicos</p>
+        </div>
+    </div>
 </body>

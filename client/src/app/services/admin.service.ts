@@ -25,7 +25,9 @@ export class AdminService {
     beginnerNameList: string[];
     expertNameList: string[];
     newName: FormControl;
+    editName: FormControl;
     selectedName: string;
+    nameAlreadyExist: boolean;
     private index: number;
 
     beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
@@ -37,7 +39,10 @@ export class AdminService {
         this.expertNameList = ['Dieyba', 'Kevin', 'Ariane'];
         this.newName = new FormControl('', [Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(12),
         Validators.minLength(3),]);
+        this.editName = new FormControl('', [Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(12),
+        Validators.minLength(3),]);
         this.selectedName = '';
+        this.nameAlreadyExist = false;
         this.index = ERROR_NUMBER;
         // console.log('get observable : ', this.getDictionaries());
         // this.getDictionaries()
@@ -102,13 +107,13 @@ export class AdminService {
     }
 
     addBeginnerName() {
-        if (this.confirmName(true)) {
+        if (this.confirmAddName(true)) {
             this.beginnerNameList.push(this.newName.value);
         }
     }
 
     addExpertName() {
-        if (this.confirmName(false)) {
+        if (this.confirmAddName(false)) {
             this.expertNameList.push(this.newName.value);
         }
     }
@@ -129,49 +134,81 @@ export class AdminService {
     deleteBeginnerName() {
         if (this.index > 2) {
             this.beginnerNameList.splice(this.index, 1);
+            this.selectedName = '';
         }
     }
 
     deleteExpertName() {
         if (this.index > 2) {
             this.expertNameList.splice(this.index, 1);
+            this.selectedName = '';
         }
     }
 
     updateBeginnerName() {
         if (this.index > 2) {
-            this.beginnerNameList[this.index] = this.newName.value;
+            if (this.confirmEditName(true)) {
+                this.beginnerNameList[this.index] = this.editName.value;
+                this.selectedName = '';
+                this.editName.setValue('');
+            }
         }
     }
 
     updateExpertName() {
         if (this.index > 2) {
-            this.beginnerNameList[this.index] = this.newName.value;
+            if (this.confirmEditName(false)) {
+                this.beginnerNameList[this.index] = this.editName.value;
+                this.selectedName = '';
+                this.editName.setValue('');
+            }
         }
     }
 
-    confirmName(isBeginner: boolean): boolean {
+    confirmAddName(isBeginner: boolean): boolean {
         if (this.newName.value === '') {
             return false;
         }
+        return this.confirmName(isBeginner);
+    }
+
+    confirmEditName(isBeginner: boolean): boolean {
+        if (this.editName.value === '') {
+            return false;
+        }
+        return this.confirmName(isBeginner);
+    }
+
+    confirmName(isBeginner: boolean): boolean {
+        // if (this.newName.value === '') {
+        //     return false;
+        // }
         if (isBeginner) {
             for (const name of this.beginnerNameList) {
                 if (name === this.newName.value) {
+                    this.nameAlreadyExist = true;
                     return false;
                 }
             }
+            this.nameAlreadyExist = true;
             return true;
         } else {
             for (const name of this.expertNameList) {
                 if (name === this.newName.value) {
+                    this.nameAlreadyExist = true;
                     return false;
                 }
             }
+            this.nameAlreadyExist = true;
             return true;
         }
     }
 
     onSelect(name: string) {
         this.selectedName = name;
+        this.isBeginnerTab();
+        if (this.index > 2) {
+            this.editName.setValue(this.selectedName);
+        }
     }
 }

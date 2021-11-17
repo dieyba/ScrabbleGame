@@ -86,7 +86,7 @@ export class AdminPageComponent implements OnInit {
     }
 
     updateName() {
-        if (this.adminService.newName.value === '') {
+        if (this.adminService.editName.value === '') {
             return;
         }
         if (this.adminService.isBeginnerTab()) {

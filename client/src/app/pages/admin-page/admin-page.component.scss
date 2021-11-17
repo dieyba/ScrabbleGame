@@ -6,6 +6,14 @@ body {
     background-color: #dcecff;
 }
 
+.page {
+    display: flex;
+}
+
+// .virtualPlayers {
+//     background-color: crimson;
+// }
+
 .image {
     display: block;
     margin-left: auto;
@@ -16,9 +24,13 @@ body {
 
 .lists {
     display: flex;
-    margin-right: 500px;
+    // margin-right: 500px;
     // margin-left: 50px;
 }
+
+// .dictionaries {
+//     background-color: brown;
+// }
 
 .beginnerNames {
     background-color: black;
@@ -41,6 +53,7 @@ h2 {
     position: relative;
     // margin-top: 10px;
     left: 300px;
+    bottom: 8px;
 }
 
 .names {
@@ -99,10 +112,9 @@ h2 {
 .deleteName {
     position: relative;
     display: inline-block;
-    border-bottom: 1px dotted black;
 }
 
-.deleteName .toolTipText {
+.deleteName .toolTipDelete {
     visibility: hidden;
     width: 120px;
     background-color: black;
@@ -116,6 +128,24 @@ h2 {
     z-index: 1;
 }
 
-.deleteName:hover .toolTipText {
+.deleteName:hover .toolTipDelete {
+    visibility: visible;
+}
+
+.updateName .toolTipUpdate {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.updateName:hover .toolTipUpdate {
     visibility: visible;
 }
