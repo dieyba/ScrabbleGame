@@ -2,8 +2,6 @@ import { Column, Row } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
 import { Vec2 } from './vec2';
 
-// TODO: déménager les fonctions/enum/constantes/etc concernés ici
-
 const PARSE_INT_BASE = 10;
 const ROW_OFFSET = 'a'.charCodeAt(0);
 const COLUMN_OFFSET = 1;
@@ -101,4 +99,10 @@ export const isValidLetter = (letter: string): boolean => {
         return isALetter;
     }
     return false;
+};
+
+export const isCoordInsideBoard = (coord: Vec2) => {
+    const isValidColumn = coord.x >= Column.One && coord.x <= Column.Fifteen;
+    const isValidRow = coord.y >= Row.A && coord.y <= Row.O;
+    return isValidColumn && isValidRow;
 };

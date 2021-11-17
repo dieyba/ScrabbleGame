@@ -6,6 +6,8 @@ describe('Dictionary', () => {
     const dictionary = new Dictionary(DictionaryType.Default);
 
     it('should create an instance', () => {
+        /* eslint-disable @typescript-eslint/no-unused-expressions*/
+        /* eslint-disable  no-unused-expressions */
         expect(dictionary).to.exist;
     });
 

@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { Injectable } from '@angular/core';
 import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
+import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { ExchangeCmd } from '@app/classes/exchange-command';
 import { PassTurnCmd } from '@app/classes/pass-command';
 import { PlaceCmd } from '@app/classes/place-command';
@@ -15,7 +16,6 @@ import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
 import { GridService } from './grid.service';
 import { PlaceService } from './place.service';
-import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
@@ -48,15 +48,14 @@ export class VirtualPlayerService {
     type: Difficulty;
 
     constructor(
-        private validationService: ValidationService,
-        private gridService: GridService,
-        private wordBuilderService: WordBuilderService,
         private bonusService: BonusService,
-        private placeService: PlaceService,
-        private gameService: GameService,
         private commandInvoker: CommandInvokerService,
+        private gameService: GameService,
+        private gridService: GridService,
+        private placeService: PlaceService,
+        private wordBuilderService: WordBuilderService,
     ) {
-        this.player = this.gameService.currentGameService.game.opponentPlayer;
+        this.player = this.gameService.game.getOpponent();
         this.rack = this.player.letters;
     }
     playTurn(): void {
@@ -376,9 +375,8 @@ export class VirtualPlayerService {
         return listOfTiles;
     }
     isWordValid(word: string): boolean {
-        // Other function to validate words locally.
-        return this.validationService.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'")
-            ? true
-            : false;
+        // TODO: see where to access dictionary downloaded
+        const dictionary: Dictionary = new Dictionary(DictionaryType.Default);
+        return dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
     }
 }

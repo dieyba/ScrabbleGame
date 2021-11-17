@@ -9,12 +9,13 @@ import { GameService } from './game.service';
 export class ActivateGuard implements CanActivate {
     constructor(private gameService: GameService) {}
 
-    /* eslint-disable no-unused-vars */
     canActivate(
+        // TODO: are those needed?
+        /* eslint-disable no-unused-vars */
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot,
     ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-        if (this.gameService.currentGameService.game.isEndGame === true) {
+        if (this.gameService.game.isEndGame === true) {
             return false;
         }
         return true;

@@ -1,4 +1,5 @@
 import { Player } from '@app/classes/player';
+import { ERROR_NUMBER } from '@app/classes/utilities';
 import { Service } from 'typedi';
 
 @Service()
@@ -7,17 +8,29 @@ export class PlayerManagerService {
     constructor() {
         this.allPlayers = [];
     }
-    addPlayer(playerName: string, socketId: string): Player {
-        const newPlayer = new Player(playerName, socketId);
-        this.allPlayers.push(newPlayer);
-        return newPlayer;
-    }
 
     getPlayerBySocketID(socketId: string): Player | undefined {
         const playerArrayIndex = this.allPlayers.findIndex((p) => p.socketId === socketId);
-        if (playerArrayIndex > -1) {
+        if (playerArrayIndex !== ERROR_NUMBER) {
             return this.allPlayers[playerArrayIndex];
         }
         return undefined;
     }
+    addPlayer(socketId: string, playerName?: string): Player | undefined {
+        let newPlayer;
+        if (this.getPlayerBySocketID(socketId) === undefined) {
+            const name = playerName !== undefined ? playerName : '';
+            newPlayer = new Player(name, socketId);
+            this.allPlayers.push(newPlayer);
+        }
+        return newPlayer;
+    }
+
+    // // TODO: do we need a remove player method too? only to be called when socket is disconnected
+    // removePlayer(socketId: string) {
+    //     const playerArrayIndex = this.allPlayers.findIndex((p) => p.socketId === socketId);
+    //     if (playerArrayIndex !== ERROR_NUMBER) {
+    //         this.allPlayers.splice(playerArrayIndex, 1);
+    //     }
+    // }
 }

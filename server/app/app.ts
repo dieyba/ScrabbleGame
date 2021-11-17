@@ -43,6 +43,7 @@ export class Application {
             res.redirect('/api/docs');
         });
         // Add headers
+        /* eslint-disable prefer-arrow/prefer-arrow-functions*/
         this.app.use(function (req, res, next) {
             // Website you wish to allow to connect
             res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');

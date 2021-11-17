@@ -1,8 +1,7 @@
-// TODO : Integrate other dictionnaries and choices
 import * as dict_path from '@app/assets/dictionnary.json';
 export enum DictionaryType {
-    Default = 0,
-    English = 1,
+    Default = 'Français',
+    English = 'Anglais',
     // Other dictionaries
 }
 

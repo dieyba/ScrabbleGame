@@ -6,6 +6,8 @@ describe('ValidationService service', () => {
         validationService = new ValidationService();
     });
     it('should create playerManagerService', () => {
+        /* eslint-disable @typescript-eslint/no-unused-expressions*/
+        /* eslint-disable  no-unused-expressions */
         expect(validationService).to.exist;
     });
     it('ValidateWords should return true', () => {

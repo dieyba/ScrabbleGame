@@ -1,4 +1,5 @@
 import { ScrabbleLetter } from './scrabble-letter';
+import { ERROR_NUMBER } from './utilities';
 
 export class Player {
     socketId: string;
@@ -6,13 +7,13 @@ export class Player {
     name: string;
     score: number;
     letters: ScrabbleLetter[];
-    isActive: boolean; // True is it is this players turn, false if not.
+    isActive: boolean;
     isWinner: boolean;
 
-    constructor(name: string, socketId: string) {
+    constructor(name: string, socketId: string, roomId?: number) {
         this.name = name;
         this.socketId = socketId;
-        this.roomId = -1;
+        this.roomId = roomId !== undefined ? roomId : ERROR_NUMBER;
         this.isActive = false;
         this.score = 0;
         this.letters = [];
