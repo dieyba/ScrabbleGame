@@ -1,4 +1,4 @@
-import { Component, HostListener, Inject } from '@angular/core';
+import { AfterViewInit, Component, HostListener, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -21,7 +21,7 @@ const LIST_UPDATE_TIMEOUT = 500;
     templateUrl: './waiting-area.component.html',
     styleUrls: ['./waiting-area.component.scss'],
 })
-export class WaitingAreaComponent {
+export class WaitingAreaComponent implements AfterViewInit {
     selectedGame: WaitingAreaGameParameters;
     playerName: FormControl;
     playerList: string[];
@@ -56,7 +56,6 @@ export class WaitingAreaComponent {
         this.pendingGameslist = [];
         this.name = false;
         this.isStarting = false;
-        this.gameList.addPlayer(data.isLog2990);
         if (data.isGameSelected) {
             this.selectedGame = new WaitingAreaGameParameters(GameType.MultiPlayer, GAME_CAPACITY, DictionaryType.Default, 0, false, false, '');
             this.playerName = new FormControl('', [
@@ -74,6 +73,11 @@ export class WaitingAreaComponent {
         }, LIST_UPDATE_TIMEOUT);
         this.socketOnConnect();
     }
+
+    ngAfterViewInit() {
+        this.gameList.getGames(this.data.isLog2990);
+    }
+
     @HostListener('window:beforeunload', ['$event'])
     onBeforeUnload() {
         this.gameList.someoneLeftRoom();

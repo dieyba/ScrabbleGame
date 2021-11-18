@@ -71,6 +71,7 @@ export class GameListManager {
     createGameInPlay(clientParametersChosen: WaitingAreaGameParameters): GameInitInfo {
         const newGame = new GameInitInfo(clientParametersChosen);
         this.gamesInPlay.push(newGame);
+        console.log(newGame);
         return newGame;
     }
     deleteGameInPlay(roomId: number): void {

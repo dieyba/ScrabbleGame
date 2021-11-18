@@ -17,12 +17,13 @@ export class GameListService {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.waitingAreaGames = new Array<WaitingAreaGameParameters>();
+        this.socket.emit('addPlayer');
         this.socket.on('updateWaitingAreaGames', (game: WaitingAreaGameParameters[]) => {
             this.waitingAreaGames = game;
         });
     }
-    addPlayer(isLog2990: boolean) {
-        this.socket.emit('addPlayer', isLog2990);
+    getGames(isLog2990: boolean) {
+        this.socket.emit('getAllWaitingAreaGames', isLog2990);
     }
     getList(): WaitingAreaGameParameters[] {
         return this.waitingAreaGames;

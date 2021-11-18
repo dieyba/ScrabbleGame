@@ -28,7 +28,7 @@ export class SidebarComponent implements AfterViewInit {
     }
 
     isLog2990(): boolean {
-        return this.gameService.game.isLog2990;
+        return Boolean(this.gameService.game.isLog2990);
     }
 
     getPlayer1Name(): string {

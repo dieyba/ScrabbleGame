@@ -54,6 +54,7 @@ export interface WaitingAreaGameParameters {
     isRandomBonus: boolean;
     isLog2990: boolean;
     gameMode: GameType;
+    sharedGoals: Goals[];
 }
 
 export class GameInitInfo {
@@ -86,15 +87,14 @@ export class GameInitInfo {
         this.stockLetters = stock.letterStock; // stock with the two players' letters removed
         this.sharedGoals = [];
         // TODO: pick the 4 public random objectives/goals from the list
-        if (clientParametersChosen.isLog2990) {
-            for (let i = 0; i < PUBLIC_GOALS_COUNT; i++) {
+        if (Boolean(clientParametersChosen.isLog2990)) {
+            for (let i = 0; this.sharedGoals.length < PUBLIC_GOALS_COUNT; i++) {
                 const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
                 if (!this.sharedGoals.includes(randomGoal)) {
-                    this.sharedGoals.push();
+                    this.sharedGoals.push(randomGoal);
                 }
             }
         }
-        console.log(this.sharedGoals);
     }
 
     getOtherPlayerInRoom(playerId: string): Player | undefined {
