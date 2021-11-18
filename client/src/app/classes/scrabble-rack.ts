@@ -1,5 +1,5 @@
 import { ScrabbleLetter } from './scrabble-letter';
-const RACK_SIZE = 7;
+export const RACK_SIZE = 7;
 export class ScrabbleRack {
     letters: ScrabbleLetter[];
 

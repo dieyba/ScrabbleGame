@@ -31,10 +31,18 @@ describe('ClassicModeComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
     it('should call openDialog', () => {
         const dialogRefSpyObj = jasmine.createSpyObj({ close: false });
         matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
-        component.openDialog();
+        component.openDialog(true);
+        expect(matdialog).toHaveBeenCalled();
+    });
+
+    it('openJoinRoom should open dialog', () => {
+        const dialogRefSpyObj = jasmine.createSpyObj({ close: false });
+        matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
+        component.openJoinRoom(false);
         expect(matdialog).toHaveBeenCalled();
     });
 });

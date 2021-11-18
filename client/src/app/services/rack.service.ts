@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ERROR_NUMBER } from '@app/classes/utilities';
 
 export const RACK_WIDTH = 500;
 export const RACK_HEIGHT = 60;
@@ -13,14 +14,18 @@ const SQUARE_WIDTH = 71;
 })
 export class RackService {
     rackLetters: ScrabbleLetter[];
-    exchangeSelected: boolean[] = [false, false, false, false, false, false, false];
-    handlingSelected: boolean[] = [false, false, false, false, false, false, false];
+    exchangeSelected: boolean[];
+    handlingSelected: boolean[];
     gridContext: CanvasRenderingContext2D;
-    squareWidth = RACK_WIDTH / MAX_LETTER_COUNT;
-    squareHeight = RACK_WIDTH;
+    squareWidth: number;
+    squareHeight: number;
 
     constructor() {
         this.rackLetters = [];
+        this.exchangeSelected = [false, false, false, false, false, false, false];
+        this.handlingSelected = [false, false, false, false, false, false, false];
+        this.squareWidth = RACK_WIDTH / MAX_LETTER_COUNT;
+        this.squareHeight = RACK_HEIGHT;
     }
 
     drawRack() {
@@ -50,7 +55,7 @@ export class RackService {
     }
 
     removeLetter(scrabbleLetter: ScrabbleLetter): number {
-        let pos = -1;
+        let pos = ERROR_NUMBER;
         for (let i = 0; i < this.rackLetters.length; i++) {
             if (this.rackLetters[i].character === scrabbleLetter.character) {
                 this.rackLetters.splice(i, 1);

@@ -1,32 +1,34 @@
 import { Injectable } from '@angular/core';
+import { ERROR_NUMBER } from '@app/classes/utilities';
 import { RackService } from './rack.service';
-
-export const ERROR_NUMBER = -1;
 
 @Injectable({
     providedIn: 'root',
 })
 export class ManipulationRackService {
-    letterSelectedPosition = ERROR_NUMBER;
-    firstOccurencePosition = ERROR_NUMBER;
+    private letterSelectedPosition: number;
+    private firstOccurencePosition: number;
 
-    constructor(private readonly rackService: RackService) {}
+    constructor(private readonly rackService: RackService) {
+        this.letterSelectedPosition = ERROR_NUMBER;
+        this.firstOccurencePosition = ERROR_NUMBER;
+    }
 
-    // set selectedPosition(newValue: number) {
-    //     this.letterSelectedPosition = newValue;
-    // }
+    set setLetterSelectedPosition(newValue: number) {
+        this.letterSelectedPosition = newValue;
+    }
 
-    // set firstOccurence(newValue: number) {
-    //     this.firstOccurencePosition = newValue;
-    // }
+    set setFirstOccurencePosition(newValue: number) {
+        this.firstOccurencePosition = newValue;
+    }
 
-    // get getSelectedPosition() {
-    //     return this.letterSelectedPosition;
-    // }
+    get getLetterSelectedPosition() {
+        return this.letterSelectedPosition;
+    }
 
-    // get getFirstOccurence() {
-    //     return this.firstOccurencePosition;
-    // }
+    get getFirstOccurencePosition() {
+        return this.firstOccurencePosition;
+    }
 
     handleSelection(position: number) {
         if (this.rackService.handlingSelected[position - 1] === false) {

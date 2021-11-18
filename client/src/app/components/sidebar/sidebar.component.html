@@ -2,8 +2,8 @@
     <img src="https://bit.ly/3m206ss" width="300" height="60" class="logo" alt="Logo Scrabble" />
     <hr />
     <mat-card class="card" [ngStyle]="{ 'background-color': isPlayer1Active() ? '#8ABBF5' : '#DCECFF' }">
-        <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': isPlayer1Active() ? 'bold' : 'normal' }">{{
-            player1Name
+        <mat-card-title class="card-title" [ngStyle]="{ 'font-weight': isPlayer1Active() ? 'bold' : 'normal' }">{{
+            getPlayer1Name()
         }}</mat-card-title>
         <mat-card-content>
             <div>
@@ -17,8 +17,8 @@
         </mat-card-content>
     </mat-card>
     <mat-card class="card" [ngStyle]="{ 'background-color': isPlayer2Active() ? '#8ABBF5' : '#DCECFF' }">
-        <mat-card-title class="card-title" align="center" [ngStyle]="{ 'font-weight': isPlayer2Active() ? 'bold' : 'normal' }">{{
-            player2Name
+        <mat-card-title class="card-title" [ngStyle]="{ 'font-weight': isPlayer2Active() ? 'bold' : 'normal' }">{{
+            getPlayer2Name()
         }}</mat-card-title>
         <mat-card-content>
             <div>
@@ -43,8 +43,9 @@
         </mat-card-content>
     </mat-card>
     <mat-card *ngIf="isEndGame() && hasWinner()">
-        <mat-card-title *ngIf="!isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br>tu as gagné!</mat-card-title>
-        <mat-card-title *ngIf="isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br>vous avez gagné!</mat-card-title>
+        <mat-card-title *ngIf="!isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br />tu as gagné!</mat-card-title>
+        <mat-card-title *ngIf="isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br />vous avez gagné!</mat-card-title>
     </mat-card>
-    <button class="return" routerLink="/start">Quitter la partie</button>
+    <button *ngIf="isEndGame()" class="return" (click)="quitGame()">Quitter la partie</button>
+    <button *ngIf="!isEndGame()" class="return" (click)="quitGame()">Abandonner la partie</button>
 </div>

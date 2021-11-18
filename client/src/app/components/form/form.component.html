@@ -20,7 +20,8 @@
             <mat-form-field appearance="fill" class="papy">
                 <mat-label>Dictonnaire :</mat-label>
                 <mat-select formControlName="dictionaryForm" [(ngModel)]="defaultDictionary" [placeholder]="defaultDictionary">
-                    <mat-option value="0">{{ dictionary }}</mat-option>
+                    <mat-option value="0">{{ dictionaryList[0] }}</mat-option>
+                    <mat-option value="1">{{ dictionaryList[1] }}</mat-option>
                 </mat-select>
                 <div class="error" *ngIf="dictionaryForm.invalid">Le champ est requis</div>
             </mat-form-field>
@@ -32,32 +33,28 @@
                     <mat-option value="30">0:30 secondes</mat-option>
                     <mat-option value="60">1:00 minute</mat-option>
                     <mat-option value="90">1:30 minutes</mat-option>
-                    <mat-option value="120">1:30 minutes</mat-option>
-                    <mat-option value="150">2:00 minutes</mat-option>
-                    <mat-option value="180">2:30 minutes</mat-option>
-                    <mat-option value="210">3:00 minutes</mat-option>
-                    <mat-option value="240">3:30 minutes</mat-option>
-                    <mat-option value="270">4:00 minutes</mat-option>
-                    <mat-option value="300">4:30 minutes</mat-option>
-                    <mat-option value="330">5:00 minutes</mat-option>
+                    <mat-option value="120">2:00 minutes</mat-option>
+                    <mat-option value="150">2:30 minutes</mat-option>
+                    <mat-option value="180">3:00 minutes</mat-option>
+                    <mat-option value="210">3:30 minutes</mat-option>
+                    <mat-option value="240">4:00 minutes</mat-option>
+                    <mat-option value="270">4:30 minutes</mat-option>
+                    <mat-option value="300">5:00 minutes</mat-option>
                 </mat-select>
                 <div class="error" *ngIf="timer.invalid">Le champ est requis</div>
             </mat-form-field>
         </div>
 
         <div class="form-check">
-            <mat-checkbox formControlName="bonus" class="form check-input">Bonus aléatoire</mat-checkbox>
+            <mat-checkbox formControlName="bonus" [(ngModel)]="defaultBonus" class="form check-input">Bonus aléatoire</mat-checkbox>
         </div>
-
-        <div>
+        <div *ngIf="isSolo">
             <p>Veuillez choisir le niveau de votre adversaire</p>
             <mat-radio-group formControlName="level">
                 <mat-radio-button value="easy" (click)="randomPlayer(debutantNameList)">Joueur Débutant</mat-radio-button>
                 <mat-radio-button disabled value="difficult">Joueur Expert</mat-radio-button>
             </mat-radio-group>
-        </div>
-        <div id="opponents">
-            <p>
+            <p id="opponents">
                 Vous allez jouer contre <strong>{{ selectedPlayer }}</strong>
             </p>
         </div>

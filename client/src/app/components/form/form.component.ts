@@ -1,8 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { SoloGameService } from '@app/services/solo-game.service';
+import { DictionaryType } from '@app/classes/dictionary';
+import { GameType } from '@app/classes/game-parameters';
+import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
+import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
+import { GameListService } from '@app/services/game-list.service';
+import { GameService } from '@app/services/game.service';
+
+export const GAME_CAPACITY = 2;
 
 @Component({
     selector: 'app-form',
@@ -17,15 +24,34 @@ export class FormComponent implements OnInit {
     level: FormControl;
     opponent: FormControl;
     dictionaryForm: FormControl;
-    debutantNameList: string[];
-    selectedPlayer: string;
-    random: number;
-    dictionary: string;
-    defaultTimer = '60';
-    defaultDictionary = '0';
 
-    constructor(private dialog: MatDialogRef<FormComponent>, private router: Router, private soloGameService: SoloGameService) {
-        this.dictionary = 'Français';
+    isLOG2990: boolean;
+    debutantNameList: string[];
+    dictionaryList: string[];
+    selectedPlayer: string;
+    randomPlayerId: number;
+    defaultTimer: string;
+    defaultDictionary: string;
+    defaultBonus: boolean;
+
+    constructor(
+        private gameService: GameService,
+        private dialog: MatDialog,
+        private dialogRef: MatDialogRef<FormComponent>,
+        private router: Router,
+        private gameList: GameListService,
+        @Inject(MAT_DIALOG_DATA) public isSolo: boolean,
+    ) {
+        this.isLOG2990 = false; // TODO: implement actual isLOG2990 depending on which page created the form
+        this.defaultTimer = '60';
+        this.defaultDictionary = '0';
+        this.defaultBonus = false;
+        if (this.isSolo === true) {
+            this.level = new FormControl('', [Validators.required]);
+        } else {
+            this.level = new FormControl('');
+        }
+        this.dictionaryList = Object.values(DictionaryType);
         this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
     }
 
@@ -35,7 +61,6 @@ export class FormComponent implements OnInit {
     }
 
     createFormControl() {
-        this.level = new FormControl('', [Validators.required]);
         this.name = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
         this.timer = new FormControl('', [Validators.required]);
         this.bonus = new FormControl('');
@@ -55,7 +80,7 @@ export class FormComponent implements OnInit {
     }
 
     closeDialog() {
-        this.dialog.close();
+        this.dialogRef.close();
     }
 
     randomNumber(minimum: number, maximum: number): number {
@@ -64,16 +89,22 @@ export class FormComponent implements OnInit {
     }
 
     randomPlayer(list: string[]): void {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        document.getElementById('opponents')!.style.visibility = 'visible';
-        this.random = this.randomNumber(0, list.length);
+        const showOpponents = document.getElementById('opponents');
+        if (showOpponents instanceof HTMLElement) {
+            showOpponents.style.visibility = 'visible';
+        }
+        this.randomPlayerId = this.randomNumber(0, list.length);
         do {
-            this.random = this.randomNumber(0, list.length);
-            this.selectedPlayer = list[this.random];
+            this.randomPlayerId = this.randomNumber(0, list.length);
+            this.selectedPlayer = list[this.randomPlayerId];
         } while (this.name.value === this.selectedPlayer);
 
-        this.selectedPlayer = list[this.random];
+        this.selectedPlayer = list[this.randomPlayerId];
         this.myForm.controls.opponent.setValue(this.selectedPlayer);
+    }
+
+    convert() {
+        this.dialog.open(FormComponent, { data: this.isSolo === true });
     }
 
     changeName(list: string[]): void {
@@ -85,9 +116,27 @@ export class FormComponent implements OnInit {
 
     submit(): void {
         if (this.myForm.valid) {
-            this.closeDialog();
-            this.router.navigate(['/game']);
-            this.soloGameService.initializeGame(this.myForm);
+            const gameMode = this.isSolo ? GameType.Solo : GameType.MultiPlayer;
+            const gameParams = new WaitingAreaGameParameters(
+                gameMode,
+                GAME_CAPACITY,
+                this.dictionaryForm.value,
+                this.timer.value,
+                this.bonus.value,
+                this.isLOG2990,
+                this.name.value, // game creator name
+            );
+            if (gameMode === GameType.Solo) {
+                this.closeDialog();
+                gameParams.joinerName = this.opponent.value;
+                this.dialogRef.close();
+                this.router.navigate(['/game']);
+                this.gameService.initializeSoloGame(gameParams, this.level.value);
+            } else {
+                this.closeDialog();
+                this.gameList.createRoom(gameParams);
+                this.dialog.open(WaitingAreaComponent, { disableClose: true });
+            }
         }
     }
 }

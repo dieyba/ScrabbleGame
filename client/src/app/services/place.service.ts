@@ -15,8 +15,8 @@ export class PlaceService {
 
     place(player: Player, placeParams: PlaceParams): ErrorType {
         const tempCoord = new Vec2();
-        // Checking if its player's turn
-        if (!this.canPlaceWord(player, placeParams)) {
+        // Checking the word is placable
+        if (!this.canPlaceWord(placeParams)) {
             return ErrorType.SyntaxError;
         }
         // Removing all the letters from my "word" that are already on the board
@@ -90,13 +90,12 @@ export class PlaceService {
             }
         }
     }
-    canPlaceWord(player: Player, placeParams: PlaceParams): boolean {
+    canPlaceWord(placeParams: PlaceParams): boolean {
         if (
             !this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, placeParams.position, placeParams.orientation) ||
             (!this.gridService.scrabbleBoard.isWordPassingInCenter(placeParams.word, placeParams.position, placeParams.orientation) &&
                 !this.gridService.scrabbleBoard.isWordPartOfAnotherWord(placeParams.word, placeParams.position, placeParams.orientation) &&
-                !this.gridService.scrabbleBoard.isWordTouchingOtherWord(placeParams.word, placeParams.position, placeParams.orientation)) ||
-            !player.isActive
+                !this.gridService.scrabbleBoard.isWordTouchingOtherWord(placeParams.word, placeParams.position, placeParams.orientation))
         ) {
             return false;
         }

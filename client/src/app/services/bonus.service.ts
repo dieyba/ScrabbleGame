@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { DARK_BLUE_FACTOR, PALE_BLUE_FACTOR, ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { SquareColor } from '@app/classes/square';
+import { Axis, ERROR_NUMBER } from '@app/classes/utilities';
 import { GridService } from './grid.service';
-import { Axis } from '@app/classes/utilities';
 
 const PINK_FACTOR = 2;
 const RED_FACTOR = 3;
@@ -12,10 +12,13 @@ const RED_FACTOR = 3;
     providedIn: 'root',
 })
 export class BonusService {
-    pinkBonusCount: number = 0;
-    redBonusCount: number = 0;
+    pinkBonusCount: number;
+    redBonusCount: number;
 
-    constructor(private readonly gridService: GridService) {}
+    constructor(private readonly gridService: GridService) {
+        this.pinkBonusCount = 0;
+        this.redBonusCount = 0;
+    }
 
     totalValue(scrabbleWord: ScrabbleWord): number {
         this.pinkBonusCount = 0;
@@ -42,7 +45,7 @@ export class BonusService {
                     total += scrabbleWord.content[i].value;
                 }
             } else {
-                total += scrabbleWord.content[i].value; // For purposes of testing, when we don't need an orientation.
+                total = ERROR_NUMBER;
             }
         }
         // Word pink/red bonuses
@@ -57,13 +60,16 @@ export class BonusService {
     }
 
     calculateValue(letter: ScrabbleLetter, color: SquareColor): number {
+        let newLetter = new ScrabbleLetter(letter.character);
+        newLetter = letter;
+        letter = newLetter;
         let total = 0;
         switch (color) {
             case SquareColor.Teal:
-                total += letter.getTealBonus();
+                total += this.getTealBonus(letter);
                 break;
             case SquareColor.DarkBlue:
-                total += letter.getDarkBlueBonus();
+                total += this.getDarkBlueBonus(letter);
                 break;
             case SquareColor.Pink:
                 this.pinkBonusCount++;
@@ -78,6 +84,14 @@ export class BonusService {
                 break;
         }
         return total;
+    }
+
+    getTealBonus(scrabbleLetter: ScrabbleLetter): number {
+        return PALE_BLUE_FACTOR * scrabbleLetter.value;
+    }
+
+    getDarkBlueBonus(scrabbleLetter: ScrabbleLetter): number {
+        return DARK_BLUE_FACTOR * scrabbleLetter.value;
     }
 
     useBonus(scrabbleWord: ScrabbleWord) {

@@ -1,19 +1,14 @@
 import { Player } from './player';
 
-export enum PlayerType {
+export enum Difficulty {
     Easy = 'easy',
     Difficult = 'difficult',
 }
-
 export class VirtualPlayer extends Player {
-    type: PlayerType;
+    type: Difficulty;
 
-    constructor(name: string, type: PlayerType) {
+    constructor(name: string, difficulty?: Difficulty) {
         super(name);
-        this.type = type;
-    }
-
-    playTurn() {
-        // TODO : implement play turn
+        this.type = difficulty !== undefined ? difficulty : Difficulty.Easy; // by default, the difficulty is easy
     }
 }

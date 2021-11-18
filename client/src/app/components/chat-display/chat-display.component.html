@@ -1,7 +1,7 @@
 <div>
     <mat-card class="card">
         <div class="chat-display" #chatDisplayBox>
-            <div *ngFor="let entry of entries; let isLast = last">
+            <div *ngFor="let entry of getEntries(); let isLast = last">
                 <p [ngStyle]="{ color: entry.color }">{{ entry.message }}</p>
                 {{ isLast ? updateScroll(entry) : '' }}
             </div>

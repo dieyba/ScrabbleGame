@@ -1,24 +1,28 @@
 import { Injectable } from '@angular/core';
+import { DefaultCommandParams } from '@app/classes/commands';
+import { ExchangeCmd } from '@app/classes/exchange-command';
+import { CommandInvokerService } from './command-invoker.service';
+import { GameService } from './game.service';
 import { RackService } from './rack.service';
-import { SoloGameService } from './solo-game.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ExchangeService {
-    constructor(private readonly rackService: RackService, private readonly soloGameService: SoloGameService) {}
+    constructor(
+        private readonly rackService: RackService,
+        private readonly gameService: GameService,
+        private commandInvokerService: CommandInvokerService,
+    ) {}
 
     handleSelection(position: number) {
-        // s'il faut désélectionner la lettre de manip quand celle de échanger
-        // est sélectionnée, ce sera comme ça
+        if (this.rackService.handlingSelected[position - 1] === true) {
+            this.rackService.handlingSelected[position - 1] = false;
+        }
         for (let i = 0; i < this.rackService.handlingSelected.length; i++) {
             if (this.rackService.handlingSelected[i] === true) {
                 this.rackService.deselect(i + 1, this.rackService.gridContext, false);
             }
-        }
-
-        if (this.rackService.handlingSelected[position - 1] === true) {
-            this.rackService.handlingSelected[position - 1] = false;
         }
 
         if (this.rackService.exchangeSelected[position - 1] === true) {
@@ -29,11 +33,14 @@ export class ExchangeService {
     }
 
     exchange() {
-        this.soloGameService.exchangeLettersSelected(this.soloGameService.localPlayer); // TODO Make a command instead
+        const defaultParams: DefaultCommandParams = { player: this.gameService.game.getLocalPlayer(), serviceCalled: this.gameService };
+        const letters = this.gameService.getLettersSelected();
+        const command = new ExchangeCmd(defaultParams, letters);
+        this.commandInvokerService.executeCommand(command);
     }
 
     cancelExchange() {
-        for (let i = 1; i <= this.soloGameService.localPlayer.letters.length; i++) {
+        for (let i = 1; i <= this.gameService.game.getLocalPlayer().letters.length; i++) {
             this.rackService.deselect(i, this.rackService.gridContext, true);
         }
     }

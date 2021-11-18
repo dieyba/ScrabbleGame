@@ -1,4 +1,5 @@
 import { Square, SquareColor } from './square';
+import { isAllLowerLetters, removeAccents } from './utilities';
 
 export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;
@@ -12,44 +13,35 @@ export class ScrabbleLetter {
     tile: Square;
 
     constructor(letter: string, value?: number) {
-        const unplaced = -1;
-        this.setLetter(letter);
         this.color = SquareColor.None;
-        this.tile = new Square(unplaced, unplaced); // -1, -1 means it is not placed yet
-
-        if (letter === '*') {
-            this.value = 0;
-        } else if ('aeilnorstu'.includes(letter)) {
-            this.value = 1;
-        } else if ('dgm'.includes(letter)) {
-            this.value = 2;
-        } else if ('bcp'.includes(letter)) {
-            this.value = 3;
-        } else if ('fhv'.includes(letter)) {
-            this.value = 4;
-        } else if ('jq'.includes(letter)) {
-            this.value = 8;
-        } else if ('kwxyz'.includes(letter)) {
-            this.value = 10;
-        }
-
+        this.tile = new Square(UNPLACED, UNPLACED); // -1, -1 means it is not placed yet
+        this.setLetter(letter);
+        this.setDefaultValue(letter);
         if (value !== undefined) {
             this.value = value;
         }
     }
-    getTealBonus(): number {
-        return PALE_BLUE_FACTOR * this.value;
-    }
-    setTealBonus(): void {
-        this.value = PALE_BLUE_FACTOR * this.value;
-    }
-    getDarkBlueBonus(): number {
-        return DARK_BLUE_FACTOR * this.value;
-    }
-    setDarkBlueBonus(): void {
-        this.value = DARK_BLUE_FACTOR * this.value;
-    }
+
     setLetter(character: string): void {
-        this.character = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        // if a captial letter is passed in, represents a blank piece, meaning a '*'
+        this.character = isAllLowerLetters(character) ? removeAccents(character) : '*';
+    }
+    setDefaultValue(character: string) {
+        // set the letter's default value
+        if ('aeilnorstu'.includes(character)) {
+            this.value = 1;
+        } else if ('dgm'.includes(character)) {
+            this.value = 2;
+        } else if ('bcp'.includes(character)) {
+            this.value = 3;
+        } else if ('fhv'.includes(character)) {
+            this.value = 4;
+        } else if ('jq'.includes(character)) {
+            this.value = 8;
+        } else if ('kwxyz'.includes(character)) {
+            this.value = 10;
+        } else {
+            this.value = 0; // default value for *
+        }
     }
 }

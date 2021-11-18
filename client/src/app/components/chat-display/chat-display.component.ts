@@ -9,11 +9,12 @@ import { ChatDisplayService } from '@app/services/chat-display.service';
 })
 export class ChatDisplayComponent {
     @ViewChild('chatDisplayBox') chatDisplayBox!: ElementRef;
-    entries: ChatDisplayEntry[];
     lastEntry: ChatDisplayEntry;
 
-    constructor(private chatDisplayService: ChatDisplayService) {
-        this.entries = this.chatDisplayService.entries;
+    constructor(private chatDisplayService: ChatDisplayService) {}
+
+    getEntries(): ChatDisplayEntry[] {
+        return this.chatDisplayService.entries;
     }
 
     updateScroll(entry: ChatDisplayEntry) {

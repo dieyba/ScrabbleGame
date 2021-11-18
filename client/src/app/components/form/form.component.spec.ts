@@ -3,13 +3,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Observable } from 'rxjs';
 import { FormComponent } from './form.component';
@@ -19,6 +19,7 @@ describe('FormComponent', () => {
     let fixture: ComponentFixture<FormComponent>;
     const list: string[] = ['dieyna', 'kevin', 'ariane'];
     let dialogSpy: jasmine.Spy;
+    let matdialog: jasmine.Spy;
     // let dialog: jasmine.SpyObj<MatDialogRef<FormComponent>> = jasmine.createSpyObj('dialog', ['close']);
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -36,10 +37,13 @@ describe('FormComponent', () => {
                 ReactiveFormsModule,
                 MatDialogModule,
                 BrowserAnimationsModule,
+                RouterModule,
             ],
             providers: [
+                { provide: MAT_DIALOG_DATA, useValue: {} },
                 { provide: MatDialogRef, useValue: { close: () => {} } }, // eslint-disable-line @typescript-eslint/no-empty-function
                 { provide: Router, useValue: { navigate: () => new Observable() } },
+                { provide: MatDialog, useValue: { open: () => new Observable() } },
             ],
         }).compileComponents();
     });
@@ -107,5 +111,44 @@ describe('FormComponent', () => {
         });
         component.submit();
         expect(component.myForm.valid).toBeTrue();
+    });
+
+    it('should call openDialog', () => {
+        const dialogRefSpyObj = jasmine.createSpyObj({ close: false });
+        matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
+        component.myForm.setValue({
+            name: 'dieyna',
+            timer: '1:00',
+            bonus: true,
+            level: 'easy',
+            dictionaryForm: 'Francais',
+            opponent: 'Sara',
+        });
+        component.isSolo = false;
+        component.submit();
+        expect(matdialog).toHaveBeenCalled();
+    });
+
+    it('should call router', () => {
+        const routerRefSpyObj = jasmine.createSpyObj({ navigate: '/game' });
+        const router = spyOn(TestBed.get(Router), 'navigate').and.returnValue(routerRefSpyObj); // eslint-disable-line deprecation/deprecation
+        component.myForm.setValue({
+            name: 'dieyna',
+            timer: '1:00',
+            bonus: true,
+            level: 'easy',
+            dictionaryForm: 'Francais',
+            opponent: 'Sara',
+        });
+        component.isSolo = true;
+        component.submit();
+        expect(router).toHaveBeenCalled();
+    });
+
+    it('convert() should open dialog', () => {
+        const dialogRefSpyObj = jasmine.createSpyObj({ close: false });
+        matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
+        component.convert();
+        expect(matdialog).toHaveBeenCalled();
     });
 });

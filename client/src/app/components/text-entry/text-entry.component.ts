@@ -6,13 +6,14 @@ import { TextEntryService } from '@app/services/text-entry.service';
     styleUrls: ['./text-entry.component.scss'],
 })
 export class TextEntryComponent {
-    inputText = '';
+    inputText: string;
 
-    constructor(private textEntryService: TextEntryService) {}
+    constructor(private textEntryService: TextEntryService) {
+        this.inputText = '';
+    }
 
     onKeyUpEnter() {
-        // onKeyUp events are always from the local player.
-        this.textEntryService.handleInput(this.inputText, true);
+        this.textEntryService.handleInput(this.inputText);
         this.inputText = '';
     }
 }

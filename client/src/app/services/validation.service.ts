@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
+import { GameType } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { Axis } from '@app/classes/utilities';
-import { Vec2 } from '@app/classes/vec2';
+import { ERROR_NUMBER } from '@app/classes/utilities';
+import { SocketHandler } from '@app/modules/socket-handler';
+import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 import { BonusService } from './bonus.service';
 import { BOARD_SIZE, GridService } from './grid.service';
 
@@ -19,38 +21,43 @@ export class ValidationService {
     dictionary: Dictionary;
     words: string[];
     isTimerElapsed: boolean;
+    areWordsValid: boolean;
+    private socket: io.Socket;
+    private readonly server: string;
 
     constructor(private readonly gridService: GridService, private bonusService: BonusService) {
         this.dictionary = new Dictionary(DictionaryType.Default);
         this.words = [];
         this.isTimerElapsed = false;
+        this.server = environment.socketUrl;
+        this.socket = SocketHandler.requestSocket(this.server);
+        this.areWordsValid = false;
+        this.socketOnConnect();
     }
-    /* eslint-disable no-unused-vars */
-    isPlacable(arg0: ScrabbleWord, arg1: Vec2, axis: Axis): boolean {
-        throw new Error('Method not implemented.');
+    socketOnConnect() {
+        this.socket.on('areWordsValid', (result: boolean) => {
+            this.areWordsValid = result;
+        });
     }
-    /* eslint-enable no-unused-vars */
-
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
         const wordsValue = this.calculateScore(newWords);
-        player.score += wordsValue;
         // Retirer lettres du board
-        setTimeout(() => {
-            if (this.validateWords(newWords)) {
-                newWords.forEach((newWord) => {
-                    // actually what was this method supposed to do? seemmed to do a few things at the same time
-                    for (const letter of newWord.content) {
-                        if (wordsValue === 0) {
-                            this.gridService.removeSquare(letter.tile.position.x, letter.tile.position.y);
-                        } else {
-                            // if change the isvalidated = true here, change how its used in solo game service
-                            this.bonusService.useBonus(newWord);
-                        }
-                    }
-                });
-            }
-            this.isTimerElapsed = true; // TODO: ca va ou ca?
-        }, WAIT_TIME);
+        if (this.areWordsValid) {
+            newWords.forEach((newWord) => {
+                if (wordsValue === ERROR_NUMBER) {
+                    newWord.content.forEach((letter) => {
+                        this.gridService.removeSquare(letter.tile.position.x, letter.tile.position.y);
+                    });
+                } else {
+                    player.score += wordsValue;
+                    newWord.content.forEach((letter) => {
+                        letter.tile.isValidated = true;
+                    });
+                    this.bonusService.useBonus(newWord);
+                }
+            });
+        }
+        this.isTimerElapsed = true;
     }
 
     calculateScore(newWords: ScrabbleWord[]): number {
@@ -66,39 +73,9 @@ export class ValidationService {
             // Add 50 points to player's score
             totalScore += BONUS_POINTS;
         } else if (this.newLettersCount() > BONUS_LETTER_COUNT) {
-            return 0;
+            return ERROR_NUMBER;
         }
         return totalScore;
-    }
-
-    validateWords(newWords: ScrabbleWord[]): boolean {
-        for (let i = 0; i < newWords.length; i++) {
-            this.words[i] = this.convertScrabbleWordToString(newWords[i].content);
-            // Word not valid, validation fails3
-            if (!this.isWordValid(this.words[i])) {
-                return false;
-            } else {
-                // Word was valid, set its letters as validated
-                newWords[i].content.forEach((letter) => {
-                    letter.tile.isValidated = true;
-                });
-            }
-        }
-        return true;
-    }
-
-    // Total value ne consume pas les bonus
-    // TODO: duplicate method with stringify in ScrabbleWord. Which one is to remove?
-    convertScrabbleWordToString(scrabbleLetter: ScrabbleLetter[]): string {
-        let word = '';
-        scrabbleLetter.forEach((letter) => {
-            word += letter.character;
-        });
-        return word.toLowerCase();
-    }
-
-    isWordValid(word: string): boolean {
-        return this.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
     }
 
     newLettersCount(): number {
@@ -114,5 +91,64 @@ export class ValidationService {
             }
         }
         return newLetters;
+    }
+
+    // Calls the server to validate the words passed in.
+    // If the words were not valid, wait 3 seconds before returning result.
+    // If the server doesnt answer after 3 sec, validation result is false by default
+    async validateWords(newWords: ScrabbleWord[], gameMode: GameType) {
+        const strWords: string[] = [];
+        newWords?.forEach((newWord) => {
+            strWords.push(newWord.stringify().toLowerCase());
+        });
+        this.areWordsValid = false;
+        let wordsHaveBeenValidated = false;
+        let validationTimer: NodeJS.Timeout;
+        if (gameMode === GameType.MultiPlayer) {
+            // server validation
+            return new Promise<boolean>((resolve) => {
+                this.socket.emit('validateWords', strWords);
+
+                this.socket.once('areWordsValid', (areWordsValid) => {
+                    this.areWordsValid = areWordsValid;
+                    wordsHaveBeenValidated = true;
+                    if (areWordsValid) {
+                        resolve(areWordsValid);
+                        clearTimeout(validationTimer);
+                    }
+                });
+                validationTimer = setTimeout(() => {
+                    if (!wordsHaveBeenValidated || !this.areWordsValid) {
+                        resolve(false);
+                    }
+                }, WAIT_TIME);
+            });
+        } else {
+            // local validation
+            return new Promise<boolean>((resolve) => {
+                this.areWordsValid = true;
+                for (const word of strWords) {
+                    if (!this.isWordValid(word)) {
+                        this.areWordsValid = false;
+                        break;
+                    }
+                }
+                wordsHaveBeenValidated = true;
+                // return true if words are valid, wait untill the end of timeout if not
+                if (this.areWordsValid) {
+                    resolve(this.areWordsValid);
+                    clearTimeout(validationTimer);
+                }
+
+                validationTimer = setTimeout(() => {
+                    if (!wordsHaveBeenValidated || !this.areWordsValid) {
+                        resolve(this.areWordsValid);
+                    }
+                }, WAIT_TIME);
+            });
+        }
+    }
+    isWordValid(word: string): boolean {
+        return this.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
     }
 }
