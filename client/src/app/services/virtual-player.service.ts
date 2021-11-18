@@ -59,6 +59,20 @@ export class VirtualPlayerService {
         this.rack = this.player.letters;
     }
     playTurn(): void {
+        let moveMade = new ScrabbleWord();
+        // if (typeof Worker !== 'undefined') {
+        //     const currentBoard = this.gridService.scrabbleBoard;
+        //     // Create a new
+        //     const worker = new Worker(new URL('./src/app/services/virtual-player.worker.ts', import.meta.url).href);
+        //     worker.onmessage = ({ data }) => {
+        //         moveMade = data;
+        //     };
+        //     // Send data to our worker
+        //     worker.postMessage({ rack: this.rack, type: this.type, board: currentBoard });
+        // } else {
+        //     // Web Workers not supported in this environment
+        //     // Fallback function
+        // }
         // Next sprint: implement difficult player type logic by separating here and in virtualPlayerService.makeMoves().
         const defaultParams: DefaultCommandParams = {
             player: this.player,
@@ -85,7 +99,7 @@ export class VirtualPlayerService {
                 this.commandInvoker.executeCommand(command);
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
-            let moveMade = new ScrabbleWord();
+            moveMade = new ScrabbleWord();
             moveMade = this.makeMoves(); // 80% chance to make a move
             console.log('moveMade: ', moveMade);
             moveMade.value = moveMade.calculateValue();
