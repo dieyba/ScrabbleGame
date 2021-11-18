@@ -23,7 +23,7 @@
     <div *ngIf="isGameSelected">
         <h1>Veuillez selectionner la partie que vous souhaitez rejoindre</h1>
         <mat-card class="games">
-            <div *ngFor="let game of pendingGameslist">
+            <div *ngFor="let game of pendingGameslist" [class.selected]="game === selectedGame">
                 <button class="game-btn" (click)="openName(true); onSelect(game)">
                     <span> Partie #{{ game.gameRoom.idGame }} - </span>
                     <span> Créateur: {{ game.creatorName }} - </span>
@@ -60,5 +60,7 @@
             </div>
         </div>
         <button class="small-btn" (click)="closeDialog(); someoneLeftRoom()">Retour</button>
+        <button class="small-btn" *ngIf="pendingGameslist.length === 1" style="visibility: visible" disabled="true">Placement Aleatoire</button>
+        <button class="small-btn" *ngIf="pendingGameslist.length >= 2" style="visibility: visible" (click)="randomGame()">Placement Aleatoire</button>
     </div>
 </div>
