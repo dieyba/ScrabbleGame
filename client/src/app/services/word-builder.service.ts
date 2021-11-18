@@ -17,6 +17,7 @@ export class WordBuilderService {
     constructor(private gridService: GridService) {}
 
     // TODO: Handle -1 error coordinates
+    // TODO: make sure the scrabbleWords returned scrabbleLetters that have everything init properly (value, coord, color, isbonusUsed)
     buildWordsOnBoard(word: string, coord: Vec2, axis: Axis): ScrabbleWord[] {
         const result: ScrabbleWord[] = [];
 

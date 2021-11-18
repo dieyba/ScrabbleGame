@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ChatDisplayEntry, ChatEntryColor, createDebugEntry, ServerChatEntry } from '@app/classes/chat-display-entry';
 import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { scrabbleLetterstoString } from '@app/classes/utilities';
+import { scrabbleLettersToString } from '@app/classes/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -69,9 +69,9 @@ export class ChatDisplayService {
     }
 
     displayEndGameMessage(remainingLetters: ScrabbleLetter[], firstPlayer: Player, secondPlayer: Player) {
-        const remainingLettersMessage = 'Fin de partie - ' + scrabbleLetterstoString(remainingLetters);
-        const firstPlayerMessage = firstPlayer.name + ' : ' + scrabbleLetterstoString(firstPlayer.letters);
-        const secondPlayerMessage = secondPlayer.name + ' : ' + scrabbleLetterstoString(secondPlayer.letters);
+        const remainingLettersMessage = 'Fin de partie - ' + scrabbleLettersToString(remainingLetters);
+        const firstPlayerMessage = firstPlayer.name + ' : ' + scrabbleLettersToString(firstPlayer.letters);
+        const secondPlayerMessage = secondPlayer.name + ' : ' + scrabbleLettersToString(secondPlayer.letters);
         const endGameMessages: ChatDisplayEntry[] = [];
         endGameMessages.push({
             color: ChatEntryColor.SystemColor,
