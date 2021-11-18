@@ -6,7 +6,7 @@ import { calculateRackPoints } from '@app/classes/player';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { BestScores, BestScoresService, HttpStatus_OK } from './best-scores.service';
+import { BestScoresService, HttpStatus_OK } from './best-scores.service';
 import { ChatDisplayService } from './chat-display.service';
 import { GameService } from './game.service';
 
@@ -53,7 +53,7 @@ export class EndGameService {
             this.endGameAfterPassedTurns();
         }
         this.bestScoresService.postClassicBestScore(this.gameService.game.getLocalPlayer().name, this.gameService.game.getLocalPlayer().score).subscribe(
-            (data: BestScores) => {
+            () => {
                 /*Do nothing */
             },
             (error: HttpErrorResponse) => {

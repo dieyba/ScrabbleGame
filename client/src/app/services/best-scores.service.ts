@@ -39,12 +39,12 @@ export class BestScoresService {
 
   postClassicBestScore(playerName: string, playerScore: number): Observable<BestScores> {
     // const bestScore: BestScores = { playerName: playerName, score: playerScore };
-    return this.http.post<BestScores>(this.baseUrl + '/classicMode/send', { playerName: playerName, score: playerScore })
+    return this.http.post<BestScores>(this.baseUrl + '/classicMode/send', { playerName: playerName, score: playerScore });
   }
 
   postLog2990BestScore(playerName: string, playerScore: number): Observable<BestScores> {
     // const bestScore: BestScores = { playerName: playerName, score: playerScore };
-    return this.http.post<BestScores>(this.baseUrl + '/log2990Mode/send', { playerName: playerName, score: playerScore })
+    return this.http.post<BestScores>(this.baseUrl + '/log2990Mode/send', { playerName: playerName, score: playerScore });
   }
 
   resetDbBestScores() {

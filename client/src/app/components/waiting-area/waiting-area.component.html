@@ -11,10 +11,8 @@
         </div>
         <div class="games" *ngFor="let game of pendingGameslist">
             <button class="game-btn" (click)="openName(true); onSelect(game)">
-                <span> Partie #{{ game.gameRoom.idGame }} - </span>
-                <span> Créateur: {{ game.creatorName }} - </span>
-                <span> Dictionnaire: {{ game.dictionaryType }} - </span>
-                <span> Temps: {{ game.totalCountDown }} secondes</span>
+                Partie #{{ game.gameRoom.idGame }} - Créateur: {{ game.creatorName }} - Dictionnaire: {{ game.dictionaryType }} - Temps:
+                {{ game.totalCountDown }} secondes
             </button>
         </div>
         <button class="small-btn" (click)="convert(true); deleteRoom()">Convertir en Mode Solo</button>
@@ -23,14 +21,12 @@
     <div *ngIf="isGameSelected">
         <h1>Veuillez selectionner la partie que vous souhaitez rejoindre</h1>
         <mat-card class="games">
-            <div *ngFor="let game of pendingGameslist" [class.selected]="game === selectedGame">
-                <button class="game-btn" (click)="openName(true); onSelect(game)">
-                    <span> Partie #{{ game.gameRoom.idGame }} - </span>
-                    <span> Créateur: {{ game.creatorName }} - </span>
-                    <span> Dictionnaire: {{ game.dictionaryType }} - </span>
-                    <span> Temps: {{ game.totalCountDown }} sec.</span>
-                </button>
-            </div>
+            <li *ngFor="let game of pendingGameslist" [class.selected]="game === selectedGame">
+                <option selected (click)="openName(true); onSelect(game)">
+                    Partie #{{ game.gameRoom.idGame }} - Créateur: {{ game.creatorName }} - Dictionnaire: {{ game.dictionaryType }} - Temps:
+                    {{ game.totalCountDown }} sec.
+                </option>
+            </li>
         </mat-card>
         <div *ngIf="name">
             <mat-form-field class="nameForm" hintLabel="characters min: 3 max: 10" appearance="fill">
