@@ -7,7 +7,6 @@ import { PlayerManagerService } from './player-manager.service';
 import { ValidationService } from './validation.service';
 
 const HANDLE_SOCKET_TIME_INTERVAL = 1000;
-const DISCONNECT_TIME_INTERVAL = 5000;
 
 export class SocketManagerService {
     private sio: io.Server;

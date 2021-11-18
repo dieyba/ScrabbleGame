@@ -63,6 +63,7 @@ export class GameService {
             this.game.scrabbleBoard = new ScrabbleBoard(initInfo.isRandomBonus);
             this.game.stock = new LetterStock();
             this.game.gameMode = initInfo.gameMode;
+            this.game.isLog2990 = initInfo.isLog2990;
             this.game.isEndGame = false;
             this.game.gameTimer.initializeTotalCountDown(initInfo.totalCountDown);
             this.game.setLocalAndOpponentId(DEFAULT_LOCAL_PLAYER_ID, DEFAULT_OPPONENT_ID);
@@ -87,9 +88,10 @@ export class GameService {
             this.game.stock = new LetterStock(initInfo.stockLetters);
             this.game.gameMode = initInfo.gameMode;
             this.game.isEndGame = false;
+            this.game.isLog2990 = initInfo.isLog2990;
         }
     }
-    
+
     initializeLog2990Game() {
 
     }
