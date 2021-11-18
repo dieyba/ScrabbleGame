@@ -19,9 +19,9 @@ import { PlaceService } from './place.service';
 import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
-    EndTurn = 0, // TODO: put the right probability settings after testing
+    EndTurn = 100, // TODO: put the right probability settings after testing
     ExchangeTile = 0,
-    MakeAMove = 100,
+    MakeAMove = 0,
     MaxValue1 = 40,
     MaxValue2 = 30,
     MaxValue3 = 30,
@@ -85,11 +85,13 @@ export class VirtualPlayerService {
                 moveMade = this.makeMoves();
                 setTimeout(() => {
                     if (moveMade.value !== 0) {
+                        // eslint-disable-next-line no-console
                         console.log('move found after 3 seconds');
                         resolve(moveMade);
                     } else {
                         setTimeout(() => {
                             resolve(moveMade);
+                            // eslint-disable-next-line no-console
                             console.log('move found after 20 seconds');
                         }, NO_MOVE_TOTAL_WAIT_TIME - DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
                     }
@@ -98,6 +100,7 @@ export class VirtualPlayerService {
             // after move is found, call the right command depending on result
             await makeMovePromise.then((moveMade: ScrabbleWord) => {
                 if (moveMade.value !== 0) {
+                    // eslint-disable-next-line no-console
                     console.log('a move was found. Calling place command');
                     const movePosition = this.findPosition(moveMade, this.orientation);
                     const params: PlaceParams = {
@@ -108,6 +111,7 @@ export class VirtualPlayerService {
                     const command = new PlaceCmd(defaultParams, params);
                     this.commandInvoker.executeCommand(command);
                 } else {
+                    // eslint-disable-next-line no-console
                     console.log('no move was found. Calling pass command');
                     const command = new PassTurnCmd(defaultParams);
                     this.commandInvoker.executeCommand(command);
