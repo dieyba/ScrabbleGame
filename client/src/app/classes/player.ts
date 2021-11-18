@@ -1,4 +1,4 @@
-import { Goals } from './game-parameters';
+import { Goals } from './goal';
 import { ScrabbleLetter } from './scrabble-letter';
 import { ERROR_NUMBER } from './utilities';
 

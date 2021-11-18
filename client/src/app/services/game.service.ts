@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { createSystemEntry } from '@app/classes/chat-display-entry';
 import { PlaceParams } from '@app/classes/commands';
 import { ErrorType } from '@app/classes/errors';
-import { DEFAULT_LOCAL_PLAYER_ID, DEFAULT_OPPONENT_ID, GameInitInfo, GameParameters, GameType, Goals, RandomLetterAndColor } from '@app/classes/game-parameters';
+import { DEFAULT_LOCAL_PLAYER_ID, DEFAULT_OPPONENT_ID, GameInitInfo, GameParameters, GameType, RandomLetterAndColor } from '@app/classes/game-parameters';
+import { Goals } from '@app/classes/goal';
 import { LetterStock } from '@app/classes/letter-stock';
 import { Player, removePlayerLetters } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
@@ -50,7 +51,7 @@ export class GameService {
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
         protected chatDisplayService: ChatDisplayService,
-        protected goalsSErvice: GoalsService,
+        protected goalsService: GoalsService,
     ) {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
