@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Injectable } from '@angular/core';
 import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
@@ -55,7 +56,7 @@ export class VirtualPlayerService {
     ) {
         this.rack = new ScrabbleRack();
     }
-    playTurn(): void {
+    async playTurn(): Promise<void> {
         // Next sprint: implement difficult player type logic by separating here and in virtualPlayerService.makeMoves().
         this.player = this.gameService.game.getOpponent();
         const defaultParams: DefaultCommandParams = {
@@ -78,11 +79,29 @@ export class VirtualPlayerService {
                 this.commandInvoker.executeCommand(command);
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
-            let moveMade = new ScrabbleWord();
-            moveMade = this.makeMoves(); // 80% chance to make a move
-            setTimeout(() => {
-                // waits 3 second to try and find a word to place
+            // 80% chance to make a move
+            const makeMovePromise = new Promise<ScrabbleWord>((resolve) => {
+                let moveMade = new ScrabbleWord();
+                moveMade = this.makeMoves();
+                setTimeout(() => {
+                    if (moveMade.value !== 0) {
+                        // eslint-disable-next-line no-console
+                        console.log('move found after 3 seconds');
+                        resolve(moveMade);
+                    } else {
+                        setTimeout(() => {
+                            resolve(moveMade);
+                            // eslint-disable-next-line no-console
+                            console.log('move found after 20 seconds');
+                        }, NO_MOVE_TOTAL_WAIT_TIME - DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+                    }
+                }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+            });
+            // after move is found, call the right command depending on result
+            await makeMovePromise.then((moveMade: ScrabbleWord) => {
                 if (moveMade.value !== 0) {
+                    // eslint-disable-next-line no-console
+                    console.log('a move was found. Calling place command');
                     const movePosition = this.findPosition(moveMade, this.orientation);
                     const params: PlaceParams = {
                         position: movePosition,
@@ -92,13 +111,12 @@ export class VirtualPlayerService {
                     const command = new PlaceCmd(defaultParams, params);
                     this.commandInvoker.executeCommand(command);
                 } else {
-                    // if no word to place was found, pass turn after 20 seconds
-                    setTimeout(() => {
-                        const command = new PassTurnCmd(defaultParams);
-                        this.commandInvoker.executeCommand(command);
-                    }, NO_MOVE_TOTAL_WAIT_TIME - DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+                    // eslint-disable-next-line no-console
+                    console.log('no move was found. Calling pass command');
+                    const command = new PassTurnCmd(defaultParams);
+                    this.commandInvoker.executeCommand(command);
                 }
-            }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+            });
         }
     }
     permutationsOfLetters(letters: ScrabbleLetter[]): ScrabbleLetter[][] {
