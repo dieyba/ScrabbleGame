@@ -3,8 +3,8 @@ import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { MAX_LETTER_COUNT, RackService } from './rack.service';
 
-export const RACK_WIDTH = 500;
-export const RACK_HEIGHT = 60;
+export const RACK_WIDTH = 440;
+export const RACK_HEIGHT = 50;
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 /* eslint-disable  @typescript-eslint/no-explicit-any */

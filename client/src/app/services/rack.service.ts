@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ERROR_NUMBER } from '@app/classes/utilities';
 
-export const RACK_WIDTH = 500;
-export const RACK_HEIGHT = 60;
+export const RACK_WIDTH = 440;
+export const RACK_HEIGHT = 50;
 export const MAX_LETTER_COUNT = 7;
 const OFFSET = 5;
 const DOUBLE_DIGIT = 10;
-const SQUARE_WIDTH = 71;
+const SQUARE_WIDTH = RACK_WIDTH / MAX_LETTER_COUNT;
 
 @Injectable({
     providedIn: 'root',
@@ -94,9 +94,9 @@ export class RackService {
         const letter = this.rackLetters[position].character.toUpperCase();
         this.gridContext.beginPath();
         this.gridContext.fillStyle = 'black';
-        this.gridContext.font = '60px system-ui';
+        this.gridContext.font = '58px system-ui';
         this.gridContext.fillText(letter, positionX + OFFSET, 0 + RACK_HEIGHT - OFFSET);
-        this.gridContext.font = '18px system-ui';
+        this.gridContext.font = '16px system-ui';
         if (this.rackLetters[position].value >= DOUBLE_DIGIT) {
             this.gridContext.fillText(String(this.rackLetters[position].value), positionX + RACK_HEIGHT - OFFSET * 2, 0 + RACK_HEIGHT - OFFSET);
         } else {
