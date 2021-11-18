@@ -35,7 +35,6 @@ export class GameListManager {
         game.gameRoom.playersName = [game.creatorName];
         this.waitingAreaGames.push(game);
         this.currentId++;
-        // console.log('creating waiting room for game of ', game.creatorName)
         return game;
     }
     addJoinerPlayer(game: WaitingAreaGameParameters, joinerName: string, joinerSocketId: string, isLog2990: boolean): boolean {
@@ -46,6 +45,15 @@ export class GameListManager {
             return true;
         }
         return false;
+    }
+    removeJoinerPlayer(roomId: number): WaitingAreaGameParameters | undefined {
+        const waitingAreaRoom = this.getAWaitingAreaGame(roomId);
+        if (waitingAreaRoom !== undefined) {
+            waitingAreaRoom.gameRoom.joinerId = '';
+            waitingAreaRoom.joinerName = '';
+            waitingAreaRoom.gameRoom.playersName = [waitingAreaRoom.creatorName];
+        }
+        return waitingAreaRoom;
     }
     deleteWaitingAreaGame(roomId: number): void {
         const index = this.waitingAreaGames.findIndex((r) => r.gameRoom.idGame === roomId);
@@ -68,7 +76,7 @@ export class GameListManager {
     deleteGameInPlay(roomId: number): void {
         const index = this.gamesInPlay.findIndex((r) => r.gameRoomId === roomId);
         if (index !== ERROR_NUMBER) {
-            this.waitingAreaGames.splice(index, 1);
+            this.gamesInPlay.splice(index, 1);
         }
     }
 }

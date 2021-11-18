@@ -5,8 +5,6 @@ import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
 import { Square } from './square';
-import { ERROR_NUMBER } from './utilities';
-import { Difficulty, VirtualPlayer } from './virtual-player';
 
 export const UNDEFINE_ID = 'none';
 export const DEFAULT_LOCAL_PLAYER_ID = 0;
@@ -66,22 +64,5 @@ export class GameParameters {
         if (this.opponentPlayerIndex >= 0 && this.opponentPlayerIndex < GAME_CAPACITY) {
             this.players[this.opponentPlayerIndex] = opponent;
         }
-    }
-
-    // TODO: method is a work in progress, to adapt as needed and see if the method works.
-    // See where to move in client and see how synchronization with server will work
-    convertToVirtualPlayer(previousPlayerIndex: number, virtualPlayerName: string): VirtualPlayer | undefined {
-        let newVirtualPlayer;
-        const isValidIndex = previousPlayerIndex > ERROR_NUMBER && previousPlayerIndex < this.players.length;
-        if (isValidIndex) {
-            const previousPlayer = this.players[previousPlayerIndex];
-            newVirtualPlayer = new VirtualPlayer(virtualPlayerName, Difficulty.Easy);
-            newVirtualPlayer.letters = previousPlayer.letters;
-            newVirtualPlayer.isActive = previousPlayer.isActive;
-            newVirtualPlayer.score = previousPlayer.score;
-            this.players[previousPlayerIndex] = newVirtualPlayer;
-            this.gameMode = GameType.Solo;
-        }
-        return newVirtualPlayer;
     }
 }
