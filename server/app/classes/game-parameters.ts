@@ -3,7 +3,7 @@ import { LetterStock } from './letter-stock';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
-import { Square } from './square';
+import { Square, SquareColor, TOTAL_COLORS } from './square';
 
 export const GAME_CAPACITY = 2;
 const DEFAULT_LETTER_COUNT = 7;
@@ -67,6 +67,7 @@ export class GameInitInfo {
     isLog2990: boolean;
     gameMode: GameType;
     sharedGoals: Goals[];
+    randomLetterAndColor: RandomLetterAndColor;
 
     constructor(clientParametersChosen: WaitingAreaGameParameters) {
         this.gameRoomId = clientParametersChosen.gameRoom.idGame;
@@ -82,34 +83,37 @@ export class GameInitInfo {
         this.players.push(new Player(clientParametersChosen.joinerName, clientParametersChosen.gameRoom.joinerId, this.gameRoomId));
         const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
         this.players[starterPlayerIndex].isActive = true;
+        this.stockLetters = stock.letterStock; // stock with the two players' letters removed
         this.sharedGoals = [];
         var usedGoals: Goals[] = [];
         // TODO: pick the 4 public random objectives/goals from the list
-        if (Boolean(clientParametersChosen.isLog2990)) {
+        if (String(clientParametersChosen.isLog2990) === 'true') {
             for (let i = 0; this.sharedGoals.length < PUBLIC_GOALS_COUNT; i++) {
                 const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
                 if (!this.sharedGoals.includes(randomGoal)) {
                     this.sharedGoals.push(randomGoal);
                     usedGoals.push(randomGoal);
+                    if (randomGoal === Goals.PlaceLetterOnColorSquare) {
+                        this.randomLetterAndColor = new RandomLetterAndColor(this.stockLetters);
+                    }
                 }
             }
-        }
-        console.log(this.sharedGoals);
-        this.players.forEach((player) => {
-            player.letters = stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-            player.goals = [];
-            if (Boolean(clientParametersChosen.isLog2990)) {
+            console.log(this.sharedGoals);
+            this.players.forEach((player) => {
+                player.letters = stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+                player.goals = [];                
                 for (let i = 0; player.goals.length < PRIVATE_GOALS_COUNT; i++) {
                     const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
                     if (!usedGoals.includes(randomGoal)) {
                         player.goals.push(randomGoal);
                         usedGoals.push(randomGoal)
+                        if (randomGoal === Goals.PlaceLetterOnColorSquare) {
+                            this.randomLetterAndColor = new RandomLetterAndColor(this.stockLetters);
+                        }
                     }
                 }
-            }
-            console.log("playergoals : " + player.goals);
-        });
-        this.stockLetters = stock.letterStock; // stock with the two players' letters removed
+            });
+        }
     }
 
     getOtherPlayerInRoom(playerId: string): Player | undefined {
@@ -137,5 +141,21 @@ export class GameInitInfo {
             return removedPlayer;
         }
         return undefined;
+    }
+}
+
+export class RandomLetterAndColor {
+    letter: ScrabbleLetter;
+    color: SquareColor;
+
+    constructor(lettersLeft: ScrabbleLetter[]) {
+        // Set random letter and random color
+        const randomLetterIndex = Math.floor(Math.random() * lettersLeft.length);
+        this.letter = lettersLeft[randomLetterIndex];
+        let randomColorIndex = 0;
+        do {
+            randomColorIndex = Math.floor(Math.random() * TOTAL_COLORS);
+        } while (randomColorIndex === 0);
+        this.color = randomColorIndex;
     }
 }

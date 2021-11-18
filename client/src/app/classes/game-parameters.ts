@@ -4,7 +4,7 @@ import { LetterStock } from './letter-stock';
 import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
-import { Square } from './square';
+import { Square, SquareColor, TOTAL_COLORS } from './square';
 
 export const UNDEFINE_ID = 'none';
 export const DEFAULT_LOCAL_PLAYER_ID = 0;
@@ -37,6 +37,7 @@ export enum GoalPoints {
     PlaceLetterOnColorSquare = 50,
 }
 
+
 export interface GameInitInfo {
     players: Player[];
     totalCountDown: number;
@@ -45,7 +46,8 @@ export interface GameInitInfo {
     gameMode: GameType;
     isLog2990: boolean;
     isRandomBonus?: boolean; // to randomize bonus tile position when creating the board
-    goals: Goals[];
+    sharedGoals: Goals[];
+    randomLetterAndColor: RandomLetterAndColor;
 }
 
 export class GameParameters {
@@ -56,10 +58,13 @@ export class GameParameters {
     isEndGame: boolean;
     gameMode: GameType;
     isLog2990: boolean;
+    sharedGoals: Goals[];
+    randomLetterAndColor: RandomLetterAndColor;
     private localPlayerIndex: number;
     private opponentPlayerIndex: number;
 
     constructor() {
+        this.sharedGoals = [];
         this.players = new Array<Player>();
         this.gameTimer = new GameTimer();
         this.isEndGame = false;
@@ -88,5 +93,22 @@ export class GameParameters {
         if (this.opponentPlayerIndex >= 0 && this.opponentPlayerIndex < GAME_CAPACITY) {
             this.players[this.opponentPlayerIndex] = opponent;
         }
+    }
+
+}
+
+export class RandomLetterAndColor {
+    letter: ScrabbleLetter;
+    color: SquareColor;
+
+    constructor(lettersLeft: ScrabbleLetter[]) {
+        // Set random letter and random color
+        const randomLetterIndex = Math.floor(Math.random() * lettersLeft.length);
+        this.letter = lettersLeft[randomLetterIndex];
+        let randomColorIndex = 0;
+        do {
+            randomColorIndex = Math.floor(Math.random() * TOTAL_COLORS);
+        } while (randomColorIndex === 0);
+        this.color = randomColorIndex;
     }
 }

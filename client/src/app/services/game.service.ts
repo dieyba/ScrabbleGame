@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { createSystemEntry } from '@app/classes/chat-display-entry';
 import { PlaceParams } from '@app/classes/commands';
 import { ErrorType } from '@app/classes/errors';
-import { DEFAULT_LOCAL_PLAYER_ID, DEFAULT_OPPONENT_ID, GameInitInfo, GameParameters, GameType } from '@app/classes/game-parameters';
+import { DEFAULT_LOCAL_PLAYER_ID, DEFAULT_OPPONENT_ID, GameInitInfo, GameParameters, GameType, Goals, RandomLetterAndColor } from '@app/classes/game-parameters';
 import { LetterStock } from '@app/classes/letter-stock';
 import { Player, removePlayerLetters } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
@@ -23,8 +23,13 @@ import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
+
 export const DEFAULT_LETTER_COUNT = 7;
 const TIMER_INTERVAL = 1000;
+const PUBLIC_GOALS_COUNT = 4;
+const PRIVATE_GOALS_COUNT = 2;
+const TOTAL_GOALS_COUNT = 8;
+
 
 @Injectable({
     providedIn: 'root',
@@ -93,6 +98,7 @@ export class GameService {
             const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
             this.game.players[starterPlayerIndex].isActive = true;
             this.validationService.dictionary.selectDictionary(initInfo.dictionaryType);
+            if (String(this.game.isLog2990) == 'true') this.initializeSoloLog2990Game();
         }
     }
     initializeMultiplayerGame(initInfo: GameInitInfo) {
@@ -108,11 +114,39 @@ export class GameService {
             this.game.gameMode = initInfo.gameMode;
             this.game.isEndGame = false;
             this.game.isLog2990 = initInfo.isLog2990;
+            this.game.sharedGoals = initInfo.sharedGoals;
+            this.game.randomLetterAndColor = initInfo.randomLetterAndColor;
         }
     }
 
-    initializeLog2990Game() {
-
+    initializeSoloLog2990Game() {
+        this.game.sharedGoals = [];
+        var usedGoals: Goals[] = [];
+        // TODO: pick the 4 public random objectives/goals from the list
+        for (let i = 0; this.game.sharedGoals.length < PUBLIC_GOALS_COUNT; i++) {
+            const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
+            if (!this.game.sharedGoals.includes(randomGoal)) {
+                this.game.sharedGoals.push(randomGoal);
+                usedGoals.push(randomGoal);
+                if (randomGoal === Goals.PlaceLetterOnColorSquare) {
+                    this.game.randomLetterAndColor = new RandomLetterAndColor(this.game.stock.letterStock);
+                }
+            }
+        }
+        this.game.players.forEach((player) => {
+            player.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+            player.goals = [];
+            for (let i = 0; player.goals.length < PRIVATE_GOALS_COUNT; i++) {
+                const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
+                if (!usedGoals.includes(randomGoal)) {
+                    player.goals.push(randomGoal);
+                    usedGoals.push(randomGoal)
+                    if (randomGoal === Goals.PlaceLetterOnColorSquare) {
+                        this.game.randomLetterAndColor = new RandomLetterAndColor(this.game.stock.letterStock);
+                    }
+                }
+            }
+        });
     }
 
     startNewGame() {
