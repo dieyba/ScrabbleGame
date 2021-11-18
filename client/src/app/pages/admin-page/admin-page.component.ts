@@ -1,5 +1,8 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AdminService } from '@app/services/admin.service';
+import { BestScores, BestScoresService, HttpStatus_OK } from '@app/services/best-scores.service';
 import { of } from 'rxjs';
 
 export interface DictionaryInterface {
@@ -17,7 +20,7 @@ export interface DictionaryInterface {
 export class AdminPageComponent implements OnInit {
     privateName: boolean;
     dictionaries: DictionaryInterface[];
-    constructor(public adminService: AdminService) {
+    constructor(public adminService: AdminService, private bestScoreService: BestScoresService, private snack: MatSnackBar) {
         this.privateName = false;
         this.dictionaries = [];
     }
@@ -98,5 +101,19 @@ export class AdminPageComponent implements OnInit {
 
     onSelect(name: string) {
         this.adminService.onSelect(name);
+    }
+    resetDataBase() {
+        this.bestScoreService.resetDbBestScores().subscribe((data: BestScores) => {
+            /*Do nothing */
+        },
+            (error: HttpErrorResponse) => {
+                if (error.status !== HttpStatus_OK) {
+                    this.snack.open("Désolé votre score ne pourra pas être éligible au tableau des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!", 'close');
+                }
+                else {
+                    this.snack.open(' La base de données a été réinitialisé avec succès!', 'close')
+                }
+            },
+        );
     }
 }
