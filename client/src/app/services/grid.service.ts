@@ -261,4 +261,28 @@ export class GridService {
         }
         return removedScrabbleLetters; // TODO check if letter is a star
     }
+
+    updateBoard(word: string, orientation: string, position: Vec2) {
+        if (orientation === 'h') {
+            for (const letter of word) {
+                const character = new ScrabbleLetter(letter);
+                character.tile.position.x = position.x;
+                character.tile.position.y = position.y;
+                this.drawLetter(character, position.x, position.y);
+                this.scrabbleBoard.squares[position.x][position.y].isValidated = true;
+                this.scrabbleBoard.squares[position.x][position.y].isBonusUsed = true;
+                position.x++;
+            }
+        } else {
+            for (const letter of word) {
+                const character = new ScrabbleLetter(letter);
+                character.tile.position.x = position.x;
+                character.tile.position.y = position.y;
+                this.drawLetter(character, position.x, position.y);
+                this.scrabbleBoard.squares[position.x][position.y].isBonusUsed = true;
+                this.scrabbleBoard.squares[position.x][position.y].isValidated = true;
+                position.y++;
+            }
+        }
+    }
 }

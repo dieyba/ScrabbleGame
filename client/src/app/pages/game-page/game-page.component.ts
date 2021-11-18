@@ -34,7 +34,7 @@ export class GamePageComponent {
                 if (confirmQuit) {
                     // calls server to display message in opponent's chat box
                     this.socket.emit('leaveRoom');
-                    this.gameService.currentGameService.game.isEndGame = true;
+                    this.gameService.game.isEndGame = true;
                     this.canNavBack = true;
                     history.back();
                 } else {

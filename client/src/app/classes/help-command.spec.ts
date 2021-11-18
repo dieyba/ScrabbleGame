@@ -1,14 +1,14 @@
-import { LocalPlayer } from '@app/classes/local-player';
 import { ChatDisplayService } from '@app/services/chat-display.service';
 import { ChatDisplayEntry, ChatEntryColor } from './chat-display-entry';
 import { DefaultCommandParams } from './commands';
 import { createHelpCmd, HelpCmd, HELP_MESSAGES } from './help-command';
+import { Player } from './player';
 
 const PLAYER_NAME = 'Sara';
 
 describe('HelpCmd', () => {
     let chatDisplayService: ChatDisplayService;
-    const localPlayer = new LocalPlayer(PLAYER_NAME);
+    const localPlayer = new Player(PLAYER_NAME);
 
     it('should create an instance', () => {
         const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: chatDisplayService };

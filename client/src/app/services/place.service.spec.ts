@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { PlaceParams } from '@app/classes/commands';
 import { ErrorType } from '@app/classes/errors';
-import { LocalPlayer } from '@app/classes/local-player';
 import { Player } from '@app/classes/player';
 import { Column, Row, ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
@@ -36,7 +35,7 @@ describe('PlaceService', () => {
         });
         service = TestBed.inject(PlaceService);
 
-        playerMock = new LocalPlayer('name') as Player;
+        playerMock = new Player('name');
     });
 
     it('should be created', () => {
