@@ -3,14 +3,11 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DictionaryType } from '@app/classes/dictionary';
-import { GameInitInfo, GameType } from '@app/classes/game-parameters';
+import { GameType } from '@app/classes/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
-import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
-import * as io from 'socket.io-client';
-import { environment } from 'src/environments/environment';
 
 export const GAME_CAPACITY = 2;
 
@@ -36,8 +33,6 @@ export class FormComponent implements OnInit {
     defaultTimer: string;
     defaultDictionary: string;
     defaultBonus: boolean;
-    private readonly server: string;
-    private socket: io.Socket;
 
     constructor(
         private gameService: GameService,
@@ -48,8 +43,6 @@ export class FormComponent implements OnInit {
         @Inject(MAT_DIALOG_DATA) public isSolo: boolean,
     ) {
         this.isLOG2990 = false; // TODO: implement actual isLOG2990 depending on which page created the form
-        this.server = environment.socketUrl;
-        this.socket = SocketHandler.requestSocket(this.server);
         this.defaultTimer = '60';
         this.defaultDictionary = '0';
         this.defaultBonus = false;
@@ -57,7 +50,6 @@ export class FormComponent implements OnInit {
             this.level = new FormControl('', [Validators.required]);
         } else {
             this.level = new FormControl('');
-            this.socketOnConnect(); // form only needs to listen to the server for the multiplayer game form
         }
         this.dictionaryList = Object.values(DictionaryType);
         this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
@@ -146,12 +138,5 @@ export class FormComponent implements OnInit {
                 this.dialog.open(WaitingAreaComponent, { disableClose: true });
             }
         }
-    }
-    socketOnConnect() {
-        this.socket.on('initClientGame', (gameParams: GameInitInfo) => {
-            this.dialogRef.close();
-            this.router.navigate(['/game']);
-            this.gameService.initializeMultiplayerGame(gameParams);
-        });
     }
 }
