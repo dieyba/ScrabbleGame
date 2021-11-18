@@ -2,10 +2,17 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { GameType } from '@app/classes/game-parameters';
+import { DictionaryType } from '@app/classes/dictionary';
+import { GameInitInfo, GameType } from '@app/classes/game-parameters';
+import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
+import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
+import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
+
+export const GAME_CAPACITY = 2;
 
 @Component({
     selector: 'app-form',
@@ -20,23 +27,29 @@ export class FormComponent implements OnInit {
     level: FormControl;
     opponent: FormControl;
     dictionaryForm: FormControl;
-    debutantNameList: string[];
-    selectedPlayer: string;
-    random: number;
-    dictionary: string;
 
+    isLOG2990: boolean;
+    debutantNameList: string[];
+    dictionaryList: string[];
+    selectedPlayer: string;
+    randomPlayerId: number;
     defaultTimer: string;
     defaultDictionary: string;
     defaultBonus: boolean;
+    private readonly server: string;
+    private socket: io.Socket;
 
     constructor(
+        private gameService: GameService,
         private dialog: MatDialog,
         private dialogRef: MatDialogRef<FormComponent>,
         private router: Router,
-        private gameService: GameService,
         private gameList: GameListService,
         @Inject(MAT_DIALOG_DATA) public isSolo: boolean,
     ) {
+        this.isLOG2990 = false; // TODO: implement actual isLOG2990 depending on which page created the form
+        this.server = environment.socketUrl;
+        this.socket = SocketHandler.requestSocket(this.server);
         this.defaultTimer = '60';
         this.defaultDictionary = '0';
         this.defaultBonus = false;
@@ -44,8 +57,9 @@ export class FormComponent implements OnInit {
             this.level = new FormControl('', [Validators.required]);
         } else {
             this.level = new FormControl('');
+            this.socketOnConnect(); // form only needs to listen to the server for the multiplayer game form
         }
-        this.dictionary = 'Français';
+        this.dictionaryList = Object.values(DictionaryType);
         this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
     }
 
@@ -83,15 +97,17 @@ export class FormComponent implements OnInit {
     }
 
     randomPlayer(list: string[]): void {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        document.getElementById('opponents')!.style.visibility = 'visible';
-        this.random = this.randomNumber(0, list.length);
+        const showOpponents = document.getElementById('opponents');
+        if (showOpponents instanceof HTMLElement) {
+            showOpponents.style.visibility = 'visible';
+        }
+        this.randomPlayerId = this.randomNumber(0, list.length);
         do {
-            this.random = this.randomNumber(0, list.length);
-            this.selectedPlayer = list[this.random];
+            this.randomPlayerId = this.randomNumber(0, list.length);
+            this.selectedPlayer = list[this.randomPlayerId];
         } while (this.name.value === this.selectedPlayer);
 
-        this.selectedPlayer = list[this.random];
+        this.selectedPlayer = list[this.randomPlayerId];
         this.myForm.controls.opponent.setValue(this.selectedPlayer);
     }
 
@@ -108,19 +124,34 @@ export class FormComponent implements OnInit {
 
     submit(): void {
         if (this.myForm.valid) {
-            if (this.isSolo === true) {
+            const gameMode = this.isSolo ? GameType.Solo : GameType.MultiPlayer;
+            const gameParams = new WaitingAreaGameParameters(
+                gameMode,
+                GAME_CAPACITY,
+                this.dictionaryForm.value,
+                this.timer.value,
+                this.bonus.value,
+                this.isLOG2990,
+                this.name.value, // game creator name
+            );
+            if (gameMode === GameType.Solo) {
                 this.closeDialog();
+                gameParams.joinerName = this.opponent.value;
+                this.dialogRef.close();
                 this.router.navigate(['/game']);
-                this.gameService.initializeGameType(GameType.Solo);
-                this.gameService.currentGameService.initializeGame(this.myForm);
+                this.gameService.initializeSoloGame(gameParams, this.level.value);
             } else {
                 this.closeDialog();
-                this.gameService.initializeGameType(GameType.MultiPlayer);
-                this.gameService.currentGameService.initializeGame(this.myForm);
-                const single = this.gameService.currentGameService.game;
-                this.gameList.createRoom(single);
+                this.gameList.createRoom(gameParams);
                 this.dialog.open(WaitingAreaComponent, { disableClose: true });
             }
         }
+    }
+    socketOnConnect() {
+        this.socket.on('initClientGame', (gameParams: GameInitInfo) => {
+            this.dialogRef.close();
+            this.router.navigate(['/game']);
+            this.gameService.initializeMultiplayerGame(gameParams);
+        });
     }
 }

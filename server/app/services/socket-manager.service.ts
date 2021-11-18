@@ -1,72 +1,54 @@
-/* eslint-disable */ // TODO Remove and fix lint errors
-import { GameParameters } from '@app/classes/game-parameters';
-import { Player } from '@app/classes/player';
+import { WaitingAreaGameParameters } from '@app/classes/game-parameters';
+import { BoardUpdate, ERROR_NUMBER, LettersUpdate } from '@app/classes/utilities';
 import * as http from 'http';
 import * as io from 'socket.io';
 import { GameListManager } from './game-list-manager.service';
 import { PlayerManagerService } from './player-manager.service';
 import { ValidationService } from './validation.service';
 
+const HANDLE_SOCKET_TIME_INTERVAL = 1000;
+const DISCONNECT_TIME_INTERVAL = 5000;
+
 export class SocketManagerService {
     private sio: io.Server;
     private gameListMan: GameListManager;
-    playerMan: PlayerManagerService;
-    private validationService: ValidationService
+    private validationService: ValidationService;
+    private playerMan: PlayerManagerService;
     constructor(server: http.Server) {
         this.gameListMan = new GameListManager();
         this.playerMan = new PlayerManagerService();
         this.validationService = new ValidationService();
-
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
     }
-    public handleSockets(): void {
+    handleSockets(): void {
         this.sio.on('connection', (socket) => {
+            // eslint-disable-next-line no-console
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
-            socket.on('addPlayer', (player: Player) => {
-                this.addPlayer(socket, player);
-                this.getAllGames(socket);
+            socket.on('addPlayer', () => {
+                this.playerMan.addPlayer(socket.id);
+                // console.log('added player:', this.playerMan.getPlayerBySocketID(socket.id));
+                this.getAllWaitingAreaGames();
             });
-            socket.on('createRoom', (game: any) => {
-                this.createRoom(socket, game);
-                this.getAllGames(socket);
+            socket.on('createWaitingAreaRoom', (gameParams: WaitingAreaGameParameters) => {
+                this.createWaitingAreaRoom(socket, gameParams);
+                this.getAllWaitingAreaGames();
             });
-            socket.on('validateWords', (newWords: string[]) => {
-                this.validateWords(socket, newWords);
+            socket.on('deleteWaitingAreaRoom', () => {
+                this.deleteWaitingAreaRoom(socket);
+                this.getAllWaitingAreaGames();
             });
-            socket.on('deleteRoom', () => {
-                this.deleteRoom(socket);
-                this.getAllGames(socket);
+            socket.on('joinWaitingAreaRoom', (joinerName: string, roomToJoinId: number) => {
+                this.joinRoom(socket, joinerName, roomToJoinId);
+                this.getAllWaitingAreaGames();
             });
-            socket.on('joinRoom', (game: any) => {
-                this.joinRoom(socket, game);
-                this.getAllGames(socket);
+            socket.on('initializeMultiPlayerGame', () => {
+                this.initializeMultiPlayerGame(socket);
             });
-            socket.on('initializeGame', (roomId: number) => {
-                this.initializeGame(socket, roomId);
+            socket.on('getAllWaitingAreaGames', () => {
+                this.getAllWaitingAreaGames();
             });
             socket.on('leaveRoom', () => {
-                this.leaveRoom(socket)
-            });
-            socket.on('getAllGames', (game: Array<GameParameters>) => {
-                this.getAllGames(socket);
-            });
-            socket.on('word placed', (word: any) => {
-                let sender = this.playerMan.getPlayerBySocketID(socket.id) as Player;
-                const opponent = this.gameListMan.getOtherPlayer(sender.socketId, sender.roomId) as Player;
-                this.sio.to(opponent.socketId).emit('update board', word);
-            });
-            socket.on('exchange letters', (update: any) => {
-                let sender = this.playerMan.getPlayerBySocketID(socket.id) as Player;
-                const opponent = this.gameListMan.getOtherPlayer(sender.socketId, sender.roomId) as Player;
-                this.sio.to(opponent.socketId).emit('letters exchange', update);
-            });
-            socket.on('place word', (update: any) => {
-                let sender = this.playerMan.getPlayerBySocketID(socket.id) as Player;
-                const opponent = this.gameListMan.getOtherPlayer(sender.socketId, sender.roomId) as Player;
-                this.sio.to(opponent.socketId).emit('update place', update);
-            });
-            socket.on('validateWords', (newWords: string[]) => {
-                this.validateWords(socket, newWords);
+                this.leaveRoom(socket);
             });
             socket.on('sendChatEntry', (message: string, messageToOpponent?: string) => {
                 if (messageToOpponent !== undefined) {
@@ -78,9 +60,6 @@ export class SocketManagerService {
             socket.on('sendSystemChatEntry', (message: string) => {
                 this.displaySystemChatEntry(socket, message);
             });
-            socket.on('change turn', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
-                this.changeTurn(socket, isCurrentTurnedPassed, consecutivePassedTurns);
-            });
             socket.on('endGame', () => {
                 this.endGame(socket);
             });
@@ -88,156 +67,223 @@ export class SocketManagerService {
                 this.displayPlayerQuitMessage(socket);
             });
             socket.on('disconnect', () => {
-                this.disconnect(socket)
+                this.disconnect(socket);
+            });
+            socket.on('exchange letters', (update: LettersUpdate) => {
+                const sender = this.playerMan.getPlayerBySocketID(socket.id);
+                if (sender === undefined) {
+                    return;
+                }
+                const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.getOtherPlayerInRoom(sender.socketId);
+                if (opponent !== undefined) {
+                    this.sio.to(opponent.socketId).emit('update letters', update);
+                }
+            });
+            socket.on('validateWords', (newWords: string[]) => {
+                this.validateWords(socket, newWords);
+            });
+            socket.on('word placed', (word: BoardUpdate) => {
+                const sender = this.playerMan.getPlayerBySocketID(socket.id);
+                if (sender === undefined) {
+                    return;
+                }
+                const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.getOtherPlayerInRoom(sender.socketId);
+                if (opponent !== undefined) {
+                    this.sio.to(opponent.socketId).emit('update board', word);
+                }
+            });
+            socket.on('place word', (update: LettersUpdate) => {
+                const sender = this.playerMan.getPlayerBySocketID(socket.id);
+                if (sender === undefined) {
+                    return;
+                }
+                const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.getOtherPlayerInRoom(sender.socketId);
+                if (opponent !== undefined) {
+                    this.sio.to(opponent.socketId).emit('update letters', update);
+                }
+            });
+            socket.on('change turn', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
+                this.changeTurn(socket, isCurrentTurnedPassed, consecutivePassedTurns);
             });
         });
-        setInterval(() => {}, 1000);
-    }
-    private createRoom(socket: io.Socket, game: any): void {
-        let newRoom = new GameParameters(game.name, game.timer, game.board, this.gameListMan.currentRoomID++)
-        newRoom.localPlayer.socketId = socket.id;
-        newRoom.creatorPlayer.socketId = socket.id;
-        let room = this.gameListMan.createRoom(newRoom);
-        let newPlayer = new Player(game.name, socket.id);
-        newPlayer.letters = game.creatorLetters;
-        newPlayer.roomId = room.gameRoom.idGame;
-        room.addPlayer(newPlayer);
-        let emptyOpponent = new Player('', '');
-        emptyOpponent.letters = game.opponentLetters;
-        room.creatorPlayer.letters = game.creatorLetters;
-        room.opponentPlayer = emptyOpponent;
-        let index = this.playerMan.allPlayers.findIndex((p) => p.socketId === socket.id);
-        this.playerMan.allPlayers.splice(index, 1);
-        this.playerMan.allPlayers.push(newPlayer)
-        room.stock = game.stock;
-        socket.join(room.gameRoom.idGame.toString());
-        this.sio.emit('roomcreated', room);
-    }
-    private deleteRoom(socket: io.Socket): void {
-        let player = this.playerMan.getPlayerBySocketID(socket.id);
-        if (player !== undefined) {
-            let roomGame = this.gameListMan.getGameFromExistingRooms(player.roomId) as GameParameters;
-            if (roomGame !== undefined) {
-                this.gameListMan.deleteExistingRoom(player.roomId);
-                this.sio.emit('roomdeleted', roomGame);
-            }
-        }
-    }
-    private leaveRoom(socket: io.Socket) {
-        let player = this.playerMan.getPlayerBySocketID(socket.id);
-        if (player !== undefined) {
-            let roomGame = this.gameListMan.getCurrentGame(player.roomId);
-            if (roomGame !== undefined) {
-                roomGame.gameRoom.playersName.splice(roomGame.gameRoom.playersName.indexOf(player.name), 1);
-                roomGame.players.splice(roomGame.players.indexOf(player), 1);
-                if (roomGame.gameRoom.playersName.length === 0) {
-                    this.gameListMan.currentGames.splice(this.gameListMan.currentGames.indexOf(roomGame), 1);
-                }
-                else {
-                    this.displayPlayerQuitMessage(socket);
-                    this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomLeft', roomGame);
-                }
-            }
-            else {
-                this.deleteRoom(socket);
-                this.getAllGames(socket)
-
-            }
-            socket.leave(player.roomId.toString());
-        }
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        setInterval(() => {}, HANDLE_SOCKET_TIME_INTERVAL);
     }
     private disconnect(socket: io.Socket) {
         setTimeout(() => {
             this.leaveRoom(socket);
-        }, 5000);
+        }, DISCONNECT_TIME_INTERVAL);
     }
-    private getAllGames(socket: io.Socket) {
-        this.sio.emit('getAllGames', this.gameListMan.existingRooms);
-    }
-    private addPlayer(socket: io.Socket, player: Player) {
-        this.playerMan.addPlayer(player.name, socket.id);
-    }
-    private joinRoom(socket: io.Socket, game: any) {
-        let joiner = this.playerMan.getPlayerBySocketID(socket.id);
-        let roomGame = this.gameListMan.getGameFromExistingRooms(game.gameId);
-        if (joiner && roomGame) {
-            joiner.name = game.joinerName;
-            joiner.roomId = roomGame.gameRoom.idGame;
-            joiner.letters = roomGame.opponentPlayer.letters;
-            roomGame.opponentPlayer = joiner;
-            roomGame.addPlayer(joiner);
-            this.gameListMan.currentGames.push(roomGame);
-            socket.join(roomGame.gameRoom.idGame.toString());
-            this.sio.to(roomGame.gameRoom.idGame.toString()).emit('roomJoined', roomGame);
+    private createWaitingAreaRoom(socket: io.Socket, gameParams: WaitingAreaGameParameters): void {
+        // TODO: make a verification to prevent creation if player already part of a room?
+        const newRoom = this.gameListMan.createWaitingAreaGame(gameParams, socket.id);
+        const creatorPlayer = this.playerMan.getPlayerBySocketID(socket.id);
+        if (creatorPlayer !== undefined) {
+            // update player info in the player manager
+            creatorPlayer.name = newRoom.creatorName;
+            creatorPlayer.roomId = newRoom.gameRoom.idGame;
+            socket.join(newRoom.gameRoom.idGame.toString());
+            this.sio.emit('waitingAreaRoomCreated', newRoom);
         }
     }
-    private initializeGame(socket: io.Socket, roomId: number) {
-        let roomGame = this.gameListMan.getCurrentGame(roomId);
-        if (roomGame) {
-            const starterPlayerIndex = Math.round(Math.random());
-            roomGame.players[starterPlayerIndex].isActive = true;
-            this.sio.to(roomGame.gameRoom.idGame.toString()).emit('updateInfo', roomGame);
+    // TODO: to test see if leaving/deleting a game in waiting or game in play room works
+    private deleteWaitingAreaRoom(socket: io.Socket): void {
+        const player = this.playerMan.getPlayerBySocketID(socket.id);
+        if (player === undefined) {
+            return;
+        }
+        const roomGame = this.gameListMan.getAWaitingAreaGame(player.roomId);
+        if (roomGame !== undefined) {
+            this.gameListMan.deleteWaitingAreaGame(player.roomId);
+            this.sio.emit('waitingAreaRoomDeleted', roomGame);
         }
     }
-
-    private validateWords(socket: io.Socket, newWords: string[]) {
-        const result = this.validationService.validateWords(newWords);
-        this.sio.to(socket.id).emit('areWordsValid', result);
+    private leaveRoom(socket: io.Socket) {
+        const player = this.playerMan.getPlayerBySocketID(socket.id);
+        if (player === undefined) {
+            return;
+        }
+        const roomGame = this.gameListMan.getGameInPlay(player.roomId);
+        if (roomGame !== undefined) {
+            // the room to leave is a game in play
+            roomGame.removePlayer(socket.id);
+            if (roomGame.players.length === 0) {
+                // if no one is left in the room, delete it from the game list manager
+                this.gameListMan.deleteGameInPlay(roomGame.gameRoomId);
+            } else {
+                // if one player left, send notice message to the remaining player and make them the winner
+                this.displayPlayerQuitMessage(socket);
+                this.sio.to(roomGame.gameRoomId.toString()).emit('roomLeft', roomGame);
+            }
+        } else {
+            // the room to leave is a waiting area game
+            this.deleteWaitingAreaRoom(socket);
+            this.getAllWaitingAreaGames(); // updates the clients' waiting area's game list
+        }
+        socket.leave(player.roomId.toString());
+    }
+    private getAllWaitingAreaGames() {
+        this.sio.emit('updateWaitingAreaGames', this.gameListMan.getAllWaitingAreaGames());
+    }
+    private joinRoom(socket: io.Socket, joinerName: string, roomToJoinId: number) {
+        // TODO: make a verification to prevent creation if player already part of a room?
+        const joiner = this.playerMan.getPlayerBySocketID(socket.id);
+        if (joiner === undefined) {
+            return;
+        }
+        const waitingAreaGame = this.gameListMan.getAWaitingAreaGame(roomToJoinId);
+        if (waitingAreaGame === undefined) {
+            return;
+        }
+        if (this.gameListMan.addJoinerPlayer(waitingAreaGame, joinerName, socket.id)) {
+            // update player info in the player manager
+            joiner.name = joinerName;
+            joiner.roomId = waitingAreaGame.gameRoom.idGame;
+            socket.join(waitingAreaGame.gameRoom.idGame.toString());
+            this.sio.to(waitingAreaGame.gameRoom.idGame.toString()).emit('roomJoined', waitingAreaGame);
+        }
+    }
+    private initializeMultiPlayerGame(socket: io.Socket) {
+        const creatorPlayer = this.playerMan.getPlayerBySocketID(socket.id);
+        if (creatorPlayer === undefined) {
+            return;
+        }
+        const waitingAreaGame = this.gameListMan.getAWaitingAreaGame(creatorPlayer.roomId);
+        if (waitingAreaGame === undefined) {
+            return;
+        }
+        const clientInitParams = this.gameListMan.createGameInPlay(waitingAreaGame);
+        // // TODO: Normally this is already be done before, go see if it is done. And check game room id too?
+        // if (newGame.players[0].name === waitingAreaGame.creatorName) {
+        //     newGame.players[0].socketId = waitingAreaGame.gameRoom.creatorId;
+        //     newGame.players[1].socketId = waitingAreaGame.gameRoom.joinerId;
+        // } else {
+        //     newGame.players[1].socketId = waitingAreaGame.gameRoom.creatorId;
+        //     newGame.players[0].socketId = waitingAreaGame.gameRoom.joinerId;
+        // }
+        this.sio.to(waitingAreaGame.gameRoom.idGame.toString()).emit('initClientGame', clientInitParams);
     }
 
+    // All chat display related methods are only used by multiplayer games
     private displayChatEntry(socket: io.Socket, message: string) {
-        const sender = this.playerMan.getPlayerBySocketID(socket.id) as Player;
-        if (sender !== undefined) {
-            const senderName = sender.name;
-            const roomId = sender.roomId.toString();
-            const chatEntry = { senderName: senderName, message: message };
-            this.sio.in(roomId).emit('addChatEntry', chatEntry);
+        const sender = this.playerMan.getPlayerBySocketID(socket.id);
+        if (sender === undefined) {
+            return;
+        }
+        if (sender.roomId !== ERROR_NUMBER) {
+            const chatEntry = { senderName: sender.name, message };
+            this.sio.in(sender.roomId.toString()).emit('addChatEntry', chatEntry);
         }
     }
+    // used when the messages to display are different depending on the client it is emitted to
     private displayDifferentChatEntry(socket: io.Socket, messageToSender: string, messageToOpponent: string) {
         const senderId = socket.id;
-        const sender = this.playerMan.getPlayerBySocketID(senderId) as Player;
-        const opponent = this.gameListMan.getOtherPlayer(senderId, sender.roomId);
-        if (opponent) {
-            const opponentId = opponent.socketId;
+        const sender = this.playerMan.getPlayerBySocketID(senderId);
+        if (sender === undefined) {
+            return;
+        }
+        const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.getOtherPlayerInRoom(senderId);
+        if (opponent === undefined) {
+            return;
+        }
+        if (opponent.socketId !== undefined) {
             const chatEntrySender = { senderName: sender.name, message: messageToSender };
             const chatEntryOpponent = { senderName: sender.name, message: messageToOpponent };
             this.sio.to(senderId).emit('addChatEntry', chatEntrySender);
-            this.sio.to(opponentId).emit('addChatEntry', chatEntryOpponent);
+            this.sio.to(opponent.socketId).emit('addChatEntry', chatEntryOpponent);
         }
     }
     private displayPlayerQuitMessage(socket: io.Socket) {
-        const senderId = socket.id;
-        const sender = this.playerMan.getPlayerBySocketID(senderId) as Player;
-        if (sender !== undefined) {
-            const opponent = this.gameListMan.getOtherPlayer(senderId, sender.roomId);
-            let roomGame = this.gameListMan.getCurrentGame(sender.roomId) as GameParameters;
-            if (opponent && roomGame) {
-                const message = sender.name + ' a quitté le jeu';
-                this.sio.to(roomGame.gameRoom.idGame.toString()).emit('addSystemChatEntry', message);
-            }
+        const sender = this.playerMan.getPlayerBySocketID(socket.id);
+        if (sender === undefined) {
+            return;
+        }
+        const gameRoom = this.gameListMan.getGameInPlay(sender.roomId);
+        if (gameRoom === undefined) {
+            return;
+        }
+        const opponent = gameRoom.getOtherPlayerInRoom(socket.id);
+        if (opponent !== undefined || gameRoom.gameRoomId === ERROR_NUMBER) {
+            const message = sender.name + ' a quitté le jeu';
+            this.sio.to(gameRoom.gameRoomId.toString()).emit('addSystemChatEntry', message);
         }
     }
     private displaySystemChatEntry(socket: io.Socket, message: string) {
-        const player = this.playerMan.getPlayerBySocketID(socket.id) as Player;
-        const roomId = player.roomId.toString();
-        this.sio.in(roomId).emit('addSystemChatEntry', message);
+        const player = this.playerMan.getPlayerBySocketID(socket.id);
+        if (player === undefined) {
+            return;
+        }
+        if (player.roomId !== ERROR_NUMBER) {
+            this.sio.in(player.roomId.toString()).emit('addSystemChatEntry', message);
+        }
+    }
+    private validateWords(socket: io.Socket, newWords: string[]) {
+        const result = this.validationService.validateWords(newWords);
+        // eslint-disable-next-line no-console
+        console.log(newWords, ' is valid:', result);
+        this.sio.to(socket.id).emit('areWordsValid', result);
     }
     private changeTurn(socket: io.Socket, isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) {
-        const player = this.playerMan.getPlayerBySocketID(socket.id) as Player;
-        const roomId = player.roomId;
-        if (roomId !== undefined) {
+        const player = this.playerMan.getPlayerBySocketID(socket.id);
+        if (player === undefined) {
+            return;
+        }
+        if (player.roomId !== ERROR_NUMBER) {
             if (isCurrentTurnedPassed) {
                 consecutivePassedTurns++;
             } else {
                 consecutivePassedTurns = 0;
             }
-            this.sio.in(roomId.toString()).emit('turn changed', isCurrentTurnedPassed, consecutivePassedTurns);
+            this.sio.in(player.roomId.toString()).emit('turn changed', consecutivePassedTurns);
         }
     }
     private endGame(socket: io.Socket) {
-        const player = this.playerMan.getPlayerBySocketID(socket.id) as Player;
-        const roomId = player.roomId.toString();
-        this.sio.in(roomId).emit('gameEnded');
+        const player = this.playerMan.getPlayerBySocketID(socket.id);
+        if (player === undefined) {
+            return;
+        }
+        if (player.roomId !== ERROR_NUMBER) {
+            this.sio.in(player.roomId.toString()).emit('gameEnded');
+        }
     }
 }

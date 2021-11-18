@@ -4,6 +4,7 @@ import { Command, CommandName, CommandParams } from '@app/classes/commands';
 import { createDebugCmd } from '@app/classes/debug-command';
 import { ErrorType } from '@app/classes/errors';
 import { createExchangeCmd } from '@app/classes/exchange-command';
+import { GameType } from '@app/classes/game-parameters';
 import { createHelpCmd } from '@app/classes/help-command';
 import { createPassCmd } from '@app/classes/pass-command';
 import { createPlaceCmd } from '@app/classes/place-command';
@@ -70,23 +71,24 @@ export class TextEntryService {
      */
     handleInput(userInput: string) {
         userInput = trimSpaces(userInput);
-        if (!isEmpty(userInput)) {
-            const isACommand = userInput.startsWith('!') && !this.gameService.currentGameService.game.isEndGame;
-            if (!isACommand) {
-                if (this.gameService.isMultiplayerGame) {
-                    this.chatDisplayService.sendMessageToServer(this.gameService.currentGameService.game.localPlayer.name + ' >> ' + userInput);
-                } else {
-                    this.chatDisplayService.addEntry(createPlayerEntry(true, this.gameService.currentGameService.game.localPlayer.name, userInput));
-                }
+        if (isEmpty(userInput)) {
+            return;
+        }
+        const isACommand = userInput.startsWith('!') && !this.gameService.game.isEndGame;
+        if (!isACommand) {
+            if (this.gameService.game.gameMode === GameType.MultiPlayer) {
+                this.chatDisplayService.sendMessageToServer(this.gameService.game.getLocalPlayer().name + ' >> ' + userInput);
             } else {
-                const commandCreationResult = this.createCommand(userInput, this.gameService.currentGameService.game.localPlayer);
-                const isCreated = commandCreationResult instanceof Command;
-                if (isCreated) {
-                    // execute command takes care of sending and displaying messages after execution
-                    this.commandInvokerService.executeCommand(commandCreationResult as Command);
-                } else {
-                    this.chatDisplayService.addEntry(createErrorEntry(commandCreationResult as ErrorType, userInput));
-                }
+                this.chatDisplayService.addEntry(createPlayerEntry(true, this.gameService.game.getLocalPlayer().name, userInput));
+            }
+        } else {
+            const commandCreationResult = this.createCommand(userInput, this.gameService.game.getLocalPlayer());
+            const isCreated = commandCreationResult instanceof Command;
+            if (isCreated) {
+                // execute command takes care of sending and displaying messages after execution
+                this.commandInvokerService.executeCommand(commandCreationResult as Command);
+            } else {
+                this.chatDisplayService.addEntry(createErrorEntry(commandCreationResult as ErrorType, userInput));
             }
         }
     }
@@ -145,7 +147,7 @@ export class TextEntryService {
     extractStockParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
             const defaultParams = { player, serviceCalled: this.chatDisplayService };
-            const stockLetters: string = scrabbleLetterstoString(this.gameService.currentGameService.stock.letterStock);
+            const stockLetters: string = scrabbleLetterstoString(this.gameService.game.stock.letterStock);
             return { defaultParams, specificParams: stockLetters };
         }
         return undefined;

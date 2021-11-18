@@ -1,62 +1,41 @@
 import { Injectable } from '@angular/core';
-import { GameParameters, GameRoom, GameType } from '@app/classes/game-parameters';
-import { LocalPlayer } from '@app/classes/local-player';
+import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { GameService } from './game.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameListService {
-    isStarting: boolean;
-    player: LocalPlayer;
-    existingRooms: GameParameters[];
-    players: LocalPlayer[];
-    myRoom: GameRoom[];
-    roomInfo: GameParameters;
-    full: boolean;
+    waitingAreaGames: WaitingAreaGameParameters[];
+    localPlayerRoomInfo: WaitingAreaGameParameters;
     private readonly server: string;
     private socket: io.Socket;
 
-    constructor(private gameService: GameService) {
-        // this.server = 'http://' + window.location.hostname + ':3000';
+    constructor() {
         this.server = environment.socketUrl;
-        this.existingRooms = new Array<GameParameters>();
-        this.myRoom = new Array<GameRoom>();
         this.socket = SocketHandler.requestSocket(this.server);
-        this.player = new LocalPlayer('');
-        this.players = new Array<LocalPlayer>();
-        this.full = false;
-        this.socket.emit('addPlayer', this.player);
-        this.socket.on('getAllGames', (game: GameParameters[]) => {
-            this.existingRooms = game;
+        this.waitingAreaGames = new Array<WaitingAreaGameParameters>();
+        this.socket.emit('addPlayer');
+        this.socket.on('updateWaitingAreaGames', (game: WaitingAreaGameParameters[]) => {
+            this.waitingAreaGames = game;
         });
     }
-    getList(): GameParameters[] {
-        return this.existingRooms;
+    getList(): WaitingAreaGameParameters[] {
+        return this.waitingAreaGames;
     }
-
-    createRoom(game: GameParameters): void {
-        this.socket.emit('createRoom', {
-            name: game.creatorPlayer.name,
-            timer: game.totalCountDown,
-            board: game.randomBonus,
-            creatorLetters: game.creatorPlayer.letters,
-            opponentLetters: game.opponentPlayer.letters,
-            stock: game.stock,
-        });
+    createRoom(gameParams: WaitingAreaGameParameters): void {
+        this.socket.emit('createWaitingAreaRoom', gameParams);
     }
     deleteRoom(): void {
-        this.socket.emit('deleteRoom');
+        this.socket.emit('deleteWaitingAreaRoom');
     }
-    start(game: GameParameters, name: string): void {
-        this.gameService.initializeGameType(GameType.MultiPlayer);
-        this.socket.emit('joinRoom', { gameId: game.gameRoom.idGame, joinerName: name });
+    start(game: WaitingAreaGameParameters, name: string): void {
+        this.socket.emit('joinWaitingAreaRoom', name, game.gameRoom.idGame);
     }
-    initializeGame(roomId: number) {
-        this.socket.emit('initializeGame', roomId);
+    initializeMultiplayerGame() {
+        this.socket.emit('initializeMultiPlayerGame');
     }
     someoneLeftRoom() {
         this.socket.emit('leaveRoom');

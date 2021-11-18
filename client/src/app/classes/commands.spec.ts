@@ -1,4 +1,4 @@
-// import { LocalPlayer } from '@app/classes/local-player';
+// import { Player } from "@app/classes/player";
 // import { ChatDisplayEntry, ChatEntryColor } from './chat-display-entry';
 // import { Command, CommandResult } from './commands';
 

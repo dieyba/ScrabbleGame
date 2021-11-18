@@ -3,7 +3,7 @@ import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
 import { PlaceCmd } from '@app/classes/place-command';
 import { BOARD_SIZE } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Axis, removeAccents, isValidLetter } from '@app/classes/utilities';
+import { Axis, isValidLetter, removeAccents } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
@@ -41,12 +41,7 @@ export class MouseWordPlacerService {
         this.wordString = '';
     }
     onMouseClick(e: MouseEvent) {
-        if (
-            !this.gameService.currentGameService.game.localPlayer.isActive ||
-            this.currentWord.length > 0 ||
-            this.gameService.currentGameService.game.isEndGame
-        )
-            return;
+        if (!this.gameService.game.getLocalPlayer().isActive || this.currentWord.length > 0 || this.gameService.game.isEndGame) return;
         this.clearOverlay();
         if (this.initialPosition.x !== 0 && this.initialPosition.y !== 0) {
             this.drawArrow(this.initialPosition, this.currentAxis);
@@ -90,7 +85,7 @@ export class MouseWordPlacerService {
         }
     }
     onKeyDown(e: KeyboardEvent) {
-        if (this.gameService.currentGameService.game.localPlayer.isActive === false) return;
+        if (this.gameService.game.getLocalPlayer().isActive === false) return;
         if (this.initialPosition.x === 0 && this.initialPosition.y === 0) return;
         const keyPressed = e.key;
         switch (keyPressed) {
@@ -260,7 +255,7 @@ export class MouseWordPlacerService {
     confirmWord() {
         const posArray = this.companionService.convertPositionToGridIndex(this.initialPosition);
         const posVec = new Vec2(posArray[0], posArray[1]);
-        const defaultParams: DefaultCommandParams = { player: this.gameService.currentGameService.game.localPlayer, serviceCalled: this.gameService };
+        const defaultParams: DefaultCommandParams = { player: this.gameService.game.getLocalPlayer(), serviceCalled: this.gameService };
         const params: PlaceParams = { position: posVec, orientation: this.currentAxis, word: this.wordString };
         // Refund letters to rack before placing
         this.removeAllLetters();
