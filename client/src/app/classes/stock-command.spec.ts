@@ -5,7 +5,7 @@
 // import { DefaultCommandParams } from './commands';
 // import { ErrorType } from './errors';
 // import { createStockCmd, StockCmd } from './stock-command';
-// import { scrabbleLetterstoString } from './utilities';
+// import { scrabbleLettersToString } from './utilities';
 
 // const PLAYER_NAME = 'Sara';
 
@@ -14,7 +14,7 @@
 //     let chatDisplayServiceSpy: jasmine.SpyObj<ChatDisplayService>;
 //     const localPlayer = new LocalPlayer(PLAYER_NAME);
 //     const stock = new LetterStock();
-//     const stockLetters = scrabbleLetterstoString(stock.letterStock);
+//     const stockLetters = scrabbleLettersToString(stock.letterStock);
 //     const expectedResult = [
 //         'a : 9',
 //         'b : 2',

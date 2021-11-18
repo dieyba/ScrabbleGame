@@ -18,6 +18,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { ChatDisplayService } from './chat-display.service';
+import { GoalsService } from './goals.service';
 import { GridService } from './grid.service';
 import { PlaceService } from './place.service';
 import { RackService } from './rack.service';
@@ -44,6 +45,7 @@ export class GameService {
         protected validationService: ValidationService,
         protected wordBuilder: WordBuilderService,
         protected chatDisplayService: ChatDisplayService,
+        protected goalsSErvice: GoalsService,
     ) {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
@@ -112,7 +114,9 @@ export class GameService {
     }
 
     initializeLog2990Game() {
-
+        if (this.game.isLog2990) {
+            // goalsSErvice
+        }
     }
 
     startNewGame() {

@@ -17,7 +17,7 @@ export const invertAxis = {
     [Axis.V]: Axis.H, // Vertical is the opposite of horizontal
 };
 
-export const scrabbleLetterstoString = (letters: ScrabbleLetter[]): string => {
+export const scrabbleLettersToString = (letters: ScrabbleLetter[]): string => {
     let stringLetters = '';
     for (const letter of letters) {
         stringLetters += letter.character;
