@@ -7,8 +7,7 @@ import { Square, SquareColor, TOTAL_COLORS } from './square';
 
 export const GAME_CAPACITY = 2;
 const DEFAULT_LETTER_COUNT = 7;
-const PUBLIC_GOALS_COUNT = 4;
-const PRIVATE_GOALS_COUNT = 2;
+const PUBLIC_GOALS_COUNT = 2;
 const TOTAL_GOALS_COUNT = 8;
 
 export enum Goals {
@@ -101,17 +100,16 @@ export class GameInitInfo {
             console.log(this.sharedGoals);
             this.players.forEach((player) => {
                 player.letters = stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-                player.goals = [];                
-                for (let i = 0; player.goals.length < PRIVATE_GOALS_COUNT; i++) {
+                do {
                     const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
                     if (!usedGoals.includes(randomGoal)) {
-                        player.goals.push(randomGoal);
+                        player.goal = randomGoal;
                         usedGoals.push(randomGoal)
                         if (randomGoal === Goals.PlaceLetterOnColorSquare) {
                             this.randomLetterAndColor = new RandomLetterAndColor(this.stockLetters);
                         }
                     }
-                }
+                } while(player.goal === undefined);
             });
         }
     }

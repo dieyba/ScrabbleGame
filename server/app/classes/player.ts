@@ -10,7 +10,7 @@ export class Player {
     letters: ScrabbleLetter[];
     isActive: boolean;
     isWinner: boolean;
-    goals: Goals[];
+    goal: Goals;
 
     constructor(name: string, socketId: string, roomId?: number) {
         this.name = name;

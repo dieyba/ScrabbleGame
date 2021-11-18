@@ -10,7 +10,7 @@ export class Player {
     letters: ScrabbleLetter[];
     isActive: boolean; // True if it is this player's turn, false if not.
     isWinner: boolean;
-    goals: Goals[];
+    goal: Goals;
 
     constructor(initInfo: string) {
         if (typeof initInfo === 'string') {

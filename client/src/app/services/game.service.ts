@@ -28,8 +28,7 @@ import { WordBuilderService } from './word-builder.service';
 
 export const DEFAULT_LETTER_COUNT = 7;
 const TIMER_INTERVAL = 1000;
-const PUBLIC_GOALS_COUNT = 4;
-const PRIVATE_GOALS_COUNT = 2;
+const PUBLIC_GOALS_COUNT = 2;
 const TOTAL_GOALS_COUNT = 8;
 
 
@@ -138,17 +137,16 @@ export class GameService {
         }
         this.game.players.forEach((player) => {
             player.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-            player.goals = [];
-            for (let i = 0; player.goals.length < PRIVATE_GOALS_COUNT; i++) {
+            do {
                 const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
                 if (!usedGoals.includes(randomGoal)) {
-                    player.goals.push(randomGoal);
+                    player.goal = randomGoal;
                     usedGoals.push(randomGoal)
                     if (randomGoal === Goals.PlaceLetterOnColorSquare) {
                         this.game.randomLetterAndColor = new RandomLetterAndColor(this.game.stock.letterStock);
                     }
                 }
-            }
+            } while (player.goal === undefined);
         });
     }
 
