@@ -24,6 +24,7 @@ export class SocketManagerService {
             // eslint-disable-next-line no-console
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
             socket.on('addPlayer', () => {
+                console.log('addPlayer : ');
                 this.playerMan.addPlayer(socket.id);
             });
             socket.on('createWaitingAreaRoom', (gameParams: WaitingAreaGameParameters) => {
@@ -33,8 +34,8 @@ export class SocketManagerService {
             });
             // This is only called when creating a game in play
             socket.on('deleteWaitingAreaRoom', () => {
-                this.deleteWaitingAreaRoom(socket);
                 console.log('deleteWaitingAreaRoom : ' + this.getIsLog2990FromId(socket.id));
+                this.deleteWaitingAreaRoom(socket);
                 this.getAllWaitingAreaGames(socket, this.getIsLog2990FromId(socket.id));
             });
             socket.on('joinWaitingAreaRoom', (joinerName: string, roomToJoinId: number, isLog2990: boolean) => {
@@ -108,7 +109,7 @@ export class SocketManagerService {
     private createWaitingAreaRoom(socket: io.Socket, gameParams: WaitingAreaGameParameters): void {
         const newRoom = this.gameListMan.createWaitingAreaGame(gameParams, socket.id);
         const creatorPlayer = this.playerMan.getPlayerBySocketID(socket.id);
-        console.log(creatorPlayer);
+        console.log('creatorPlayer : ' + creatorPlayer);
         if (creatorPlayer !== undefined) {
             // update player info in the player manager
             creatorPlayer.name = newRoom.creatorName;
@@ -189,7 +190,7 @@ export class SocketManagerService {
             joiner.name = joinerName;
             joiner.roomId = waitingAreaGame.gameRoom.idGame;
             socket.join(waitingAreaGame.gameRoom.idGame.toString());
-            console.log(waitingAreaGame);
+
             this.sio.to(waitingAreaGame.gameRoom.idGame.toString()).emit('roomJoined', waitingAreaGame);
         }
     }

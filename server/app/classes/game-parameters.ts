@@ -8,6 +8,7 @@ import { Square } from './square';
 export const GAME_CAPACITY = 2;
 const DEFAULT_LETTER_COUNT = 7;
 const PUBLIC_GOALS_COUNT = 4;
+const PRIVATE_GOALS_COUNT = 2;
 const TOTAL_GOALS_COUNT = 8;
 
 export enum Goals {
@@ -19,7 +20,7 @@ export enum Goals {
     FormThreeWords = 4, // Form three words at the same time 
     PlaceLetterOnBoardCorner = 5, // Place a letter on one of the 4 boaard corners
     ActivateTwoBonuses = 6, // Active 2 bonuses at the same time / place a word with 2 letters on a colour square
-    PlaceLetterOnColorSquare = 7,// Place letter x on a square of color y. x and y are randomly chosen at start of game
+    PlaceLetterOnColorSquare = 7, // Place letter x on a square of color y. x and y are randomly chosen at start of game
 }
 
 export enum GoalPoints {
@@ -81,20 +82,34 @@ export class GameInitInfo {
         this.players.push(new Player(clientParametersChosen.joinerName, clientParametersChosen.gameRoom.joinerId, this.gameRoomId));
         const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
         this.players[starterPlayerIndex].isActive = true;
-        this.players.forEach((player) => {
-            player.letters = stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-        });
-        this.stockLetters = stock.letterStock; // stock with the two players' letters removed
         this.sharedGoals = [];
+        var usedGoals: Goals[] = [];
         // TODO: pick the 4 public random objectives/goals from the list
         if (Boolean(clientParametersChosen.isLog2990)) {
             for (let i = 0; this.sharedGoals.length < PUBLIC_GOALS_COUNT; i++) {
                 const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
                 if (!this.sharedGoals.includes(randomGoal)) {
                     this.sharedGoals.push(randomGoal);
+                    usedGoals.push(randomGoal);
                 }
             }
         }
+        console.log(this.sharedGoals);
+        this.players.forEach((player) => {
+            player.letters = stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+            player.goals = [];
+            if (Boolean(clientParametersChosen.isLog2990)) {
+                for (let i = 0; player.goals.length < PRIVATE_GOALS_COUNT; i++) {
+                    const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
+                    if (!usedGoals.includes(randomGoal)) {
+                        player.goals.push(randomGoal);
+                        usedGoals.push(randomGoal)
+                    }
+                }
+            }
+            console.log("playergoals : " + player.goals);
+        });
+        this.stockLetters = stock.letterStock; // stock with the two players' letters removed
     }
 
     getOtherPlayerInRoom(playerId: string): Player | undefined {
