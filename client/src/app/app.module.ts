@@ -20,12 +20,13 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { StartingPageComponent } from '@app/pages/starting-page/starting-page.component';
 import { ChatDisplayComponent } from './components/chat-display/chat-display.component';
+import { DictionaryTransferComponent } from './components/dictionary-transfer/dictionary-transfer.component';
+import { EndGamePopupComponent } from './components/end-game-popup/end-game-popup.component';
 import { FormComponent } from './components/form/form.component';
 import { RackComponent } from './components/rack/rack.component';
 import { TextEntryComponent } from './components/text-entry/text-entry.component';
 import { WaitingAreaComponent } from './components/waiting-area/waiting-area.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
-import { EndGamePopupComponent } from './components/end-game-popup/end-game-popup.component';
 
 /**
  * Main module that is used in main.ts.
@@ -53,6 +54,7 @@ import { EndGamePopupComponent } from './components/end-game-popup/end-game-popu
         WaitingAreaComponent,
         RackComponent,
         EndGamePopupComponent,
+        DictionaryTransferComponent,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     imports: [

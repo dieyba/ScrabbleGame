@@ -38,6 +38,7 @@ export class DictionaryDBController {
         });
         this.router.post('/', async (req: Request, res: Response) => {
             // TODO Validate entry
+            // TODO Client can't guarantee that it's a JSON file
             this.dictionaryDBService
                 .postDictionary(req.body)
                 .then(() => {
