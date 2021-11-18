@@ -1,5 +1,5 @@
 import { DictionaryInterface } from '@app/classes/dictionary';
-import { Collection, MongoClient } from 'mongodb';
+import { Collection, FindOptions, MongoClient } from 'mongodb';
 import { Service } from 'typedi';
 
 // CHANGE the URL for your database information
@@ -13,7 +13,6 @@ export class DictionaryDBService {
     dictionaryCollection: Collection<DictionaryInterface>;
 
     constructor(url = DATABASE_URL) {
-        console.log('here!');
         MongoClient.connect(url)
             .then((client: MongoClient) => {
                 this.client = client;
@@ -25,41 +24,39 @@ export class DictionaryDBService {
             });
     }
 
-    // async getClassicBestScore(): Promise<BestScores[]> {
-    //     return this.classicCollection
-    //         .find({})
-    //         .toArray()
-    //         .then((classicBestScores: BestScores[]) => {
-    //             return classicBestScores;
-    //         })
-    //         .catch((error: Error) => {
-    //             throw error;
-    //         });
+    async getDictionary(name: string): Promise<DictionaryInterface> {
+        return this.dictionaryCollection
+            .findOne({ title: name })
+            .then((dictionary) => {
+                return dictionary as DictionaryInterface;
+            })
+            .catch(() => {
+                throw new Error('Failed to get dictionary');
+            });
+    }
 
-    // }
-    // async getLog2990BestScore(): Promise<BestScores[]> {
-    //     return this.log2990Collection
-    //         .find({})
-    //         .toArray()
-    //         .then((log2990BestScores: BestScores[]) => {
-    //             return log2990BestScores;
-    //         })
-    //         .catch((error: Error) => {
-    //             throw error;
-    //         });
-
-    // }
-
-    // async postClassicBestScore(classicBestScore: BestScores): Promise<void> {
-    //     this.classicCollection
-    //         .insertOne(classicBestScore)
-    //         .then(() => {
-    //             /* do nothing */
-    //         })
-    //         .catch((error: Error) => {
-    //             throw error;
-    //         });
-    // }
+    async getAllDictionaryDescription(): Promise<DictionaryInterface[]> {
+        const projection: FindOptions = { projection: { words: 0 } };
+        return this.dictionaryCollection
+            .find({}, projection)
+            .toArray()
+            .then((dictionaries) => {
+                return dictionaries as DictionaryInterface[];
+            })
+            .catch(() => {
+                throw new Error('Failed to get dictionary');
+            });
+    }
+    async postDictionary(dictionary: DictionaryInterface): Promise<void> {
+        this.dictionaryCollection
+            .insertOne(dictionary)
+            .then(() => {
+                /* do nothing */
+            })
+            .catch(() => {
+                throw new Error('Failed to post dictionary');
+            });
+    }
     // async postLog2990BestScore(log2990BestScore: BestScores): Promise<void> {
     //     this.classicCollection
     //         .insertOne(log2990BestScore)
