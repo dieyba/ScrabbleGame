@@ -108,7 +108,7 @@ export class AdminPageComponent implements OnInit {
         },
             (error: HttpErrorResponse) => {
                 if (error.status !== HttpStatus_OK) {
-                    this.snack.open("Désolé votre score ne pourra pas être éligible au tableau des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!", 'close');
+                    this.snack.open("La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!", 'close');
                 }
                 else {
                     this.snack.open(' La base de données a été réinitialisé avec succès!', 'close')

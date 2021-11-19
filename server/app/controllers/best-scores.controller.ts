@@ -1,19 +1,8 @@
 import { BestScores } from '@app/classes/best-scores';
 import { BestScoresService } from '@app/services/best-scores.service';
-import { NextFunction, Request, Response, Router } from 'express';
+import { Request, Response, Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-
-export enum HttpStatus {
-    OK = 200,
-    CREATED = 201,
-    NO_CONTENT = 204,
-    BAD_REQUEST = 400,
-    FORBIDDEN = 403,
-    NOT_FOUND = 404,
-    UNPROCESSABLE = 422,
-    TOO_MANY = 429,
-    INTERNAL_ERROR = 500,
-}
 
 @Service()
 export class BestScoresController {
@@ -26,56 +15,56 @@ export class BestScoresController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.get('/classicMode', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.get('/classicMode', async (req: Request, res: Response) => {
             this.bestScoresSrvice
-                .getClassicBestScore()
+                .getBestScores(this.bestScoresSrvice.classicCollection)
                 .then((bestScores: BestScores[]) => {
                     res.json(bestScores);
                 })
                 .catch((error: Error) => {
-                    res.status(HttpStatus.NOT_FOUND).send(error.message);
+                    res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
-        this.router.get('/log2990Mode', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.get('/log2990Mode', async (req: Request, res: Response) => {
             this.bestScoresSrvice
-                .getLog2990BestScore()
+                .getBestScores(this.bestScoresSrvice.log2990Collection)
                 .then((bestScores: BestScores[]) => {
                     res.json(bestScores);
                 })
                 .catch((error: Error) => {
-                    res.status(HttpStatus.NOT_FOUND).send(error.message);
+                    res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
 
         this.router.post('/classicMode/send', async (req: Request, res: Response) => {
             this.bestScoresSrvice
-                .postClassicBestScore(req.body)
+                .postBestScore(this.bestScoresSrvice.classicCollection, req.body)
                 .then(() => {
-                    res.sendStatus(HttpStatus.OK).send();
+                    res.sendStatus(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
-                    res.status(HttpStatus.BAD_REQUEST).send(error.message);
+                    res.status(StatusCodes.BAD_REQUEST).send(error.message);
                 });
         });
-        this.router.post('/log2990Mode/send', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.post('/log2990Mode/send', async (req: Request, res: Response) => {
             this.bestScoresSrvice
-                .postLog2990BestScore(req.body)
+                .postBestScore(this.bestScoresSrvice.log2990Collection, req.body)
                 .then(() => {
-                    res.sendStatus(HttpStatus.OK).send();
+                    res.sendStatus(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
-                    res.status(HttpStatus.BAD_REQUEST).send(error.message);
+                    res.status(StatusCodes.BAD_REQUEST).send(error.message);
                 });
         });
 
-        this.router.delete('/', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.delete('/', async (req: Request, res: Response) => {
             this.bestScoresSrvice
                 .resetDataBase()
                 .then(() => {
-                    res.sendStatus(HttpStatus.OK).send();
+                    res.sendStatus(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
-                    res.status(HttpStatus.NOT_FOUND).send(error.message);
+                    res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
     }

@@ -19,11 +19,13 @@ export class Application {
     private readonly internalError: number = StatusCodes.INTERNAL_SERVER_ERROR;
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
-    constructor(private readonly exampleController: ExampleController,
+    constructor(
+        private readonly exampleController: ExampleController,
         private readonly dateController: DateController,
         private readonly virtualPlayerNameController: VirtualPlayerNameController,
         private readonly bestScoresController: BestScoresController,
-        private readonly dictionaryController: DictionarController) {
+        private readonly dictionaryController: DictionarController,
+    ) {
         this.app = express();
 
         this.swaggerOptions = {

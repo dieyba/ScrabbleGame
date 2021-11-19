@@ -1,23 +1,12 @@
 // import { HttpStatus } from '@common/communication/http-status';
 // import { Image } from '@common/communication/image-data';
 import { VirtualPlayerName } from '@app/classes/virtual-player-name';
-import { NextFunction, Request, Response, Router } from 'express';
+import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
+import { Request, Response, Router } from 'express';
+// import Types from '../types';
+import { StatusCodes } from 'http-status-codes';
 // import { inject } from 'inversify';
 import { Service } from 'typedi';
-import { VirtualPlayerNameService } from '../services/virtual-player-name.service';
-// import Types from '../types';
-
-export enum HttpStatus {
-    OK = 200,
-    CREATED = 201,
-    NO_CONTENT = 204,
-    BAD_REQUEST = 400,
-    FORBIDDEN = 403,
-    NOT_FOUND = 404,
-    UNPROCESSABLE = 422,
-    TOO_MANY = 429,
-    INTERNAL_ERROR = 500,
-}
 
 @Service()
 export class VirtualPlayerNameController {
@@ -30,47 +19,47 @@ export class VirtualPlayerNameController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.get('/beginners', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.get('/beginners', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
                 .getBeginnersVirtualPlayerNames()
                 .then((virtualPlayerNames: VirtualPlayerName[]) => {
                     res.json(virtualPlayerNames);
                 })
                 .catch((error: Error) => {
-                    res.status(HttpStatus.NOT_FOUND).send(error.message);
+                    res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
 
-        this.router.get('/experts', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.get('/experts', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
                 .getExpertsVirtualPlayerNames()
                 .then((virtualPlayerNames: VirtualPlayerName[]) => {
                     res.json(virtualPlayerNames);
                 })
                 .catch((error: Error) => {
-                    res.status(HttpStatus.NOT_FOUND).send(error.message);
+                    res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
 
-        this.router.post('/beginners', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.post('/beginners', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
                 .postBeginnersVirtualPlayerName(req.body)
                 .then(() => {
-                    res.sendStatus(HttpStatus.OK).send();
+                    res.sendStatus(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
-                    res.status(HttpStatus.BAD_REQUEST).send(error.message);
+                    res.status(StatusCodes.BAD_REQUEST).send(error.message);
                 });
         });
 
-        this.router.post('/experts', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.post('/experts', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
                 .postExpertsVirtualPlayerName(req.body)
                 .then(() => {
-                    res.sendStatus(HttpStatus.OK).send();
+                    res.sendStatus(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
-                    res.status(HttpStatus.BAD_REQUEST).send(error.message);
+                    res.status(StatusCodes.BAD_REQUEST).send(error.message);
                 });
         });
 

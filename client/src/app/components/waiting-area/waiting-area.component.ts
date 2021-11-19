@@ -69,7 +69,7 @@ export class WaitingAreaComponent {
         this.nameErrorMessage = '';
         this.nameValid = false;
         this.timer = setInterval(() => {
-            this.pendingGameslist = this.gameList.getList();
+            this.pendingGameslist = this.gameList.waitingAreaGames;
         }, LIST_UPDATE_TIMEOUT);
         this.socketOnConnect();
     }

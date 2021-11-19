@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
-
+export const BASE_URL = 'http://localhost:3000/api/bestScores';
 // export enum HttpStatus {
 export const HttpStatus_OK = 200;
 // CREATED = 201,
@@ -24,31 +24,27 @@ export interface BestScores {
   providedIn: 'root'
 })
 export class BestScoresService {
-  private baseUrl: string;
   constructor(private http: HttpClient, private snack: MatSnackBar,) {
-    this.baseUrl = 'http://localhost:3000/api/bestScores'
+  }
+  getBestScores(url: string): Observable<BestScores[]> {
+    return this.http.get<BestScores[]>(url);
+  }
+  postBestScore(playerName: string, playerScore: number, url: string): Observable<BestScores> {
+    return this.http.post<BestScores>(url, { playerName: playerName, score: playerScore });
   }
 
-  getClassicModeBestScores(): Observable<BestScores[]> {
-    return this.http.get<BestScores[]>(this.baseUrl + '/classicMode');
-  }
+  // postClassicBestScore(playerName: string, playerScore: number): Observable<BestScores> {
+  //   // const bestScore: BestScores = { playerName: playerName, score: playerScore };
+  //   return this.http.post<BestScores>(this.baseUrl + '/classicMode/send', { playerName: playerName, score: playerScore });
+  // }
 
-  getLog2990ModeBestScores(): Observable<BestScores[]> {
-    return this.http.get<BestScores[]>(this.baseUrl + '/log2990Mode');
-  }
-
-  postClassicBestScore(playerName: string, playerScore: number): Observable<BestScores> {
-    // const bestScore: BestScores = { playerName: playerName, score: playerScore };
-    return this.http.post<BestScores>(this.baseUrl + '/classicMode/send', { playerName: playerName, score: playerScore });
-  }
-
-  postLog2990BestScore(playerName: string, playerScore: number): Observable<BestScores> {
-    // const bestScore: BestScores = { playerName: playerName, score: playerScore };
-    return this.http.post<BestScores>(this.baseUrl + '/log2990Mode/send', { playerName: playerName, score: playerScore });
-  }
+  // postLog2990BestScore(playerName: string, playerScore: number): Observable<BestScores> {
+  //   // const bestScore: BestScores = { playerName: playerName, score: playerScore };
+  //   return this.http.post<BestScores>(this.baseUrl + '/log2990Mode/send', { playerName: playerName, score: playerScore });
+  // }
 
   resetDbBestScores() {
-    return this.http.delete<BestScores>(this.baseUrl);
+    return this.http.delete<BestScores>(BASE_URL);
   }
   handleErrorSnackBar(error: HttpErrorResponse): void {
     if (error.status !== HttpStatus_OK) {

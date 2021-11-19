@@ -6,8 +6,7 @@ import { GameListManager } from './game-list-manager.service';
 import { PlayerManagerService } from './player-manager.service';
 import { ValidationService } from './validation.service';
 
-const HANDLE_SOCKET_TIME_INTERVAL = 1000;
-// const DISCONNECT_TIME_INTERVAL = 5000;
+const DISCONNECT_TIME_INTERVAL = 5000;
 
 export class SocketManagerService {
     private sio: io.Server;
@@ -66,9 +65,9 @@ export class SocketManagerService {
             socket.on('playerQuit', () => {
                 this.displayPlayerQuitMessage(socket);
             });
-            // socket.on('disconnect', () => {
-            //     this.disconnect(socket);
-            // });
+            socket.on('disconnect', () => {
+                this.disconnect(socket);
+            });
             socket.on('exchange letters', (update: LettersUpdate) => {
                 const sender = this.playerMan.getPlayerBySocketID(socket.id);
                 if (sender === undefined) {
@@ -106,14 +105,12 @@ export class SocketManagerService {
                 this.changeTurn(socket, isCurrentTurnedPassed, consecutivePassedTurns);
             });
         });
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        setInterval(() => {}, HANDLE_SOCKET_TIME_INTERVAL);
     }
-    // private disconnect(socket: io.Socket) {
-    //     setTimeout(() => {
-    //         this.leaveRoom(socket);
-    //     }, DISCONNECT_TIME_INTERVAL);
-    // }
+    private disconnect(socket: io.Socket) {
+        setTimeout(() => {
+            this.leaveRoom(socket);
+        }, DISCONNECT_TIME_INTERVAL);
+    }
     private createWaitingAreaRoom(socket: io.Socket, gameParams: WaitingAreaGameParameters): void {
         // TODO: make a verification to prevent creation if player already part of a room?
         const newRoom = this.gameListMan.createWaitingAreaGame(gameParams, socket.id);

@@ -1,11 +1,10 @@
-import { Dictionary, DictionaryInterface, DictionaryType } from "@app/classes/dictionary";
-import { Collection, MongoClient } from "mongodb";
+import { Dictionary, DictionaryInterface, DictionaryType } from '@app/classes/dictionary';
+import { Collection, MongoClient } from 'mongodb';
 import { Service } from 'typedi';
 
-const DATABASE_URL =
-    "mongodb+srv://Scrabble304:Scrabble304@cluster0.bvwkn.mongodb.net/database?retryWrites=true&w=majority";
-const DATABASE_NAME = "Dictionary";
-const DATABASE_COLLECTION = "dictionary";
+const DATABASE_URL = 'mongodb+srv://Scrabble304:Scrabble304@cluster0.bvwkn.mongodb.net/database?retryWrites=true&w=majority';
+const DATABASE_NAME = 'Dictionary';
+const DATABASE_COLLECTION = 'dictionary';
 
 @Service()
 export class DictionaryService {
@@ -13,7 +12,6 @@ export class DictionaryService {
     dictionaryCollection: Collection<Dictionary>;
 
     constructor(url = DATABASE_URL) {
-        console.log('constructeur')
         MongoClient.connect(url)
             .then((client: MongoClient) => {
                 this.client = client;
@@ -45,19 +43,18 @@ export class DictionaryService {
             })
             .catch((error: Error) => {
                 throw error;
-            })
+            });
     }
 
     async populateDictionary(): Promise<void> {
-        let defaultDict = new Dictionary(DictionaryType.Default);
-        let dict: DictionaryInterface =
-        {
+        const defaultDict = new Dictionary(DictionaryType.Default);
+        const dict: DictionaryInterface = {
             idDict: 1,
             title: defaultDict.title,
             description: defaultDict.description,
             words: defaultDict.words,
         };
-        if (await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION).countDocuments() === 0) {
+        if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION).countDocuments()) === 0) {
             await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION).insertOne(dict);
         }
     }

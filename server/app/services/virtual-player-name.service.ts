@@ -1,12 +1,10 @@
-
-import { Collection, MongoClient } from "mongodb";
+import { VirtualPlayerName } from '@app/classes/virtual-player-name';
+import { Collection, MongoClient } from 'mongodb';
 import { Service } from 'typedi';
-import { VirtualPlayerName } from "../classes/virtual-player-name";
 // import { DatabaseService } from "./database.service";
-const DATABASE_URL =
-    "mongodb+srv://Scrabble304:Scrabble304@cluster0.bvwkn.mongodb.net/database?retryWrites=true&w=majority";
-const DATABASE_NAME = "VirtualPlayerName";
-const DATABASE_COLLECTION = ["beginners", "experts"];
+const DATABASE_URL = 'mongodb+srv://Scrabble304:Scrabble304@cluster0.bvwkn.mongodb.net/database?retryWrites=true&w=majority';
+const DATABASE_NAME = 'VirtualPlayerName';
+const DATABASE_COLLECTION = ['beginners', 'experts'];
 
 @Service()
 export class VirtualPlayerNameService {
@@ -97,22 +95,21 @@ export class VirtualPlayerNameService {
     }
 
     async populateBeginnersDB(): Promise<void> {
-        if (await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments() === 0) {
-            let courses: VirtualPlayerName[] = [
+        if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments()) === 0) {
+            const courses: VirtualPlayerName[] = [
                 {
-                    idName: "1",
-                    virtualPlayerName: "Erika",
+                    idName: '1',
+                    virtualPlayerName: 'Erika',
                 },
                 {
-                    idName: "2",
-                    virtualPlayerName: "Sara",
+                    idName: '2',
+                    virtualPlayerName: 'Sara',
                 },
                 {
-                    idName: "3",
-                    virtualPlayerName: "Etienne"
+                    idName: '3',
+                    virtualPlayerName: 'Etienne',
                 },
             ];
-            console.log("THIS ADDS BEGINNER PLAYER NAMES TO THE DATABASE, DO NOT USE OTHERWISE");
             for (const course of courses) {
                 await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(course);
             }
@@ -120,22 +117,21 @@ export class VirtualPlayerNameService {
     }
 
     async populateExpertsDB(): Promise<void> {
-        if (await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]).countDocuments() === 0) {
-            let courses: VirtualPlayerName[] = [
+        if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]).countDocuments()) === 0) {
+            const courses: VirtualPlayerName[] = [
                 {
-                    idName: "1",
-                    virtualPlayerName: "Dieyba",
+                    idName: '1',
+                    virtualPlayerName: 'Dieyba',
                 },
                 {
-                    idName: "2",
-                    virtualPlayerName: "Kevin",
+                    idName: '2',
+                    virtualPlayerName: 'Kevin',
                 },
                 {
-                    idName: "3",
-                    virtualPlayerName: "Ariane",
+                    idName: '3',
+                    virtualPlayerName: 'Ariane',
                 },
             ];
-            console.log("THIS ADDS EXPERT PLAYER NAMES TO THE DATABASE, DO NOT USE OTHERWISE");
             for (const course of courses) {
                 await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]).insertOne(course);
             }
