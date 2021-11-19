@@ -1,4 +1,5 @@
 // import { BestScores } from '@app/classes/best-scores';
+import { BestScores } from '@app/classes/best-scores';
 import { BestScoresService } from '@app/services/best-scores.service';
 import { expect } from 'chai';
 // import { containerBootstrapper } from '../app/inversify.config';
@@ -14,29 +15,32 @@ import Container from 'typedi';
 import { Application } from '../app';
 
 describe('BestScoresController', () => {
-    // const bestScore = {
-    //     playerName: 'Dieyba',
-    //     score: 180
-    // } as BestScores
+    const bestScore: BestScores[] = [{
+        playerName: 'Dieyba',
+        score: 180,
+    }
+    ]
+
 
     let bestScoreService: SinonStubbedInstance<BestScoresService>;
     let expressApp: Express.Application;
 
     beforeEach(async () => {
         bestScoreService = createStubInstance(BestScoresService);
+        bestScoreService.getBestScores.resolves(bestScore)
         const app = Container.get(Application);
         // eslint-disable-next-line dot-notation
-        Object.defineProperty(app['BestScoresController'], 'bestScoreService', { value: bestScoreService, writable: true });
+        Object.defineProperty(app['bestScoresController'], 'bestScoreService', { value: bestScoreService, writable: true });
         expressApp = app.app;
     });
     it('should return an array of all images', async () => {
         // bestScoreService.getClassicBestScore.resolves([bestScore])
         return supertest(expressApp)
             .get('/api/bestScores/classicMode')
-            .expect(StatusCodes.OK)
             .then((response) => {
+                expect(response.statusCode).to.equal(StatusCodes.NOT_FOUND);
                 // expect(response.statusCode).to.equal(HttpStatus.OK);
-                expect(response.body).to.be.a('array');
+                expect(response.body).to.deep.equal(bestScore);
             });
     });
 });

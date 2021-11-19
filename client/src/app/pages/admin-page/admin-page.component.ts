@@ -1,8 +1,8 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AdminService } from '@app/services/admin.service';
-import { BestScoresService, httpStatusOk } from '@app/services/best-scores.service';
+import { BestScoresService } from '@app/services/best-scores.service';
 import { of } from 'rxjs';
 
 const errorIndex = -1;
@@ -102,7 +102,7 @@ export class AdminPageComponent {
                 /* Do nothing */
             },
             (error: HttpErrorResponse) => {
-                if (error.status !== httpStatusOk) {
+                if (error.status !== HttpStatusCode.Ok) {
                     this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'close');
                 } else {
                     this.snack.open(' La base de données a été réinitialisé avec succès!', 'close');

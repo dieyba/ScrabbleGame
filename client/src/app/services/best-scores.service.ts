@@ -1,20 +1,8 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 export const BASE_URL = 'http://localhost:3000/api/bestScores';
-// import { StatusCodes } from 'http-status-codes';
-// export enum HttpStatus {
-export const httpStatusOk = 200;
-// CREATED = 201,
-// NO_CONTENT = 204,
-// BAD_REQUEST = 400,
-// FORBIDDEN = 403,
-// NOT_FOUND = 404,
-// UNPROCESSABLE = 422,
-// TOO_MANY = 429,
-// INTERNAL_ERROR = 500,
-// }
 
 export interface BestScores {
     playerName: string;
@@ -47,7 +35,7 @@ export class BestScoresService {
         return this.http.delete<BestScores>(BASE_URL);
     }
     handleErrorSnackBar(error: HttpErrorResponse): void {
-        if (error.status !== httpStatusOk) {
+        if (error.status !== HttpStatusCode.Ok) {
             this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'close');
         }
     }
