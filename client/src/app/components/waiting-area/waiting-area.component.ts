@@ -94,6 +94,8 @@ export class WaitingAreaComponent {
     onSelect(game: WaitingAreaGameParameters): WaitingAreaGameParameters {
         if (this.isGameSelected) {
             this.selectedGame = game;
+            // when selecting a new game, the previous game was cancelled message should be removed
+            this.gameCancelled = false;
         }
         return this.selectedGame;
     }
@@ -158,6 +160,7 @@ export class WaitingAreaComponent {
     }
     socketOnConnect() {
         this.socket.on('initClientGame', (gameParams: GameInitInfo) => {
+            clearTimeout(this.timer);
             this.dialogRef.close();
             this.router.navigate(['/game']);
             this.gameService.initializeMultiplayerGame(gameParams);
@@ -166,6 +169,7 @@ export class WaitingAreaComponent {
         this.socket.on('waitingAreaRoomDeleted', (game: WaitingAreaGameParameters) => {
             this.joindre = false;
             this.nameValid = false;
+            this.nameErrorMessage = '';
             this.gameCancelled = true;
             this.roomDeletedId = game.gameRoom.idGame;
         });
@@ -179,11 +183,13 @@ export class WaitingAreaComponent {
             this.playerList = this.gameList.localPlayerRoomInfo.gameRoom.playersName;
         });
         this.socket.on('roomLeft', (game: WaitingAreaGameParameters) => {
-            this.gameList.localPlayerRoomInfo = game;
-            this.playerList = this.gameList.localPlayerRoomInfo.gameRoom.playersName;
-            this.joindre = false;
-            this.nameValid = false;
-            this.gameCancelled = true;
+            if (game !== undefined) {
+                this.gameList.localPlayerRoomInfo = game;
+                this.playerList = this.gameList.localPlayerRoomInfo.gameRoom.playersName;
+                this.joindre = false;
+                this.nameValid = false;
+                this.gameCancelled = true;
+            }
         });
     }
 }
