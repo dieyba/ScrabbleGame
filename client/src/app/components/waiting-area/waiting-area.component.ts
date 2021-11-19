@@ -83,12 +83,10 @@ export class WaitingAreaComponent {
     }
 
     randomGame() {
-        let randomFloat = Math.random() * (this.pendingGameslist.length);
+        let randomFloat = Math.random() * this.pendingGameslist.length;
         randomFloat = Math.floor(randomFloat);
-        console.log(randomFloat);
         this.selectedGame = this.pendingGameslist[randomFloat];
         this.openName(true);
-        console.log(this.selectedGame);
     }
 
     onSelect(game: WaitingAreaGameParameters): WaitingAreaGameParameters {

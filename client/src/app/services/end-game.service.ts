@@ -6,7 +6,7 @@ import { calculateRackPoints } from '@app/classes/player';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { BASE_URL, BestScoresService, HttpStatus_OK } from './best-scores.service';
+import { BASE_URL, BestScoresService, httpStatusOk } from './best-scores.service';
 import { ChatDisplayService } from './chat-display.service';
 import { GameService } from './game.service';
 
@@ -17,7 +17,12 @@ export class EndGameService {
     private socket: io.Socket;
     private readonly server: string;
 
-    constructor(private gameService: GameService, private chatDisplayService: ChatDisplayService, private bestScoresService: BestScoresService, private snack: MatSnackBar) {
+    constructor(
+        private gameService: GameService,
+        private chatDisplayService: ChatDisplayService,
+        private bestScoresService: BestScoresService,
+        private snack: MatSnackBar,
+    ) {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.socket.on('gameEnded', () => {
@@ -52,16 +57,23 @@ export class EndGameService {
         } else {
             this.endGameAfterPassedTurns();
         }
-        this.bestScoresService.postBestScore(this.gameService.game.getLocalPlayer().name, this.gameService.game.getLocalPlayer().score, BASE_URL + '/classicMode/send').subscribe(
-            () => {
-                /*Do nothing */
-            },
-            (error: HttpErrorResponse) => {
-                if (error.status !== HttpStatus_OK) {
-                    this.snack.open("Désolé votre score ne pourra pas être éligible au tableau des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!", 'close');
-                }
-            },
-        );
+        this.bestScoresService
+            .postBestScore(this.gameService.game.getLocalPlayer().name, this.gameService.game.getLocalPlayer().score, BASE_URL + '/classicMode/send')
+            .subscribe(
+                () => {
+                    /* Do nothing */
+                },
+                (error: HttpErrorResponse) => {
+                    if (error.status !== httpStatusOk) {
+                        this.snack.open(
+                            'Désolé votre score ne pourra pas être éligible au tableau' +
+                                'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
+                                'Veuillez réessayer plus tard!',
+                            'close',
+                        );
+                    }
+                },
+            );
         clearInterval(this.gameService.game.gameTimer.intervalValue);
         this.gameService.game.gameTimer.timerMs = 0;
         this.gameService.game.gameTimer.secondsToMinutes();

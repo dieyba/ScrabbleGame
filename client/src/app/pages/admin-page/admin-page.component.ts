@@ -1,10 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AdminService } from '@app/services/admin.service';
-import { BestScores, BestScoresService, HttpStatus_OK } from '@app/services/best-scores.service';
+import { BestScoresService, httpStatusOk } from '@app/services/best-scores.service';
 import { of } from 'rxjs';
 
+const errorIndex = -1;
 export interface DictionaryInterface {
     idDict: number;
     title: string;
@@ -15,9 +16,9 @@ export interface DictionaryInterface {
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
-    styleUrls: ['./admin-page.component.scss']
+    styleUrls: ['./admin-page.component.scss'],
 })
-export class AdminPageComponent implements OnInit {
+export class AdminPageComponent {
     privateName: boolean;
     dictionaries: DictionaryInterface[];
     constructor(public adminService: AdminService, private bestScoreService: BestScoresService, private snack: MatSnackBar) {
@@ -25,20 +26,20 @@ export class AdminPageComponent implements OnInit {
         this.dictionaries = [];
     }
 
-    ngOnInit(): void {
-        this.getDictionaries();
-        // console.log(this.dictionaries);
-    }
+    // ngOnInit(): void {
+    //     this.getDictionaries();
+    //     // console.log(this.dictionaries);
+    // }
 
-    getDictionaries() {
-        // this.dynamicDownloadJson();
-        console.log(this.adminService.getDictionaries().subscribe(dictionary => (this.dictionaries = dictionary)));
-    }
+    // getDictionaries() {
+    //     // this.dynamicDownloadJson();
+    //     console.log(this.adminService.getDictionaries().subscribe((dictionary) => (this.dictionaries = dictionary)));
+    // }
 
     fakeValidateUserData() {
         return of({
             userDate1: 1,
-            userData2: 2
+            userData2: 2,
         });
     }
 
@@ -46,26 +47,20 @@ export class AdminPageComponent implements OnInit {
         this.adminService.getDictionaries().subscribe((res) => {
             this.dyanmicDownloadByHtmlTag({
                 fileName: 'Pitie Seigneur.json',
-                text: JSON.stringify(res)
+                text: JSON.stringify(res),
             });
         });
     }
 
-    private dyanmicDownloadByHtmlTag(arg: {
-        fileName: string,
-        text: string
-    }) {
+    dyanmicDownloadByHtmlTag(arg: { fileName: string; text: string }) {
         const element = document.createElement('a');
-        const fileType = arg.fileName.indexOf('.json') > -1 ? 'text/json' : 'text/plain';
+        const fileType = arg.fileName.indexOf('.json') > errorIndex ? 'text/json' : 'text/plain';
         element.setAttribute('href', `data:${fileType};charset=utf-8,${encodeURIComponent(arg.text)}`);
         element.setAttribute('download', arg.fileName);
 
-        const event = new MouseEvent("click");
+        const event = new MouseEvent('click');
         element.dispatchEvent(event);
     }
-
-
-
 
     isUntouchable(): boolean {
         return this.adminService.untouchable();
@@ -82,8 +77,7 @@ export class AdminPageComponent implements OnInit {
     deleteName() {
         if (this.adminService.isBeginnerTab()) {
             this.adminService.deleteBeginnerName();
-        }
-        else {
+        } else {
             this.adminService.deleteExpertName();
         }
     }
@@ -103,15 +97,15 @@ export class AdminPageComponent implements OnInit {
         this.adminService.onSelect(name);
     }
     resetDataBase() {
-        this.bestScoreService.resetDbBestScores().subscribe((data: BestScores) => {
-            /*Do nothing */
-        },
+        this.bestScoreService.resetDbBestScores().subscribe(
+            () => {
+                /* Do nothing */
+            },
             (error: HttpErrorResponse) => {
-                if (error.status !== HttpStatus_OK) {
-                    this.snack.open("La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!", 'close');
-                }
-                else {
-                    this.snack.open(' La base de données a été réinitialisé avec succès!', 'close')
+                if (error.status !== httpStatusOk) {
+                    this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'close');
+                } else {
+                    this.snack.open(' La base de données a été réinitialisé avec succès!', 'close');
                 }
             },
         );
