@@ -15,19 +15,19 @@ import Container from 'typedi';
 import { Application } from '../app';
 
 describe('BestScoresController', () => {
-    const bestScore: BestScores[] = [{
-        playerName: 'Dieyba',
-        score: 180,
-    }
-    ]
-
+    const bestScore: BestScores[] = [
+        {
+            playerName: 'Dieyba',
+            score: 180,
+        },
+    ];
 
     let bestScoreService: SinonStubbedInstance<BestScoresService>;
     let expressApp: Express.Application;
 
     beforeEach(async () => {
         bestScoreService = createStubInstance(BestScoresService);
-        bestScoreService.getBestScores.resolves(bestScore)
+        bestScoreService.getBestScores.resolves(bestScore);
         const app = Container.get(Application);
         // eslint-disable-next-line dot-notation
         Object.defineProperty(app['bestScoresController'], 'bestScoreService', { value: bestScoreService, writable: true });

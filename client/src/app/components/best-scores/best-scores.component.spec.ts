@@ -4,7 +4,6 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { BestScoresService } from '@app/services/best-scores.service';
 import { BestScoresComponent } from './best-scores.component';
 
-
 describe('BestScoresComponent', () => {
     let component: BestScoresComponent;
     let fixture: ComponentFixture<BestScoresComponent>;
@@ -25,9 +24,9 @@ describe('BestScoresComponent', () => {
                 {
                     provide: BestScoresService,
                     useValue: bestScoresServiceSpy,
-                },],
+                },
+            ],
             imports: [HttpClientModule, MatDialogModule],
-
         }).compileComponents();
     });
 
