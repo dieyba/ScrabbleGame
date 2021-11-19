@@ -22,9 +22,6 @@ export class GameListService {
             this.waitingAreaGames = game;
         });
     }
-    getList(): WaitingAreaGameParameters[] {
-        return this.waitingAreaGames;
-    }
     createRoom(gameParams: WaitingAreaGameParameters): void {
         this.socket.emit('createWaitingAreaRoom', gameParams);
     }
