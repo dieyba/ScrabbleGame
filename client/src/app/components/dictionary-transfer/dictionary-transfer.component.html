@@ -2,13 +2,12 @@
     <!-- <mat-card for="file">Choose a dictionary (JSON file):</mat-card> -->
     <input #inputFile type="file" id="file" accept=".json" />
     <button mat-button (click)="onUpload()">Upload</button>
-    <div>
-        <mat-form-field appearance="fill" class="papy">
-            <mat-label>Dictonnaire :</mat-label>
-            <mat-select formControlName="dictionaryForm" [(ngModel)]="defaultDictionary" [placeholder]="defaultDictionary">
-                <mat-option value="0">{{ dictionaryList[0] }}</mat-option>
-                <mat-option value="1">{{ dictionaryList[1] }}</mat-option>
-            </mat-select>
-        </mat-form-field>
+
+    <div class="dropdown">
+        <button class="dropbtn">{{ selectedDictionary }}</button>
+        <div class="dropdown-content">
+            <span *ngFor="let dictionary of dictionaryList; index as i" (click)="onDictionarySelection(i)"> {{ dictionary }} </span>
+        </div>
     </div>
+    <button mat-button (click)="onDownload()">Download</button>
 </div>
