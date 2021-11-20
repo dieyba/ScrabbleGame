@@ -1,18 +1,16 @@
-// eslint-disable-next-line max-classes-per-file
-import { Player } from './player';
+import { ValidationService } from '@app/services/validation.service';
+import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
 
-// TODO: remove what is in game params
-export enum Goals {
-    PlaceLetterWorthTenPts = 0, // Place a word containing a letter with a 10 pts value
-    FormTwoLettersStarsOnly = 1, // Form 2 letter word, both letters are *
-    FormWordWithLettersFromName = 2 /* Form a word containing at least 3 letters from the player's name
-        (can be same letter, but different occurence)*/,
-    FormAnExistingWord = 3, // Form a word already on the board
-    FormThreeWords = 4, // Form three words at the same time
-    PlaceLetterOnBoardCorner = 5, // Place a letter on one of the 4 boaard corners
-    ActivateTwoBonuses = 6, // Active 2 bonuses at the same time / place a word with 2 letters on a colour square
-    PlaceLetterOnColorSquare = 7, // Place letter x on a square of color y. x and y are randomly chosen at start of game
+export enum GoalType {
+    PlaceLetterWorthTenPts = 0,
+    FormTwoLettersStarsOnly = 1,
+    FormWordWithLettersFromName = 2,
+    FormAnExistingWord = 3,
+    FormThreeWords = 4,
+    PlaceLetterOnBoardCorner = 5,
+    ActivateTwoBonuses = 6,
+    PlaceLetterOnColorSquare = 7,
 }
 
 export enum GoalDescriptions {
@@ -38,13 +36,13 @@ export enum GoalPoints {
 }
 
 export abstract class Goal {
+    type: GoalType;
     description: string;
-    isExecuted: boolean;
-    players: Player[]; // player(s) who has/have this goal
+    isAchieved: boolean;
     constructor() {
-        this.players = new Array<Player>();
         this.description = '';
-        this.isExecuted = false;
+        this.isAchieved = false;
     }
-    abstract execute(wordsFormed: ScrabbleWord[]): number;
+    initialize?(goalParameters: ScrabbleLetter | ValidationService | string): void;
+    abstract achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters?: ScrabbleLetter[]): number;
 }

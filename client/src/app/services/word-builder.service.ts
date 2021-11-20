@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { Axis, invertAxis, isCoordInsideBoard } from '@app/classes/utilities';
+import { Axis, invertAxis, isCoordInsideBoard, MIN_WORD_LENGHT } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from './grid.service';
 
@@ -8,7 +8,6 @@ const TOWARD_START = true;
 const TOWARD_END = false;
 const BACKWARD_STEP = -1;
 const FORWARD_STEP = 1;
-const MIN_WORD_LENGHT = 2;
 
 @Injectable({
     providedIn: 'root',

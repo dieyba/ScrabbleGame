@@ -24,23 +24,23 @@ export class SocketManagerService {
             // eslint-disable-next-line no-console
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
             socket.on('addPlayer', () => {
-                console.log('addPlayer : ');
                 this.playerMan.addPlayer(socket.id);
+                console.log('addPlayer : ', this.playerMan.allPlayers[this.playerMan.allPlayers.length - 1]?.socketId);
             });
             socket.on('createWaitingAreaRoom', (gameParams: WaitingAreaGameParameters) => {
                 this.createWaitingAreaRoom(socket, gameParams);
-                console.log('createWaitingAreaRoom : ' + gameParams.isLog2990);
+                // console.log('createWaitingAreaRoom, isLog2990: ' + gameParams.isLog2990);
                 this.getAllWaitingAreaGames(socket, gameParams.isLog2990);
             });
             // This is only called when creating a game in play
             socket.on('deleteWaitingAreaRoom', () => {
-                console.log('deleteWaitingAreaRoom : ' + this.getIsLog2990FromId(socket.id));
+                // console.log('deleteWaitingAreaRoom : ' + this.getIsLog2990FromId(socket.id));
                 this.deleteWaitingAreaRoom(socket);
                 this.getAllWaitingAreaGames(socket, this.getIsLog2990FromId(socket.id));
             });
             socket.on('joinWaitingAreaRoom', (joinerName: string, roomToJoinId: number, isLog2990: boolean) => {
                 this.joinRoom(socket, joinerName, roomToJoinId, isLog2990);
-                console.log('joinWaitingAreaRoom : ' + isLog2990);
+                // console.log('joinWaitingAreaRoom : ' + isLog2990);
                 this.getAllWaitingAreaGames(socket, isLog2990);
             });
             socket.on('initializeMultiPlayerGame', () => {
@@ -109,7 +109,7 @@ export class SocketManagerService {
     private createWaitingAreaRoom(socket: io.Socket, gameParams: WaitingAreaGameParameters): void {
         const newRoom = this.gameListMan.createWaitingAreaGame(gameParams, socket.id);
         const creatorPlayer = this.playerMan.getPlayerBySocketID(socket.id);
-        console.log('creatorPlayer : ' + creatorPlayer);
+        // console.log('creatorPlayer : ' + creatorPlayer);
         if (creatorPlayer !== undefined) {
             // update player info in the player manager
             creatorPlayer.name = newRoom.creatorName;
@@ -154,7 +154,7 @@ export class SocketManagerService {
             this.deleteWaitingAreaRoom(socket);
         }
         const waitingAreaRoomUpdate = this.gameListMan.getAWaitingAreaGame(roomId);
-        console.log("leaveWaitingAreaRoom fct : " + this.getIsLog2990FromId(socket.id));
+        // console.log("leaveWaitingAreaRoom fct : " + this.getIsLog2990FromId(socket.id));
         this.getAllWaitingAreaGames(socket, this.getIsLog2990FromId(socket.id));
         this.sio.to(waitingAreaRoom.gameRoom.idGame.toString()).emit('roomLeft', waitingAreaRoomUpdate);
     }
@@ -289,12 +289,13 @@ export class SocketManagerService {
     }
     getIsLog2990FromId(id: string): boolean {
         let room = this.playerMan.getPlayerBySocketID(id)?.roomId;
-        console.log('Room : ' + room);
-        if (room !== undefined) {
-            let waitingArea = this.gameListMan.getAWaitingAreaGame(room);
-            console.log("waitingArea : " + waitingArea?.isLog2990);
-            if (waitingArea !== undefined) return waitingArea.isLog2990;
+        // console.log('Room : ' + room);
+        if (room === undefined) {
+            return false;
         }
+        let waitingArea = this.gameListMan.getAWaitingAreaGame(room);
+        // console.log("waitingArea : " + waitingArea?.isLog2990);
+        if (waitingArea !== undefined) return waitingArea.isLog2990;
         return false;
     }
 }

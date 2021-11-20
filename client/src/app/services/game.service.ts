@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { createSystemEntry } from '@app/classes/chat-display-entry';
 import { PlaceParams } from '@app/classes/commands';
 import { ErrorType } from '@app/classes/errors';
-import { DEFAULT_LOCAL_PLAYER_ID, DEFAULT_OPPONENT_ID, GameInitInfo, GameParameters, GameType, RandomLetterAndColor } from '@app/classes/game-parameters';
-import { Goals } from '@app/classes/goal';
+import { DEFAULT_LOCAL_PLAYER_ID, DEFAULT_OPPONENT_ID, GameInitInfo, GameParameters, GameType } from '@app/classes/game-parameters';
+import { GoalType } from '@app/classes/goal';
 import { LetterStock } from '@app/classes/letter-stock';
 import { Player, removePlayerLetters } from '@app/classes/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
@@ -28,9 +28,6 @@ import { WordBuilderService } from './word-builder.service';
 
 export const DEFAULT_LETTER_COUNT = 7;
 const TIMER_INTERVAL = 1000;
-const PUBLIC_GOALS_COUNT = 2;
-const TOTAL_GOALS_COUNT = 8;
-
 
 @Injectable({
     providedIn: 'root',
@@ -72,12 +69,12 @@ export class GameService {
             const playerArrayIndex = this.game.players.findIndex((p) => p.socketId === previousPlayerSocketId);
             if (playerArrayIndex !== ERROR_NUMBER && !this.game.isEndGame) {
                 const previousPlayer = this.game.players[playerArrayIndex];
-                // TODO: see how to go get a random beginner vp name from the database
-                const newVpName = 'SomeBeginnerVP';
+                const newVpName = 'SomeBeginnerVP'; // TODO: see how to go get a random beginner vp name from the database
                 newVirtualPlayer = new VirtualPlayer(newVpName, Difficulty.Easy);
                 newVirtualPlayer.letters = previousPlayer.letters;
                 newVirtualPlayer.isActive = previousPlayer.isActive;
                 newVirtualPlayer.score = previousPlayer.score;
+                newVirtualPlayer.goal = previousPlayer.goal;
                 this.game.players[playerArrayIndex] = newVirtualPlayer;
                 this.game.gameMode = GameType.Solo;
                 this.chatDisplayService.addEntry(createSystemEntry('Conversion en mode solo'));
@@ -100,9 +97,16 @@ export class GameService {
             const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
             this.game.players[starterPlayerIndex].isActive = true;
             this.validationService.dictionary.selectDictionary(initInfo.dictionaryType);
-            if (String(this.game.isLog2990) == 'true') this.initializeSoloLog2990Game();
+            if (String(this.game.isLog2990) === 'true') {
+                var usedGoals: GoalType[] = [];
+                const sharedGoals = this.goalsService.pickSharedGoals(usedGoals);
+                this.goalsService.pickPrivateGoals(usedGoals, this.game.players);
+                const randomLetterAndColor = this.goalsService.pickRandomLetterAndColor(this.game.stock.letterStock);
+                this.createGoals(sharedGoals, randomLetterAndColor);
+            }
         }
     }
+
     initializeMultiplayerGame(initInfo: GameInitInfo) {
         if (initInfo.gameMode === GameType.MultiPlayer) {
             const localPlayerIndex = this.socket.id === initInfo.players[0].socketId ? 0 : 1;
@@ -116,38 +120,31 @@ export class GameService {
             this.game.gameMode = initInfo.gameMode;
             this.game.isEndGame = false;
             this.game.isLog2990 = initInfo.isLog2990;
-            this.game.sharedGoals = initInfo.sharedGoals;
-            this.game.randomLetterAndColor = initInfo.randomLetterAndColor;
+            if (this.game.isLog2990) this.createGoals(initInfo.sharedGoals, initInfo.randomLetterAndColor);
         }
     }
 
-    initializeSoloLog2990Game() {
-        this.game.sharedGoals = [];
-        var usedGoals: Goals[] = [];
-        // TODO: pick the 4 public random objectives/goals from the list
-        for (let i = 0; this.game.sharedGoals.length < PUBLIC_GOALS_COUNT; i++) {
-            const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
-            if (!this.game.sharedGoals.includes(randomGoal)) {
-                this.game.sharedGoals.push(randomGoal);
-                usedGoals.push(randomGoal);
-                if (randomGoal === Goals.PlaceLetterOnColorSquare) {
-                    this.game.randomLetterAndColor = new RandomLetterAndColor(this.game.stock.letterStock);
-                }
+    createGoals(sharedGoals: GoalType[], randomLetterAndColor: ScrabbleLetter) {
+        this.goalsService.initialize();
+        // Create the goals
+        sharedGoals.forEach(sharedGoalType => {
+            this.goalsService.addSharedGoal(sharedGoalType);
+        });
+        this.game.players.forEach(player => {
+            this.goalsService.addPrivateGoal(player.goal);
+        });
+        // Initialize goals' specific attributes
+        const goalTypesToInitialize = [GoalType.PlaceLetterOnColorSquare, GoalType.FormWordWithLettersFromName, GoalType.FormAnExistingWord];
+        const goalsParameters = [randomLetterAndColor, this.game.getLocalPlayer().name, this.validationService];
+        for (let i = 0; i < goalTypesToInitialize.length; i++) {
+            const goalToInitialize = this.goalsService.getGoalByType(goalTypesToInitialize[i]); // set random letter and color
+            if (goalToInitialize !== undefined && goalToInitialize.initialize !== undefined) {
+                goalToInitialize.initialize(goalsParameters[i]);
             }
         }
-        this.game.players.forEach((player) => {
-            player.letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-            do {
-                const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
-                if (!usedGoals.includes(randomGoal)) {
-                    player.goal = randomGoal;
-                    usedGoals.push(randomGoal)
-                    if (randomGoal === Goals.PlaceLetterOnColorSquare) {
-                        this.game.randomLetterAndColor = new RandomLetterAndColor(this.game.stock.letterStock);
-                    }
-                }
-            } while (player.goal === undefined);
-        });
+        console.log('shared:', this.goalsService.sharedGoals);
+        console.log('private:', this.goalsService.privateGoals);
+        return;
     }
 
     startNewGame() {
@@ -220,44 +217,56 @@ export class GameService {
             return ErrorType.ImpossibleCommand;
         }
         let errorResult = this.placeService.place(player, placeParams);
-        if (errorResult === ErrorType.NoError) {
-            // Generate all words created
-            let tempScrabbleWords: ScrabbleWord[];
-            if (placeParams.orientation === Axis.H) {
-                tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
-            } else {
-                tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
-            }
-            const strWords: string[] = [];
-            tempScrabbleWords.forEach((scrabbleWord) => {
-                strWords.push(scrabbleWord.stringify().toLowerCase());
-            });
-            // validate words waits 3sec if the words are invalid or the server doesn't answer.
-            await this.validationService.validateWords(tempScrabbleWords, this.game.gameMode).then((isValidWordsResult: boolean) => {
-                errorResult = isValidWordsResult ? ErrorType.NoError : ErrorType.ImpossibleCommand;
-                let lettersToAddToRack;
-                if (!this.validationService.areWordsValid) {
-                    // Retake letters
-                    lettersToAddToRack = this.gridService.removeInvalidLetters(
-                        placeParams.position,
-                        placeParams.word.length,
-                        placeParams.orientation,
-                    );
-                } else {
-                    // Take new letters
-                    this.validationService.updatePlayerScore(tempScrabbleWords, player);
-                    lettersToAddToRack = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-                }
-                this.addRackLetters(lettersToAddToRack);
-                lettersToAddToRack.forEach((letter) => {
-                    player.letters.push(letter);
-                });
-                this.isTurnPassed = false;
-                this.isTurnEndSubject.next(this.isTurnPassed);
-                this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
-            });
+        if (errorResult !== ErrorType.NoError) {
             return errorResult;
         }
+        // Generate all words created
+        let tempScrabbleWords: ScrabbleWord[];
+        if (placeParams.orientation === Axis.H) {
+            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
+        } else {
+            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
+        }
+        const strWords: string[] = [];
+        const newlyPlacedLetters: ScrabbleLetter[] = [];
+        tempScrabbleWords[0].content.forEach(newWordLetter => {
+            if (!newWordLetter.tile.isValidated) {
+                newlyPlacedLetters.push(newWordLetter);
+            }
+        });
+        tempScrabbleWords.forEach((scrabbleWord) => {
+            strWords.push(scrabbleWord.stringify().toLowerCase());
+        });
+        // validate words waits 3sec if the words are invalid or the server doesn't answer.
+        await this.validationService.validateWords(tempScrabbleWords, this.game.gameMode).then((isValidWordsResult: boolean) => {
+            errorResult = isValidWordsResult ? ErrorType.NoError : ErrorType.ImpossibleCommand;
+            let lettersToAddToRack;
+            if (!this.validationService.areWordsValid) {
+                // Retake letters
+                lettersToAddToRack = this.gridService.removeInvalidLetters(
+                    placeParams.position,
+                    placeParams.word.length,
+                    placeParams.orientation,
+                );
+            } else {
+                // Take new letters
+                this.validationService.updatePlayerScore(tempScrabbleWords, player);
+                if (String(this.game.isLog2990) === 'true') {
+                    // TODO: make sure that scrabbleLetter.tile is updated properly every turn because it is needed in goal validation
+                    player.score += this.goalsService.achieveGoals(player, tempScrabbleWords, newlyPlacedLetters);
+                    console.log('shared goals:', this.goalsService.sharedGoals);
+                    console.log('private goals:', this.goalsService.privateGoals);
+                }
+                lettersToAddToRack = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
+            }
+            this.addRackLetters(lettersToAddToRack);
+            lettersToAddToRack.forEach((letter) => {
+                player.letters.push(letter);
+            });
+            this.isTurnPassed = false;
+            this.isTurnEndSubject.next(this.isTurnPassed);
+            this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
+        });
         return errorResult;
     }
     synchronizeAfterPlaceCommand(errorResult: ErrorType, placeParams: PlaceParams, player: Player) {

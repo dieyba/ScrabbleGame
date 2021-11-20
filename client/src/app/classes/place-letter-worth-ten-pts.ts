@@ -1,23 +1,24 @@
-import { Goal, GoalDescriptions, GoalPoints } from './goal';
-import { Player } from './player';
+import { Goal, GoalDescriptions, GoalPoints, GoalType } from './goal';
+import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
 
 const GOAL_LETTER_VALUE = 10;
 
 export class PlaceLetterWorthTenPts extends Goal {
-    constructor(players: Player[]) {
+    constructor() {
         super();
-        this.players = players;
+        this.type = GoalType.PlaceLetterWorthTenPts;
         this.description = GoalDescriptions.PlaceLetterWorthTenPts;
     }
-    execute(wordsFormed: ScrabbleWord[]) {
-        if (this.isExecuted) {
+    achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters: ScrabbleLetter[]) {
+        if (this.isAchieved) {
             return 0;
         }
         const wordPlaced = wordsFormed[0];
-        for (const letter of wordPlaced.content) {
-            if (letter.value === GOAL_LETTER_VALUE) {
-                this.isExecuted = true;
+        for (let scrabbleLetter of wordPlaced.content) {
+            const isNewlyPlacedLetter = newlyPlacedLetters.includes(scrabbleLetter);
+            if (scrabbleLetter.value === GOAL_LETTER_VALUE && isNewlyPlacedLetter) {
+                this.isAchieved = true;
                 return GoalPoints.PlaceLetterWorthTenPts;
             }
         }
@@ -25,6 +26,6 @@ export class PlaceLetterWorthTenPts extends Goal {
     }
 }
 
-export const createPlaceLetterWorthTenPts = (players: Player[]): PlaceLetterWorthTenPts => {
-    return new PlaceLetterWorthTenPts(players);
+export const createPlaceLetterWorthTenPts = (): PlaceLetterWorthTenPts => {
+    return new PlaceLetterWorthTenPts();
 };
