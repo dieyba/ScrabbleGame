@@ -78,7 +78,6 @@ export class DictionaryDBService {
                     words: ['patates frites #1', 'patates frites #2', 'patates frites #3', 'patates frites #4', 'patates frites #5'],
                 },
             ];
-            console.log('THIS ADDS DATA TO THE DATABASE, DO NOT USE OTHERWISE');
             for (const course of dictionaries) {
                 await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(course);
             }
