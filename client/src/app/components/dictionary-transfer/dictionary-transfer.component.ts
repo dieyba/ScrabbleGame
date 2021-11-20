@@ -39,7 +39,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
     upload(dictionary: string) {
         this.dictionaryService.uploadFromString(dictionary).subscribe(
             () => {
-                console.log('dictionary uploaded'); // TODO tell user the dictionary is successfully uploaded (snackbar?)
+                // TODO tell user the dictionary is successfully uploaded (snackbar?)
             },
             (error: HttpErrorResponse) => {
                 this.dictionaryService.handleErrorSnackBar(error);
