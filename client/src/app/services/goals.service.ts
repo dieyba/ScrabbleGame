@@ -103,13 +103,14 @@ export class GoalsService {
 		if (privateGoal !== undefined) {
 			pointsMade += privateGoal.achieve(wordsFormed, newlyPlacedLetters);
 		}
+		// TODO: see with UI if we want to remove the goals that are achieved or leave them
 		// Remove goals achieved this turn
-		this.sharedGoals = this.sharedGoals.filter((goal: Goal) => {
-			return !goal.isAchieved;
-		});
-		this.privateGoals = this.privateGoals.filter((goal: Goal) => {
-			return !goal.isAchieved;
-		});
+		// this.sharedGoals = this.sharedGoals.filter((goal: Goal) => {
+		// 	return !goal.isAchieved;
+		// });
+		// this.privateGoals = this.privateGoals.filter((goal: Goal) => {
+		// 	return !goal.isAchieved;
+		// });
 		return pointsMade;
 	}
 
