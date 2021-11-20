@@ -3,7 +3,7 @@ import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { SquareColor } from '@app/classes/square';
 import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
-import { BOARD_OFFSET, BOARD_SIZE } from './grid.service';
+import { BOARD_SIZE } from './grid.service';
 import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE } from './mouse-word-placer.service';
 
 @Injectable({
@@ -11,7 +11,7 @@ import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE } from './mouse-word-placer.ser
 })
 export class MouseWordPlacerCompanionService {
     convertPositionToGridIndex(position: Vec2): number[] {
-        const positionInGrid: Vec2 = new Vec2(position.x - BOARD_OFFSET, position.y - BOARD_OFFSET);
+        const positionInGrid: Vec2 = new Vec2(position.x, position.y);
         // gridIndex : [row, column]
         let gridIndex: number[] = [Math.floor(positionInGrid.x / ACTUAL_SQUARE_SIZE), Math.floor(positionInGrid.y / ACTUAL_SQUARE_SIZE)];
         if (position.x > ABSOLUTE_BOARD_SIZE || position.y > ABSOLUTE_BOARD_SIZE) return (gridIndex = [BOARD_SIZE, BOARD_SIZE]); // Out of bounds
