@@ -9,7 +9,7 @@ const DATABASE_COLLECTION = ['ClassicMode', 'Log2990Mode'];
 const MAX_SCORE = 100000000000;
 @Service()
 export class BestScoresService {
-    client: MongoClient;
+    private client: MongoClient;
     defaultClassicBestScoresValue: BestScores[];
     defaultLog2990BestScoresValue: BestScores[];
     classicCollection: Collection<BestScores>;
