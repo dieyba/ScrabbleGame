@@ -8,6 +8,7 @@ const DATABASE_COLLECTION = 'dictionary';
 
 @Service()
 export class DictionaryService {
+    // TODO remove this fake service
     client: MongoClient;
     dictionaryCollection: Collection<Dictionary>;
 

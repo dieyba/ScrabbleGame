@@ -7,6 +7,7 @@ import { Service } from 'typedi';
 
 @Service()
 export class DictionarController {
+    // TODO remove this fake controller
     router: Router;
 
     constructor(private readonly dictionaryService: DictionaryService) {
