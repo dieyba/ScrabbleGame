@@ -6,14 +6,14 @@
                 <h2>Joueurs débutants</h2>
                 <div class="names">
                     <div class="beginnerNames" *ngFor="let name of adminService.beginnerNameList">
-                        <button class="name-btn" (click)="onSelect(name)">{{ name }}</button>
+                        <button class="name-btn" (click)="onSelect(name)">{{ name.name }}</button>
                     </div>
                 </div>
 
                 <h2>Joueurs experts</h2>
                 <div class="names">
                     <div class="expertNames" *ngFor="let name of adminService.expertNameList">
-                        <button class="name-btn" (click)="onSelect(name)">{{ name }}</button>
+                        <button class="name-btn" (click)="onSelect(name)">{{ name.name }}</button>
                     </div>
                 </div>
             </div>
@@ -37,11 +37,13 @@
             <div class="deletUpdate">
                 <div class="deleteName">
                     <button class="btn" *ngIf="isUntouchable()" disabled="true">Supprimer</button>
-                    <button class="btn" *ngIf="!isUntouchable()" (click)="deleteName()">Supprimer {{ adminService.selectedName }}</button>
+                    <button class="btn" *ngIf="!isUntouchable()" (click)="deleteName(); adminService.editName.setValue('')">
+                        Supprimer {{ adminService.selectedName.name }}
+                    </button>
                     <span class="toolTipDelete">Sélectionner un nom puis cliquer sur Supprimer. </span>
                 </div>
                 <div>
-                    <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill" *ngIf="adminService.editName.value !== ''">
+                    <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill" *ngIf="adminService.selectedName.name !== ''">
                         <mat-label>Modifiez le nom</mat-label>
                         <input
                             matInput
@@ -57,14 +59,14 @@
                     </mat-form-field>
                     <div class="updateName">
                         <button class="btn" *ngIf="isUntouchable()" (click)="updateName()" disabled="true">Modifier le nom</button>
-                        <button class="btn" *ngIf="adminService.selectedName !== '' && !isUntouchable()" (click)="updateName()">
-                            Modifier {{ adminService.selectedName }}
+                        <button class="btn" *ngIf="adminService.selectedName.name !== '' && !isUntouchable()" (click)="updateName()">
+                            Modifier {{ adminService.selectedName.name }}
                         </button>
                         <span class="toolTipUpdate">Sélectionner un nom pour le modifer. </span>
                     </div>
                 </div>
             </div>
-            <p>{{ adminService.selectedName }}</p>
+            <p>{{ adminService.selectedName.name }}</p>
         </div>
 
         <div class="dictionaries">

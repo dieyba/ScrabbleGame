@@ -14,22 +14,6 @@ export class ManipulationRackService {
         this.firstOccurencePosition = ERROR_NUMBER;
     }
 
-    set setLetterSelectedPosition(newValue: number) {
-        this.letterSelectedPosition = newValue;
-    }
-
-    set setFirstOccurencePosition(newValue: number) {
-        this.firstOccurencePosition = newValue;
-    }
-
-    get getLetterSelectedPosition() {
-        return this.letterSelectedPosition;
-    }
-
-    get getFirstOccurencePosition() {
-        return this.firstOccurencePosition;
-    }
-
     handleSelection(position: number) {
         if (this.rackService.handlingSelected[position - 1] === false) {
             if (this.rackService.exchangeSelected[position - 1] === true) {

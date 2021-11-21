@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AdminService } from '@app/services/admin.service';
-import { of } from 'rxjs';
+import { AdminService, VirtualPlayerName } from '@app/services/admin.service';
 
 export interface DictionaryInterface {
     idDict: number;
@@ -23,20 +22,12 @@ export class AdminPageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.getDictionaries();
-        // console.log(this.dictionaries);
+        // // this.getDictionaries();
+        // console.log('beginner names : ', this.beginnerNameList);
     }
-
     getDictionaries() {
         // this.dynamicDownloadJson();
-        console.log(this.adminService.getDictionaries().subscribe(dictionary => (this.dictionaries = dictionary)));
-    }
-
-    fakeValidateUserData() {
-        return of({
-            userDate1: 1,
-            userData2: 2
-        });
+        // console.log(this.adminService.getDictionaries().subscribe(dictionary => (this.dictionaries = dictionary)));
     }
 
     dynamicDownloadJson() {
@@ -96,7 +87,7 @@ export class AdminPageComponent implements OnInit {
         }
     }
 
-    onSelect(name: string) {
+    onSelect(name: VirtualPlayerName) {
         this.adminService.onSelect(name);
     }
 }
