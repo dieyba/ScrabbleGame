@@ -1,11 +1,12 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { BestScores, BestScoresService } from '@app/services/best-scores.service';
+import { BASE_URL, BestScores, BestScoresService } from '@app/services/best-scores.service';
 
 @Component({
     selector: 'app-best-scores',
     templateUrl: './best-scores.component.html',
-    styleUrls: ['./best-scores.component.scss']
+    styleUrls: ['./best-scores.component.scss'],
 })
 export class BestScoresComponent implements OnInit {
     classicModeBestScores: BestScores[];
@@ -16,17 +17,33 @@ export class BestScoresComponent implements OnInit {
         this.log2990ModeBestScores = [];
     }
 
-    ngOnInit(): void {
-        this.getClassicModeBestScores();
-        this.getLog2990ModeBestScores();
-        console.log(this.classicModeBestScores)
+    ngOnInit() {
+        this.getClassicBestScores(BASE_URL + '/classicMode');
+        this.getLog2990BestScores(BASE_URL + '/log2990Mode');
     }
-    getClassicModeBestScores(): void {
-        this.bestScoresService.getClassicModeBestScores().subscribe(classicModeBestScore => (this.classicModeBestScores = classicModeBestScore));
+
+    getClassicBestScores(url: string) {
+        this.bestScoresService.getBestScores(url).subscribe(
+            (receiveBestScore) => {
+                this.classicModeBestScores = receiveBestScore;
+            },
+            (error: HttpErrorResponse) => {
+                this.bestScoresService.handleErrorSnackBar(error);
+            },
+        );
     }
-    getLog2990ModeBestScores() {
-        this.bestScoresService.getLog2990ModeBestScores().subscribe(log2990ModeBestScore => (this.log2990ModeBestScores = log2990ModeBestScore));
+
+    getLog2990BestScores(url: string) {
+        this.bestScoresService.getBestScores(url).subscribe(
+            (receiveBestScore) => {
+                this.log2990ModeBestScores = receiveBestScore;
+            },
+            (error: HttpErrorResponse) => {
+                this.bestScoresService.handleErrorSnackBar(error);
+            },
+        );
     }
+
     closeDialog() {
         this.dialogRef.close();
     }

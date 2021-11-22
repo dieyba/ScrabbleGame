@@ -2,69 +2,75 @@ import { Component, HostListener, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { GameParameters } from '@app/classes/game-parameters';
-import { FormComponent } from '@app/components/form/form.component';
+import { DictionaryType } from '@app/classes/dictionary';
+import { GameInitInfo, GameType } from '@app/classes/game-parameters';
+import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
+import { FormComponent, GAME_CAPACITY } from '@app/components/form/form.component';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
-import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
+import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-/* eslint-disable  @typescript-eslint/no-magic-numbers */
+
+const MAX_NAME_LENGHT = 12;
+const MIN_NAME_LENGHT = 3;
+const LIST_UPDATE_TIMEOUT = 500;
+
 @Component({
     selector: 'app-waiting-area',
     templateUrl: './waiting-area.component.html',
     styleUrls: ['./waiting-area.component.scss'],
 })
 export class WaitingAreaComponent {
-    // mettre server dans un ficher pour les constantes
-    selectedGame: GameParameters;
+    selectedGame: WaitingAreaGameParameters;
     playerName: FormControl;
     playerList: string[];
-    list: GameParameters[];
+    pendingGameslist: WaitingAreaGameParameters[];
     roomDeletedId: number;
     nameErrorMessage: string;
     isStarting: boolean;
+
+    // TODO: rename the booleans according to convention
     name: boolean;
     error: boolean;
     nameValid: boolean;
     joindre: boolean;
     full: boolean;
     gameCancelled: boolean;
+
     private readonly server: string;
-    private timer: any;
+    private timer: NodeJS.Timeout;
     private socket: io.Socket;
 
     constructor(
-        private multiManService: MultiPlayerGameService,
+        private gameService: GameService,
         private router: Router,
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
         private dialog: MatDialog,
         public gameList: GameListService,
-        @Inject(MAT_DIALOG_DATA) public gameSelected: boolean,
+        @Inject(MAT_DIALOG_DATA) public isGameSelected: boolean,
     ) {
-        // this.server = 'http://' + window.location.hostname + ':3000';
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.playerList = [];
-        this.list = [];
+        this.pendingGameslist = [];
         this.name = false;
         this.isStarting = false;
-        if (gameSelected) {
-            this.selectedGame = new GameParameters('', 0, false);
+        if (isGameSelected) {
+            this.selectedGame = new WaitingAreaGameParameters(GameType.MultiPlayer, GAME_CAPACITY, DictionaryType.Default, 0, false, false, '');
             this.playerName = new FormControl('', [
                 Validators.required,
                 Validators.pattern('[a-zA-ZÉé]*'),
-                Validators.maxLength(12),
-                Validators.minLength(3),
+                Validators.maxLength(MAX_NAME_LENGHT),
+                Validators.minLength(MIN_NAME_LENGHT),
             ]);
         }
         this.full = false;
         this.nameErrorMessage = '';
         this.nameValid = false;
         this.timer = setInterval(() => {
-            this.list = this.gameList.getList();
-        }, 500);
+            this.pendingGameslist = this.gameList.waitingAreaGames;
+        }, LIST_UPDATE_TIMEOUT);
         this.socketOnConnect();
     }
     @HostListener('window:beforeunload', ['$event'])
@@ -76,9 +82,18 @@ export class WaitingAreaComponent {
         this.gameList.someoneLeftRoom();
     }
 
-    onSelect(game: GameParameters): GameParameters {
-        if (this.gameSelected) {
+    randomGame() {
+        let randomFloat = Math.random() * this.pendingGameslist.length;
+        randomFloat = Math.floor(randomFloat);
+        this.selectedGame = this.pendingGameslist[randomFloat];
+        this.openName(true);
+    }
+
+    onSelect(game: WaitingAreaGameParameters): WaitingAreaGameParameters {
+        if (this.isGameSelected) {
             this.selectedGame = game;
+            // when selecting a new game, the previous game was cancelled message should be removed
+            this.gameCancelled = false;
         }
         return this.selectedGame;
     }
@@ -89,7 +104,7 @@ export class WaitingAreaComponent {
     }
 
     openName(selected: boolean): boolean {
-        if (this.gameSelected) {
+        if (this.isGameSelected) {
             return (this.name = selected);
         }
         return false;
@@ -99,7 +114,7 @@ export class WaitingAreaComponent {
         if (this.playerList.length === 2) {
             this.isStarting = true;
             clearInterval(this.timer);
-            this.gameList.initializeGame(this.gameList.roomInfo.gameRoom.idGame);
+            this.gameList.initializeMultiplayerGame();
         }
     }
 
@@ -112,8 +127,8 @@ export class WaitingAreaComponent {
         }
     }
 
-    confirmName(game: GameParameters) {
-        if (this.playerName.value === game.creatorPlayer.name || !this.playerName.valid) {
+    confirmName(game: WaitingAreaGameParameters) {
+        if (this.playerName.value === game.creatorName || !this.playerName.valid) {
             this.error = true;
             this.nameErrorMessage = 'Vous ne pouvez pas avoir le meme nom que votre adversaire';
         } else {
@@ -142,33 +157,37 @@ export class WaitingAreaComponent {
         this.dialogRef.close();
     }
     socketOnConnect() {
-        this.socket.on('updateInfo', (game: GameParameters) => {
+        this.socket.on('initClientGame', (gameParams: GameInitInfo) => {
+            clearTimeout(this.timer);
             this.dialogRef.close();
             this.router.navigate(['/game']);
-            this.multiManService.initializeGame2(game);
-            this.socket.emit('deleteRoom');
+            this.gameService.initializeMultiplayerGame(gameParams);
+            this.socket.emit('deleteWaitingAreaRoom');
         });
-        this.socket.on('roomdeleted', (game: GameParameters) => {
+        this.socket.on('waitingAreaRoomDeleted', (game: WaitingAreaGameParameters) => {
             this.joindre = false;
             this.nameValid = false;
+            this.nameErrorMessage = '';
             this.gameCancelled = true;
             this.roomDeletedId = game.gameRoom.idGame;
         });
-        this.socket.on('roomJoined', (game: GameParameters) => {
-            this.gameList.roomInfo = game;
-            this.gameList.roomInfo.gameRoom = game.gameRoom;
-            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
+        this.socket.on('roomJoined', (game: WaitingAreaGameParameters) => {
+            this.gameList.localPlayerRoomInfo = game;
+            this.gameList.localPlayerRoomInfo.gameRoom = game.gameRoom;
+            this.playerList = this.gameList.localPlayerRoomInfo.gameRoom.playersName;
         });
-        this.socket.on('roomcreated', (game: GameParameters) => {
-            this.gameList.roomInfo = game;
-            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
+        this.socket.on('waitingAreaRoomCreated', (game: WaitingAreaGameParameters) => {
+            this.gameList.localPlayerRoomInfo = game;
+            this.playerList = this.gameList.localPlayerRoomInfo.gameRoom.playersName;
         });
-        this.socket.on('roomLeft', (game: GameParameters) => {
-            this.gameList.roomInfo = game;
-            this.playerList = this.gameList.roomInfo.gameRoom.playersName;
-            this.joindre = false;
-            this.nameValid = false;
-            this.gameCancelled = true;
+        this.socket.on('roomLeft', (game: WaitingAreaGameParameters) => {
+            if (game !== undefined) {
+                this.gameList.localPlayerRoomInfo = game;
+                this.playerList = this.gameList.localPlayerRoomInfo.gameRoom.playersName;
+                this.joindre = false;
+                this.nameValid = false;
+                this.gameCancelled = true;
+            }
         });
     }
 }

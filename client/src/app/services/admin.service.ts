@@ -16,6 +16,7 @@ export interface DictionaryInterface {
     description: string;
     words: string[];
 }
+const maxLength = 12;
 
 export interface VirtualPlayerName {
     // idName: string;
@@ -23,10 +24,13 @@ export interface VirtualPlayerName {
 }
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class AdminService {
     // dictionaries: Dictionary[];
+    beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
+    expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
+    dictionariesUrl = 'http://localhost:3000/api/Dictionary';
 
     beginnerNameList: VirtualPlayerName[];
     expertNameList: VirtualPlayerName[];
@@ -34,10 +38,6 @@ export class AdminService {
     editName: FormControl;
     selectedName: VirtualPlayerName;
     nameAlreadyExist: boolean;
-
-    beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
-    expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
-    dictionariesUrl = 'http://localhost:3000/api/Dictionary';
     private index: number;
 
     constructor(private http: HttpClient) {
@@ -46,11 +46,10 @@ export class AdminService {
         this.getBeginnersVirtualPlayerNames().subscribe(beginnerList => (this.beginnerNameList = beginnerList));
         this.getExpertsVirtualPlayerNames().subscribe(expertList => (this.expertNameList = expertList));
 
-        this.newName = new FormControl('', [Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(12),
-        Validators.minLength(3),]);
-        this.editName = new FormControl('', [Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(12),
-        Validators.minLength(3),]);
         this.selectedName = { name: '' };
+        this.newName = new FormControl('', [Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(maxLength), Validators.minLength(3)]);
+        this.editName = new FormControl('', [Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(maxLength), Validators.minLength(3)]);
+
         this.nameAlreadyExist = false;
         this.index = ERROR_NUMBER;
         // console.log('get observable : ', this.getDictionaries());
@@ -59,38 +58,26 @@ export class AdminService {
         // console.log('try : ', this.dictionaries);
     }
 
-    private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
-        return (error: Error): Observable<T> => {
+    handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
+        return (): Observable<T> => {
             return of(result as T);
         };
     }
 
     getDictionaries(): Observable<DictionaryInterface[]> {
-        return this.http.get<DictionaryInterface[]>(this.dictionariesUrl)
-            .pipe(
-                catchError(this.handleError('getDictionaries', []))
-            );
+        return this.http.get<DictionaryInterface[]>(this.dictionariesUrl).pipe(catchError(this.handleError('getDictionaries', [])));
     }
 
     postDictionaries(dico: DictionaryInterface) {
-        return this.http.post<DictionaryInterface>(this.dictionariesUrl, { dico })
-            .pipe(
-                catchError(this.handleError('postDictionaries', []))
-            );
+        return this.http.post<DictionaryInterface>(this.dictionariesUrl, { dico }).pipe(catchError(this.handleError('postDictionaries', [])));
     }
 
     getBeginnersVirtualPlayerNames(): Observable<VirtualPlayerName[]> {
-        return this.http.get<VirtualPlayerName[]>(this.beginnerNameUrl)
-            .pipe(
-                catchError(this.handleError('getBeginnersVirtualPlayerNames', []))
-            );
+        return this.http.get<VirtualPlayerName[]>(this.beginnerNameUrl).pipe(catchError(this.handleError('getBeginnersVirtualPlayerNames', [])));
     }
 
     getExpertsVirtualPlayerNames(): Observable<VirtualPlayerName[]> {
-        return this.http.get<VirtualPlayerName[]>(this.expertNameUrl)
-            .pipe(
-                catchError(this.handleError('getExpertsVirtualPlayerNames', []))
-            );
+        return this.http.get<VirtualPlayerName[]>(this.expertNameUrl).pipe(catchError(this.handleError('getExpertsVirtualPlayerNames', [])));
     }
 
     postBeginnersVirtualPlayerNames(name: string): Observable<VirtualPlayerName> {
@@ -169,9 +156,9 @@ export class AdminService {
     // }
 
     isBeginnerTab() {
-        /*this.getIndex(this.beginnerNameList); */ this.index = this.beginnerNameList.indexOf(this.selectedName);
+        /* this.getIndex(this.beginnerNameList); */ this.index = this.beginnerNameList.indexOf(this.selectedName);
         if (this.index === ERROR_NUMBER) {
-            /*this.getIndex(this.expertNameList)*/ this.index = this.expertNameList.indexOf(this.selectedName);
+            /* this.getIndex(this.expertNameList)*/ this.index = this.expertNameList.indexOf(this.selectedName);
             return false;
         }
         return true;

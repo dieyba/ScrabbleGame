@@ -21,6 +21,7 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { StartingPageComponent } from '@app/pages/starting-page/starting-page.component';
 import { BestScoresComponent } from './components/best-scores/best-scores.component';
 import { ChatDisplayComponent } from './components/chat-display/chat-display.component';
+import { DictionaryTransferComponent } from './components/dictionary-transfer/dictionary-transfer.component';
 import { EndGamePopupComponent } from './components/end-game-popup/end-game-popup.component';
 import { FormComponent } from './components/form/form.component';
 import { RackComponent } from './components/rack/rack.component';
@@ -55,6 +56,7 @@ import { AdminPageComponent } from './pages/admin-page/admin-page.component';
         WaitingAreaComponent,
         RackComponent,
         EndGamePopupComponent,
+        DictionaryTransferComponent,
         AdminPageComponent,
         BestScoresComponent,
     ],
