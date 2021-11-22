@@ -1,5 +1,5 @@
 
-import { Collection, MongoClient } from "mongodb";
+import { Collection, Filter, MongoClient } from "mongodb";
 import { Service } from 'typedi';
 import { VirtualPlayerName } from "../classes/virtual-player-name";
 // import { DatabaseService } from "./database.service";
@@ -52,6 +52,20 @@ export class VirtualPlayerNameService {
             });
     }
 
+    async isSameName(nameToCompare: VirtualPlayerName, playersName: Collection<VirtualPlayerName>): Promise<boolean> {
+        let isSameName = false;
+
+        await playersName.find().forEach((virtualPlayerName) => {
+            if (virtualPlayerName.name === nameToCompare.name) {
+                isSameName = true;
+                // return true;
+            }
+            // return false;
+        });
+        console.log(isSameName);
+        return isSameName;
+    }
+
     async postBeginnersVirtualPlayerName(virtualPlayerName: VirtualPlayerName): Promise<void> {
         this.beginnersCollection
             .insertOne(virtualPlayerName)
@@ -74,9 +88,53 @@ export class VirtualPlayerNameService {
             });
     }
 
-    async deleteBeginnersVirtualPlayerName(idName: string): Promise<void> {
-        this.beginnersCollection
-            .findOneAndDelete({ _id: idName })
+    async isInCollection(nameToCompare: VirtualPlayerName, playersName: Collection<VirtualPlayerName>): Promise<boolean> {
+        let isInCollection = false;
+        await playersName.find().forEach((virtualPlayerName) => {
+            if (virtualPlayerName.name === nameToCompare.name) {
+                isInCollection = true;
+            }
+        });
+
+        // console.log('is in collection ? ', isInCollection);
+        return isInCollection;
+    }
+
+    async deleteBeginnersVirtualPlayerName(name: string): Promise<void> {
+        // if (await this.isInCollection(({ name: name }) as VirtualPlayerName, this.beginnersCollection)) {
+
+        return this.beginnersCollection
+            .findOneAndDelete({ name: name })
+            .then((deleted) => {
+                /* do nothing */
+                console.log('then dans fonction');
+                if (!deleted.value) {
+                    throw new Error("Could not find name");
+                }
+            })
+            .catch(() => {
+                console.log('catch dans fonction')
+                throw new Error("Failed to delete name");
+            });
+        // }
+    }
+
+    // async deleteCourse(sbjCode: string): Promise<void> {
+    //     return this.collection
+    //       .findOneAndDelete({ subjectCode: sbjCode })
+    //       .then((res:FindAndModifyWriteOpResultObject<Course>) => {
+    //         if(!res.value){
+    //           throw new Error("Could not find course");
+    //         }
+    //       })
+    //       .catch(() => {
+    //         throw new Error("Failed to delete course");
+    //       });
+    //   }
+
+    async deleteExpertsVirtualPlayerName(name: string): Promise<void> {
+        return this.expertsCollection
+            .findOneAndDelete({ name: name })
             .then(() => {
                 /* do nothing */
             })
@@ -85,31 +143,44 @@ export class VirtualPlayerNameService {
             });
     }
 
-    async deleteExpertsVirtualPlayerName(idName: string): Promise<void> {
-        this.expertsCollection
-            .findOneAndDelete({ _id: idName })
-            .then(() => {
-                /* do nothing */
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
+    async updateBeginnerVirtualPlayerName(nameToUpdate: string, updateName: string): Promise<void> {
+        if (await this.isSameName(({ name: updateName }) as VirtualPlayerName, this.beginnersCollection)) {
+            return;
+        }
+
+        let filterSameName: Filter<VirtualPlayerName> = { name: nameToUpdate };
+        return this.beginnersCollection
+            .findOneAndReplace(filterSameName, { name: updateName })
+            .then(() => {})
+            .catch((error) => console.error(error));
+    }
+
+    async updateExpertVirtualPlayerName(nameToUpdate: string, updateName: string): Promise<void> {
+        if (await this.isSameName(({ name: updateName }) as VirtualPlayerName, this.expertsCollection)) {
+            return;
+        }
+
+        let filterSameName: Filter<VirtualPlayerName> = { name: nameToUpdate };
+        return this.expertsCollection
+            .findOneAndReplace(filterSameName, { name: updateName })
+            .then(() => {})
+            .catch((error) => console.error(error));
     }
 
     async populateBeginnersDB(): Promise<void> {
         if (await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments() === 0) {
             let courses: VirtualPlayerName[] = [
                 {
-                    idName: "1",
-                    virtualPlayerName: "Erika",
+                    // idName: "1",
+                    name: "Erika",
                 },
                 {
-                    idName: "2",
-                    virtualPlayerName: "Sara",
+                    // idName: "2",
+                    name: "Sara",
                 },
                 {
-                    idName: "3",
-                    virtualPlayerName: "Etienne"
+                    // idName: "3",
+                    name: "Etienne"
                 },
             ];
             console.log("THIS ADDS BEGINNER PLAYER NAMES TO THE DATABASE, DO NOT USE OTHERWISE");
@@ -123,16 +194,16 @@ export class VirtualPlayerNameService {
         if (await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]).countDocuments() === 0) {
             let courses: VirtualPlayerName[] = [
                 {
-                    idName: "1",
-                    virtualPlayerName: "Dieyba",
+                    // idName: "1",
+                    name: "Dieyba",
                 },
                 {
-                    idName: "2",
-                    virtualPlayerName: "Kevin",
+                    // idName: "2",
+                    name: "Kevin",
                 },
                 {
-                    idName: "3",
-                    virtualPlayerName: "Ariane",
+                    // idName: "3",
+                    name: "Ariane",
                 },
             ];
             console.log("THIS ADDS EXPERT PLAYER NAMES TO THE DATABASE, DO NOT USE OTHERWISE");

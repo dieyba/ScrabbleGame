@@ -1,4 +1,4 @@
 export interface VirtualPlayerName {
-    idName: string;
-    virtualPlayerName: string;
+    // idName: string;
+    name: string;
 }

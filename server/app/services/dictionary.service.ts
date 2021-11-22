@@ -13,7 +13,6 @@ export class DictionaryService {
     dictionaryCollection: Collection<Dictionary>;
 
     constructor(url = DATABASE_URL) {
-        console.log('constructeur')
         MongoClient.connect(url)
             .then((client: MongoClient) => {
                 this.client = client;
