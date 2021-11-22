@@ -41,7 +41,7 @@ export class VirtualPlayerNameController {
                 });
         });
 
-        this.router.post('/beginners/send', async (req: Request, res: Response, next: NextFunction) => {
+        this.router.post('/beginners', async (req: Request, res: Response, next: NextFunction) => {
             if (await this.virtualPlayerNameService.isSameName(req.body, this.virtualPlayerNameService.beginnersCollection)) {
                 return;
             }

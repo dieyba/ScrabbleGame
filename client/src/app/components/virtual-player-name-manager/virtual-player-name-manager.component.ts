@@ -55,9 +55,10 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
                     console.log('added : ', added);
                     this.beginnerNameList.push(added);
                 },
-                // (error: HttpErrorResponse) => {
-                //     console.log('ERREUR : ', error);
-                // }
+                (error: HttpErrorResponse) => {
+                    console.log('VA DANS LA PREMIERE PARTIE ORHH');
+                    console.log('ERREUR : ', error);
+                }
             );
         }
     }

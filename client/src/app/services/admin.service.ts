@@ -45,7 +45,7 @@ export class AdminService {
     }
 
     postBeginnersVirtualPlayerNames(name: string): Observable<VirtualPlayerName> {
-        return this.http.post<VirtualPlayerName>(this.beginnerNameUrl + "/send", { name: name })
+        return this.http.post<VirtualPlayerName>(this.beginnerNameUrl, { name: name })
         // .pipe(
         //     catchError(this.handleError('postBeginnersVirtualPlayerNames', { name: name }))
         // );
