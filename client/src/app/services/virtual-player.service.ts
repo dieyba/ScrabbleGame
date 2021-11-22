@@ -5,6 +5,7 @@ import { ExchangeCmd } from '@app/classes/exchange-command';
 import { PassTurnCmd } from '@app/classes/pass-command';
 import { PlaceCmd } from '@app/classes/place-command';
 import { Player } from '@app/classes/player';
+import { BOARD_SIZE } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Axis, ERROR_NUMBER } from '@app/classes/utilities';
@@ -30,6 +31,7 @@ export enum Points {
     MaxValue1 = 6,
     MaxValue2 = 12,
     MaxValue3 = 18,
+    MaxValue4 = Number.MAX_SAFE_INTEGER,
 }
 
 const DEFAULT_VIRTUAL_PLAYER_WAIT_TIME = 3000;
@@ -59,36 +61,28 @@ export class VirtualPlayerService {
         this.player = this.gameService.game.getOpponent();
         this.rack = this.player.letters;
     }
+
     playTurn(): void {
         let moveMade = new ScrabbleWord();
-        // if (typeof Worker !== 'undefined') {
-        //     const currentBoard = this.gridService.scrabbleBoard;
-        //     // Create a new
-        //     const worker = new Worker(new URL('./src/app/services/virtual-player.worker.ts', import.meta.url).href);
-        //     worker.onmessage = ({ data }) => {
-        //         moveMade = data;
-        //     };
-        //     // Send data to our worker
-        //     worker.postMessage({ rack: this.rack, type: this.type, board: currentBoard });
-        // } else {
-        //     // Web Workers not supported in this environment
-        //     // Fallback function
-        // }
-        // Next sprint: implement difficult player type logic by separating here and in virtualPlayerService.makeMoves().
         const defaultParams: DefaultCommandParams = {
             player: this.player,
             serviceCalled: this.gameService,
         };
-        const currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
+        let currentMove = this.getRandomIntInclusive(1, PERCENTAGE);
+        if (this.type === Difficulty.Difficult) {
+            // Always tries to make a move
+            currentMove = PERCENTAGE;
+        }
         if (currentMove <= Probability.EndTurn) {
             setTimeout(() => {
-                // 10% chance to end turn
+                // 10% chance to end turn on easy mode
                 const command = new PassTurnCmd(defaultParams);
                 this.commandInvoker.executeCommand(command);
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
             setTimeout(() => {
-                const chosenTiles = this.chooseTilesFromRack(); // 10% chance to exchange tiles
+                // 10% chance to exchange tiles on easy mode
+                const chosenTiles = this.chooseTilesFromRack();
                 // Converts chosen word to string
                 if (chosenTiles.length === 0) {
                     const emptyRackPass = new PassTurnCmd(defaultParams);
@@ -100,18 +94,37 @@ export class VirtualPlayerService {
                 this.commandInvoker.executeCommand(command);
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
-            moveMade = new ScrabbleWord();
-            moveMade = this.makeMoves(); // 80% chance to make a move
-            console.log('moveMade: ', moveMade);
-            moveMade.value = moveMade.calculateValue();
-            const movePosition = this.findPosition(moveMade, this.orientation);
-            const params: PlaceParams = {
-                position: movePosition,
-                orientation: this.orientation,
-                word: moveMade.stringify(),
-            };
+            // 80% chance to make a move on easy mode
+            const value = this.selectRandomValue();
             setTimeout(() => {
+                let possiblePermutations: ScrabbleLetter[][] = [];
+                if (typeof Worker !== 'undefined') {
+                    const currentBoard = this.gridService.scrabbleBoard;
+                    // Create the worker for the current turn
+                    const worker = new Worker(new URL('./src/app/services/virtual-player.worker.ts', import.meta.url).href);
+                    // Send the rack and the board to our worker
+                    worker.postMessage({ rack: this.rack, board: currentBoard });
+                    // Receive the permutations from the worker
+                    worker.onmessage = ({ data }) => {
+                        possiblePermutations = data.permutations;
+                    };
+                } else {
+                    // Web Workers not supported in this environment
+                    // Implement fallback function if needed
+                }
+                if (possiblePermutations.length === 0) {
+                    // No permutations found, because the board is empty. let's play the first move.
+                    this.playFirstTurn(this.movesWithRack(value), value);
+                }
                 // waits 3 second to try and find a word to place
+                moveMade = this.makeMoves(possiblePermutations, value);
+                console.log('moveMade: ', moveMade);
+                const movePosition = this.findPosition(moveMade, this.orientation);
+                const params: PlaceParams = {
+                    position: movePosition,
+                    orientation: this.orientation,
+                    word: moveMade.stringify(),
+                };
                 if (moveMade.value !== 0 && moveMade.content.length > 1 && this.placeService.canPlaceWord(params)) {
                     const command = new PlaceCmd(defaultParams, params);
                     this.commandInvoker.executeCommand(command);
@@ -125,6 +138,85 @@ export class VirtualPlayerService {
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         }
     }
+
+    filterPermutations(permutations: ScrabbleWord[]): ScrabbleWord[] {
+        const filteredPermutations: ScrabbleWord[] = [];
+        for (const permutation of permutations) {
+            const permutationString = permutation.stringify();
+            if (this.isWordValid(permutationString)) {
+                filteredPermutations.push(permutation);
+            }
+        }
+        return filteredPermutations;
+    }
+
+    playFirstTurn(permutations: ScrabbleWord[], value: number): void {
+        const wordFound = this.findFirstValidWord(permutations, value);
+        const defaultParams: DefaultCommandParams = {
+            player: this.player,
+            serviceCalled: this.gameService,
+        };
+        if (!wordFound) {
+            // Pass turn
+            setTimeout(() => {
+                const passTurn = new PassTurnCmd(defaultParams);
+                this.commandInvoker.executeCommand(passTurn);
+            }, NO_MOVE_TOTAL_WAIT_TIME - DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+        }
+        // Play the word
+        // Find the best position for the move for the points if VP is expert
+        // else just place it in the middle, it's good enough.
+        const params: PlaceParams = {
+            position: positionOfMove,
+            orientation: this.orientation,
+            word: wordFound.stringify(),
+        };
+        const command = new PlaceCmd(defaultParams, params);
+        this.commandInvoker.executeCommand(command);
+    }
+
+    selectRandomValue(): number {
+        // Expert mode
+        if (this.type === Difficulty.Difficult) {
+            return Points.MaxValue4;
+        }
+        // Easy mode
+        const chosen = this.getRandomIntInclusive(1, PERCENTAGE);
+        let value = 0;
+        if (chosen <= Probability.MaxValue1){
+            value = Points.MaxValue1;
+        } else if (chosen <= Probability.MaxValue1 + Probability.MaxValue2) {
+            value = Points.MaxValue2;
+        } else if (chosen <= Probability.MaxValue1 + Probability.MaxValue2 + Probability.MaxValue3) {
+            value = Points.MaxValue3;
+        }
+        return value;
+    }
+
+    findFirstValidWord(permutations: ScrabbleWord[], value: number): ScrabbleWord {
+        const filteredPermutations = this.filterPermutations(permutations);
+        let currentMaxValue = 0;
+        let currentBestWord: ScrabbleWord = new ScrabbleWord();
+        if (value === Points.MaxValue4) {
+            for (const permutation of filteredPermutations) {
+                if (permutation.value > currentMaxValue) {
+                    currentMaxValue = permutation.value;
+                    currentBestWord = permutation;
+                }
+            }
+            return currentBestWord;
+        }
+        for (const permutation of filteredPermutations) {
+            if (
+                (permutation.value <= value && permutation.value >= value - POINTS_INTERVAL) ||
+                (value === Points.MaxValue1 && permutation.value === 0)
+            ) {
+                return permutation;
+            }
+        }
+        return new ScrabbleWord();
+    }
+
     permutationsOfLetters(letters: ScrabbleLetter[]): ScrabbleLetter[][] {
         // Adapted from medium.com/weekly-webtips/step-by-step-guide-to-array-permutation-using-recursion-in-javascript-4e76188b88ff
         const result = [];
@@ -143,6 +235,7 @@ export class VirtualPlayerService {
         }
         return result;
     }
+
     // Returns all valid combinations of the letter + the letters currently in the rack
     movesWithGivenLetter(letter: ScrabbleLetter): ScrabbleWord[] {
         const lettersAvailable: ScrabbleLetter[] = [];
@@ -178,6 +271,7 @@ export class VirtualPlayerService {
         }
         return possibleMoves;
     }
+
     // I have to do this, sorry everyone. If it wasn't for the randomizing we wouldn't have to go this far. Current complexity: 17
     // eslint-disable-next-line complexity
     possibleMoves(points: number, axis: Axis): ScrabbleWord[] {
@@ -263,6 +357,7 @@ export class VirtualPlayerService {
             return wordsFirstTurn;
         }
     }
+
     movesWithRack(points: number): ScrabbleWord[] {
         const possibleMoves: ScrabbleWord[] = [];
         for (const letter of this.rack) {
@@ -277,7 +372,8 @@ export class VirtualPlayerService {
         }
         return possibleMoves;
     }
-    makeMoves(): ScrabbleWord {
+
+    makeMoves(permutations: ScrabbleLetter[][], value: number): ScrabbleWord {
         this.orientation = Axis.H;
         if (this.getRandomIntInclusive(0, 1) === 1) {
             // coin flip to determine starting axis
@@ -302,6 +398,7 @@ export class VirtualPlayerService {
         }
         return new ScrabbleWord(); // randomize move to make
     }
+
     displayMoves(moves: ScrabbleWord[]): string {
         // Displays a message based on an array of moves.
         let message = '';
@@ -325,12 +422,14 @@ export class VirtualPlayerService {
             }
         return message;
     }
+
     displayMoveChat(move: ScrabbleWord, position: Vec2, axis: Axis): string {
         if (move.content.length > 0 && position.x !== POSITION_ERROR && position.y !== POSITION_ERROR) {
             const message = '!placer ' + position.y /* convert this to letters*/ + position.x + axis + ' ' + move.stringify();
             return message;
         } else return 'Erreur de placement';
     }
+
     wordify(letters: ScrabbleLetter[]): ScrabbleWord {
         const word = new ScrabbleWord();
         for (let i = 0; i < letters.length; i++) {
@@ -338,12 +437,14 @@ export class VirtualPlayerService {
         }
         return word;
     }
+
     getRandomIntInclusive(min: number, max: number): number {
         // found on developer.mozilla.org under Math.random()
         min = Math.ceil(min);
         max = Math.ceil(max);
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
+
     findPosition(word: ScrabbleWord, axis: Axis): Vec2 {
         let origin = new ScrabbleLetter('', 0); // Convert position
         let index;
@@ -369,6 +470,7 @@ export class VirtualPlayerService {
         }
         return position;
     }
+
     chooseTilesFromRack(): ScrabbleLetter[] {
         if (this.rack.length === 0) return [];
         const numberOfTiles = this.getRandomIntInclusive(1, this.rack.length);
@@ -389,6 +491,7 @@ export class VirtualPlayerService {
         }
         return listOfTiles;
     }
+
     isWordValid(word: string): boolean {
         return this.validationService.isWordValid(word);
     }
