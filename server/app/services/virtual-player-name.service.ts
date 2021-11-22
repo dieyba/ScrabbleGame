@@ -65,7 +65,7 @@ export class VirtualPlayerNameService {
     }
 
     async postBeginnersVirtualPlayerName(virtualPlayerName: VirtualPlayerName): Promise<void> {
-        this.beginnersCollection
+        return this.beginnersCollection
             .insertOne(virtualPlayerName)
             .then(() => {
                 /* do nothing */
@@ -76,7 +76,7 @@ export class VirtualPlayerNameService {
     }
 
     async postExpertsVirtualPlayerName(virtualPlayerName: VirtualPlayerName): Promise<void> {
-        this.expertsCollection
+        return this.expertsCollection
             .insertOne(virtualPlayerName)
             .then(() => {
                 /* do nothing */
@@ -99,8 +99,6 @@ export class VirtualPlayerNameService {
     }
 
     async deleteBeginnersVirtualPlayerName(name: string): Promise<void> {
-        // if (await this.isInCollection(({ name: name }) as VirtualPlayerName, this.beginnersCollection)) {
-
         return this.beginnersCollection
             .findOneAndDelete({ name: name })
             .then((deleted) => {
@@ -114,21 +112,7 @@ export class VirtualPlayerNameService {
                 console.log('catch dans fonction')
                 throw new Error("Failed to delete name");
             });
-        // }
     }
-
-    // async deleteCourse(sbjCode: string): Promise<void> {
-    //     return this.collection
-    //       .findOneAndDelete({ subjectCode: sbjCode })
-    //       .then((res:FindAndModifyWriteOpResultObject<Course>) => {
-    //         if(!res.value){
-    //           throw new Error("Could not find course");
-    //         }
-    //       })
-    //       .catch(() => {
-    //         throw new Error("Failed to delete course");
-    //       });
-    //   }
 
     async deleteExpertsVirtualPlayerName(name: string): Promise<void> {
         return this.expertsCollection
