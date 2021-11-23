@@ -2,6 +2,7 @@ import { ValidationService } from '@app/services/validation.service';
 import { Goal, GoalDescriptions, GoalPoints, GoalType } from './goal';
 import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
+import { ERROR_NUMBER, scrabbleLettersToString } from './utilities';
 
 export class FormAnExistingWord extends Goal {
     private validationService: ValidationService;
@@ -17,12 +18,12 @@ export class FormAnExistingWord extends Goal {
         if (this.isAchieved) {
             return 0;
         }
+        const previousValidWordsFormed = this.validationService.validWordsFormed.slice(0, -wordsFormed.length);
         for (let newWordFormed of wordsFormed) {
-            const newWordFormedFirstOccurence = this.validationService.validWordsFormed.findIndex(wordFormed => {
-                return newWordFormed.content === wordFormed.content;
-            });
-            const newWordFormedLastOccurence = this.validationService.validWordsFormed.lastIndexOf(newWordFormed);
-            if (newWordFormedFirstOccurence !== newWordFormedLastOccurence) {
+            // TODO: Voir pour les étoiles si les lettres si il faut toLower() dans validWordsFormed et newWordFormed 
+            const previousLastIndexOfNewWordFormed = previousValidWordsFormed.lastIndexOf(scrabbleLettersToString(newWordFormed.content));
+            const currentLastIndexOfNewWordFormed = this.validationService.validWordsFormed.lastIndexOf(scrabbleLettersToString(newWordFormed.content));
+            if (previousLastIndexOfNewWordFormed !== ERROR_NUMBER && previousLastIndexOfNewWordFormed !== currentLastIndexOfNewWordFormed) {
                 this.isAchieved = true;
                 return GoalPoints.FormAnExistingWord;
             }

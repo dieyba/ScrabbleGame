@@ -12,6 +12,9 @@ import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { TOTAL_COLORS } from '@app/classes/square';
+import { SocketHandler } from '@app/modules/socket-handler';
+import * as io from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 
 const PUBLIC_GOALS_COUNT = 2;
 const TOTAL_GOALS_COUNT = 8;
@@ -22,12 +25,19 @@ export class GoalsService {
 	goalsCreationMap: Map<GoalType, Function>; // eslint-disable-line @typescript-eslint/ban-types
 	sharedGoals: Goal[];
 	privateGoals: Goal[];
+	private socket: io.Socket;
+	private readonly server: string;
 
 	constructor() {
+		this.server = environment.socketUrl;
+		this.socket = SocketHandler.requestSocket(this.server);
 		this.goalsCreationMap = new Map();
 		this.initialize();
+		this.socket.on('goal achieved', (goalAchieved: GoalType) => {
+			this.getGoalByType(goalAchieved).isAchieved = true;
+			console.log('opponent new goal achieved:', this.getGoalByType(goalAchieved).constructor.name);
+		});
 	}
-
 	initialize() {
 		this.sharedGoals = new Array<Goal>();
 		this.privateGoals = new Array<Goal>();
@@ -95,7 +105,11 @@ export class GoalsService {
 
 	achieveGoals(activePlayer: Player, wordsFormed: ScrabbleWord[], newlyPlacedLetters: ScrabbleLetter[]) {
 		let pointsMade = 0;
-		// Checks if goals were achieved this turn
+		const allGoals = this.sharedGoals.concat(this.privateGoals);
+		const alreadyAchievedGoals = allGoals.filter((goal: Goal) => {
+			return goal.isAchieved;
+		});
+		// Check if a new goal was achieved and return the corresponding points
 		this.sharedGoals.forEach((goal) => {
 			pointsMade += goal.achieve(wordsFormed, newlyPlacedLetters);
 		});
@@ -103,14 +117,14 @@ export class GoalsService {
 		if (privateGoal !== undefined) {
 			pointsMade += privateGoal.achieve(wordsFormed, newlyPlacedLetters);
 		}
-		// TODO: see with UI if we want to remove the goals that are achieved or leave them
-		// Remove goals achieved this turn
-		// this.sharedGoals = this.sharedGoals.filter((goal: Goal) => {
-		// 	return !goal.isAchieved;
-		// });
-		// this.privateGoals = this.privateGoals.filter((goal: Goal) => {
-		// 	return !goal.isAchieved;
-		// });
+		// Synchronize the new goals achieved for multiplayer mode
+		allGoals.forEach(goal => {
+			if (!alreadyAchievedGoals.includes(goal) && goal.isAchieved) {
+				this.socket.emit('achieve goal', goal.type);
+				console.log('new goal achieved:', goal.constructor.name);
+			}
+		});
+
 		return pointsMade;
 	}
 

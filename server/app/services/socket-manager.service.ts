@@ -1,4 +1,4 @@
-import { GameInitInfo, WaitingAreaGameParameters } from '@app/classes/game-parameters';
+import { GameInitInfo, GoalType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
 import { BoardUpdate, ERROR_NUMBER, LettersUpdate } from '@app/classes/utilities';
 import * as http from 'http';
 import * as io from 'socket.io';
@@ -99,6 +99,16 @@ export class SocketManagerService {
                 const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.getOtherPlayerInRoom(sender.socketId);
                 if (opponent !== undefined) {
                     this.sio.to(opponent.socketId).emit('update letters', update);
+                }
+            });
+            socket.on('achieve goal', (goalAchieved: GoalType) => {
+                const sender = this.playerMan.getPlayerBySocketID(socket.id);
+                if (sender === undefined) {
+                    return;
+                }
+                const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.getOtherPlayerInRoom(sender.socketId);
+                if (opponent !== undefined) {
+                    this.sio.to(opponent.socketId).emit('goal achieved', goalAchieved);
                 }
             });
             socket.on('change turn', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
@@ -263,6 +273,17 @@ export class SocketManagerService {
         // eslint-disable-next-line no-console
         console.log(newWords, ' is valid:', result);
         this.sio.to(socket.id).emit('areWordsValid', result);
+        if (!result) {
+            return;
+        }
+        const sender = this.playerMan.getPlayerBySocketID(socket.id);
+        if (sender === undefined) {
+            return;
+        }
+        const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.getOtherPlayerInRoom(sender.socketId);
+        if (opponent !== undefined) {
+            this.sio.to(opponent.socketId).emit('newValidWords', newWords);
+        }
     }
     private changeTurn(socket: io.Socket, isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) {
         const player = this.playerMan.getPlayerBySocketID(socket.id);

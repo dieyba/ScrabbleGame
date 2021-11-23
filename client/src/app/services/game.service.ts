@@ -152,6 +152,7 @@ export class GameService {
         this.isTurnEndSubject = new BehaviorSubject<boolean>(this.isTurnPassed);
         this.isTurnEndObservable = this.isTurnEndSubject.asObservable();
         this.rackService.rackLetters = [];
+        this.validationService.validWordsFormed = [];
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
         this.addRackLetters(this.game.getLocalPlayer().letters);
         this.startCountdown();
@@ -254,8 +255,6 @@ export class GameService {
                 if (String(this.game.isLog2990) === 'true') {
                     // TODO: make sure that scrabbleLetter.tile is updated properly every turn because it is needed in goal validation
                     player.score += this.goalsService.achieveGoals(player, tempScrabbleWords, newlyPlacedLetters);
-                    console.log('shared goals:', this.goalsService.sharedGoals);
-                    console.log('private goals:', this.goalsService.privateGoals);
                 }
                 lettersToAddToRack = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
             }
