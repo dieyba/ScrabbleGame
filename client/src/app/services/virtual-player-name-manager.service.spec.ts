@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { VirtualPlayerNameManager } from './virtual-player-name-manager';
 
-describe('AdminService', () => {
+describe('VirtualPlayerNameManager', () => {
     let service: VirtualPlayerNameManager;
 
     beforeEach(() => {
