@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ERROR_NUMBER } from '@app/classes/utilities';
-import { VirtualPlayerNameManager, VirtualPlayerName } from '@app/services/virtual-player-name-manager';
+import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
 
 const maxLength = 12;
 // export const BEGINNER_VIRTUAL_PLAYER_NAMES_URL = 'http://localhost:3000/api/VirtualPlayerName/beginners';
@@ -13,8 +13,8 @@ const maxLength = 12;
 enum ErrorCase {
     InvalidName = 'Ce nom est invalide',
     AlreadyThere = 'Ce nom existe déjà dans la base de données, actualisez votre page.',
-    DeleteAfterDeleteOrUpdate = 'Le nom que vous essayer de supprimer a déjà été modifié ou supprimé, actualisez votre page.',
-    UpdateAfterDelete = 'Le nom que vous essayer de modifié a été supprimé, actualisez votre page.',
+    DeleteAfterDeleteOrUpdate = 'Le nom que vous essayiez de supprimer a déjà été modifié ou supprimé, actualisez votre page.',
+    UpdateAfterDelete = 'Le nom que vous essayiez de modifié a été supprimé, actualisez votre page.',
     DatabaseServerCrash = 'La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard.',
 }
 

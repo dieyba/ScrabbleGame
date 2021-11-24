@@ -60,14 +60,12 @@ export class GameService {
             this.game.getOpponent().letters = update.newLetters;
             this.game.getOpponent().score = update.newScore;
         });
-        this.socket.on('convert to solo', (previousPlayerSocketId: string) => {
+        this.socket.on('convert to solo', (previousPlayerSocketId: string, virtualPlayerName: string) => {
             let newVirtualPlayer;
             const playerArrayIndex = this.game.players.findIndex((p) => p.socketId === previousPlayerSocketId);
             if (playerArrayIndex !== ERROR_NUMBER && !this.game.isEndGame) {
                 const previousPlayer = this.game.players[playerArrayIndex];
-                // TODO: see how to go get a random beginner vp name from the database
-                const newVpName = 'SomeBeginnerVP';
-                newVirtualPlayer = new VirtualPlayer(newVpName, Difficulty.Easy);
+                newVirtualPlayer = new VirtualPlayer(virtualPlayerName, Difficulty.Easy);
                 newVirtualPlayer.letters = previousPlayer.letters;
                 newVirtualPlayer.isActive = previousPlayer.isActive;
                 newVirtualPlayer.score = previousPlayer.score;
