@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { DictionaryInterface } from '@app/services/admin.service';
+import { DictionaryInterface } from '@app/services/virtual-player-name-manager';
 import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
 
 @Component({

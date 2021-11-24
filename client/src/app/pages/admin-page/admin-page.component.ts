@@ -2,11 +2,9 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { AdminService } from '@app/services/admin.service';
+import { VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
 import { BestScoresService } from '@app/services/best-scores.service';
-// import { of } from 'rxjs';
 
-// const errorIndex = -1;
 export interface DictionaryInterface {
     idDict: number;
     title: string;
@@ -21,16 +19,29 @@ export interface DictionaryInterface {
 })
 export class AdminPageComponent {
     privateName: boolean;
-    constructor(public adminService: AdminService, private bestScoreService: BestScoresService, private snack: MatSnackBar) {
+    constructor(public virtualPlayerNameManagerService: VirtualPlayerNameManager, private bestScoreService: BestScoresService, private snack: MatSnackBar) {
         this.privateName = false;
     }
 
-    ngOnInit(): void {
-        // console.log('beginner names : ', this.beginnerNameList);
-    }
+    // ngOnInit(): void {
+    //     // console.log('beginner names : ', this.beginnerNameList);
+    // }
 
     resetDataBase() {
         this.bestScoreService.resetDbBestScores().subscribe(
+            () => {
+                /* Do nothing */
+            },
+            (error: HttpErrorResponse) => {
+                if (error.status !== HttpStatusCode.Ok) {
+                    this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'close');
+                } else {
+                    this.snack.open(' La base de données a été réinitialisé avec succès!', 'close');
+                }
+            },
+        );
+
+        this.virtualPlayerNameManagerService.reset().subscribe(
             () => {
                 /* Do nothing */
             },

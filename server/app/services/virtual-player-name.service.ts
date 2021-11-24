@@ -1,5 +1,5 @@
 import { VirtualPlayerName } from '@app/classes/virtual-player-name';
-import { Collection, Filter, MongoClient } from 'mongodb';
+import { Collection, Filter, FindOneAndUpdateOptions, MongoClient, ObjectId } from 'mongodb';
 import { Service } from 'typedi';
 // import { DatabaseService } from "./database.service";
 const DATABASE_URL = 'mongodb+srv://Scrabble304:Scrabble304@cluster0.bvwkn.mongodb.net/database?retryWrites=true&w=majority';
@@ -50,21 +50,11 @@ export class VirtualPlayerNameService {
             });
     }
 
-    async isSameName(nameToCompare: VirtualPlayerName, playersName: Collection<VirtualPlayerName>): Promise<boolean> {
-        let isSameName = false;
-
-        await playersName.find().forEach((virtualPlayerName) => {
-            if (virtualPlayerName.name === nameToCompare.name) {
-                isSameName = true;
-                // return true;
-            }
-            // return false;
-        });
-        console.log(isSameName);
-        return isSameName;
-    }
-
     async postBeginnersVirtualPlayerName(virtualPlayerName: VirtualPlayerName): Promise<void> {
+        if (await this.isSameName(virtualPlayerName, this.beginnersCollection)) {
+            throw new Error('Ce nom existe déjà');
+        }
+
         return this.beginnersCollection
             .insertOne(virtualPlayerName)
             .then(() => {
@@ -76,6 +66,10 @@ export class VirtualPlayerNameService {
     }
 
     async postExpertsVirtualPlayerName(virtualPlayerName: VirtualPlayerName): Promise<void> {
+        if (await this.isSameName(virtualPlayerName, this.expertsCollection)) {
+            throw new Error('Ce nom existe déjà');
+        }
+
         return this.expertsCollection
             .insertOne(virtualPlayerName)
             .then(() => {
@@ -86,83 +80,84 @@ export class VirtualPlayerNameService {
             });
     }
 
-    async isInCollection(nameToCompare: VirtualPlayerName, playersName: Collection<VirtualPlayerName>): Promise<boolean> {
-        let isInCollection = false;
-        await playersName.find().forEach((virtualPlayerName) => {
-            if (virtualPlayerName.name === nameToCompare.name) {
-                isInCollection = true;
-            }
-        });
-
-        // console.log('is in collection ? ', isInCollection);
-        return isInCollection;
-    }
-
     async deleteBeginnersVirtualPlayerName(name: string): Promise<void> {
         return this.beginnersCollection
-            .findOneAndDelete({ name: name })
+            .findOneAndDelete({ name })
             .then((deleted) => {
-                /* do nothing */
-                console.log('then dans fonction');
                 if (!deleted.value) {
-                    throw new Error("Could not find name");
+                    throw new Error('Could not find name');
                 }
             })
             .catch(() => {
-                console.log('catch dans fonction')
-                throw new Error("Failed to delete name");
+                throw new Error('Failed to delete name');
             });
     }
 
     async deleteExpertsVirtualPlayerName(name: string): Promise<void> {
         return this.expertsCollection
-            .findOneAndDelete({ name: name })
-            .then(() => {
-                /* do nothing */
+            .findOneAndDelete({ name })
+            .then((deleted) => {
+                if (!deleted.value) {
+                    throw new Error('Could not find name');
+                }
             })
-            .catch((error: Error) => {
+            .catch(() => {
+                throw new Error('Failed to delete name');
+            });
+    }
+
+    async updateBeginnerVirtualPlayerName(nameToUpdateId: ObjectId, updateName: string): Promise<void> {
+        if (await this.isSameName({ _id: new ObjectId(), name: updateName }, this.beginnersCollection)) {
+            throw new Error('Ce nom existe déjà');
+        }
+
+        const filterSameId: Filter<VirtualPlayerName> = { _id: new ObjectId(nameToUpdateId) };
+        const options = { returnNewDocument: true } as FindOneAndUpdateOptions;
+        return this.beginnersCollection
+            .findOneAndUpdate(filterSameId, { $set: { name: updateName } }, options)
+            .then(() => {
+                /* Do nothing */
+            })
+            .catch((error) => {
                 throw error;
             });
     }
 
-    async updateBeginnerVirtualPlayerName(nameToUpdate: string, updateName: string): Promise<void> {
-        if (await this.isSameName(({ name: updateName }) as VirtualPlayerName, this.beginnersCollection)) {
-            return;
+    async updateExpertVirtualPlayerName(nameToUpdateId: ObjectId, updateName: string): Promise<void> {
+        if (await this.isSameName({ _id: new ObjectId(), name: updateName }, this.expertsCollection)) {
+            throw new Error('Ce nom existe déjà');
         }
 
-        let filterSameName: Filter<VirtualPlayerName> = { name: nameToUpdate };
-        return this.beginnersCollection
-            .findOneAndReplace(filterSameName, { name: updateName })
-            .then(() => {})
-            .catch((error) => console.error(error));
+        const filterSameId: Filter<VirtualPlayerName> = { _id: new ObjectId(nameToUpdateId) };
+        return this.expertsCollection
+            .findOneAndReplace(filterSameId, { $set: { name: updateName } })
+            .then(() => {
+                /* Do nothing */
+            })
+            .catch((error) => {
+                throw error;
+            });
     }
 
-    async updateExpertVirtualPlayerName(nameToUpdate: string, updateName: string): Promise<void> {
-        if (await this.isSameName(({ name: updateName }) as VirtualPlayerName, this.expertsCollection)) {
-            return;
-        }
-
-        let filterSameName: Filter<VirtualPlayerName> = { name: nameToUpdate };
-        return this.expertsCollection
-            .findOneAndReplace(filterSameName, { name: updateName })
-            .then(() => {})
-            .catch((error) => console.error(error));
+    async resetDataBase(): Promise<void> {
+        await this.resetCollection(this.beginnersCollection);
+        await this.resetCollection(this.expertsCollection);
     }
 
     async populateBeginnersDB(): Promise<void> {
         if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments()) === 0) {
             const courses: VirtualPlayerName[] = [
                 {
-                    // idName: "1",
-                    name: "Erika",
+                    _id: new ObjectId(),
+                    name: 'Erika',
                 },
                 {
-                    // idName: "2",
-                    name: "Sara",
+                    _id: new ObjectId(),
+                    name: 'Sara',
                 },
                 {
-                    // idName: "3",
-                    name: "Etienne"
+                    _id: new ObjectId(),
+                    name: 'Etienne',
                 },
             ];
             for (const course of courses) {
@@ -175,21 +170,44 @@ export class VirtualPlayerNameService {
         if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]).countDocuments()) === 0) {
             const courses: VirtualPlayerName[] = [
                 {
-                    // idName: "1",
-                    name: "Dieyba",
+                    _id: new ObjectId(),
+                    name: 'Dieyba',
                 },
                 {
-                    // idName: "2",
-                    name: "Kevin",
+                    _id: new ObjectId(),
+                    name: 'Kevin',
                 },
                 {
-                    // idName: "3",
-                    name: "Ariane",
+                    _id: new ObjectId(),
+                    name: 'Ariane',
                 },
             ];
             for (const course of courses) {
                 await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]).insertOne(course);
             }
         }
+    }
+
+    private async isSameName(nameToCompare: VirtualPlayerName, playersName: Collection<VirtualPlayerName>): Promise<boolean> {
+        let isSameName = false;
+
+        await playersName.find().forEach((virtualPlayerName) => {
+            if (virtualPlayerName.name === nameToCompare.name) {
+                isSameName = true;
+            }
+        });
+        return isSameName;
+    }
+
+    private async resetCollection(collection: Collection<VirtualPlayerName>): Promise<void> {
+        return collection
+            .deleteMany({})
+            .then(() => {
+                this.populateBeginnersDB();
+                this.populateExpertsDB();
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
     }
 }

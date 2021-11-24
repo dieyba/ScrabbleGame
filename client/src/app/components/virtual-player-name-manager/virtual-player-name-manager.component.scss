@@ -3,6 +3,20 @@
     right: 150px;
 }
 
+.information {
+    position: relative;
+    left: 300px;
+    font-size: 10pt;
+    bottom: 10px;
+}
+
+.information2 {
+    position: relative;
+    left: 200px;
+    top: 5px;
+    font-size: 7pt;
+}
+
 .add {
     position: relative;
     bottom: 10px;
@@ -25,7 +39,6 @@
 }
 
 .beginnerNames {
-    // background-color: black;
     margin-top: 10px;
     //     overflow-y: scroll;
     //     height: fit-content;
@@ -33,7 +46,6 @@
 }
 
 .expertNames {
-    // background-color: blanchedalmond;
     margin-top: 10px;
     //     overflow-y: scroll;
     //     height: fit-content;
@@ -72,6 +84,7 @@ h2 {
 
 .input {
     display: flex;
+    flex-direction: column;
     margin-left: 600px;
     margin-top: 50px;
 }

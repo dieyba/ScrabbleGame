@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { AdminService } from './admin.service';
+import { VirtualPlayerNameManager } from './virtual-player-name-manager';
 
 describe('AdminService', () => {
-    let service: AdminService;
+    let service: VirtualPlayerNameManager;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(AdminService);
+        service = TestBed.inject(VirtualPlayerNameManager);
     });
 
     it('should be created', () => {
