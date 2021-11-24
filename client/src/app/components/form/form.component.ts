@@ -13,7 +13,7 @@ import { DictionaryService, BASE_URL } from '@app/services/dictionary.service';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
 import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
-import { ErrorCase } from '../virtual-player-name-manager/virtual-player-name-manager.component';
+import { ErrorCase } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
 
 export const GAME_CAPACITY = 2;
 
@@ -58,36 +58,38 @@ export class FormComponent implements OnInit {
         this.isLOG2990 = false; // TODO: implement actual isLOG2990 depending on which page created the form
         this.beginnerNameList = [];
         this.expertNameList = [];
-        this.dictionaryList = [];//Object.values(DictionaryType);
-        this.selectedPlayer = "";
+        this.dictionaryList = []; // Object.values(DictionaryType);
+        this.selectedPlayer = '';
         this.randomPlayerId = 0;
         this.defaultTimer = '60';
         this.defaultDictionary = '0';
         this.defaultBonus = false;
         this.beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
         this.expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
-        
+
         if (this.isSolo === true) {
             this.level = new FormControl('', [Validators.required]);
         } else {
             this.level = new FormControl('');
         }
-        
+
         this.virtualPlayerNameService.getVirtualPlayerNames(this.beginnerNameUrl).subscribe(
             (list) => {
                 this.beginnerNameList = list;
             },
             () => {
-                this.snack.open(ErrorCase.DatabaseServerCrash, "close");
-            });
+                this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+            },
+        );
 
         this.virtualPlayerNameService.getVirtualPlayerNames(this.expertNameUrl).subscribe(
             (list) => {
                 this.expertNameList = list;
             },
             () => {
-                this.snack.open(ErrorCase.DatabaseServerCrash, "close");
-            });
+                this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+            },
+        );
 
         this.dictionaryService.getDictionaries(BASE_URL).subscribe(
             (dictionaries: DictionaryInterface[]) => {
