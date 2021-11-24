@@ -19,7 +19,7 @@ export interface DictionaryInterface {
 })
 export class AdminPageComponent {
     privateName: boolean;
-    constructor(public virtualPlayerNameManagerService: VirtualPlayerNameManager, private bestScoreService: BestScoresService, private snack: MatSnackBar) {
+    constructor(public virtualPlayerNameService: VirtualPlayerNameManager, private bestScoreService: BestScoresService, private snack: MatSnackBar) {
         this.privateName = false;
     }
 
@@ -41,7 +41,7 @@ export class AdminPageComponent {
             },
         );
 
-        this.virtualPlayerNameManagerService.reset().subscribe(
+        this.virtualPlayerNameService.reset().subscribe(
             () => {
                 /* Do nothing */
             },
