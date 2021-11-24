@@ -144,7 +144,7 @@ export class SocketManagerService {
         roomGame.removePlayer(socket.id);
         this.displayPlayerQuitMessage(socket);
         this.virtualPlayerNameService
-            .getBeginnersVirtualPlayerNames()
+            .getVirtualPlayerNames(this.virtualPlayerNameService.beginnersCollection)
             .then((virtualPlayerNames: VirtualPlayerName[]) => {
                 const randomNewNameIndex = Math.floor(Math.random() * virtualPlayerNames.length);
                 const newVirtualPlayerName = virtualPlayerNames[randomNewNameIndex].name;

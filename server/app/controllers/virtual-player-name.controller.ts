@@ -17,7 +17,7 @@ export class VirtualPlayerNameController {
 
         this.router.get('/beginners', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
-                .getBeginnersVirtualPlayerNames()
+                .getVirtualPlayerNames(this.virtualPlayerNameService.beginnersCollection)
                 .then((virtualPlayerNames: VirtualPlayerName[]) => {
                     res.json(virtualPlayerNames);
                 })
@@ -28,7 +28,7 @@ export class VirtualPlayerNameController {
 
         this.router.get('/experts', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
-                .getExpertsVirtualPlayerNames()
+                .getVirtualPlayerNames(this.virtualPlayerNameService.expertsCollection)
                 .then((virtualPlayerNames: VirtualPlayerName[]) => {
                     res.json(virtualPlayerNames);
                 })
@@ -39,7 +39,7 @@ export class VirtualPlayerNameController {
 
         this.router.post('/beginners', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
-                .postBeginnersVirtualPlayerName(req.body)
+                .postVirtualPlayerName(this.virtualPlayerNameService.beginnersCollection, req.body)
                 .then(() => {
                     res.json(req.body);
                 })
@@ -50,7 +50,7 @@ export class VirtualPlayerNameController {
 
         this.router.post('/experts', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
-                .postExpertsVirtualPlayerName(req.body)
+                .postVirtualPlayerName(this.virtualPlayerNameService.expertsCollection, req.body)
                 .then(() => {
                     res.json(req.body);
                 })
@@ -61,7 +61,7 @@ export class VirtualPlayerNameController {
 
         this.router.delete('/beginners/:name', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
-                .deleteBeginnersVirtualPlayerName(req.params.name)
+                .deleteVirtualPlayerName(this.virtualPlayerNameService.beginnersCollection, req.params.name)
                 .then(() => {
                     res.status(StatusCodes.NO_CONTENT).send();
                 })
@@ -76,7 +76,7 @@ export class VirtualPlayerNameController {
 
         this.router.delete('/experts/:name', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
-                .deleteExpertsVirtualPlayerName(req.params.name)
+                .deleteVirtualPlayerName(this.virtualPlayerNameService.expertsCollection, req.params.name)
                 .then(() => {
                     res.status(StatusCodes.NO_CONTENT).send();
                 })
@@ -91,16 +91,11 @@ export class VirtualPlayerNameController {
 
         this.router.patch('/beginners', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
-                .updateBeginnerVirtualPlayerName(req.body.id, req.body.newName)
+                .updateVirtualPlayerName(this.virtualPlayerNameService.beginnersCollection, req.body.id, req.body.newName)
                 .then(() => {
                     res.status(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
-                    // if (error.message === "Ce nom existe déjà") {
-                    //     console.log('erreur nom existe deja');
-                    //     res.status(StatusCodes.BAD_REQUEST).send(error.message);
-                    //     return;
-                    // }
                     if (error.message === 'Cannot remove headers after they are sent to the client') {
                         // do nothing
                     } else {
@@ -111,14 +106,11 @@ export class VirtualPlayerNameController {
 
         this.router.patch('/experts', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
-                .updateExpertVirtualPlayerName(req.body.id, req.body.newName)
+                .updateVirtualPlayerName(this.virtualPlayerNameService.expertsCollection, req.body.id, req.body.newName)
                 .then(() => {
                     res.status(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
-                    // if (error.message === "Ce nom existe déjà") {
-                    //     res.status(StatusCodes.BAD_REQUEST).send(error.message);
-                    // }
                     if (error.message === 'Cannot remove headers after they are sent to the client') {
                         // do nothing
                     } else {
@@ -134,6 +126,7 @@ export class VirtualPlayerNameController {
                     res.status(StatusCodes.NO_CONTENT).send();
                 })
                 .catch((error: Error) => {
+                    // TODO : avoid if-else
                     if (error.message === 'Cannot remove headers after they are sent to the client') {
                         // do nothing
                     } else {

@@ -10,11 +10,11 @@ const maxLength = 12;
 // export const BEGINNER_VIRTUAL_PLAYER_NAMES_URL = 'http://localhost:3000/api/VirtualPlayerName/beginners';
 // export const EXPERT_VIRTUAL_PLAYER_NAMES_URL = 'http://localhost:3000/api/VirtualPlayerName/experts';
 
-enum ErrorCase {
+export enum ErrorCase {
     InvalidName = 'Ce nom est invalide',
     AlreadyThere = 'Ce nom existe déjà dans la base de données, actualisez votre page.',
-    DeleteAfterDeleteOrUpdate = 'Le nom que vous essayiez de supprimer a déjà été modifié ou supprimé, actualisez votre page.',
-    UpdateAfterDelete = 'Le nom que vous essayiez de modifié a été supprimé, actualisez votre page.',
+    DeleteAfterDeleteOrUpdate = 'Le nom que vous essayez de supprimer a déjà été modifié ou supprimé, actualisez votre page.',
+    UpdateAfterDelete = 'Le nom que vous essayez de modifié a été supprimé, actualisez votre page.',
     DatabaseServerCrash = 'La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard.',
 }
 

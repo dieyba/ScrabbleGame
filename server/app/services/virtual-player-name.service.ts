@@ -8,26 +8,37 @@ const DATABASE_COLLECTION = ['beginners', 'experts'];
 
 @Service()
 export class VirtualPlayerNameService {
-    client: MongoClient;
     beginnersCollection: Collection<VirtualPlayerName>;
     expertsCollection: Collection<VirtualPlayerName>;
+    private client: MongoClient;
+    private originalBeginnerVirtualPlayerNames: VirtualPlayerName[];
+    private originalExpertVirtualPlayerNames: VirtualPlayerName[];
 
     constructor(url = DATABASE_URL) {
         MongoClient.connect(url)
             .then((client: MongoClient) => {
                 this.client = client;
+                this.originalBeginnerVirtualPlayerNames = [
+                    { _id: new ObjectId(), name: 'Erika' },
+                    { _id: new ObjectId(), name: 'Sara' },
+                    { _id: new ObjectId(), name: 'Etienne' },
+                ];
+                this.originalExpertVirtualPlayerNames = [
+                    { _id: new ObjectId(), name: 'Dieyba' },
+                    { _id: new ObjectId(), name: 'Kevin' },
+                    { _id: new ObjectId(), name: 'Ariane' },
+                ];
                 this.beginnersCollection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]);
                 this.expertsCollection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]);
-                this.populateBeginnersDB();
-                this.populateExpertsDB();
+                this.populate();
             })
             .catch((error) => {
                 throw error;
             });
     }
 
-    async getBeginnersVirtualPlayerNames(): Promise<VirtualPlayerName[]> {
-        return this.beginnersCollection
+    async getVirtualPlayerNames(collection: Collection<VirtualPlayerName>): Promise<VirtualPlayerName[]> {
+        return collection
             .find({})
             .toArray()
             .then((virtualPlayerName: VirtualPlayerName[]) => {
@@ -38,24 +49,12 @@ export class VirtualPlayerNameService {
             });
     }
 
-    async getExpertsVirtualPlayerNames(): Promise<VirtualPlayerName[]> {
-        return this.expertsCollection
-            .find({})
-            .toArray()
-            .then((virtualPlayerName: VirtualPlayerName[]) => {
-                return virtualPlayerName;
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
-    }
-
-    async postBeginnersVirtualPlayerName(virtualPlayerName: VirtualPlayerName): Promise<void> {
+    async postVirtualPlayerName(collection: Collection<VirtualPlayerName>, virtualPlayerName: VirtualPlayerName): Promise<void> {
         if (await this.isSameName(virtualPlayerName, this.beginnersCollection)) {
             throw new Error('Ce nom existe déjà');
         }
 
-        return this.beginnersCollection
+        return collection
             .insertOne(virtualPlayerName)
             .then(() => {
                 /* do nothing */
@@ -65,23 +64,8 @@ export class VirtualPlayerNameService {
             });
     }
 
-    async postExpertsVirtualPlayerName(virtualPlayerName: VirtualPlayerName): Promise<void> {
-        if (await this.isSameName(virtualPlayerName, this.expertsCollection)) {
-            throw new Error('Ce nom existe déjà');
-        }
-
-        return this.expertsCollection
-            .insertOne(virtualPlayerName)
-            .then(() => {
-                /* do nothing */
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
-    }
-
-    async deleteBeginnersVirtualPlayerName(name: string): Promise<void> {
-        return this.beginnersCollection
+    async deleteVirtualPlayerName(collection: Collection<VirtualPlayerName>, name: string): Promise<void> {
+        return collection
             .findOneAndDelete({ name })
             .then((deleted) => {
                 if (!deleted.value) {
@@ -93,44 +77,15 @@ export class VirtualPlayerNameService {
             });
     }
 
-    async deleteExpertsVirtualPlayerName(name: string): Promise<void> {
-        return this.expertsCollection
-            .findOneAndDelete({ name })
-            .then((deleted) => {
-                if (!deleted.value) {
-                    throw new Error('Could not find name');
-                }
-            })
-            .catch(() => {
-                throw new Error('Failed to delete name');
-            });
-    }
-
-    async updateBeginnerVirtualPlayerName(nameToUpdateId: ObjectId, updateName: string): Promise<void> {
+    async updateVirtualPlayerName(collection: Collection<VirtualPlayerName>, nameToUpdateId: ObjectId, updateName: string): Promise<void> {
         if (await this.isSameName({ _id: new ObjectId(), name: updateName }, this.beginnersCollection)) {
             throw new Error('Ce nom existe déjà');
         }
 
         const filterSameId: Filter<VirtualPlayerName> = { _id: new ObjectId(nameToUpdateId) };
         const options = { returnNewDocument: true } as FindOneAndUpdateOptions;
-        return this.beginnersCollection
+        return collection
             .findOneAndUpdate(filterSameId, { $set: { name: updateName } }, options)
-            .then(() => {
-                /* Do nothing */
-            })
-            .catch((error) => {
-                throw error;
-            });
-    }
-
-    async updateExpertVirtualPlayerName(nameToUpdateId: ObjectId, updateName: string): Promise<void> {
-        if (await this.isSameName({ _id: new ObjectId(), name: updateName }, this.expertsCollection)) {
-            throw new Error('Ce nom existe déjà');
-        }
-
-        const filterSameId: Filter<VirtualPlayerName> = { _id: new ObjectId(nameToUpdateId) };
-        return this.expertsCollection
-            .findOneAndReplace(filterSameId, { $set: { name: updateName } })
             .then(() => {
                 /* Do nothing */
             })
@@ -144,46 +99,16 @@ export class VirtualPlayerNameService {
         await this.resetCollection(this.expertsCollection);
     }
 
-    async populateBeginnersDB(): Promise<void> {
+    async populate(): Promise<void> {
         if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments()) === 0) {
-            const courses: VirtualPlayerName[] = [
-                {
-                    _id: new ObjectId(),
-                    name: 'Erika',
-                },
-                {
-                    _id: new ObjectId(),
-                    name: 'Sara',
-                },
-                {
-                    _id: new ObjectId(),
-                    name: 'Etienne',
-                },
-            ];
-            for (const course of courses) {
-                await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(course);
+            for (const virtualPlayerName of this.originalBeginnerVirtualPlayerNames) {
+                await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(virtualPlayerName);
             }
         }
-    }
 
-    async populateExpertsDB(): Promise<void> {
         if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]).countDocuments()) === 0) {
-            const courses: VirtualPlayerName[] = [
-                {
-                    _id: new ObjectId(),
-                    name: 'Dieyba',
-                },
-                {
-                    _id: new ObjectId(),
-                    name: 'Kevin',
-                },
-                {
-                    _id: new ObjectId(),
-                    name: 'Ariane',
-                },
-            ];
-            for (const course of courses) {
-                await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]).insertOne(course);
+            for (const virtualPlayerName of this.originalExpertVirtualPlayerNames) {
+                await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]).insertOne(virtualPlayerName);
             }
         }
     }
@@ -203,8 +128,7 @@ export class VirtualPlayerNameService {
         return collection
             .deleteMany({})
             .then(() => {
-                this.populateBeginnersDB();
-                this.populateExpertsDB();
+                this.populate();
             })
             .catch((error: Error) => {
                 throw error;
