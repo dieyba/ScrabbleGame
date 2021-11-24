@@ -11,9 +11,12 @@ import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
 export class DictionaryTransferComponent implements AfterViewInit {
     @ViewChild('inputFile', { static: false }) private inputFile!: ElementRef<HTMLInputElement>;
     selectedDictionary: string;
-    dictionaryList: string[] = [];
+    dictionaryList: string[];
 
-    constructor(private dictionaryService: DictionaryService) {}
+    constructor(private dictionaryService: DictionaryService) {
+        this.selectedDictionary = '';
+        this.dictionaryList = [];
+    }
 
     ngAfterViewInit(): void {
         this.dictionaryService.getDictionaries(BASE_URL).subscribe(

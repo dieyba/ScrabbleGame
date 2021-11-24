@@ -19,46 +19,64 @@ export interface VirtualPlayerName {
 })
 export class VirtualPlayerNameManager {
     private databaseUrl = 'http://localhost:3000/api/VirtualPlayerName';
-    private beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
-    private expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
+    // private beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
+    // private expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
 
     constructor(private http: HttpClient) {}
 
-    getBeginnersVirtualPlayerNames(): Observable<VirtualPlayerName[]> {
-        return this.http.get<VirtualPlayerName[]>(this.beginnerNameUrl);
+    getVirtualPlayerNames(url: string): Observable<VirtualPlayerName[]> {
+        return this.http.get<VirtualPlayerName[]>(url);
     }
 
-    getExpertsVirtualPlayerNames(): Observable<VirtualPlayerName[]> {
-        return this.http.get<VirtualPlayerName[]>(this.expertNameUrl);
+    postVirtualPlayerNames(url: string, name: string): Observable<VirtualPlayerName> {
+        return this.http.post<VirtualPlayerName>(url, { name });
     }
 
-    postBeginnersVirtualPlayerNames(name: string): Observable<VirtualPlayerName> {
-        return this.http.post<VirtualPlayerName>(this.beginnerNameUrl, { name });
+    delete(url: string, name: string): Observable<VirtualPlayerName> {
+        const lastUrl = url + '/' + name;
+
+        return this.http.delete<VirtualPlayerName>(lastUrl);
     }
 
-    postExpertsVirtualPlayerNames(name: string): Observable<VirtualPlayerName> {
-        return this.http.post<VirtualPlayerName>(this.expertNameUrl, { name });
+    update(url: string, nameToUpdateId: unknown, updatedName: string) {
+        return this.http.patch<VirtualPlayerName>(url, { id: nameToUpdateId, newName: updatedName });
     }
 
-    deleteBeginner(name: string): Observable<VirtualPlayerName> {
-        const url = this.beginnerNameUrl + '/' + name;
+    // getBeginnersVirtualPlayerNames(url: string): Observable<VirtualPlayerName[]> {
+    //     return this.http.get<VirtualPlayerName[]>(url);
+    // }
 
-        return this.http.delete<VirtualPlayerName>(url);
-    }
+    // getExpertsVirtualPlayerNames(url: string): Observable<VirtualPlayerName[]> {
+    //     return this.http.get<VirtualPlayerName[]>(url);
+    // }
 
-    deleteExpert(name: string): Observable<VirtualPlayerName> {
-        const url = this.expertNameUrl + '/' + name;
+    // postBeginnersVirtualPlayerNames(url: string, name: string): Observable<VirtualPlayerName> {
+    //     return this.http.post<VirtualPlayerName>(url, { name });
+    // }
 
-        return this.http.delete<VirtualPlayerName>(url);
-    }
+    // postExpertsVirtualPlayerNames(url: string, name: string): Observable<VirtualPlayerName> {
+    //     return this.http.post<VirtualPlayerName>(url, { name });
+    // }
 
-    updateBeginner(nameToUpdateId: unknown, updatedName: string) {
-        return this.http.patch<VirtualPlayerName>(this.beginnerNameUrl, { id: nameToUpdateId, newName: updatedName });
-    }
+    // deleteBeginner(url: string, name: string): Observable<VirtualPlayerName> {
+    //     const lastUrl = this.beginnerNameUrl + '/' + name;
 
-    updateExpert(nameToUpdateId: unknown, updatedName: string) {
-        return this.http.patch<VirtualPlayerName>(this.expertNameUrl, { name: nameToUpdateId, newName: updatedName });
-    }
+    //     return this.http.delete<VirtualPlayerName>(lastUrl);
+    // }
+
+    // deleteExpert(url: string, name: string): Observable<VirtualPlayerName> {
+    //     const lastUrl = this.expertNameUrl + '/' + name;
+
+    //     return this.http.delete<VirtualPlayerName>(lastUrl);
+    // }
+
+    // updateBeginner(url: string, nameToUpdateId: unknown, updatedName: string) {
+    //     return this.http.patch<VirtualPlayerName>(url, { id: nameToUpdateId, newName: updatedName });
+    // }
+
+    // updateExpert(url: string, nameToUpdateId: unknown, updatedName: string) {
+    //     return this.http.patch<VirtualPlayerName>(url, { name: nameToUpdateId, newName: updatedName });
+    // }
 
     reset() {
         return this.http.delete<VirtualPlayerName[]>(this.databaseUrl);

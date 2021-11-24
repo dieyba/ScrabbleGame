@@ -19,6 +19,7 @@ export interface DictionaryInterface {
 })
 export class AdminPageComponent {
     privateName: boolean;
+
     constructor(public virtualPlayerNameService: VirtualPlayerNameManager, private bestScoreService: BestScoresService, private snack: MatSnackBar) {
         this.privateName = false;
     }

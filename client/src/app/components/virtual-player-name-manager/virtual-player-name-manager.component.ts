@@ -7,6 +7,8 @@ import { ERROR_NUMBER } from '@app/classes/utilities';
 import { VirtualPlayerNameManager, VirtualPlayerName } from '@app/services/virtual-player-name-manager';
 
 const maxLength = 12;
+// export const BEGINNER_VIRTUAL_PLAYER_NAMES_URL = 'http://localhost:3000/api/VirtualPlayerName/beginners';
+// export const EXPERT_VIRTUAL_PLAYER_NAMES_URL = 'http://localhost:3000/api/VirtualPlayerName/experts';
 
 enum ErrorCase {
     InvalidName = 'Ce nom est invalide',
@@ -22,13 +24,14 @@ enum ErrorCase {
     styleUrls: ['./virtual-player-name-manager.component.scss'],
 })
 export class VirtualPlayerNameManagerComponent implements OnInit {
+    beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
+    expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
     beginnerNameList: VirtualPlayerName[];
     expertNameList: VirtualPlayerName[];
 
     selectedName: VirtualPlayerName;
     newName: FormControl;
     editName: FormControl;
-    nameAlreadyExist: boolean;
     private index: number;
 
     constructor(private virtualPlayerNameManagerService: VirtualPlayerNameManager, private snack: MatSnackBar) {
@@ -37,48 +40,29 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
         this.selectedName = { _id: '', name: '' };
         this.newName = new FormControl('', [Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(maxLength), Validators.minLength(3)]);
         this.editName = new FormControl('', [Validators.pattern('[a-zA-ZÉé]*'), Validators.maxLength(maxLength), Validators.minLength(3)]);
-        this.nameAlreadyExist = false;
         this.index = ERROR_NUMBER;
     }
 
     ngOnInit(): void {
-        this.virtualPlayerNameManagerService.getBeginnersVirtualPlayerNames().subscribe((beginnerList) => (this.beginnerNameList = beginnerList));
-        this.virtualPlayerNameManagerService.getExpertsVirtualPlayerNames().subscribe((expertList) => (this.expertNameList = expertList));
+        this.virtualPlayerNameManagerService
+            .getVirtualPlayerNames(this.beginnerNameUrl)
+            .subscribe((beginnerList) => (this.beginnerNameList = beginnerList));
+        this.virtualPlayerNameManagerService.getVirtualPlayerNames(this.expertNameUrl).subscribe((expertList) => (this.expertNameList = expertList));
     }
 
     isUntouchable(): boolean {
         return this.beginnerNameList.indexOf(this.selectedName) <= 2 && this.expertNameList.indexOf(this.selectedName) <= 2;
     }
 
-    addBeginnerName() {
+    addName(collection: VirtualPlayerName[], url: string) {
         if (!this.newName.valid) {
             this.snack.open(ErrorCase.InvalidName, 'close');
             return;
         }
 
-        this.virtualPlayerNameManagerService.postBeginnersVirtualPlayerNames(this.newName.value).subscribe(
+        this.virtualPlayerNameManagerService.postVirtualPlayerNames(url, this.newName.value).subscribe(
             (added) => {
-                this.beginnerNameList.push(added);
-            },
-            (error: HttpErrorResponse) => {
-                if (error.statusText === 'Unknown Error') {
-                    this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
-                    return;
-                }
-                this.snack.open(ErrorCase.AlreadyThere, 'close');
-            },
-        );
-    }
-
-    addExpertName() {
-        if (!this.newName.valid) {
-            this.snack.open(ErrorCase.InvalidName, 'close');
-            return;
-        }
-
-        this.virtualPlayerNameManagerService.postExpertsVirtualPlayerNames(this.newName.value).subscribe(
-            (added) => {
-                this.expertNameList.push(added);
+                collection.push(added);
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
@@ -101,9 +85,9 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
 
     deleteName() {
         if (this.isBeginnerTab()) {
-            this.deleteBeginnerName();
+            this.delete(this.beginnerNameList, this.beginnerNameUrl);
         } else {
-            this.deleteExpertName();
+            this.delete(this.expertNameList, this.expertNameUrl);
         }
     }
 
@@ -112,9 +96,9 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             return;
         }
         if (this.isBeginnerTab()) {
-            this.updateBeginnerName();
+            this.update(this.beginnerNameList, this.beginnerNameUrl);
         } else {
-            this.updateExpertName();
+            this.update(this.expertNameList, this.expertNameUrl);
         }
     }
 
@@ -126,78 +110,29 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
         }
     }
 
-    private deleteBeginnerName() {
-        if (this.index > 2) {
-            this.virtualPlayerNameManagerService.deleteBeginner(this.selectedName.name).subscribe(
-                (deleted) => {
-                    if (!deleted) {
-                        this.beginnerNameList.splice(this.index, 1);
-                        this.selectedName.name = '';
-                    }
-                },
-                (error: HttpErrorResponse) => {
-                    if (error.statusText === 'Unknown Error') {
-                        this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
-                        return;
-                    }
-                    this.snack.open(ErrorCase.DeleteAfterDeleteOrUpdate, 'close');
-                },
-            );
-        }
-    }
-
-    private deleteExpertName() {
-        if (this.index > 2) {
-            this.virtualPlayerNameManagerService.deleteExpert(this.selectedName.name).subscribe(
-                (deleted) => {
-                    if (!deleted) {
-                        this.expertNameList.splice(this.index, 1);
-                        this.selectedName.name = '';
-                    }
-                },
-                (error: HttpErrorResponse) => {
-                    if (error.statusText === 'Unknown Error') {
-                        this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
-                        return;
-                    }
-                    this.snack.open(ErrorCase.DeleteAfterDeleteOrUpdate, 'close');
-                },
-            );
-        }
-    }
-
-    private updateBeginnerName() {
+    private delete(collection: VirtualPlayerName[], url: string) {
         if (this.index <= 2) {
             return;
         }
 
-        if (!this.editName.valid) {
-            this.snack.open(ErrorCase.InvalidName, 'close');
-            return;
-        }
-
-        this.virtualPlayerNameManagerService.updateBeginner(this.selectedName._id, this.editName.value).subscribe(
-            () => {
-                this.beginnerNameList[this.index] = { _id: this.selectedName._id, name: this.editName.value };
-                this.selectedName.name = '';
-                this.editName.setValue('');
+        this.virtualPlayerNameManagerService.delete(url, this.selectedName.name).subscribe(
+            (deleted) => {
+                if (!deleted) {
+                    collection.splice(this.index, 1);
+                    this.selectedName.name = '';
+                }
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
                     this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
                     return;
                 }
-
-                if (error.error === 'Ce nom existe déjà') {
-                    this.snack.open(ErrorCase.AlreadyThere, 'close');
-                    return;
-                }
-                this.snack.open(ErrorCase.UpdateAfterDelete, 'close');
+                this.snack.open(ErrorCase.DeleteAfterDeleteOrUpdate, 'close');
             },
         );
     }
 
-    private updateExpertName() {
+    private update(collection: VirtualPlayerName[], url: string) {
         if (this.index <= 2) {
             return;
         }
@@ -207,9 +142,9 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             return;
         }
 
-        this.virtualPlayerNameManagerService.updateExpert(this.selectedName._id, this.editName.value).subscribe(
+        this.virtualPlayerNameManagerService.update(url, this.selectedName._id, this.editName.value).subscribe(
             () => {
-                this.expertNameList[this.index] = { _id: this.selectedName._id, name: this.editName.value };
+                collection[this.index] = { _id: this.selectedName._id, name: this.editName.value };
                 this.selectedName.name = '';
                 this.editName.setValue('');
             },

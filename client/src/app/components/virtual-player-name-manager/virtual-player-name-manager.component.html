@@ -34,8 +34,8 @@
         </div>
 
         <div class="addName">
-            <button class="btn" (click)="addBeginnerName(); newName.setValue('')">Ajouter joueur débutant</button>
-            <button class="btn" (click)="addExpertName(); newName.setValue('')">Ajouter joueur expert</button>
+            <button class="btn" (click)="addName(beginnerNameList, beginnerNameUrl); newName.setValue('')">Ajouter joueur débutant</button>
+            <button class="btn" (click)="addName(expertNameList, expertNameUrl); newName.setValue('')">Ajouter joueur expert</button>
         </div>
     </div>
     <div class="deletUpdate">
