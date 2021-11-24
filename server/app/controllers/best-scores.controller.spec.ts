@@ -33,7 +33,7 @@ describe('BestScoresController', () => {
         bestScoreService = createStubInstance(BestScoresService);
         bestScoreService.getBestScores.resolves(bestScore);
         bestScoreService.postBestScore.resolves();
-        bestScoreService.resetCollectionInDb.resolves();
+        bestScoreService.resetDataBase.resolves();
         const app = Container.get(Application);
         // eslint-disable-next-line dot-notation
         Object.defineProperty(app['bestScoresController'], 'bestScoresService', { value: bestScoreService, writable: true });
@@ -127,20 +127,21 @@ describe('BestScoresController', () => {
             });
     });
 
-    // it('should delete an image correctly', async () => {
-    //     return supertest(expressApp)
-    //         .delete('/')
-    //         .then((response) => {
-    //             expect(response.statusCode).to.equal(StatusCodes.OK);
-    //         });
-    // });
+    it('should reset all scores correctly', async () => {
+        return supertest(expressApp)
+            .delete('/api/bestScores')
+            .expect(StatusCodes.OK)
+            .then((response) => {
+                expect(response.statusCode).to.equal(StatusCodes.OK);
+            });
+    });
 
-    // it('should send an error while attempt deleting image', async () => {
-    //     bestScoreService.resetDataBase.rejects();
-    //     return supertest(expressApp)
-    //         .delete('/api/bestSores')
-    //         .then((response) => {
-    //             expect(response.statusCode).to.equal(StatusCodes.NOT_FOUND);
-    //         });
-    // });
+    it('should send an error while attempt reset bestScores database', async () => {
+        bestScoreService.resetDataBase.rejects();
+        return supertest(expressApp)
+            .delete('/api/bestScores')
+            .then((response) => {
+                expect(response.statusCode).to.equal(StatusCodes.NOT_FOUND);
+            });
+    });
 });

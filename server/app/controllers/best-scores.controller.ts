@@ -41,7 +41,7 @@ export class BestScoresController {
             this.bestScoresService
                 .postBestScore(this.bestScoresService.classicCollection, req.body)
                 .then(() => {
-                    res.sendStatus(StatusCodes.OK).send();
+                    res.status(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.BAD_REQUEST).send(error.message);
@@ -51,7 +51,7 @@ export class BestScoresController {
             this.bestScoresService
                 .postBestScore(this.bestScoresService.log2990Collection, req.body)
                 .then(() => {
-                    res.sendStatus(StatusCodes.OK).send();
+                    res.status(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.BAD_REQUEST).send(error.message);
@@ -62,7 +62,7 @@ export class BestScoresController {
             this.bestScoresService
                 .resetDataBase()
                 .then(() => {
-                    res.sendStatus(StatusCodes.OK).send();
+                    res.status(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);

@@ -4,7 +4,7 @@ import { Service } from 'typedi';
 // import { DatabaseService } from "./database.service";
 const DATABASE_URL = 'mongodb+srv://Scrabble304:Scrabble304@cluster0.bvwkn.mongodb.net/database?retryWrites=true&w=majority';
 const DATABASE_NAME = 'BestScore';
-const DATABASE_COLLECTION = ['ClassicMode', 'Log2990Mode'];
+export const DATABASE_COLLECTION = ['ClassicMode', 'Log2990Mode'];
 
 const MAX_SCORE = 100000000000;
 @Service()
@@ -61,25 +61,32 @@ export class BestScoresService {
                 score: 3,
             },
         ];
+        this.connectClient(url);
+    }
+
+    async connectClient(url: string): Promise<void> {
         MongoClient.connect(url)
-            .then((client: MongoClient) => {
+            .then(async (client: MongoClient) => {
                 this.client = client;
                 this.classicCollection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]);
                 this.log2990Collection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]);
                 this.populateDB(this.defaultClassicBestScoresValue, DATABASE_COLLECTION[0]);
+                // console.log(await this.classicCollection.find({}).toArray())
                 this.populateDB(this.defaultLog2990BestScoresValue, DATABASE_COLLECTION[1]);
             })
             .catch((error) => {
                 throw error;
             });
     }
+
     async getBestScores(collectionType: Collection<BestScores>): Promise<BestScores[]> {
         return collectionType
             .find({})
             .sort({ score: -1 })
             .toArray()
-            .then((log2990BestScores: BestScores[]) => {
-                return log2990BestScores;
+            .then((bestScores: BestScores[]) => {
+                console.log(bestScores);
+                return bestScores;
             })
             .catch((error: Error) => {
                 throw error;
@@ -152,6 +159,7 @@ export class BestScoresService {
 
     async populateDB(typeScores: BestScores[], dbCollection: string): Promise<void> {
         if ((await this.client.db(DATABASE_NAME).collection(dbCollection).countDocuments()) === 0) {
+            console.log('enter')
             for (const score of typeScores) {
                 await this.client.db(DATABASE_NAME).collection(dbCollection).insertOne(score);
             }
