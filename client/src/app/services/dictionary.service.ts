@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/h
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
-import { DictionaryInterface } from './admin.service';
+import { DictionaryInterface } from './virtual-player-name-manager';
 
 export const BASE_URL = 'http://localhost:3000/api/dictionary';
 @Injectable({

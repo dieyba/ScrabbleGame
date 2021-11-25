@@ -1,18 +1,14 @@
-// import { HttpStatus } from '@common/communication/http-status';
-// import { Image } from '@common/communication/image-data';
 import { VirtualPlayerName } from '@app/classes/virtual-player-name';
 import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
 import { Request, Response, Router } from 'express';
-// import Types from '../types';
 import { StatusCodes } from 'http-status-codes';
-// import { inject } from 'inversify';
 import { Service } from 'typedi';
 
 @Service()
 export class VirtualPlayerNameController {
     router: Router;
 
-    constructor(private readonly virtualPlayerNameService: VirtualPlayerNameService) {
+    constructor(private virtualPlayerNameService: VirtualPlayerNameService) {
         this.configureRouter();
     }
 
@@ -21,7 +17,7 @@ export class VirtualPlayerNameController {
 
         this.router.get('/beginners', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
-                .getBeginnersVirtualPlayerNames()
+                .getVirtualPlayerNames(this.virtualPlayerNameService.beginnersCollection)
                 .then((virtualPlayerNames: VirtualPlayerName[]) => {
                     res.json(virtualPlayerNames);
                 })
@@ -32,7 +28,7 @@ export class VirtualPlayerNameController {
 
         this.router.get('/experts', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
-                .getExpertsVirtualPlayerNames()
+                .getVirtualPlayerNames(this.virtualPlayerNameService.expertsCollection)
                 .then((virtualPlayerNames: VirtualPlayerName[]) => {
                     res.json(virtualPlayerNames);
                 })
@@ -43,9 +39,9 @@ export class VirtualPlayerNameController {
 
         this.router.post('/beginners', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
-                .postBeginnersVirtualPlayerName(req.body)
+                .postVirtualPlayerName(this.virtualPlayerNameService.beginnersCollection, req.body)
                 .then(() => {
-                    res.sendStatus(StatusCodes.OK).send();
+                    res.json(req.body);
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.BAD_REQUEST).send(error.message);
@@ -54,28 +50,89 @@ export class VirtualPlayerNameController {
 
         this.router.post('/experts', async (req: Request, res: Response) => {
             this.virtualPlayerNameService
-                .postExpertsVirtualPlayerName(req.body)
+                .postVirtualPlayerName(this.virtualPlayerNameService.expertsCollection, req.body)
                 .then(() => {
-                    res.sendStatus(StatusCodes.OK).send();
+                    res.json(req.body);
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.BAD_REQUEST).send(error.message);
                 });
         });
 
-        // this.router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
-        //     this.virtualPlayerNameService
-        //         .deleteVirtualPlayerName(req.params.id)
-        //         .then(() => {
-        //             res.sendStatus(HttpStatus.NO_CONTENT).send();
-        //         })
-        //         .catch((error: Error) => {
-        //             if (error.message === 'Cannot remove headers after they are sent to the client') {
-        //                 // do nothing
-        //             } else {
-        //                 res.status(HttpStatus.NOT_FOUND).send(error.message);
-        //             }
-        //         });
-        // });
+        this.router.delete('/beginners/:name', async (req: Request, res: Response) => {
+            this.virtualPlayerNameService
+                .deleteVirtualPlayerName(this.virtualPlayerNameService.beginnersCollection, req.params.name)
+                .then(() => {
+                    res.status(StatusCodes.NO_CONTENT).send();
+                })
+                .catch((error: Error) => {
+                    if (error.message === 'Cannot remove headers after they are sent to the client') {
+                        // do nothing
+                    } else {
+                        res.status(StatusCodes.BAD_REQUEST).send(error.message);
+                    }
+                });
+        });
+
+        this.router.delete('/experts/:name', async (req: Request, res: Response) => {
+            this.virtualPlayerNameService
+                .deleteVirtualPlayerName(this.virtualPlayerNameService.expertsCollection, req.params.name)
+                .then(() => {
+                    res.status(StatusCodes.NO_CONTENT).send();
+                })
+                .catch((error: Error) => {
+                    if (error.message === 'Cannot remove headers after they are sent to the client') {
+                        // do nothing
+                    } else {
+                        res.status(StatusCodes.BAD_REQUEST).send(error.message);
+                    }
+                });
+        });
+
+        this.router.patch('/beginners', async (req: Request, res: Response) => {
+            this.virtualPlayerNameService
+                .updateVirtualPlayerName(this.virtualPlayerNameService.beginnersCollection, req.body.id, req.body.newName)
+                .then(() => {
+                    res.status(StatusCodes.OK).send();
+                })
+                .catch((error: Error) => {
+                    if (error.message === 'Cannot remove headers after they are sent to the client') {
+                        // do nothing
+                    } else {
+                        res.status(StatusCodes.BAD_REQUEST).send(error.message);
+                    }
+                });
+        });
+
+        this.router.patch('/experts', async (req: Request, res: Response) => {
+            this.virtualPlayerNameService
+                .updateVirtualPlayerName(this.virtualPlayerNameService.expertsCollection, req.body.id, req.body.newName)
+                .then(() => {
+                    res.status(StatusCodes.OK).send();
+                })
+                .catch((error: Error) => {
+                    if (error.message === 'Cannot remove headers after they are sent to the client') {
+                        // do nothing
+                    } else {
+                        res.status(StatusCodes.BAD_REQUEST).send(error.message);
+                    }
+                });
+        });
+
+        this.router.delete('', async (req: Request, res: Response) => {
+            this.virtualPlayerNameService
+                .resetDataBase()
+                .then(() => {
+                    res.status(StatusCodes.NO_CONTENT).send();
+                })
+                .catch((error: Error) => {
+                    // TODO : avoid if-else
+                    if (error.message === 'Cannot remove headers after they are sent to the client') {
+                        // do nothing
+                    } else {
+                        res.status(StatusCodes.BAD_REQUEST).send(error.message);
+                    }
+                });
+        });
     }
 }

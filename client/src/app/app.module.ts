@@ -29,6 +29,7 @@ import { TextEntryComponent } from './components/text-entry/text-entry.component
 import { WaitingAreaComponent } from './components/waiting-area/waiting-area.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
+import { VirtualPlayerNameManagerComponent } from './components/virtual-player-name-manager/virtual-player-name-manager.component';
 
 /**
  * Main module that is used in main.ts.
@@ -59,6 +60,7 @@ import { AdminPageComponent } from './pages/admin-page/admin-page.component';
         DictionaryTransferComponent,
         AdminPageComponent,
         BestScoresComponent,
+        VirtualPlayerNameManagerComponent,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     imports: [

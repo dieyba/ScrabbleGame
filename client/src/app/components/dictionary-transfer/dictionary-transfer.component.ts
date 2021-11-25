@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { DictionaryInterface } from '@app/services/admin.service';
+import { DictionaryInterface } from '@app/services/virtual-player-name-manager';
 import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
 
 @Component({
@@ -11,9 +11,12 @@ import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
 export class DictionaryTransferComponent implements AfterViewInit {
     @ViewChild('inputFile', { static: false }) private inputFile!: ElementRef<HTMLInputElement>;
     selectedDictionary: string;
-    dictionaryList: string[] = [];
+    dictionaryList: string[];
 
-    constructor(private dictionaryService: DictionaryService) {}
+    constructor(private dictionaryService: DictionaryService) {
+        this.selectedDictionary = '';
+        this.dictionaryList = [];
+    }
 
     ngAfterViewInit(): void {
         this.dictionaryService.getDictionaries(BASE_URL).subscribe(
