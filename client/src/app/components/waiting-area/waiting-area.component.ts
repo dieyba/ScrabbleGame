@@ -69,7 +69,7 @@ export class WaitingAreaComponent implements AfterViewInit {
         this.nameErrorMessage = '';
         this.nameValid = false;
         this.timer = setInterval(() => {
-            this.pendingGameslist = this.gameList.getList();
+            this.pendingGameslist = this.gameList.waitingAreaGames;
         }, LIST_UPDATE_TIMEOUT);
         this.socketOnConnect();
     }
@@ -85,6 +85,13 @@ export class WaitingAreaComponent implements AfterViewInit {
     @HostListener('window:popstate', ['$event'])
     onPopState() {
         this.gameList.someoneLeftRoom();
+    }
+
+    randomGame() {
+        let randomFloat = Math.random() * this.pendingGameslist.length;
+        randomFloat = Math.floor(randomFloat);
+        this.selectedGame = this.pendingGameslist[randomFloat];
+        this.openName(true);
     }
 
     onSelect(game: WaitingAreaGameParameters): WaitingAreaGameParameters {

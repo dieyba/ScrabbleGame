@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { BestScoresComponent } from '@app/components/best-scores/best-scores.component';
 
 @Component({
     selector: 'app-starting-page',
@@ -7,7 +9,7 @@ import { Router } from '@angular/router';
     styleUrls: ['./starting-page.component.scss'],
 })
 export class StartingPageComponent {
-    constructor(private router: Router) {}
+    constructor(private router: Router, private dialog: MatDialog) {}
 
     openPage(isLog2990: boolean) {
         if (isLog2990) {
@@ -15,5 +17,12 @@ export class StartingPageComponent {
         } else {
             this.router.navigate(['/game-mode', { isLog2990: false }])
         }
+    }
+
+    openDialog(): void {
+        this.dialog.open(BestScoresComponent, {
+            // height: '150%',
+            // width: '90%',
+        });
     }
 }

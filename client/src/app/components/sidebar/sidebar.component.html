@@ -91,13 +91,11 @@
     <mat-card *ngIf="isLog2990() === 'true'" class="card">
         <mat-card-title class="card-title" align="center">Objectifs publics</mat-card-title>
         <mat-card-content>
-            <div class="row publicGoals center">
-                <div *ngFor="let sharedGoal of sharedGoals">
+            <div class="row publicGoals">
+                <div *ngFor="let sharedGoal of sharedGoals" class="column">
                     <div
                         *ngIf="!sharedGoal.isAchieved"
                         class="rectangle"
-                        disabled="true"
-                        class="column rectangle"
                         mat-raised-button
                         matTooltip="{{ sharedGoal.description }}"
                         matTooltipPosition="right"
@@ -111,8 +109,6 @@
                     <div
                         *ngIf="sharedGoal.isAchieved"
                         class="achieved-rectangle"
-                        disabled="true"
-                        class="column rectangle"
                         mat-raised-button
                         matTooltip="{{ sharedGoal.description }}"
                         matTooltipPosition="right"

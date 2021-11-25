@@ -1,0 +1,13 @@
+<div class="form-group">
+    <!-- <mat-card for="file">Choose a dictionary (JSON file):</mat-card> -->
+    <input #inputFile type="file" id="file" accept=".json" />
+    <button mat-button (click)="onUpload()">Upload</button>
+
+    <div class="dropdown">
+        <button class="dropbtn">{{ selectedDictionary }}</button>
+        <div class="dropdown-content">
+            <span *ngFor="let dictionary of dictionaryList; index as i" (click)="onDictionarySelection(i)"> {{ dictionary }} </span>
+        </div>
+    </div>
+    <button mat-button (click)="onDownload()">Download</button>
+</div>

@@ -10,7 +10,7 @@
                 minlength="3"
                 placeholder="Ex. Nougat"
                 formControlName="name"
-                (change)="changeName(debutantNameList)"
+                (change)="changeName(beginnerNameList)"
             />
             <mat-hint align="end">{{ input.value?.length || 0 }}/10</mat-hint>
             <div class="error" *ngIf="name.errors?.pattern">Le nom ne doit pas contenir de chiffres et de caractères</div>
@@ -51,7 +51,7 @@
         <div *ngIf="data.isSolo">
             <p>Veuillez choisir le niveau de votre adversaire</p>
             <mat-radio-group formControlName="level">
-                <mat-radio-button value="easy" (click)="randomPlayer(debutantNameList)">Joueur Débutant</mat-radio-button>
+                <mat-radio-button value="easy" (click)="randomPlayer(beginnerNameList)">Joueur Débutant</mat-radio-button>
                 <mat-radio-button disabled value="difficult">Joueur Expert</mat-radio-button>
             </mat-radio-group>
             <p id="opponents">

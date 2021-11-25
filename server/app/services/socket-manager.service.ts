@@ -1,5 +1,7 @@
 import { GameInitInfo, GoalType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
 import { BoardUpdate, ERROR_NUMBER, LettersUpdate } from '@app/classes/utilities';
+import { VirtualPlayerName } from '@app/classes/virtual-player-name';
+import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
 import * as http from 'http';
 import * as io from 'socket.io';
 import { GameListManager } from './game-list-manager.service';
@@ -12,11 +14,13 @@ export class SocketManagerService {
     private sio: io.Server;
     private gameListMan: GameListManager;
     private validationService: ValidationService;
+    private virtualPlayerNameService: VirtualPlayerNameService;
     private playerMan: PlayerManagerService;
     constructor(server: http.Server) {
         this.gameListMan = new GameListManager();
         this.playerMan = new PlayerManagerService();
         this.validationService = new ValidationService();
+        this.virtualPlayerNameService = new VirtualPlayerNameService();
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
     }
     handleSockets(): void {
@@ -153,8 +157,20 @@ export class SocketManagerService {
     private leaveGameInPlay(socket: io.Socket, roomGame: GameInitInfo) {
         roomGame.removePlayer(socket.id);
         this.displayPlayerQuitMessage(socket);
-        this.sio.to(roomGame.gameRoomId.toString()).emit('convert to solo', socket.id);
-        this.gameListMan.deleteGameInPlay(roomGame.gameRoomId);
+        this.virtualPlayerNameService
+            .getVirtualPlayerNames(this.virtualPlayerNameService.beginnersCollection)
+            .then((virtualPlayerNames: VirtualPlayerName[]) => {
+                const randomNewNameIndex = Math.floor(Math.random() * virtualPlayerNames.length);
+                const newVirtualPlayerName = virtualPlayerNames[randomNewNameIndex].name;
+                this.sio.to(roomGame.gameRoomId.toString()).emit('convert to solo', socket.id, newVirtualPlayerName);
+                this.gameListMan.deleteGameInPlay(roomGame.gameRoomId);
+            })
+            .catch(() => {
+                // If database is not available, provides a default name for the virtual player
+                const defaultVirtualPlayerName = 'Sara';
+                this.sio.to(roomGame.gameRoomId.toString()).emit('convert to solo', socket.id, defaultVirtualPlayerName);
+                this.gameListMan.deleteGameInPlay(roomGame.gameRoomId);
+            });
     }
     private leaveWaitingAreaRoom(socket: io.Socket, waitingAreaRoom: WaitingAreaGameParameters) {
         const roomId = waitingAreaRoom.gameRoom.idGame;

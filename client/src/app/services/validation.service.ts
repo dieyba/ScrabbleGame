@@ -57,7 +57,6 @@ export class ValidationService {
                     newWord.content.forEach((letter) => {
                         letter.tile.isValidated = true;
                     });
-                    // TODO: if change the isvalidated = true here, change how its used in solo game service
                     this.bonusService.useBonus(newWord);
                 }
             });

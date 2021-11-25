@@ -23,6 +23,41 @@
     height: fit-content;
     max-height: 200px;
     margin: 5px 10px;
+    // margin: 0 0 2em 0;
+    list-style-type: none;
+    // padding: 0;
+    // width: 15em;
+}
+li {
+    // cursor: pointer;
+    // position: relative;
+    // left: 0;
+    padding: 10px 10px;
+    border-radius: 10px;
+    margin: 5px 0px;
+    background-color: #dcecff;
+    // margin: 0.5em;
+    margin: 5px 10px;
+    // padding: 0.3em 0;
+    // height: 1.6em;
+    // border-radius: 4px;
+}
+li:hover {
+    // color: #2c3a41;
+    background-color: rgb(0, 132, 255);
+    // left: 0.1em;
+}
+.games li.selected {
+    background-color: rgb(0, 132, 255);
+    color: white;
+}
+// .games li.selected:hover {
+//     background-color: #505050;
+//     color: white;
+// }
+.games li.selected:active {
+    background-color: blue;
+    // color: white;
 }
 
 .image {
@@ -77,3 +112,25 @@ h3 {
     border-radius: 10px;
     margin: 5px 0px;
 }
+button:active::after {
+    background-color: black;
+    padding: 10px 10px;
+    border-radius: 10px;
+    margin: 5px 0px;
+}
+// .game-btn span {
+//     cursor: pointer;
+//     position: relative;
+//     background-color: #eee;
+//     padding: 10px 10px;
+//     border-radius: 10px;
+//     margin: 5px 0px;
+// }
+// .game-btn span.selected {
+//     color: white;
+//     background-color: black;
+// }
+// .game-btn span.selected:active {
+//     color: white;
+//     background-color: black;
+// }
