@@ -60,6 +60,7 @@ export class VirtualPlayerService {
     ) {
         this.player = this.gameService.game.getOpponent();
         this.rack = this.player.letters;
+        this.type = Difficulty.Difficult; // REMOVE THIS LATER
     }
 
     playTurn(): void {
@@ -359,11 +360,16 @@ export class VirtualPlayerService {
     }
 
     // Returns all valid combinations of the letter + the letters currently in the rack
-    movesWithGivenLetter(letter: ScrabbleLetter, fromRack?: boolean): ScrabbleWord[] {
-        const lettersAvailable: ScrabbleLetter[] = [];
+    movesWithGivenLetter(letter: ScrabbleLetter, moveLength: number, fromRack?: boolean): ScrabbleWord[] {
+        let lettersAvailable: ScrabbleLetter[] = [];
         lettersAvailable[0] = letter;
         const lettersInArray: boolean[] = [false, false, false, false, false, false, false];
-        for (let i = 1; i < this.getRandomIntInclusive(2, this.rack.length); i++) {
+        for (let i = 1; i < moveLength; i++) {
+            if (fromRack) {
+                // Remove the letter from the pool since it is already used
+                lettersAvailable = this.rack;
+                break;
+            }
             // Randomize length of word
             let index = this.getRandomIntInclusive(0, this.rack.length - 1);
             while (lettersInArray[index] === true) {
@@ -372,16 +378,12 @@ export class VirtualPlayerService {
                     index++;
                 } else index = 0; // Code coverage on this line
             }
-            if (lettersAvailable[i] === letter && fromRack) {
-                // Remove the letter from the pool since it is already used
-                lettersInArray[index] = true;
-                continue;
-            }
             lettersAvailable[i] = this.rack[index];
             lettersInArray[index] = true;
         }
         // check all possible permutations. Maximum of O(8!)
         const permutations = this.permutationsOfLetters(lettersAvailable);
+        console.log(permutations);
         const possibleMoves = [];
         let movesFound = 0;
         const charArray = [];
@@ -399,14 +401,28 @@ export class VirtualPlayerService {
         return possibleMoves;
     }
 
+    allSubsetPermutations(letter: ScrabbleLetter, fromRack?: boolean): ScrabbleWord[][] {
+        const allPermutations: ScrabbleWord[][] = [];
+        for (let i = 2; i <= this.rack.length; i++) {
+            allPermutations[i] = this.movesWithGivenLetter(letter, i, fromRack);
+        }
+        return allPermutations;
+    }
+
     movesWithRack(points: number): ScrabbleWord[] {
         const possibleMoves: ScrabbleWord[] = [];
         for (const letter of this.rack) {
-            const newWords = this.movesWithGivenLetter(letter, true);
-            for (const newWord of newWords) {
-                if (!possibleMoves.includes(newWord)) {
-                    if (newWord.value < points || newWord.value > 0) {
-                        possibleMoves.push(newWord);
+            const allNewWords = this.allSubsetPermutations(letter);
+            for (const newWords of allNewWords) {
+                if (newWords) {
+                    for (const newWord of newWords) {
+                        if (newWord) {
+                            if (!possibleMoves.includes(newWord) && (newWord.value < points || newWord.value > 0)) {
+                                if (newWord.value < points || newWord.value > 0) {
+                                    possibleMoves.push(newWord);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -414,19 +430,19 @@ export class VirtualPlayerService {
         return possibleMoves;
     }
 
-    makeMoves(permutations: ScrabbleLetter[][], value: number): ScrabbleMove {
+    makeMoves(permutations: ScrabbleWord[], value: number): ScrabbleMove {
         // TODO: Modify this to show alternate placements
         let currentMaxValue;
         let currentBestWord;
         let movePosition = new Vec2(POSITION_ERROR, POSITION_ERROR);
         const permutationsToWords: ScrabbleWord[] = [];
         for (const permutation of permutations) {
-            const word = this.wordify(permutation);
-            permutationsToWords.push(word);
+            permutationsToWords.push(permutation);
         }
         const filteredPermutations = this.filterPermutations(permutationsToWords);
-        console.log('hello from MakeMoves');
+        console.log('filteredPerms', filteredPermutations);
         if (value === Points.MaxValue4) {
+            console.log('hello!!');
             // Expert algorithm
             currentMaxValue = 0;
             currentBestWord = new ScrabbleWord();
@@ -438,6 +454,7 @@ export class VirtualPlayerService {
                         this.orientation = myAxis;
                         const position = this.findPosition(word, myAxis);
                         const wordValue = this.valueOnPosition(word, position, myAxis);
+                        console.log('Word: ' + word.content + ' Value: ' + wordValue);
                         if (wordValue > currentMaxValue) {
                             currentMaxValue = wordValue;
                             currentBestWord = word;
@@ -537,27 +554,29 @@ export class VirtualPlayerService {
         return this.validationService.isWordValid(word);
     }
 
-    permutationsWithBoard(): ScrabbleLetter[][] {
-        const allLetters = this.rack;
-        const permutations: ScrabbleLetter[][] = [];
+    permutationsWithBoard(): ScrabbleWord[] {
+        const returnPermutations: ScrabbleWord[] = [];
         for (const row of this.gameService.game.scrabbleBoard.squares) {
             for (const square of row) {
                 if (square.letter) {
                     if (square.letter.tile.occupied) {
-                        allLetters.push(square.letter);
-                        const permutationsOfAllLetters = this.permutationsOfLetters(allLetters);
-                        for (const permutation of permutationsOfAllLetters) {
-                            permutations.push(permutation);
+                        const permutationsOfAllLetters = this.allSubsetPermutations(square.letter, false);
+                        for (const permutations of permutationsOfAllLetters) {
+                            if (permutations) {
+                                for (const word of permutations) {
+                                    if (word) {
+                                        returnPermutations.push(word);
+                                    }
+                                }
+                            }
                         }
-                        allLetters.pop();
                     }
                 }
             }
         }
-        return permutations;
+        return returnPermutations;
         // We will then try to place the word on each space on the board
     }
-    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
     permutationsOfLetters(letters: ScrabbleLetter[]): ScrabbleLetter[][] {
         // Adapted from medium.com/weekly-webtips/step-by-step-guide-to-array-permutation-using-recursion-in-javascript-4e76188b88ff
         const result = [];
