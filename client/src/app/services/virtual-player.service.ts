@@ -22,9 +22,9 @@ import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
-    EndTurn = 10,
-    ExchangeTile = 10,
-    MakeAMove = 80,
+    EndTurn = 0,
+    ExchangeTile = 100,
+    MakeAMove = 0,
     MaxValue1 = 40,
     MaxValue2 = 30,
     MaxValue3 = 30,
@@ -94,8 +94,7 @@ export class VirtualPlayerService {
                 }
                 const chosenTilesString = chosenTiles.map((tile) => tile.character).join(''); // TEST THIS, may not work.
                 const command = new ExchangeCmd(defaultParams, chosenTilesString);
-                // TODO: push the real debug messages
-                command.debugMessages.push('a debug message');
+                command.debugMessages.push('lettres échangées: ' + chosenTilesString);
                 this.commandInvoker.executeCommand(command);
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
