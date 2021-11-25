@@ -85,7 +85,7 @@ export class VirtualPlayerService {
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
             setTimeout(() => {
                 // 10% chance to exchange tiles on easy mode
-                const chosenTiles = this.chooseTilesFromRack();
+                const chosenTiles = this.chooseTilesFromRack(this.selectRandomValue());
                 // Converts chosen word to string
                 if (chosenTiles.length === 0) {
                     const emptyRackPass = new PassTurnCmd(defaultParams);
@@ -587,7 +587,8 @@ export class VirtualPlayerService {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
-    chooseTilesFromRack(): ScrabbleLetter[] {
+    chooseTilesFromRack(value: Points): ScrabbleLetter[] {
+        if (value === Points.MaxValue4) return this.rack;
         if (this.rack.length === 0) return [];
         const numberOfTiles = this.getRandomIntInclusive(1, this.rack.length);
         let tileReplaced = 0;
