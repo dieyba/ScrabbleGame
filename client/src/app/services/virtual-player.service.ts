@@ -63,7 +63,7 @@ export class VirtualPlayerService {
     }
 
     playTurn(): void {
-        let moveMade = new ScrabbleWord();
+        let moveMade = new ScrabbleMove();
         const defaultParams: DefaultCommandParams = {
             player: this.player,
             serviceCalled: this.gameService,
@@ -106,13 +106,12 @@ export class VirtualPlayerService {
                 // waits 3 second to try and find a word to place
                 moveMade = this.makeMoves(possiblePermutations, value);
                 console.log('moveMade: ', moveMade);
-                const movePosition = this.findPosition(moveMade, this.orientation);
                 const params: PlaceParams = {
-                    position: movePosition,
+                    position: moveMade.position,
                     orientation: this.orientation,
-                    word: moveMade.stringify(),
+                    word: moveMade.word.stringify(),
                 };
-                if (moveMade.content.length > 1 && this.placeService.canPlaceWord(params)) {
+                if (moveMade.word.content.length > 1 && this.placeService.canPlaceWord(params)) {
                     const command = new PlaceCmd(defaultParams, params);
                     this.commandInvoker.executeCommand(command);
                 } else {
@@ -223,10 +222,18 @@ export class VirtualPlayerService {
                 if (axis) {
                     const myAxis = Axis[axis as keyof typeof Axis];
                     this.orientation = myAxis;
-                    const position = this.findPosition(word, myAxis, isFirstTurn);
-                    const wordValue = this.valueOnPosition(word, position, myAxis);
+                    const thisPosition = this.findPosition(word, myAxis, isFirstTurn);
+                    const wordValue = this.valueOnPosition(word, thisPosition, myAxis);
+                    const params: PlaceParams = {
+                        position: thisPosition,
+                        orientation: this.orientation,
+                        word: word.stringify(),
+                    };
+                    if (!this.placeService.canPlaceWord(params)) {
+                        continue;
+                    }
                     if (wordValue > maxValue) {
-                        returnPosition = position;
+                        returnPosition = thisPosition;
                         return returnPosition;
                     }
                 }
@@ -238,10 +245,18 @@ export class VirtualPlayerService {
             if (axis) {
                 const myAxis = Axis[axis as keyof typeof Axis];
                 this.orientation = myAxis;
-                const position = this.findPosition(word, myAxis, isFirstTurn);
-                const wordValue = this.valueOnPosition(word, position, myAxis);
+                const thisPosition = this.findPosition(word, myAxis, isFirstTurn);
+                const wordValue = this.valueOnPosition(word, thisPosition, myAxis);
+                const params: PlaceParams = {
+                    position: thisPosition,
+                    orientation: this.orientation,
+                    word: word.stringify(),
+                };
+                if (!this.placeService.canPlaceWord(params)) {
+                    continue;
+                }
                 if ((wordValue <= value && wordValue >= value - POINTS_INTERVAL) || (wordValue === Points.MaxValue1 && wordValue === 0)) {
-                    returnPosition = position;
+                    returnPosition = thisPosition;
                     return returnPosition;
                 }
             }
@@ -344,7 +359,7 @@ export class VirtualPlayerService {
     }
 
     // Returns all valid combinations of the letter + the letters currently in the rack
-    movesWithGivenLetter(letter: ScrabbleLetter): ScrabbleWord[] {
+    movesWithGivenLetter(letter: ScrabbleLetter, fromRack?: boolean): ScrabbleWord[] {
         const lettersAvailable: ScrabbleLetter[] = [];
         lettersAvailable[0] = letter;
         const lettersInArray: boolean[] = [false, false, false, false, false, false, false];
@@ -356,6 +371,11 @@ export class VirtualPlayerService {
                 if (index !== lettersInArray.length - 1) {
                     index++;
                 } else index = 0; // Code coverage on this line
+            }
+            if (lettersAvailable[i] === letter && fromRack) {
+                // Remove the letter from the pool since it is already used
+                lettersInArray[index] = true;
+                continue;
             }
             lettersAvailable[i] = this.rack[index];
             lettersInArray[index] = true;
@@ -382,7 +402,7 @@ export class VirtualPlayerService {
     movesWithRack(points: number): ScrabbleWord[] {
         const possibleMoves: ScrabbleWord[] = [];
         for (const letter of this.rack) {
-            const newWords = this.movesWithGivenLetter(letter);
+            const newWords = this.movesWithGivenLetter(letter, true);
             for (const newWord of newWords) {
                 if (!possibleMoves.includes(newWord)) {
                     if (newWord.value < points || newWord.value > 0) {
@@ -394,47 +414,56 @@ export class VirtualPlayerService {
         return possibleMoves;
     }
 
-    makeMoves(permutations: ScrabbleLetter[][], value: number): ScrabbleWord {
+    makeMoves(permutations: ScrabbleLetter[][], value: number): ScrabbleMove {
         // TODO: Modify this to show alternate placements
         let currentMaxValue;
         let currentBestWord;
+        let movePosition = new Vec2(POSITION_ERROR, POSITION_ERROR);
+        const permutationsToWords: ScrabbleWord[] = [];
+        for (const permutation of permutations) {
+            const word = this.wordify(permutation);
+            permutationsToWords.push(word);
+        }
+        const filteredPermutations = this.filterPermutations(permutationsToWords);
+        console.log('hello from MakeMoves');
         if (value === Points.MaxValue4) {
             // Expert algorithm
             currentMaxValue = 0;
             currentBestWord = new ScrabbleWord();
-            for (const permutation of permutations) {
-                const word = this.wordify(permutation);
+            for (const word of filteredPermutations) {
                 for (const axis in Axis) {
                     // Try with both axises for each permutation.
                     if (axis) {
                         const myAxis = Axis[axis as keyof typeof Axis];
+                        this.orientation = myAxis;
                         const position = this.findPosition(word, myAxis);
                         const wordValue = this.valueOnPosition(word, position, myAxis);
                         if (wordValue > currentMaxValue) {
                             currentMaxValue = wordValue;
                             currentBestWord = word;
+                            movePosition = position;
                         }
                     }
                 }
             }
-            return currentBestWord;
+            return new ScrabbleMove(currentBestWord, movePosition);
         }
         // Easy algorithm
-        for (const permutation of permutations) {
-            const word = this.wordify(permutation);
+        for (const word of filteredPermutations) {
             for (const axis in Axis) {
                 // Try with both axises for each permutation.
                 if (axis) {
                     const myAxis = Axis[axis as keyof typeof Axis];
+                    this.orientation = myAxis;
                     const position = this.findPosition(word, myAxis);
                     const wordValue = this.valueOnPosition(word, position, myAxis);
                     if ((wordValue > value - POINTS_INTERVAL && wordValue <= value) || (wordValue === Points.MaxValue1 && wordValue === 0)) {
-                        return word;
+                        return new ScrabbleMove(word, position);
                     }
                 }
             }
         }
-        return new ScrabbleWord();
+        return new ScrabbleMove();
     }
 
     displayMoves(moves: ScrabbleWord[]): string {
