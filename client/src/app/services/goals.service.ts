@@ -111,7 +111,7 @@ export class GoalsService {
 		});
 		// Check if a new goal was achieved and return the corresponding points
 		this.sharedGoals.forEach((goal) => {
-			pointsMade += goal.achieve(wordsFormed, newlyPlacedLetters);
+			pointsMade += goal.achieve(wordsFormed, newlyPlacedLetters, activePlayer.name);
 		});
 		const privateGoal = this.getGoalOfAPlayer(activePlayer)
 		if (privateGoal !== undefined) {

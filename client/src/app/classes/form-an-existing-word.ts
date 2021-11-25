@@ -1,6 +1,5 @@
 import { ValidationService } from '@app/services/validation.service';
 import { Goal, GoalDescriptions, GoalPoints, GoalType } from './goal';
-import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
 import { scrabbleLettersToString } from './utilities';
 
@@ -16,7 +15,7 @@ export class FormAnExistingWord extends Goal {
     initialize(validationService: ValidationService) {
         this.validationService = validationService;
     }
-    achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters: ScrabbleLetter[]) {
+    achieve(wordsFormed: ScrabbleWord[]) {
         if (this.isAchieved) {
             return 0;
         }
