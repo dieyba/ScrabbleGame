@@ -16,12 +16,30 @@
                 <div class="row" *ngIf="isLog2990() === 'true'">
                     <label class="column info goal-title">Objectif privé:</label>
                     <div class="column privateGoals">
-                        <button class="rectangle">
+                        <div
+                            *ngIf="!isPlayer1GoalAchieved()"
+                            class="rectangle"
+                            mat-raised-button
+                            matTooltip="{{ getPrivateGoalDescription() }}"
+                            matTooltipPosition="right"
+                        >
                             <img
-                                class="goal"
+                                class="goals"
                                 src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
                             />
-                        </button>
+                        </div>
+                        <div
+                            *ngIf="isPlayer1GoalAchieved()"
+                            class="achieved-rectangle"
+                            mat-raised-button
+                            matTooltip="{{ getPrivateGoalDescription() }}"
+                            matTooltipPosition="right"
+                        >
+                            <img
+                                class="goals"
+                                src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -42,12 +60,18 @@
                 <div class="row" *ngIf="isLog2990() === 'true'">
                     <label class="column info goal-title">Objectif privé:</label>
                     <div class="column privateGoals">
-                        <button class="rectangle" disabled="true">
+                        <div *ngIf="!isPlayer2GoalAchieved()" class="rectangle" disabled="true">
                             <img
-                                class="goal"
+                                class="goals"
                                 src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
                             />
-                        </button>
+                        </div>
+                        <div *ngIf="isPlayer2GoalAchieved()" class="achieved-rectangle" disabled="true">
+                            <img
+                                class="goals"
+                                src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -67,19 +91,39 @@
     <mat-card *ngIf="isLog2990() === 'true'" class="card">
         <mat-card-title class="card-title" align="center">Objectifs publics</mat-card-title>
         <mat-card-content>
-            <div class="row publicGoals">
-                <button class="column rectangle">
-                    <img
-                        class="goal"
-                        src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
-                    />
-                </button>
-                <button class="column rectangle">
-                    <img
-                        class="goal"
-                        src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
-                    />
-                </button>
+            <div class="row publicGoals center">
+                <div *ngFor="let sharedGoal of sharedGoals">
+                    <div
+                        *ngIf="!sharedGoal.isAchieved"
+                        class="rectangle"
+                        disabled="true"
+                        class="column rectangle"
+                        mat-raised-button
+                        matTooltip="{{ sharedGoal.description }}"
+                        matTooltipPosition="right"
+                        matTooltipClass="custom-tooltip"
+                    >
+                        <img
+                            class="goals"
+                            src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
+                        />
+                    </div>
+                    <div
+                        *ngIf="sharedGoal.isAchieved"
+                        class="achieved-rectangle"
+                        disabled="true"
+                        class="column rectangle"
+                        mat-raised-button
+                        matTooltip="{{ sharedGoal.description }}"
+                        matTooltipPosition="right"
+                        matTooltipClass="custom-tooltip"
+                    >
+                        <img
+                            class="goals"
+                            src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
+                        />
+                    </div>
+                </div>
             </div>
         </mat-card-content>
     </mat-card>

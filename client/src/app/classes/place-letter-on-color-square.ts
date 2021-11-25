@@ -15,6 +15,8 @@ export class PlaceLetterOnColorSquare extends Goal {
     initialize(targetLetterAndColor: ScrabbleLetter) {
         this.targetLetter = targetLetterAndColor.character;
         this.targetColor = targetLetterAndColor.color;
+        var description = GoalDescriptions.PlaceLetterOnColorSquare.replace('x', this.targetLetter);
+        this.description = description.replace('y', this.colorToString(this.targetColor));
     }
     achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters: ScrabbleLetter[]) {
         if (this.isAchieved) {
@@ -31,6 +33,19 @@ export class PlaceLetterOnColorSquare extends Goal {
             }
         };
         return 0;
+    }
+    colorToString(color: SquareColor): string {
+        switch (color) {
+            case SquareColor.DarkBlue:
+                return 'bleu foncé';
+            case SquareColor.Teal:
+                return 'bleu pale';
+            case SquareColor.Pink:
+                return 'rose';
+            case SquareColor.Red:
+                return 'rouge';
+        }
+        return 'blanche';
     }
 }
 

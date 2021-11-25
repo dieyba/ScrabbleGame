@@ -128,7 +128,7 @@ export class GoalsService {
 		return pointsMade;
 	}
 
-	getGoalOfAPlayer(activePlayer: Player) {
+	getGoalOfAPlayer(activePlayer: Player): Goal {
 		const activePlayerGoalId = this.privateGoals.findIndex((goal: Goal) => {
 			if (activePlayer.goal === undefined || goal.type === undefined) {
 				return false;

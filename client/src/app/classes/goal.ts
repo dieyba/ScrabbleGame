@@ -14,14 +14,14 @@ export enum GoalType {
 }
 
 export enum GoalDescriptions {
-    PlaceLetterWorthTenPts = 'Place a word containing a letter with a 10 pts value',
-    FormTwoLettersStarsOnly = 'Form 2 letter word, both letters are *',
-    FormWordWithLettersFromName = 'Form a word containing at least 3 letters from the player name(can be same letter, but different occurence)',
-    FormAnExistingWord = 'Form a word already on the board',
-    FormThreeWords = 'Form three words at the same time',
-    PlaceLetterOnBoardCorner = 'Place a letter on one of the 4 boaard corners',
-    ActivateTwoBonuses = 'Active 2 bonuses at the same time / place a word with 2 letters on a colour square',
-    PlaceLetterOnColorSquare = 'Place letter x on a square of color y. x and y are randomly chosen at start of game',
+    PlaceLetterWorthTenPts = 'Placer un mot contenant une lettre valant 10 points',
+    FormTwoLettersStarsOnly = 'Former un mot avec seulement deux lettres qui contient les deux étoiles (*)',
+    FormWordWithLettersFromName = "Former un mot avec au moins 3 lettres de ton nom. Chaque lettre peut être utilisé le nombre de fois qu'elle apparaît dans ton nom.",
+    FormAnExistingWord = "Former un mot d'au moins 5 lettres qui a déjà été former auparavant",
+    FormThreeWords = 'Former 3 mots avec un seul placement',
+    PlaceLetterOnBoardCorner = 'Placer une lettre dans un des 4 coins du jeu',
+    ActivateTwoBonuses = 'Activer 2 boni avec un seul placemen',
+    PlaceLetterOnColorSquare = 'Placer la lettre x dans une case de couleur y',
 }
 
 export enum GoalPoints {
