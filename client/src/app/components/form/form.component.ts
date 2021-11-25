@@ -1,16 +1,19 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { DictionaryType } from '@app/classes/dictionary';
-import { GameInitInfo, GameType } from '@app/classes/game-parameters';
+// import { DictionaryType } from '@app/classes/dictionary';
+import { GameType } from '@app/classes/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
-import { SocketHandler } from '@app/modules/socket-handler';
+import { DictionaryInterface } from '@app/pages/admin-page/admin-page.component';
+import { DictionaryService, BASE_URL } from '@app/services/dictionary.service';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
-import * as io from 'socket.io-client';
-import { environment } from 'src/environments/environment';
+import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
+import { ErrorCase } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
 
 export const GAME_CAPACITY = 2;
 
@@ -29,15 +32,17 @@ export class FormComponent implements OnInit {
     dictionaryForm: FormControl;
 
     isLOG2990: boolean;
-    debutantNameList: string[];
+    beginnerNameList: VirtualPlayerName[];
+    expertNameList: VirtualPlayerName[];
     dictionaryList: string[];
     selectedPlayer: string;
     randomPlayerId: number;
     defaultTimer: string;
     defaultDictionary: string;
     defaultBonus: boolean;
-    private readonly server: string;
-    private socket: io.Socket;
+
+    private beginnerNameUrl: string;
+    private expertNameUrl: string;
 
     constructor(
         private gameService: GameService,
@@ -45,22 +50,57 @@ export class FormComponent implements OnInit {
         private dialogRef: MatDialogRef<FormComponent>,
         private router: Router,
         private gameList: GameListService,
+        private virtualPlayerNameService: VirtualPlayerNameManager,
+        private dictionaryService: DictionaryService,
+        private snack: MatSnackBar,
         @Inject(MAT_DIALOG_DATA) public isSolo: boolean,
     ) {
         this.isLOG2990 = false; // TODO: implement actual isLOG2990 depending on which page created the form
-        this.server = environment.socketUrl;
-        this.socket = SocketHandler.requestSocket(this.server);
+        this.beginnerNameList = [];
+        this.expertNameList = [];
+        this.dictionaryList = []; // Object.values(DictionaryType);
+        this.selectedPlayer = '';
+        this.randomPlayerId = 0;
         this.defaultTimer = '60';
         this.defaultDictionary = '0';
         this.defaultBonus = false;
+        this.beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
+        this.expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
+
         if (this.isSolo === true) {
             this.level = new FormControl('', [Validators.required]);
         } else {
             this.level = new FormControl('');
-            this.socketOnConnect(); // form only needs to listen to the server for the multiplayer game form
         }
-        this.dictionaryList = Object.values(DictionaryType);
-        this.debutantNameList = ['Érika', 'Étienne', 'Sara'];
+
+        this.virtualPlayerNameService.getVirtualPlayerNames(this.beginnerNameUrl).subscribe(
+            (list) => {
+                this.beginnerNameList = list;
+            },
+            () => {
+                this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+            },
+        );
+
+        this.virtualPlayerNameService.getVirtualPlayerNames(this.expertNameUrl).subscribe(
+            (list) => {
+                this.expertNameList = list;
+            },
+            () => {
+                this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+            },
+        );
+
+        this.dictionaryService.getDictionaries(BASE_URL).subscribe(
+            (dictionaries: DictionaryInterface[]) => {
+                for (const dictionary of dictionaries) {
+                    this.dictionaryList.push(dictionary.title);
+                }
+            },
+            (error: HttpErrorResponse) => {
+                this.dictionaryService.handleErrorSnackBar(error);
+            },
+        );
     }
 
     ngOnInit() {
@@ -96,7 +136,7 @@ export class FormComponent implements OnInit {
         return Math.floor(randomFloat) + minimum;
     }
 
-    randomPlayer(list: string[]): void {
+    randomPlayer(list: VirtualPlayerName[]): void {
         const showOpponents = document.getElementById('opponents');
         if (showOpponents instanceof HTMLElement) {
             showOpponents.style.visibility = 'visible';
@@ -104,10 +144,10 @@ export class FormComponent implements OnInit {
         this.randomPlayerId = this.randomNumber(0, list.length);
         do {
             this.randomPlayerId = this.randomNumber(0, list.length);
-            this.selectedPlayer = list[this.randomPlayerId];
+            this.selectedPlayer = list[this.randomPlayerId].name;
         } while (this.name.value === this.selectedPlayer);
 
-        this.selectedPlayer = list[this.randomPlayerId];
+        this.selectedPlayer = list[this.randomPlayerId].name;
         this.myForm.controls.opponent.setValue(this.selectedPlayer);
     }
 
@@ -115,7 +155,7 @@ export class FormComponent implements OnInit {
         this.dialog.open(FormComponent, { data: this.isSolo === true });
     }
 
-    changeName(list: string[]): void {
+    changeName(list: VirtualPlayerName[]): void {
         if (this.name.value === this.selectedPlayer) {
             this.randomPlayer(list);
             this.myForm.controls.opponent.setValue(this.selectedPlayer);
@@ -146,12 +186,5 @@ export class FormComponent implements OnInit {
                 this.dialog.open(WaitingAreaComponent, { disableClose: true });
             }
         }
-    }
-    socketOnConnect() {
-        this.socket.on('initClientGame', (gameParams: GameInitInfo) => {
-            this.dialogRef.close();
-            this.router.navigate(['/game']);
-            this.gameService.initializeMultiplayerGame(gameParams);
-        });
     }
 }

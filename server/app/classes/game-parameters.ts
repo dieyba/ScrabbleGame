@@ -82,8 +82,9 @@ export class GameInitInfo {
         const playerToRemove = this.getPlayerBySocketId(playerId);
         if (playerToRemove !== undefined) {
             const indexPlayerToRemove = this.players.indexOf(playerToRemove);
-            this.players.splice(indexPlayerToRemove, 1);
+            const removedPlayer = this.players.splice(indexPlayerToRemove, 1)[0];
+            return removedPlayer;
         }
-        return playerToRemove;
+        return undefined;
     }
 }

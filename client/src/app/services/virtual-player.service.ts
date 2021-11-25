@@ -21,9 +21,9 @@ import { PlaceService } from './place.service';
 import { ValidationService } from './validation.service';
 
 export enum Probability {
-    EndTurn = 0, // TODO: put the right probability settings after testing
-    ExchangeTile = 100,
-    MakeAMove = 0,
+    EndTurn = 10,
+    ExchangeTile = 10,
+    MakeAMove = 80,
     MaxValue1 = 40,
     MaxValue2 = 30,
     MaxValue3 = 30,
@@ -60,7 +60,7 @@ export class VirtualPlayerService {
     ) {
         this.player = this.gameService.game.getOpponent();
         this.rack = this.player.letters;
-        this.type = Difficulty.Difficult; // REMOVE THIS LATER
+        this.type = Difficulty.Difficult; // REMOVE THIS LATER AFTER TESTING
     }
 
     playTurn(): void {
@@ -118,13 +118,12 @@ export class VirtualPlayerService {
                     const command = new PlaceCmd(defaultParams, params);
                     this.commandInvoker.executeCommand(command);
                 } else {
-                    // if no word to place was found, pass turn after 20 seconds
-                    setTimeout(() => {
-                        const command = new PassTurnCmd(defaultParams);
-                        this.commandInvoker.executeCommand(command);
-                    }, NO_MOVE_TOTAL_WAIT_TIME - DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+                    // eslint-disable-next-line no-console
+                    console.log('no move was found. Calling pass command');
+                    const command = new PassTurnCmd(defaultParams);
+                    this.commandInvoker.executeCommand(command);
                 }
-            }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+            });
         }
     }
 
@@ -444,7 +443,6 @@ export class VirtualPlayerService {
         const filteredPermutations = this.filterPermutations(permutationsToWords);
         console.log('filteredPerms', filteredPermutations);
         if (value === Points.MaxValue4) {
-            console.log('hello!!');
             // Expert algorithm
             currentMaxValue = 0;
             currentBestWord = new ScrabbleWord();
@@ -456,7 +454,6 @@ export class VirtualPlayerService {
                         this.orientation = myAxis;
                         const position = this.findPosition(word, myAxis);
                         const wordValue = this.valueOnPosition(word, position, myAxis);
-                        console.log('Word: ' + word.content + ' Value: ' + wordValue);
                         if (wordValue > currentMaxValue) {
                             currentMaxValue = wordValue;
                             currentBestWord = word;
