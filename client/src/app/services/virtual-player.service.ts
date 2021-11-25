@@ -9,8 +9,8 @@ import { BOARD_SIZE } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleMove } from '@app/classes/scrabble-move';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { SquareColor } from '@app/classes/square';
-import { Axis } from '@app/classes/utilities';
+import { Square, SquareColor } from '@app/classes/square';
+import { Axis, ERROR_NUMBER } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { Difficulty } from '@app/classes/virtual-player';
 import { BonusService } from './bonus.service';
@@ -19,6 +19,7 @@ import { GameService } from './game.service';
 import { GridService } from './grid.service';
 import { PlaceService } from './place.service';
 import { ValidationService } from './validation.service';
+import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
     EndTurn = 10,
@@ -57,6 +58,7 @@ export class VirtualPlayerService {
         private gridService: GridService,
         private placeService: PlaceService,
         private validationService: ValidationService,
+        private wordBuilderService: WordBuilderService,
     ) {
         this.player = this.gameService.game.getOpponent();
         this.rack = this.player.letters;
@@ -118,12 +120,11 @@ export class VirtualPlayerService {
                     const command = new PlaceCmd(defaultParams, params);
                     this.commandInvoker.executeCommand(command);
                 } else {
-                    // eslint-disable-next-line no-console
                     console.log('no move was found. Calling pass command');
                     const command = new PassTurnCmd(defaultParams);
                     this.commandInvoker.executeCommand(command);
                 }
-            });
+            }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         }
     }
 
@@ -148,7 +149,6 @@ export class VirtualPlayerService {
         console.log('moveFound: ', moveFound);
         if (moveFound.position.x === POSITION_ERROR || moveFound.position.y === POSITION_ERROR || moveFound.word.content.length === 0) {
             // Pass turn
-            console.log('bonjour');
             setTimeout(() => {
                 const passTurn = new PassTurnCmd(defaultParams);
                 this.commandInvoker.executeCommand(passTurn);
@@ -311,7 +311,44 @@ export class VirtualPlayerService {
         } else if (doubleScore) {
             totalValue *= 2;
         }
+        const allLettersPlaced = 8;
+        if (word.content.length === allLettersPlaced) return totalValue * 2;
         return totalValue;
+    }
+
+    tempPlacement(word: ScrabbleWord, startPos: Vec2, axis: Axis) {
+        const currentCoord = new Vec2(startPos.x, startPos.y);
+        for (const letter of word.content) {
+            const currentSquare = this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y];
+            word.content[word.content.indexOf(letter)].tile = currentSquare;
+            if (axis === Axis.H && currentCoord.x + 1 < this.gridService.scrabbleBoard.squares.length) {
+                currentCoord.x += 1;
+            } else if (axis === Axis.V && currentCoord.y + 1 < this.gridService.scrabbleBoard.squares[0].length) {
+                currentCoord.y += 1;
+            }
+            if (!currentSquare) return;
+            if (currentSquare.isValidated) continue;
+            currentSquare.letter = letter;
+            currentSquare.occupied = true;
+        }
+    }
+
+    removalAfterTempPlacement(word: ScrabbleWord, startPos: Vec2, axis: Axis) {
+        const currentCoord = new Vec2(startPos.x, startPos.y);
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < word.content.length; i++) {
+            const currentSquare = this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y];
+            if (axis === Axis.H && currentCoord.x + 1 < BOARD_SIZE) {
+                currentCoord.x += 1;
+            }
+            if (axis === Axis.V && currentCoord.y + 1 < BOARD_SIZE) {
+                currentCoord.y += 1;
+            }
+            if (currentSquare.isValidated) continue;
+            word.content[i].tile = new Square(ERROR_NUMBER, ERROR_NUMBER);
+            currentSquare.letter = new ScrabbleLetter('');
+            currentSquare.occupied = false;
+        }
     }
 
     findPosition(word: ScrabbleWord, axis: Axis, isFirstTurn?: boolean): Vec2 {
@@ -343,6 +380,16 @@ export class VirtualPlayerService {
                 for (let j = 0; j < this.gridService.scrabbleBoard.squares[i].length; j++) {
                     if (this.gridService.scrabbleBoard.squares[i][j].letter === word.content[letter]) {
                         const letterPos = new Vec2(i, j);
+                        const realPos = this.getBeginningPosition(word.content.length, letterPos, axis);
+                        this.tempPlacement(word, realPos, axis);
+                        const wordsBuilt = this.wordBuilderService.buildWordsOnBoard(word.stringify(), realPos, axis);
+                        this.removalAfterTempPlacement(word, realPos, axis);
+                        // CHANGE LETTERPOS FOR POSITION OF BEGINNING LETTER
+                        let isErrorInWordsBuilt = false;
+                        for (const wordBuilt of wordsBuilt) {
+                            if (!this.isWordValid(wordBuilt.stringify())) isErrorInWordsBuilt = true;
+                        }
+                        if (isErrorInWordsBuilt) continue;
                         switch (axis) {
                             case Axis.H:
                                 returnPos = letterPos;
@@ -358,6 +405,18 @@ export class VirtualPlayerService {
             }
         }
         return returnPos;
+    }
+    getBeginningPosition(length: number, letterPos: Vec2, axis: Axis): Vec2 {
+        const returnVec = new Vec2(letterPos.x, letterPos.y);
+        switch (axis) {
+            case Axis.H:
+                returnVec.x -= length - 1;
+                break;
+            case Axis.V:
+                returnVec.y -= length - 1;
+                break;
+        }
+        return returnVec;
     }
 
     // Returns all valid combinations of the letter + the letters currently in the rack
