@@ -206,7 +206,11 @@ export class GameService {
                     this.validationService.updatePlayerScore(tempScrabbleWords, player);
                     lettersToAddToRack = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
                 }
-                this.addRackLetters(lettersToAddToRack);
+                // Update the rack with new letters
+                if (!(player instanceof VirtualPlayer)) {
+                    this.addRackLetters(lettersToAddToRack);
+                }
+                // Update the player's letters attribute
                 lettersToAddToRack.forEach((letter) => {
                     player.letters.push(letter);
                 });
