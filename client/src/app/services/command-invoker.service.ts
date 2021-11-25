@@ -16,29 +16,27 @@ export class CommandInvokerService {
 
     async executeCommand(command: Command): Promise<void> {
         const commandResult = command.execute();
-        const isExchangeCmd = command instanceof ExchangeCmd;
-        const isToDisplayRemotely = isExchangeCmd || command instanceof PassTurnCmd || command instanceof PlaceCmd;
         if (commandResult instanceof Promise) {
-            await commandResult.then((executionResult: CommandResult) => {
-                this.displayExecutionResultMessages(executionResult, isExchangeCmd, isToDisplayRemotely);
+            commandResult.then((executionResult: CommandResult) => {
+                this.displayExecutionResultMessages(executionResult, command);
             });
         } else {
-            this.displayExecutionResultMessages(commandResult, isExchangeCmd, isToDisplayRemotely);
+            this.displayExecutionResultMessages(commandResult, command);
         }
     }
-    displayExecutionResultMessages(commandResult: CommandResult, isExchangeCmd: boolean, isToDisplayRemotely: boolean) {
+    displayExecutionResultMessages(commandResult: CommandResult, command: Command) {
+        const isExchangeCmd = command instanceof ExchangeCmd;
+        const isToDisplayRemotely = isExchangeCmd || command instanceof PassTurnCmd || command instanceof PlaceCmd;
         const isSendToServer = this.gameService.game.gameMode === GameType.MultiPlayer && isToDisplayRemotely && commandResult.isExecuted;
-        const isFromVirtualPlayer =
-            this.gameService.game.gameMode === GameType.Solo && commandResult.executionMessages[0].color === ChatEntryColor.RemotePlayer;
-
+        const debugMessages = command.debugMessages;
         if (isSendToServer) {
             this.displayExecutionWithServer(isExchangeCmd, commandResult);
         } else {
-            this.displayExecutionLocally(isFromVirtualPlayer, isExchangeCmd, commandResult);
+            this.displayExecutionLocally(isExchangeCmd, commandResult, debugMessages);
         }
     }
     displayExecutionWithServer(isExchangeCmd: boolean, commandResult: CommandResult) {
-        // extract command is the only situation where the message is different for the local/remove player
+        // extract command is the only situation where the message is different for the local/remote player
         if (isExchangeCmd) {
             const messageLocalPlayer = commandResult.executionMessages[0].message;
             const messageRemotePlayer = commandResult.executionMessages[1].message;
@@ -49,11 +47,14 @@ export class CommandInvokerService {
             });
         }
     }
-    displayExecutionLocally(isFromVirtualPlayer: boolean, isExchangeCmd: boolean, commandResult: CommandResult) {
+    displayExecutionLocally(isExchangeCmd: boolean, commandResult: CommandResult, debugMessages: string[]) {
+        const isFromVirtualPlayer =
+            this.gameService.game.gameMode === GameType.Solo &&
+            commandResult.executionMessages[0].color === ChatEntryColor.RemotePlayer &&
+            debugMessages.length !== 0;
         if (isFromVirtualPlayer) {
             // TODO: see how exactly debug messages will be added in command invoker
             const commandMessage = commandResult.executionMessages[0].message;
-            const debugMessages = ['some debug message', 'some other debug message'];
             this.chatDisplayService.addVirtalPlayerEntry(commandMessage, debugMessages);
         } else if (isExchangeCmd) {
             // extract command returns both players message, but solo game only displays the local message

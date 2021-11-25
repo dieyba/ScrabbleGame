@@ -21,9 +21,9 @@ import { PlaceService } from './place.service';
 import { ValidationService } from './validation.service';
 
 export enum Probability {
-    EndTurn = 10, // TODO: put the right probability settings after testing
-    ExchangeTile = 10,
-    MakeAMove = 80,
+    EndTurn = 0, // TODO: put the right probability settings after testing
+    ExchangeTile = 100,
+    MakeAMove = 0,
     MaxValue1 = 40,
     MaxValue2 = 30,
     MaxValue3 = 30,
@@ -92,6 +92,8 @@ export class VirtualPlayerService {
                 }
                 const chosenTilesString = chosenTiles.map((tile) => tile.character).join(''); // TEST THIS, may not work.
                 const command = new ExchangeCmd(defaultParams, chosenTilesString);
+                // TODO: push the real debug messages
+                command.debugMessages.push('a debug message');
                 this.commandInvoker.executeCommand(command);
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
@@ -253,7 +255,7 @@ export class VirtualPlayerService {
                     orientation: this.orientation,
                     word: word.stringify(),
                 };
-                if (!this.placeService.canPlaceWord(params)) {
+                if (!this.placeService.canPlaceWord(params)) {
                     continue;
                 }
                 if ((wordValue <= value && wordValue >= value - POINTS_INTERVAL) || (wordValue === Points.MaxValue1 && wordValue === 0)) {
