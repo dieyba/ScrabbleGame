@@ -31,9 +31,9 @@ export class FormComponent implements OnInit {
     opponent: FormControl;
     dictionaryForm: FormControl;
 
+    debutantNameList: string[];
     beginnerNameList: VirtualPlayerName[];
     expertNameList: VirtualPlayerName[];
-    debutantNameList: string[];
     dictionaryList: string[];
     selectedPlayer: string;
     randomPlayerId: number;

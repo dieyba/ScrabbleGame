@@ -24,7 +24,7 @@
 
 .card {
     margin: 10px 0px;
-    background-color: #dcecff;
+    background-color: #b9d0ec;
 }
 
 .card-title {
@@ -69,16 +69,24 @@ hr {
     border-width: 0px;
 }
 
-.goal {
+.achieved-rectangle {
+    height: 50px;
+    width: 50px;
+    background-color: #6aa0e0;
+    border-radius: 5px;
+    margin: 5px 5px 0px 5px;
+    border-width: 0px;
+}
+
+.goals {
     height: 40px;
     width: 40px;
+    margin: 5px 0px 0px 5px;
 }
 
 .publicGoals {
-    width: 60%;    
-    display: block;
-    margin-left: auto;    
-    margin-right: auto;
+    margin-left: 45px;
+    width: 60%;
 }
 
 .privateGoals {
@@ -87,4 +95,8 @@ hr {
 
 .goal-title {
     margin-top: 10px;
+}
+
+.custom-tooltip {
+    font-size: 15px;
 }

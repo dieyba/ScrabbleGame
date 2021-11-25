@@ -18,17 +18,11 @@
     position: relative;
 }
 
-// .games {
-//     overflow-y: scroll;
-//
-//     max-height: 200px;
-//     margin: 5px 10px;
-// }
 .games {
     overflow-y: scroll;
-    // height: fit-content;
-    // max-height: 200px;
-    // margin: 5px 10px;
+    height: fit-content;
+    max-height: 200px;
+    margin: 5px 10px;
     // margin: 0 0 2em 0;
     list-style-type: none;
     // padding: 0;
