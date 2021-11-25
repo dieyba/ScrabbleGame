@@ -23,8 +23,8 @@ import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
     EndTurn = 0,
-    ExchangeTile = 100,
-    MakeAMove = 0,
+    ExchangeTile = 0,
+    MakeAMove = 100,
     MaxValue1 = 40,
     MaxValue2 = 30,
     MaxValue3 = 30,
@@ -133,7 +133,7 @@ export class VirtualPlayerService {
             const permutationString = permutation.stringify();
             if (this.isWordValid(permutationString)) {
                 filteredPermutations.push(permutation);
-                console.log('one valid perm: ', permutationString);
+                // console.log('one valid perm: ', permutationString);
             }
         }
         return filteredPermutations;
@@ -145,7 +145,7 @@ export class VirtualPlayerService {
             serviceCalled: this.gameService,
         };
         const moveFound = this.findFirstValidWords(permutations, value, true);
-        console.log('moveFound: ', moveFound);
+        // console.log('moveFound: ', moveFound);
         if (moveFound.position.x === POSITION_ERROR || moveFound.position.y === POSITION_ERROR || moveFound.word.content.length === 0) {
             // Pass turn
             setTimeout(() => {
@@ -442,7 +442,7 @@ export class VirtualPlayerService {
         }
         // check all possible permutations. Maximum of O(8!)
         const permutations = this.permutationsOfLetters(lettersAvailable);
-        console.log(permutations);
+        // console.log(permutations);
         const possibleMoves = [];
         let movesFound = 0;
         const charArray = [];
@@ -499,7 +499,7 @@ export class VirtualPlayerService {
             permutationsToWords.push(permutation);
         }
         const filteredPermutations = this.filterPermutations(permutationsToWords);
-        console.log('filteredPerms', filteredPermutations);
+        // console.log('filteredPerms', filteredPermutations);
         if (value === Points.MaxValue4) {
             // Expert algorithm
             currentMaxValue = 0;
