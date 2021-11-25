@@ -21,10 +21,10 @@ import { PlaceService } from './place.service';
 import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
-export enum Probability {
-    EndTurn = 0,
-    ExchangeTile = 100,
-    MakeAMove = 0,
+export enum Probability { //    Probabilities for the easy virtual player
+    EndTurn = 10,
+    ExchangeTile = 10,
+    MakeAMove = 80,
     MaxValue1 = 40,
     MaxValue2 = 30,
     MaxValue3 = 30,
@@ -115,7 +115,7 @@ export class VirtualPlayerService {
                     orientation: this.orientation,
                     word: moveMade.word.stringify(),
                 };
-                if (moveMade.word.content.length > 1 && this.placeService.canPlaceWord(params)) {
+                if (moveMade.word.content.length > 1) {
                     const command = new PlaceCmd(defaultParams, params);
                     this.commandInvoker.executeCommand(command);
                 } else {
@@ -343,10 +343,12 @@ export class VirtualPlayerService {
             if (axis === Axis.V && currentCoord.y + 1 < BOARD_SIZE) {
                 currentCoord.y += 1;
             }
-            if (currentSquare.isValidated) continue;
-            word.content[i].tile = new Square(ERROR_NUMBER, ERROR_NUMBER);
-            currentSquare.letter = new ScrabbleLetter('');
-            currentSquare.occupied = false;
+            if (currentSquare) {
+                if (currentSquare.isValidated) continue;
+                word.content[i].tile = new Square(ERROR_NUMBER, ERROR_NUMBER);
+                currentSquare.letter = new ScrabbleLetter('');
+                currentSquare.occupied = false;
+            }
         }
     }
 
