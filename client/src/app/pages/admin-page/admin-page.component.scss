@@ -6,13 +6,27 @@ body {
     background-color: #dcecff;
 }
 
+.virtual-names {
+    margin: 10px;
+    position: relative;
+    flex: 75%;
+}
+
+.dictionaries {    
+    margin: 10px;
+    position: relative;
+    flex: 25%;
+}
+
 .page {
     display: flex;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .reset {
-    position: absolute;
-    left: 700px;
+    text-align: right;
+    margin: 5px 20px;
 }
 
 .image {

@@ -1,20 +1,17 @@
 .virtualPlayers {
     position: relative;
-    right: 150px;
 }
 
 .information {
     position: relative;
-    left: 300px;
+    margin: 20px 10px 10px 10px;
     font-size: 10pt;
-    bottom: 10px;
 }
 
 .information2 {
     position: relative;
-    left: 200px;
-    top: 5px;
-    font-size: 7pt;
+    margin: 10px;
+    font-size: 8pt;
 }
 
 .add {
@@ -30,6 +27,12 @@
 .reset {
     position: relative;
     left: 700px;
+}
+
+.text {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 18px;
 }
 
 .lists {
@@ -53,20 +56,26 @@
 }
 
 h2 {
-    flex: 50%;
-    position: relative;
     // margin-top: 10px;
     left: 300px;
     bottom: 8px;
 }
 
 .names {
-    flex: 50%;
-    position: relative;
-    margin-top: 20px;
+    margin-top: 10px;
     overflow-y: scroll;
     height: fit-content;
-    max-height: 200px;
+    border-radius: 10px;
+    background-color: white;
+    max-height: 135px;
+}
+
+.column {    
+    flex: 25%;
+    position: relative;
+    margin-left: 10px;
+    margin-right: 10px;
+    background-color: #dcecff;
 }
 
 .name-btn {
@@ -85,28 +94,27 @@ h2 {
 .input {
     display: flex;
     flex-direction: column;
-    margin-left: 600px;
     margin-top: 50px;
+    width: 350px;
 }
 
 .addName {
-    display: flex;
-    margin-left: 500px;
-    margin-top: 50px;
+    margin-top: 20px;
 }
 
 .deletUpdate {
-    display: flex;
-    margin-left: 500px;
-    margin-top: 50px;
+    margin-top: 70px;
+}
+
+hr {
+    border: 0.5px solid #6aa0e0;
+    background-color: #6aa0e0;
 }
 
 .btn {
     white-space: nowrap;
     position: relative;
-    margin-top: 1px;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin: 10px;
     font-size: 20px;
     border-radius: 5px;
     background-color: #6aa0e0;
