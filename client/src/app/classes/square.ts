@@ -1,6 +1,8 @@
 import { ScrabbleLetter } from './scrabble-letter';
 import { Vec2 } from './vec2';
 
+export const TOTAL_COLORS = 5;
+
 export enum SquareColor {
     None = 0,
     Teal = 1,

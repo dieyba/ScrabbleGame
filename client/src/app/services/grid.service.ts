@@ -14,15 +14,15 @@ export enum Colors {
 }
 
 // TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
-export const DEFAULT_WIDTH = 600;
-export const DEFAULT_HEIGHT = 600;
+export const DEFAULT_WIDTH = 540;
+export const DEFAULT_HEIGHT = 540;
 export const BOARD_SIZE = 15;
 export const SQUARE_SIZE = DEFAULT_WIDTH / BOARD_SIZE - 2;
 export const BOARD_OFFSET = 20;
-const SMALL_OFFSET_Y = 20;
-const BIG_OFFSET_Y = 35;
+const SMALL_OFFSET_Y = 18;
+const BIG_OFFSET_Y = 30;
 const SMALL_OFFSET_X = 6;
-const BIG_OFFSET_X = 15;
+const BIG_OFFSET_X = 13;
 const DOUBLE_DIGIT = 10;
 const DEFAULT_LETTER_FONT_INDEX = 2;
 const DEFAULT_VALUE_FONT_INDEX = 2;
@@ -101,7 +101,7 @@ export class GridService {
     drawSingleSquareColor(i: number, j: number) {
         const startX = (this.width * i) / BOARD_SIZE + 1 + BOARD_OFFSET;
         const startY = (this.height * j) / BOARD_SIZE + 1 + BOARD_OFFSET;
-        this.gridContext.font = '11px system-ui';
+        this.gridContext.font = '10px system-ui';
         // If colored square, hide text
         switch (this.scrabbleBoard.squares[i][j].color) {
             case SquareColor.DarkBlue:

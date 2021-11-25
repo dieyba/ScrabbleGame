@@ -26,6 +26,11 @@ export class SidebarComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         clearTimeout(this.gameService.game.gameTimer.intervalValue);
     }
+
+    isLog2990(): string {
+        return String(this.gameService.game.isLog2990);
+    }
+
     getPlayer1Name(): string {
         return this.gameService.game.getLocalPlayer().name;
     }

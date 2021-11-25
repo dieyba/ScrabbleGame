@@ -7,13 +7,13 @@ import { Router } from '@angular/router';
 // import { DictionaryType } from '@app/classes/dictionary';
 import { GameType } from '@app/classes/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
+import { ErrorCase } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
 import { DictionaryInterface } from '@app/pages/admin-page/admin-page.component';
-import { DictionaryService, BASE_URL } from '@app/services/dictionary.service';
+import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
 import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
-import { ErrorCase } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
 
 export const GAME_CAPACITY = 2;
 
@@ -31,9 +31,9 @@ export class FormComponent implements OnInit {
     opponent: FormControl;
     dictionaryForm: FormControl;
 
-    isLOG2990: boolean;
     beginnerNameList: VirtualPlayerName[];
     expertNameList: VirtualPlayerName[];
+    debutantNameList: string[];
     dictionaryList: string[];
     selectedPlayer: string;
     randomPlayerId: number;
@@ -53,9 +53,8 @@ export class FormComponent implements OnInit {
         private virtualPlayerNameService: VirtualPlayerNameManager,
         private dictionaryService: DictionaryService,
         private snack: MatSnackBar,
-        @Inject(MAT_DIALOG_DATA) public isSolo: boolean,
+        @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
-        this.isLOG2990 = false; // TODO: implement actual isLOG2990 depending on which page created the form
         this.beginnerNameList = [];
         this.expertNameList = [];
         this.dictionaryList = []; // Object.values(DictionaryType);
@@ -67,7 +66,7 @@ export class FormComponent implements OnInit {
         this.beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
         this.expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
 
-        if (this.isSolo === true) {
+        if (this.data.isSolo === true) {
             this.level = new FormControl('', [Validators.required]);
         } else {
             this.level = new FormControl('');
@@ -152,7 +151,7 @@ export class FormComponent implements OnInit {
     }
 
     convert() {
-        this.dialog.open(FormComponent, { data: this.isSolo === true });
+        this.dialog.open(FormComponent, { data: { isSolo: true, isLog2990: this.data.isLog2990 } });
     }
 
     changeName(list: VirtualPlayerName[]): void {
@@ -164,14 +163,14 @@ export class FormComponent implements OnInit {
 
     submit(): void {
         if (this.myForm.valid) {
-            const gameMode = this.isSolo ? GameType.Solo : GameType.MultiPlayer;
+            const gameMode = this.data.isSolo ? GameType.Solo : GameType.MultiPlayer;
             const gameParams = new WaitingAreaGameParameters(
                 gameMode,
                 GAME_CAPACITY,
                 this.dictionaryForm.value,
                 this.timer.value,
                 this.bonus.value,
-                this.isLOG2990,
+                this.data.isLog2990,
                 this.name.value, // game creator name
             );
             if (gameMode === GameType.Solo) {
@@ -183,7 +182,7 @@ export class FormComponent implements OnInit {
             } else {
                 this.closeDialog();
                 this.gameList.createRoom(gameParams);
-                this.dialog.open(WaitingAreaComponent, { disableClose: true });
+                this.dialog.open(WaitingAreaComponent, { data: { isLog2990: this.data.isLog2990 }, disableClose: true });
             }
         }
     }

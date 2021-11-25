@@ -12,8 +12,8 @@ describe('GridService', () => {
     let service: GridService;
     let ctxStub: CanvasRenderingContext2D;
 
-    const DEFAULT_WIDTH = 600;
-    const DEFAULT_HEIGHT = 600;
+    const DEFAULT_WIDTH = 540;
+    const DEFAULT_HEIGHT = 540;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});

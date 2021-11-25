@@ -23,6 +23,7 @@ export class Server {
             return false;
         }
     }
+    
     init(): void {
         this.application.app.set('port', Server.appPort);
 

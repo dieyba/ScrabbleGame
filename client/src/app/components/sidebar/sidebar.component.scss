@@ -4,20 +4,22 @@
     padding: 15px;
 }
 
-.summary {
-    padding: 20px 10px;
+.row {
+    display: flex;
+    margin: 5px 0px 5px 0px;
 }
 
-.row {
-    margin: 10px 0px 10px 0px;
+.column {
+    flex: 50%;
+    position: relative;
 }
 
 .info {
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .bold {
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .card {
@@ -26,14 +28,13 @@
 }
 
 .card-title {
-    margin-top:  0;
-    margin-left: 20px;
-    margin-right: 20px;
-    line-height: 30px;
+    font-size: 22px;
+    display: block;
+    text-align: center;
 }
 
 .values {
-    font-size: 25px;
+    font-size: 20px;
     display: block;
     text-align: center;
 }
@@ -51,11 +52,39 @@ hr {
 
 .return {
     position: relative;
-    margin-top: 20px;
-    font-size: 25px;
+    font-size: 20px;
     border-radius: 5px;
     background-color: #6aa0e0;
     border: 1px solid #6aa0e0;
     padding: 5px;
     width: 100%;
+}
+
+.rectangle {
+    height: 50px;
+    width: 50px;
+    background-color: #f1f7ff;
+    border-radius: 5px;
+    margin: 5px 5px 0px 5px;
+    border-width: 0px;
+}
+
+.goal {
+    height: 40px;
+    width: 40px;
+}
+
+.publicGoals {
+    width: 60%;    
+    display: block;
+    margin-left: auto;    
+    margin-right: auto;
+}
+
+.privateGoals {
+    width: 25%;
+}
+
+.goal-title {
+    margin-top: 10px;
 }
