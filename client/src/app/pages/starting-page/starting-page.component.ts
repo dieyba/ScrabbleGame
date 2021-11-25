@@ -9,7 +9,14 @@ import { BestScoresComponent } from '@app/components/best-scores/best-scores.com
     styleUrls: ['./starting-page.component.scss'],
 })
 export class StartingPageComponent {
-    constructor(private router: Router, private dialog: MatDialog) {}
+    constructor(private dialog: MatDialog, private router: Router) {}
+
+    openDialog(): void {
+        this.dialog.open(BestScoresComponent, {
+            // height: '150%',
+            // width: '90%',
+        });
+    }
 
     openPage(isLog2990: boolean) {
         if (isLog2990) {
@@ -17,12 +24,5 @@ export class StartingPageComponent {
         } else {
             this.router.navigate(['/game-mode', { isLog2990: false }])
         }
-    }
-
-    openDialog(): void {
-        this.dialog.open(BestScoresComponent, {
-            // height: '150%',
-            // width: '90%',
-        });
     }
 }

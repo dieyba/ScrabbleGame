@@ -53,8 +53,6 @@ export class FormComponent implements OnInit {
         private virtualPlayerNameService: VirtualPlayerNameManager,
         private dictionaryService: DictionaryService,
         private snack: MatSnackBar,
-
-
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
         this.beginnerNameList = [];

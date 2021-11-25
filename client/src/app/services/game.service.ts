@@ -126,12 +126,9 @@ export class GameService {
     createGoals(sharedGoals: GoalType[], randomLetterAndColor: ScrabbleLetter) {
         this.goalsService.initialize();
         // Create the goals
-        sharedGoals = [GoalType.FormWordWithLettersFromName, GoalType.FormAnExistingWord];
         sharedGoals.forEach(sharedGoalType => {
             this.goalsService.addSharedGoal(sharedGoalType);
         });
-        this.game.getLocalPlayer().goal = GoalType.ActivateTwoBonuses;
-        this.game.getOpponent().goal = GoalType.PlaceLetterOnColorSquare;
         this.game.players.forEach(player => {
             this.goalsService.addPrivateGoal(player.goal);
         });

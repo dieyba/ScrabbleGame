@@ -6,7 +6,6 @@
 
 .row {
     display: flex;
-    margin: 5px 0px 5px 0px;
 }
 
 .column {
@@ -15,38 +14,39 @@
 }
 
 .info {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .bold {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .card {
     margin: 10px 0px;
-    background-color: #b9d0ec;
+    background-color: #dcecff;
 }
 
 .card-title {
-    font-size: 22px;
-    display: block;
-    text-align: center;
-}
-
-.values {
     font-size: 20px;
     display: block;
     text-align: center;
 }
 
+.values {
+    font-size: 18px;
+    display: block;
+    text-align: center;
+}
+
 hr {
-    margin: 15px 0px;
-    border: 1px solid #6aa0e0;
+    margin: 10px 0px;
+    border: 0.5px solid #6aa0e0;
+    background-color: #6aa0e0;
 }
 
 .logo {
     display: block;
-    margin: 15px 0px;
+    margin: 10px 0px;
     filter: grayscale(100%);
 }
 
@@ -61,8 +61,8 @@ hr {
 }
 
 .rectangle {
-    height: 50px;
-    width: 50px;
+    height: 40px;
+    width: 40px;
     background-color: #f1f7ff;
     border-radius: 5px;
     margin: 5px 5px 0px 5px;
@@ -70,8 +70,8 @@ hr {
 }
 
 .achieved-rectangle {
-    height: 50px;
-    width: 50px;
+    height: 40px;
+    width: 40px;
     background-color: #6aa0e0;
     border-radius: 5px;
     margin: 5px 5px 0px 5px;
@@ -79,9 +79,9 @@ hr {
 }
 
 .goals {
-    height: 40px;
-    width: 40px;
-    margin: 5px 0px 0px 5px;
+    height: 35px;
+    width: 35px;
+    margin: 2.5px 0px 0px 2.5px;
 }
 
 .publicGoals {

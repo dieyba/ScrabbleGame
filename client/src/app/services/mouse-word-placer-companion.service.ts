@@ -81,7 +81,7 @@ export class MouseWordPlacerCompanionService {
                 context.fillStyle = '#FFA7C7';
                 break;
             case 'red':
-                context.fillStyle = '#C03E3E';
+                context.fillStyle = '#E60000';
                 break;
             default:
                 break;

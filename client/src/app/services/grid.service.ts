@@ -9,7 +9,7 @@ export enum Colors {
     Teal = '#ACE3EE',
     DarkBlue = '#6AA0E0',
     Pink = '#FFA7C7',
-    Red = '#C03E3E',
+    Red = '#E60000',
     None = 'white',
 }
 
