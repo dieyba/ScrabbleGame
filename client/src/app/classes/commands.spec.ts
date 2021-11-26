@@ -4,9 +4,6 @@ import { Command, CommandResult } from './commands';
 
 describe('Commands', () => {
     class CommandTest extends Command {
-        constructor(player: Player) {
-            super(player);
-        }
         execute() {
             const chat: ChatDisplayEntry[] = [{ color: ChatEntryColor.LocalPlayer, message: 'allo' }];
             const commandResult: CommandResult = { isExecuted: true, executionMessages: chat };

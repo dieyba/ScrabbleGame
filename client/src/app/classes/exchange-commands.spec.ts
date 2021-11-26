@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { createExchangeCmd, ExchangeCmd } from '@app/classes/exchange-command';
 import { GameService } from '@app/services/game.service';
 import { ChatEntryColor, createErrorEntry } from './chat-display-entry';
@@ -20,7 +21,7 @@ describe('ExchangeCmd', () => {
         gameServiceSpy = jasmine.createSpyObj('GameService', ['exchangeLetters']);
         gameServiceSpy.game = new GameParameters();
         gameServiceSpy.game.players = [localPlayer, opponentPlayer];
-        let defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
+        const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
         exchange = new ExchangeCmd(defaultParams, LETTERS);
     });
 
@@ -54,7 +55,7 @@ describe('ExchangeCmd', () => {
         const localPlayerEntry = { color: ChatEntryColor.RemotePlayer, message: OPPONENT_NAME + ' >> !échanger ' + LETTERS };
         const opponentPlayerEntry = {
             color: ChatEntryColor.RemotePlayer,
-            message: OPPONENT_NAME + ' >> !échanger ' + LETTERS.length + ' lettre(s)'
+            message: OPPONENT_NAME + ' >> !échanger ' + LETTERS.length + ' lettre(s)',
         };
         exchange.player = opponentPlayer;
         exchange.player.isActive = true;
@@ -71,9 +72,11 @@ describe('ExchangeCmd', () => {
     });
 
     it('createExchangeCmd should create an instance', () => {
-        expect(createExchangeCmd({
-            defaultParams: { player: localPlayer, serviceCalled: gameServiceSpy },
-            specificParams: LETTERS
-        })).toBeTruthy();
+        expect(
+            createExchangeCmd({
+                defaultParams: { player: localPlayer, serviceCalled: gameServiceSpy },
+                specificParams: LETTERS,
+            }),
+        ).toBeTruthy();
     });
 });

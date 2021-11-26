@@ -1,11 +1,12 @@
-import { GAME_CAPACITY } from "@app/components/form/form.component";
-import { GameParameters } from "./game-parameters";
-import { Player } from "./player";
-import { ERROR_NUMBER } from "./utilities";
+/* eslint-disable dot-notation */
+import { GAME_CAPACITY } from '@app/components/form/form.component';
+import { GameParameters } from './game-parameters';
+import { Player } from './player';
+import { ERROR_NUMBER } from './utilities';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('GameParameters', () => {
-    let gameParameters = new GameParameters();
+    const gameParameters = new GameParameters();
     const localPlayer = new Player('LocalPlayerName');
     const opponent = new Player('OpponentName');
     const localPlayerId = 0;
@@ -20,7 +21,7 @@ describe('GameParameters', () => {
         expect(gameParameters).toBeTruthy();
     });
 
-    it('should set the proper players\' id', () => {
+    it("should set the proper players' id", () => {
         expect(gameParameters['localPlayerIndex']).toEqual(localPlayerId);
         expect(gameParameters['opponentPlayerIndex']).toEqual(opponentPlayerId);
     });

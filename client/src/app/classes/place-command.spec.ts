@@ -17,13 +17,13 @@ describe('PlaceCmd', () => {
     let place: PlaceCmd;
     const localPlayer = new Player(PLAYER_NAME);
     const opponentPlayer = new Player(OPPONENT_NAME);
-    let placeParams: PlaceParams = { position: new Vec2(7, 7), orientation: Axis.H, word: 'word' };
+    const placeParams: PlaceParams = { position: new Vec2(7, 7), orientation: Axis.H, word: 'word' };
 
     beforeEach(() => {
         gameServiceSpy = jasmine.createSpyObj('GameService', ['place']);
         gameServiceSpy.game = new GameParameters();
         gameServiceSpy.game.players = [localPlayer, opponentPlayer];
-        let defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
+        const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };
         place = new PlaceCmd(defaultParams, placeParams);
     });
 
@@ -63,9 +63,11 @@ describe('PlaceCmd', () => {
     });
 
     it('createPlaceCmd should create an instance', () => {
-        expect(createPlaceCmd({
-            defaultParams: { player: localPlayer, serviceCalled: gameServiceSpy },
-            specificParams: placeParams
-        })).toBeTruthy();
+        expect(
+            createPlaceCmd({
+                defaultParams: { player: localPlayer, serviceCalled: gameServiceSpy },
+                specificParams: placeParams,
+            }),
+        ).toBeTruthy();
     });
 });

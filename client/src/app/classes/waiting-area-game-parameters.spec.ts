@@ -1,20 +1,13 @@
-import { GAME_CAPACITY } from "@app/components/form/form.component";
-import { DictionaryType } from "./dictionary";
-import { GameType } from "./game-parameters";
-import { WaitingAreaGameParameters } from "./waiting-area-game-parameters";
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+import { GAME_CAPACITY } from '@app/components/form/form.component';
+import { DictionaryType } from './dictionary';
+import { GameType } from './game-parameters';
+import { WaitingAreaGameParameters } from './waiting-area-game-parameters';
 
-fdescribe('WaitingAreaGameParameters', () => {
+describe('WaitingAreaGameParameters', () => {
     let parameters: WaitingAreaGameParameters;
     it('should create an instance', () => {
-        parameters = new WaitingAreaGameParameters(
-            GameType.Solo,
-            GAME_CAPACITY,
-            DictionaryType.Default,
-            60,
-            false,
-            false,
-            'Creator Name',
-        );
+        parameters = new WaitingAreaGameParameters(GameType.Solo, GAME_CAPACITY, DictionaryType.Default, 60, false, false, 'Creator Name');
         expect(parameters).toBeTruthy();
     });
     it('should create an instance with an opponent name', () => {
@@ -31,4 +24,3 @@ fdescribe('WaitingAreaGameParameters', () => {
         expect(parameters).toBeTruthy();
     });
 });
-
