@@ -23,8 +23,8 @@ export class GameTimer {
         }
     }
     secondsToMinutes() {
-        const s = Math.floor(this.timerMs / MINUTE_IN_SEC);
-        const ms = this.timerMs % MINUTE_IN_SEC;
+        const s = this.timerMs >= 0 ? Math.floor(this.timerMs / MINUTE_IN_SEC) : 0;
+        const ms = this.timerMs >= 0 ? this.timerMs % MINUTE_IN_SEC : 0;
         if (ms < DOUBLE_DIGIT) {
             this.timer = s + ':' + 0 + ms;
         } else {

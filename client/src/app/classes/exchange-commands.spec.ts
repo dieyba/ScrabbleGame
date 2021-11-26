@@ -10,11 +10,11 @@ const PLAYER_NAME = 'Sara';
 const OPPONENT_NAME = 'Not Sara';
 const LETTERS = 'abcd';
 
-fdescribe('ExchangeCmd', () => {
+describe('ExchangeCmd', () => {
     let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let exchange: ExchangeCmd;
     const localPlayer = new Player(PLAYER_NAME);
     const opponentPlayer = new Player(OPPONENT_NAME);
-    let exchange: ExchangeCmd;
 
     beforeEach(() => {
         gameServiceSpy = jasmine.createSpyObj('GameService', ['exchangeLetters']);
@@ -28,7 +28,7 @@ fdescribe('ExchangeCmd', () => {
         expect(exchange).toBeTruthy();
     });
 
-    it('should call exchangeLetters from solo game service', () => {
+    it('should call exchangeLetters from game service', () => {
         exchange.execute();
         expect(gameServiceSpy.exchangeLetters).toHaveBeenCalled();
     });
