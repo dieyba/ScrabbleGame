@@ -14,8 +14,10 @@ export class BestScoresService {
     defaultLog2990BestScoresValue: BestScores[];
     classicCollection: Collection<BestScores>;
     log2990Collection: Collection<BestScores>;
+    dbUrl: string
 
-    constructor(url = DATABASE_URL) {
+    constructor(url: string = DATABASE_URL) {
+        this.dbUrl = url;
         this.defaultClassicBestScoresValue = [
             {
                 playerName: 'Erika',
@@ -61,20 +63,24 @@ export class BestScoresService {
                 score: 3,
             },
         ];
-        this.connectClient(url);
+        // this.connectClient();
+
     }
 
-    async connectClient(url: string): Promise<void> {
-        MongoClient.connect(url)
+    async connectClient(url?: string): Promise<void> {
+        console.log('In connect client')
+        return MongoClient.connect(this.dbUrl)
             .then(async (client: MongoClient) => {
+                console.log('Client conected')
                 this.client = client;
                 this.classicCollection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]);
                 this.log2990Collection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]);
-                this.populateDB(this.defaultClassicBestScoresValue, DATABASE_COLLECTION[0]);
+                await this.populateDB(this.defaultClassicBestScoresValue, DATABASE_COLLECTION[0]);
                 // console.log(await this.classicCollection.find({}).toArray())
-                this.populateDB(this.defaultLog2990BestScoresValue, DATABASE_COLLECTION[1]);
+                await this.populateDB(this.defaultLog2990BestScoresValue, DATABASE_COLLECTION[1]);
             })
             .catch((error) => {
+                console.error(error)
                 throw error;
             });
     }
@@ -94,6 +100,15 @@ export class BestScoresService {
     }
 
     async postBestScore(collectionType: Collection<BestScores>, bestScore: BestScores): Promise<void> {
+        // // if (await this.canSetInDb(collectionType, bestScore)) {
+        // try {
+        //     if (await this.canSetInDb(collectionType, bestScore)) {
+        //         console.log('insert')
+        //         await collectionType.insertOne(bestScore)
+        //     }
+        // } catch (error) {
+        //     throw error;
+        // }
         if (await this.canSetInDb(collectionType, bestScore)) {
             collectionType
                 .insertOne(bestScore)
@@ -104,16 +119,43 @@ export class BestScoresService {
                     throw error;
                 });
         }
+
+        // .then(() => {
+        //     /* do nothing */
+        // })
+        // .catch((error: Error) => {
+        //     throw error;
+        // });
+        // }
     }
 
     async checkingIfAlreadyInDb(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
         let haveToChange = false;
+        console.log('newScore', newScore);
         await tabScore.find({}).forEach((score) => {
-            if (score.score < newScore.score && score.playerName === newScore.playerName) {
+            if (score.score <= newScore.score && score.playerName === newScore.playerName) {
                 tabScore.findOneAndDelete(score);
+                console.log('deleted');
                 haveToChange = true;
             }
         });
+        // // console.log(tabs);
+        // console.log(newScore);
+        // for (let score of tabs) {
+        //     if (score.score < newScore.score && score.playerName === newScore.playerName) {
+        //         await tabScore.findOneAndDelete(score);
+        //         console.log('delete');
+        //         haveToChange = true;
+        //     }
+        // }
+
+        // forEach(async (score) => {
+        //     if (score.score < newScore.score && score.playerName === newScore.playerName) {
+        //         await tabScore.findOneAndDelete(score);
+        //         haveToChange = true;
+        //     }
+        // });
+        console.log('haveToChange', haveToChange)
         return haveToChange;
     }
 
@@ -127,6 +169,7 @@ export class BestScoresService {
                 }
             });
         }
+        console.log('twoSameBestScore', twoSameBestScore)
         return twoSameBestScore;
     }
 
@@ -136,18 +179,22 @@ export class BestScoresService {
         const sameNameSameScore = await this.checkingIfAlreadyInDb(tabScore, newScore);
         const twoBestScores = await this.isTwoSameBestScores(tabScore, newScore);
         if (!sameNameSameScore && !twoBestScores) {
+            console.log('high')
             await tabScore.find({}).forEach((score) => {
                 if (score.score < deleteMinScore.score) {
                     deleteMinScore.playerName = score.playerName;
                     deleteMinScore.score = score.score;
+                    // console.log('deleteMinScore.score before delete', deleteMinScore.score);
                 }
             });
+            console.log('deleteMinScore.score before delete', deleteMinScore.score, 'newScore', newScore);
             if (deleteMinScore.score < newScore.score) {
-                tabScore.findOneAndDelete(deleteMinScore);
+                console.log('deleteMinScore.score', deleteMinScore.score);
+                await tabScore.findOneAndDelete(deleteMinScore);
                 valid = true;
             }
         }
-
+        console.log('valid', valid)
         return valid;
     }
     async canSetInDb(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
@@ -158,23 +205,25 @@ export class BestScoresService {
     }
 
     async populateDB(typeScores: BestScores[], dbCollection: string): Promise<void> {
-        if ((await this.client.db(DATABASE_NAME).collection(dbCollection).countDocuments()) === 0) {
+        const docCount = await this.client.db(DATABASE_NAME).collection(dbCollection).countDocuments()
+        if (docCount === 0) {
             console.log('enter')
             for (const score of typeScores) {
                 await this.client.db(DATABASE_NAME).collection(dbCollection).insertOne(score);
             }
+        } else {
+            console.log('Database not empty, size : ' + docCount);
         }
     }
 
     async resetCollectionInDb(tabScore: Collection<BestScores>, typeScores: BestScores[], dbCollection: string): Promise<void> {
-        tabScore
-            .deleteMany({})
-            .then(() => {
-                this.populateDB(typeScores, dbCollection);
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
+        try {
+            await tabScore.deleteMany({})
+            await this.populateDB(typeScores, dbCollection);
+        } catch (error) {
+            throw error;
+        }
+
     }
 
     async resetDataBase() {

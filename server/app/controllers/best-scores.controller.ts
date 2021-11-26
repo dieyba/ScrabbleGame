@@ -9,6 +9,7 @@ export class BestScoresController {
     router: Router;
 
     constructor(private bestScoresService: BestScoresService) {
+        bestScoresService.connectClient();
         this.configureRouter();
     }
 
