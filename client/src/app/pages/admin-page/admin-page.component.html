@@ -4,13 +4,17 @@
         <button class="btn" (click)="resetDataBase()">Réinitialiser</button>
     </div>
     <div class="page">
-        <mat-card class="virtual-names">
-            <mat-card-title align="center">Mode admin</mat-card-title>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Noms des joueurs virtuels</mat-panel-title>
+            </mat-expansion-panel-header>
             <app-virtual-player-name-manager></app-virtual-player-name-manager>
-        </mat-card>
-        <mat-card class="dictionaries">
-            <mat-card-title align="center">Dictionnaires</mat-card-title>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Dictionnaires</mat-panel-title>
+            </mat-expansion-panel-header>
             <app-dictionary-transfer></app-dictionary-transfer>
-        </mat-card>
+        </mat-expansion-panel>
     </div>
 </body>
