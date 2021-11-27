@@ -16,11 +16,11 @@ export class ActivateTwoBonuses extends Goal {
         }
         const wordPlaced = wordsFormed[0];
         let newBonusUsedCounter = 0;
-        for (let scrabbleLetter of wordPlaced.content) {
+        for (const scrabbleLetter of wordPlaced.content) {
             if (scrabbleLetter.tile.color !== SquareColor.None && scrabbleLetter.tile.isBonusUsed) {
                 newBonusUsedCounter++;
             }
-        };
+        }
         if (newBonusUsedCounter >= MIN_AMOUNT_BONUS_USED) {
             this.isAchieved = true;
             return GoalPoints.ActivateTwoBonuses;

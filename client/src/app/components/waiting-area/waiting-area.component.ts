@@ -74,10 +74,6 @@ export class WaitingAreaComponent implements AfterViewInit {
         this.socketOnConnect();
     }
 
-    ngAfterViewInit() {
-        this.gameList.getGames(this.data.isLog2990);
-    }
-
     @HostListener('window:beforeunload', ['$event'])
     onBeforeUnload() {
         this.gameList.someoneLeftRoom();
@@ -85,6 +81,10 @@ export class WaitingAreaComponent implements AfterViewInit {
     @HostListener('window:popstate', ['$event'])
     onPopState() {
         this.gameList.someoneLeftRoom();
+    }
+
+    ngAfterViewInit() {
+        this.gameList.getGames(this.data.isLog2990);
     }
 
     randomGame() {

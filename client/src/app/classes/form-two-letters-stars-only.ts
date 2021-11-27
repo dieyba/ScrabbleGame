@@ -14,7 +14,7 @@ export class FormTwoLettersStarsOnly extends Goal {
         }
         const wordPlaced = wordsFormed[0];
         let numberOfStars = 0;
-        for (let scrabbleLetter of wordPlaced.content) {
+        for (const scrabbleLetter of wordPlaced.content) {
             if (scrabbleLetter.character === '*') numberOfStars++;
         }
         const isValidWordLenght = wordPlaced.content.length >= MIN_WORD_LENGHT;

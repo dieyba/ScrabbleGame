@@ -97,7 +97,7 @@ export class GameService {
             this.game.players[starterPlayerIndex].isActive = true;
             this.validationService.dictionary.selectDictionary(initInfo.dictionaryType);
             if (String(this.game.isLog2990) === 'true') {
-                var usedGoals: GoalType[] = [];
+                const usedGoals: GoalType[] = [];
                 const sharedGoals = this.goalsService.pickSharedGoals(usedGoals);
                 this.goalsService.pickPrivateGoals(usedGoals, this.game.players);
                 const randomLetterAndColor = this.goalsService.pickRandomLetterAndColor(this.game.stock.letterStock);
@@ -126,10 +126,10 @@ export class GameService {
     createGoals(sharedGoals: GoalType[], randomLetterAndColor: ScrabbleLetter) {
         this.goalsService.initialize();
         // Create the goals
-        sharedGoals.forEach(sharedGoalType => {
+        sharedGoals.forEach((sharedGoalType) => {
             this.goalsService.addSharedGoal(sharedGoalType);
         });
-        this.game.players.forEach(player => {
+        this.game.players.forEach((player) => {
             this.goalsService.addPrivateGoal(player.goal);
         });
         // Initialize goals' specific attributes
@@ -229,7 +229,7 @@ export class GameService {
         }
         const strWords: string[] = [];
         const newlyPlacedLetters: ScrabbleLetter[] = [];
-        tempScrabbleWords[0].content.forEach(newWordLetter => {
+        tempScrabbleWords[0].content.forEach((newWordLetter) => {
             if (!newWordLetter.tile.isValidated) {
                 newlyPlacedLetters.push(newWordLetter);
             }
@@ -243,11 +243,7 @@ export class GameService {
             let lettersToAddToRack;
             if (!this.validationService.areWordsValid) {
                 // Retake letters
-                lettersToAddToRack = this.gridService.removeInvalidLetters(
-                    placeParams.position,
-                    placeParams.word.length,
-                    placeParams.orientation,
-                );
+                lettersToAddToRack = this.gridService.removeInvalidLetters(placeParams.position, placeParams.word.length, placeParams.orientation);
             } else {
                 // Take new letters
                 this.validationService.updatePlayerScore(tempScrabbleWords, player);

@@ -116,6 +116,14 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
         this.editName.setValue('');
     }
 
+    openAddPlayerCard() {
+        this.isAddPlayerCardVisible = true;
+    }
+
+    closeAddPlayerCard() {
+        this.isAddPlayerCardVisible = false;
+    }
+
     private delete(collection: VirtualPlayerName[], url: string) {
         if (this.index <= 2) {
             return;
@@ -168,14 +176,6 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             },
         );
     }
-
-    openAddPlayerCard() {
-        this.isAddPlayerCardVisible = true;
-    } 
-
-    closeAddPlayerCard() {
-        this.isAddPlayerCardVisible = false;
-    } 
 
     // confirmName(tab: VirtualPlayerName[], nameToCompare: string): boolean {
     //     this.nameAlreadyExist = false;

@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { DictionaryInterface } from '@app/services/virtual-player-name-manager';
 import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
+import { DictionaryInterface } from '@app/services/virtual-player-name-manager';
 
 @Component({
     selector: 'app-dictionary-transfer',
@@ -12,6 +12,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
     @ViewChild('inputFile', { static: false }) private inputFile!: ElementRef<HTMLInputElement>;
     selectedDictionary: string;
     dictionaryList: string[];
+    isSelected: boolean = false;
 
     constructor(private dictionaryService: DictionaryService) {
         this.selectedDictionary = '';

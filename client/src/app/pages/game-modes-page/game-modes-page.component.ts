@@ -16,6 +16,9 @@ export class GameModesComponent {
         this.dialog.open(FormComponent, { data: { isSolo: isSolo, isLog2990: this.route.snapshot.params.isLog2990 } });
     }
     openJoinRoom(isGameSelected: boolean) {
-        this.dialog.open(WaitingAreaComponent, { data: { isGameSelected: isGameSelected, isLog2990: this.route.snapshot.params.isLog2990 }, disableClose: true });
+        this.dialog.open(WaitingAreaComponent, {
+            data: { isGameSelected: isGameSelected, isLog2990: this.route.snapshot.params.isLog2990 },
+            disableClose: true,
+        });
     }
 }

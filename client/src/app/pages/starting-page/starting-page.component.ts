@@ -20,9 +20,9 @@ export class StartingPageComponent {
 
     openPage(isLog2990: boolean) {
         if (isLog2990) {
-            this.router.navigate(['/game-mode', { isLog2990: true }])
+            this.router.navigate(['/game-mode', { isLog2990: true }]);
         } else {
-            this.router.navigate(['/game-mode', { isLog2990: false }])
+            this.router.navigate(['/game-mode', { isLog2990: false }]);
         }
     }
 }

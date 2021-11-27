@@ -15,7 +15,7 @@ export class PlaceLetterWorthTenPts extends Goal {
             return 0;
         }
         const wordPlaced = wordsFormed[0];
-        for (let scrabbleLetter of wordPlaced.content) {
+        for (const scrabbleLetter of wordPlaced.content) {
             const isNewlyPlacedLetter = newlyPlacedLetters.includes(scrabbleLetter);
             if (scrabbleLetter.value === GOAL_LETTER_VALUE && isNewlyPlacedLetter) {
                 this.isAchieved = true;

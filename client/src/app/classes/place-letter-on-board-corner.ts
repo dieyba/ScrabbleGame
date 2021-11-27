@@ -13,7 +13,7 @@ export class PlaceLetterOnBoardCorner extends Goal {
             new Vec2(Row.A, Column.One),
             new Vec2(Row.A, Column.Fifteen),
             new Vec2(Row.O, Column.One),
-            new Vec2(Row.O, Column.Fifteen)
+            new Vec2(Row.O, Column.Fifteen),
         ];
         this.type = GoalType.PlaceLetterOnBoardCorner;
         this.description = GoalDescriptions.PlaceLetterOnBoardCorner;
@@ -23,14 +23,14 @@ export class PlaceLetterOnBoardCorner extends Goal {
             return 0;
         }
         const wordPlaced = wordsFormed[0];
-        for (let scrabbleLetter of wordPlaced.content) {
+        for (const scrabbleLetter of wordPlaced.content) {
             const isInCorner = this.targetCoordinates.includes(scrabbleLetter.tile.position);
             const isNewlyPlacedLetter = newlyPlacedLetters.includes(scrabbleLetter);
             if (isInCorner && isNewlyPlacedLetter) {
                 this.isAchieved = true;
                 return GoalPoints.PlaceLetterOnBoardCorner;
             }
-        };
+        }
         return 0;
     }
 }
