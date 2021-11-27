@@ -133,16 +133,14 @@ export class GameService {
             this.goalsService.addPrivateGoal(player.goal);
         });
         // Initialize goals' specific attributes
-        const goalTypesToInitialize = [GoalType.PlaceLetterOnColorSquare, GoalType.FormWordWithLettersFromName, GoalType.FormAnExistingWord];
-        const goalsParameters = [randomLetterAndColor, this.game.getLocalPlayer().name, this.validationService];
+        const goalTypesToInitialize = [GoalType.PlaceLetterOnColorSquare, GoalType.FormAnExistingWord];
+        const goalsParameters = [randomLetterAndColor, this.validationService];
         for (let i = 0; i < goalTypesToInitialize.length; i++) {
             const goalToInitialize = this.goalsService.getGoalByType(goalTypesToInitialize[i]); // set random letter and color
             if (goalToInitialize !== undefined && goalToInitialize.initialize !== undefined) {
                 goalToInitialize.initialize(goalsParameters[i]);
             }
         }
-        console.log('shared:', this.goalsService.sharedGoals);
-        console.log('private:', this.goalsService.privateGoals);
         return;
     }
 

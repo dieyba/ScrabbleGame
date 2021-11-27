@@ -1,4 +1,5 @@
 import { ValidationService } from '@app/services/validation.service';
+import { Player } from './player';
 import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
 
@@ -21,7 +22,7 @@ export enum GoalDescriptions {
     FormAnExistingWord = "Former un mot d'au moins 5 lettres qui a déjà été former auparavant. (+20pts)",
     FormThreeWords = 'Former 3 mots avec un seul placement. (+50pts)',
     PlaceLetterOnBoardCorner = 'Placer une lettre dans un des 4 coins du jeu. (+30pts)',
-    ActivateTwoBonuses = 'Activer 2 boni avec un seul placement. (+30pts)',
+    ActivateTwoBonuses = 'Activer 2 bonus avec un seul placement. (+30pts)',
     PlaceLetterOnColorSquare = 'Placer la lettre x dans une case de couleur y. (+50pts)',
 }
 
@@ -44,6 +45,6 @@ export abstract class Goal {
         this.description = '';
         this.isAchieved = false;
     }
-    initialize?(goalParameters: ScrabbleLetter | ValidationService | string): void;
-    abstract achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters?: ScrabbleLetter[]): number;
+    initialize?(goalParameters: ScrabbleLetter | ValidationService | Player[]): void;
+    abstract achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters?: ScrabbleLetter[], activePlayerName?: string): number;
 }

@@ -5,24 +5,18 @@ import { ScrabbleWord } from './scrabble-word';
 const NAME_LETTERS_MIN_AMOUNT = 3;
 
 export class FormWordWithLettersFromName extends Goal {
-    private playerName: string;
-
     constructor() {
         super();
-        this.playerName = '';
         this.type = GoalType.FormWordWithLettersFromName;
         this.description = GoalDescriptions.FormWordWithLettersFromName;
     }
-    initialize(playerName: string) {
-        this.playerName = playerName;
-    }
-    achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters: ScrabbleLetter[]) {
+    achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters: ScrabbleLetter[], activePlayerName: string) {
         if (this.isAchieved) {
             return 0;
         }
         const wordPlaced = wordsFormed[0];
         let nameLettersCounter = 0;
-        const remainingNameLetters = this.playerName;
+        const remainingNameLetters = activePlayerName;
         for (const scrabbleLetter of wordPlaced.content) {
             const isNewlyPlacedLetter = newlyPlacedLetters.includes(scrabbleLetter);
             if (remainingNameLetters.includes(scrabbleLetter.character) && isNewlyPlacedLetter) {
