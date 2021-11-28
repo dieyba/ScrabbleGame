@@ -1,6 +1,6 @@
 import { createPassCmd, PassTurnCmd } from '@app/classes/pass-command';
 import { GameService } from '@app/services/game.service';
-import { ChatEntryColor, createErrorEntry } from './chat-display-entry';
+import { createErrorEntry } from './chat-display-entry';
 import { DefaultCommandParams } from './commands';
 import { ErrorType } from './errors';
 import { GameParameters } from './game-parameters';
@@ -32,11 +32,10 @@ describe('PassTurnCmd', () => {
         expect(gameServiceSpy.passTurn).toHaveBeenCalled();
     });
 
-    it('should execute and return successful command message from local player', () => {
+    it('should execute and return successful result from local player', () => {
         gameServiceSpy.passTurn.and.returnValue(ErrorType.NoError);
-        const commandEntry = { color: ChatEntryColor.LocalPlayer, message: PLAYER_NAME + ' >> !passer' };
         pass.player.isActive = true;
-        expect(pass.execute()).toEqual({ isExecuted: true, executionMessages: [commandEntry] });
+        expect(pass.execute()).toEqual({ isExecuted: true, executionMessages: [] });
     });
 
     it('should execute and return impossible command error from local player', () => {
@@ -45,12 +44,11 @@ describe('PassTurnCmd', () => {
         pass.player.isActive = false;
         expect(pass.execute()).toEqual({ isExecuted: false, executionMessages: [errorMessage] });
     });
-    it('should execute and return successful command message from opponent player', () => {
+    it('should execute and return successful result from opponent player', () => {
         gameServiceSpy.passTurn.and.returnValue(ErrorType.NoError);
-        const commandEntry = { color: ChatEntryColor.RemotePlayer, message: OPPONENT_NAME + ' >> !passer' };
         pass.player = opponentPlayer;
         pass.player.isActive = true;
-        expect(pass.execute()).toEqual({ isExecuted: true, executionMessages: [commandEntry] });
+        expect(pass.execute()).toEqual({ isExecuted: true, executionMessages: [] });
     });
 
     it('should execute and return impossible command error from opponent player', () => {

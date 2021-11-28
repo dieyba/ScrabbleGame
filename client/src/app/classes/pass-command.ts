@@ -17,7 +17,9 @@ export class PassTurnCmd extends Command {
         const executionResult = this.gameService.passTurn(this.player);
         if (executionResult === ErrorType.ImpossibleCommand) {
             executionMessages.push(createErrorEntry(executionResult, commandMessage));
+            return { isExecuted: this.isExecuted, executionMessages };
         }
+        this.isExecuted = true;
         return { isExecuted: this.isExecuted, executionMessages };
     }
 }
