@@ -10,7 +10,7 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleMove } from '@app/classes/scrabble-move';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Square, SquareColor } from '@app/classes/square';
-import { Axis, ERROR_NUMBER } from '@app/classes/utilities';
+import { Axis, ERROR_NUMBER, isCoordInsideBoard } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { Difficulty } from '@app/classes/virtual-player';
 import { BonusService } from './bonus.service';
@@ -321,24 +321,26 @@ export class VirtualPlayerService {
     }
 
     tempPlacement(word: ScrabbleWord, startPos: Vec2, axis: Axis) {
+        if (!isCoordInsideBoard(startPos)) return;
         const currentCoord = new Vec2(startPos.x, startPos.y);
-        if(currentCoord.x === POSITION_ERROR || currentCoord.y === POSITION_ERROR) return;
-        for (const letter of word.content) {
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < word.content.length; i++) {
             const currentSquare = this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y];
-            word.content[word.content.indexOf(letter)].tile = currentSquare;
-            if (axis === Axis.H && currentCoord.x + 1 < this.gridService.scrabbleBoard.squares.length) {
+            word.content[i].tile = currentSquare;
+            if (axis === Axis.H && currentCoord.x + 1 < BOARD_SIZE) {
                 currentCoord.x += 1;
-            } else if (axis === Axis.V && currentCoord.y + 1 < this.gridService.scrabbleBoard.squares[0].length) {
+            } else if (axis === Axis.V && currentCoord.y + 1 < BOARD_SIZE) {
                 currentCoord.y += 1;
             }
             if (!currentSquare) return;
-            if (currentSquare.isValidated && currentSquare.letter.character === letter.character) continue;
-            currentSquare.letter = letter;
+            if (currentSquare.isValidated && currentSquare.letter.character === word.content[i].character) continue;
+            currentSquare.letter = word.content[i];
             currentSquare.occupied = true;
         }
     }
 
     removalAfterTempPlacement(word: ScrabbleWord, startPos: Vec2, axis: Axis) {
+        if (!isCoordInsideBoard(startPos)) return;
         const currentCoord = new Vec2(startPos.x, startPos.y);
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for (let i = 0; i < word.content.length; i++) {
@@ -373,9 +375,6 @@ export class VirtualPlayerService {
                 letterIndex++;
             }
             returnPos = new Vec2((BOARD_SIZE - 1) / 2, (BOARD_SIZE - 1) / 2);
-            console.log('maxLetterIndex', maxLetterIndex);
-            console.log('maxValue', maxValue);
-            console.log('word: ' + word.stringify());
             const bonusSpace = 4;
             if (word.content.length > bonusSpace && maxLetterIndex >= bonusSpace) {
                 const offset = maxLetterIndex - bonusSpace;
@@ -388,32 +387,28 @@ export class VirtualPlayerService {
                         break;
                 }
             }
-            console.log('returnPos', returnPos);
             return returnPos;
         }
         for (let letter = 0; letter < word.content.length; letter++) {
-            for (let i = 0; i < this.gridService.scrabbleBoard.squares.length; i++) {
-                for (let j = 0; j < this.gridService.scrabbleBoard.squares[i].length; j++) {
-                    if (this.gridService.scrabbleBoard.squares[i][j].letter === word.content[letter]) {
+            for (let i = 0; i < BOARD_SIZE; i++) {
+                for (let j = 0; j < BOARD_SIZE; j++) {
+                    if (!this.gridService.scrabbleBoard.squares[i][j].letter) continue;
+                    if (this.gridService.scrabbleBoard.squares[i][j].letter.character === word.content[letter].character) {
                         const letterPos = new Vec2(i, j);
-                        const realPos = this.getBeginningPosition(word.content.length, letterPos, axis);
+                        const realPos = this.getBeginningPosition(letter, letterPos, axis);
+                        console.log('letter character: ', this.gridService.scrabbleBoard.squares[i][j].letter.character);
+                        console.log('letterPos: ', letterPos, '\nrealPos: ', realPos);
                         this.tempPlacement(word, realPos, axis);
                         const wordsBuilt = this.wordBuilderService.buildWordsOnBoard(word.stringify(), realPos, axis);
-                        let isErrorInWordsBuilt = wordsBuilt.length > 0 ? true : false;
+                        console.log('wordsBuilt: ', wordsBuilt);
+                        this.removalAfterTempPlacement(word, realPos, axis);
+                        let isErrorInWordsBuilt = wordsBuilt.length > 0 ? false : true;
                         for (const wordBuilt of wordsBuilt) {
                             if (!this.isWordValid(wordBuilt.stringify())) isErrorInWordsBuilt = true;
                         }
+                        console.log(isErrorInWordsBuilt);
                         if (isErrorInWordsBuilt) continue;
-                        switch (axis) {
-                            case Axis.H:
-                                returnPos = letterPos;
-                                returnPos.x -= letter;
-                                break;
-                            case Axis.V:
-                                returnPos = letterPos;
-                                returnPos.y -= letter;
-                                break;
-                        }
+                        returnPos = realPos;
                     }
                 }
             }
@@ -421,14 +416,14 @@ export class VirtualPlayerService {
         return returnPos;
     }
 
-    getBeginningPosition(length: number, letterPos: Vec2, axis: Axis): Vec2 {
+    getBeginningPosition(index: number, letterPos: Vec2, axis: Axis): Vec2 {
         const returnVec = new Vec2(letterPos.x, letterPos.y);
         switch (axis) {
             case Axis.H:
-                returnVec.x -= length - 1;
+                returnVec.x -= index;
                 break;
             case Axis.V:
-                returnVec.y -= length - 1;
+                returnVec.y -= index;
                 break;
         }
         return returnVec;
@@ -493,7 +488,7 @@ export class VirtualPlayerService {
                     for (const newWord of newWords) {
                         if (newWord) {
                             if (!possibleMoves.includes(newWord) && (newWord.value < points || newWord.value > 0)) {
-                                if (newWord.value < points || newWord.value > 0) {
+                                if ((newWord.value < points || newWord.value > 0) && this.lettersInRack(newWord)) {
                                     possibleMoves.push(newWord);
                                 }
                             }
@@ -503,6 +498,19 @@ export class VirtualPlayerService {
             }
         }
         return possibleMoves;
+    }
+    lettersInRack(word: ScrabbleWord): boolean {
+        const rackCopy = [];
+        for (const letter of this.rack) {
+            rackCopy.push(letter);
+        }
+        for (const letter of word.content) {
+            if (!rackCopy.includes(letter)) return false;
+            else {
+                rackCopy.splice(rackCopy.indexOf(letter), 1);
+            }
+        }
+        return true;
     }
 
     makeMoves(permutations: ScrabbleWord[], value: number): ScrabbleMove {
