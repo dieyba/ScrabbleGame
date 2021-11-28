@@ -189,29 +189,24 @@ export class GameService {
                 strWords.push(scrabbleWord.stringify().toLowerCase());
             });
             // validate words waits 3sec if the words are invalid or the server doesn't answer.
-            await this.validationService.validateWords(tempScrabbleWords, this.game.gameMode).then((isValidWordsResult: boolean) => {
-                errorResult = isValidWordsResult ? ErrorType.NoError : ErrorType.ImpossibleCommand;
-                let lettersToAddToRack;
-                if (!this.validationService.areWordsValid) {
-                    // Retake letters
-                    lettersToAddToRack = this.gridService.removeInvalidLetters(
-                        placeParams.position,
-                        placeParams.word.length,
-                        placeParams.orientation,
-                    );
-                } else {
-                    // Take new letters
-                    this.validationService.updatePlayerScore(tempScrabbleWords, player);
-                    lettersToAddToRack = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length);
-                }
-                this.addRackLetters(lettersToAddToRack);
-                lettersToAddToRack.forEach((letter) => {
-                    player.letters.push(letter);
-                });
-                this.isTurnPassed = false;
-                this.isTurnEndSubject.next(this.isTurnPassed);
-                this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
+            await this.validationService.validateWords(tempScrabbleWords, this.game.gameMode);
+            errorResult = this.validationService.areWordsValid ? ErrorType.NoError : ErrorType.ImpossibleCommand;
+            // Change the score if the words were valid
+            if (this.validationService.areWordsValid) {
+                this.validationService.updatePlayerScore(tempScrabbleWords, player);
+            }
+            // Update player's rack with previously placed letters or new letters
+            const lettersToAddToRack = !this.validationService.areWordsValid
+                ? this.gridService.removeInvalidLetters(placeParams.position, placeParams.word.length, placeParams.orientation) // Retake letters
+                : this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT - player.letters.length); // Take new letters
+            this.addRackLetters(lettersToAddToRack);
+            lettersToAddToRack.forEach((letter) => {
+                player.letters.push(letter);
             });
+            // End turn
+            this.isTurnPassed = false;
+            this.isTurnEndSubject.next(this.isTurnPassed);
+            this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
             return errorResult;
         }
         return errorResult;
