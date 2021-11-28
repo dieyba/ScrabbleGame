@@ -33,7 +33,7 @@ export class FormComponent implements OnInit {
     isLOG2990: boolean;
     beginnerNameList: VirtualPlayerName[];
     expertNameList: VirtualPlayerName[];
-    dictionaryList: string[];
+    dictionaryList: DictionaryInterface[];
     selectedPlayer: string;
     randomPlayerId: number;
     defaultTimer: string;
@@ -61,7 +61,7 @@ export class FormComponent implements OnInit {
         this.selectedPlayer = '';
         this.randomPlayerId = 0;
         this.defaultTimer = '60';
-        this.defaultDictionary = '0';
+        this.defaultDictionary = 'Mon dictionnaire'; // TODO give the dictionary a name
         this.defaultBonus = false;
         this.beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
         this.expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
@@ -93,7 +93,7 @@ export class FormComponent implements OnInit {
         this.dictionaryService.getDictionaries(BASE_URL).subscribe(
             (dictionaries: DictionaryInterface[]) => {
                 for (const dictionary of dictionaries) {
-                    this.dictionaryList.push(dictionary.title);
+                    this.dictionaryList.push(dictionary);
                 }
             },
             (error: HttpErrorResponse) => {
