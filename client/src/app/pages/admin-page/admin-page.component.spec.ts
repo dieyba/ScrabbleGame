@@ -1,4 +1,6 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AdminPageComponent } from './admin-page.component';
 
 describe('AdminPageComponent', () => {
@@ -8,6 +10,7 @@ describe('AdminPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [AdminPageComponent],
+            imports: [HttpClientModule, MatSnackBarModule],
         }).compileComponents();
     });
 

@@ -53,6 +53,7 @@ export class FormComponent implements OnInit {
         private virtualPlayerNameService: VirtualPlayerNameManager,
         private dictionaryService: DictionaryService,
         private snack: MatSnackBar,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
         this.beginnerNameList = [];

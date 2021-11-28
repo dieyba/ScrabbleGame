@@ -18,6 +18,7 @@ import { environment } from 'src/environments/environment';
 
 const PUBLIC_GOALS_COUNT = 2;
 const TOTAL_GOALS_COUNT = 8;
+
 @Injectable({
     providedIn: 'root',
 })
@@ -35,7 +36,7 @@ export class GoalsService {
         this.initialize();
         this.socket.on('goal achieved', (goalAchieved: GoalType) => {
             this.getGoalByType(goalAchieved).isAchieved = true;
-            console.log('opponent new goal achieved:', this.getGoalByType(goalAchieved).constructor.name);
+            // console.log('opponent new goal achieved:', this.getGoalByType(goalAchieved).constructor.name);
         });
     }
     initialize() {
@@ -121,7 +122,7 @@ export class GoalsService {
         allGoals.forEach((goal) => {
             if (!alreadyAchievedGoals.includes(goal) && goal.isAchieved) {
                 this.socket.emit('achieve goal', goal.type);
-                console.log('new goal achieved:', goal.constructor.name);
+                // console.log('new goal achieved:', goal.constructor.name);
             }
         });
 

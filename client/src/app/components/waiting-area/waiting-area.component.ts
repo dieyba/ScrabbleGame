@@ -48,6 +48,7 @@ export class WaitingAreaComponent implements AfterViewInit {
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
         private dialog: MatDialog,
         public gameList: GameListService,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
         this.server = environment.socketUrl;
@@ -154,13 +155,14 @@ export class WaitingAreaComponent implements AfterViewInit {
     convert(isSolo: boolean) {
         this.name = false;
         this.closeDialog();
-        this.dialog.open(FormComponent, { data: { isSolo: isSolo, isLog2990: this.data.isLog2990 } });
+        this.dialog.open(FormComponent, { data: { isSolo, isLog2990: this.data.isLog2990 } });
     }
 
     closeDialog() {
         this.name = false;
         this.dialogRef.close();
     }
+
     socketOnConnect() {
         this.socket.on('initClientGame', (gameParams: GameInitInfo) => {
             clearTimeout(this.timer);

@@ -68,8 +68,8 @@ export class EndGameService {
                     if (error.status !== HttpStatusCode.Ok) {
                         this.snack.open(
                             'Désolé votre score ne pourra pas être éligible au tableau' +
-                            'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
-                            'Veuillez réessayer plus tard!',
+                                'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
+                                'Veuillez réessayer plus tard!',
                             'close',
                         );
                     }

@@ -1,3 +1,4 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -7,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterTestingModule } from '@angular/router/testing';
 import { Observable } from 'rxjs';
 import { GameModesComponent } from './game-modes-page.component';
 
@@ -17,7 +19,17 @@ describe('GameModesComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GameModesComponent],
-            imports: [MatRadioModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatSelectModule, BrowserAnimationsModule],
+            imports: [
+                RouterTestingModule,
+                HttpClientModule,
+                MatRadioModule,
+                MatCardModule,
+                MatCheckboxModule,
+                MatFormFieldModule,
+                MatInputModule,
+                MatSelectModule,
+                BrowserAnimationsModule,
+            ],
             providers: [{ provide: MatDialog, useValue: { open: () => new Observable() } }],
         }).compileComponents();
     });
