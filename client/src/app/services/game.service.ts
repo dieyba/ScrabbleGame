@@ -207,7 +207,6 @@ export class GameService {
             this.isTurnPassed = false;
             this.isTurnEndSubject.next(this.isTurnPassed);
             this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
-            return errorResult;
         }
         return errorResult;
     }

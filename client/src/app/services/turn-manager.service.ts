@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
+import { ChatEntryColor } from '@app/classes/chat-display-entry';
 import { GameType } from '@app/classes/game-parameters';
 import { VirtualPlayer } from '@app/classes/virtual-player';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import { ChatDisplayService } from './chat-display.service';
 import { EndGameService } from './end-game.service';
 import { GameService } from './game.service';
 import { VirtualPlayerService } from './virtual-player.service';
@@ -16,8 +18,12 @@ export class TurnManagerService {
     private consecutivePassedTurns: number;
     private socket: io.Socket;
     private readonly server: string;
-
-    constructor(private gameService: GameService, private endGameService: EndGameService, private virtualPlayerService: VirtualPlayerService) {
+    constructor(
+        protected chatDisplayService: ChatDisplayService,
+        private gameService: GameService,
+        private endGameService: EndGameService,
+        private virtualPlayerService: VirtualPlayerService,
+    ) {
         this.consecutivePassedTurns = 0;
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
@@ -29,12 +35,16 @@ export class TurnManagerService {
 
     socketOnConnect() {
         this.socket.on('turn changed', (consecutivePassedTurns: number) => {
+            if (this.consecutivePassedTurns !== consecutivePassedTurns) {
+                this.gameService.isTurnPassed = true;
+            }
             this.consecutivePassedTurns = consecutivePassedTurns;
             if (!this.gameService.game.isEndGame) {
                 const isLocalPlayerEndingGame = this.consecutivePassedTurns >= MAX_TURNS_PASSED && this.gameService.game.getLocalPlayer().isActive;
                 if (isLocalPlayerEndingGame) {
                     this.endGameService.endGame();
                 }
+                this.displayPassTurnMessage();
                 this.updateActivePlayer();
                 this.gameService.resetTimer();
                 this.gameService.isTurnPassed = false;
@@ -46,6 +56,8 @@ export class TurnManagerService {
             return;
         }
         if (this.gameService.game.gameMode === GameType.Solo) {
+            // Display "!passer" message for automatic pass turn or player pass turn command
+            this.displayPassTurnMessage();
             this.updateConsecutivePassedTurns();
             this.updateActivePlayer();
             this.gameService.resetTimer();
@@ -86,5 +98,14 @@ export class TurnManagerService {
         }
         activePlayer.isActive = false;
         inactivePlayer.isActive = true;
+    }
+    displayPassTurnMessage() {
+        if (this.gameService.isTurnPassed) {
+            const activePlayer = this.gameService.game.getLocalPlayer().isActive
+                ? this.gameService.game.getLocalPlayer()
+                : this.gameService.game.getOpponent();
+            const entryColor = this.gameService.game.getLocalPlayer().isActive ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
+            this.chatDisplayService.addEntry({ color: entryColor, message: activePlayer.name + ' >> !passer' });
+        }
     }
 }
