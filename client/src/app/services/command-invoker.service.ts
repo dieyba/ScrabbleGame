@@ -23,7 +23,7 @@ export class CommandInvokerService {
     displayExecutionResultMessages(commandResult: CommandResult, isExchangeCmd: boolean, isToDisplayRemotely: boolean) {
         const isSendToServer = this.gameService.game.gameMode === GameType.MultiPlayer && isToDisplayRemotely && commandResult.isExecuted;
         const isFromVirtualPlayer =
-            this.gameService.game.gameMode === GameType.Solo && commandResult.executionMessages[0].color === ChatEntryColor.RemotePlayer;
+            this.gameService.game.gameMode === GameType.Solo && commandResult.executionMessages[0]?.color === ChatEntryColor.RemotePlayer;
         if (isSendToServer) {
             this.displayExecutionWithServer(isExchangeCmd, commandResult);
         } else {
