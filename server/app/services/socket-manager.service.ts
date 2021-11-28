@@ -280,7 +280,7 @@ export class SocketManagerService {
             } else {
                 consecutivePassedTurns = 0;
             }
-            this.sio.in(player.roomId.toString()).emit('turn changed', consecutivePassedTurns);
+            this.sio.in(player.roomId.toString()).emit('turn changed', isCurrentTurnedPassed, consecutivePassedTurns);
         }
     }
     private endGame(socket: io.Socket) {

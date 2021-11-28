@@ -34,10 +34,8 @@ export class TurnManagerService {
     }
 
     socketOnConnect() {
-        this.socket.on('turn changed', (consecutivePassedTurns: number) => {
-            if (this.consecutivePassedTurns !== consecutivePassedTurns) {
-                this.gameService.isTurnPassed = true;
-            }
+        this.socket.on('turn changed', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
+            this.gameService.isTurnPassed = isCurrentTurnedPassed;
             this.consecutivePassedTurns = consecutivePassedTurns;
             if (!this.gameService.game.isEndGame) {
                 const isLocalPlayerEndingGame = this.consecutivePassedTurns >= MAX_TURNS_PASSED && this.gameService.game.getLocalPlayer().isActive;
