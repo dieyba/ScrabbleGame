@@ -77,6 +77,9 @@ export class FormComponent implements OnInit {
                 this.beginnerNameList = list;
             },
             () => {
+                // TODO: make a default list of players name to use when cannot access database
+                // and pick a name diffrent from the human player name
+                this.beginnerNameList = [{ _id: '', name: 'Sara' }];
                 this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
             },
         );
@@ -86,6 +89,9 @@ export class FormComponent implements OnInit {
                 this.expertNameList = list;
             },
             () => {
+                // TODO: make a default list of players name to use when cannot access database
+                // and pick a name diffrent from the human player name
+                this.expertNameList = [{ _id: '', name: 'Ariane' }];
                 this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
             },
         );
