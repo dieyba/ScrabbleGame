@@ -1,5 +1,6 @@
 import { BestScores } from "@app/classes/best-scores";
 import { rejects } from "assert";
+import { ObjectId } from "bson";
 import { expect } from "chai";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { BestScoresService, DATABASE_COLLECTION } from "./best-scores.service";
@@ -14,6 +15,7 @@ describe('BestScoresService', () => {
 
     beforeEach(async () => {
         bestScores1 = {
+            _id: new ObjectId(),
             playerName: 'Erika',
             score: 1,
         } as BestScores;
@@ -38,7 +40,7 @@ describe('BestScoresService', () => {
     });
 
     afterEach(async () => {
-        await bestScoresService["client"].close();
+        // await bestScoresService["client"].close();
         // client.close();
         // if (bestScoresService["client"]) {
         // await bestScoresService["client"].close();
@@ -74,38 +76,38 @@ describe('BestScoresService', () => {
     });
 
     it('should throw an error when get all Scores in Mongo Database', async () => {
-        // const dbData = await bestScoresService.getBestScores(bestScoresService.classicCollection);
-        // expect(dbData.length).to.equal(2);
-        // expect(bestScores1).to.deep.equals(dbData[1]);
-        // client.close();
-        try {
-            await rejects(bestScoresService.getBestScores(bestScoresService.log2990Collection))
-        } catch (error) {
+        await bestScoresService["client"].close();
+        // try {
+        await rejects(bestScoresService.getBestScores(bestScoresService.log2990Collection)).catch((error: Error) => {
+            // throw error;
             expect(error).to.not.be.undefined;
-        }
+        });
+        // } catch (error) {
+        //     expect(error).to.not.be.undefined;
+        // }
     });
 
-    it('should post a Score in Mongo Database ', async () => {
+    it('should only change score of player if already in db with a less score when posting in Mongo Database ', async () => {
         const newScore = {
+            _id: new ObjectId(),
             playerName: 'Sara',
             score: 20,
         } as BestScores;
         await bestScoresService.postBestScore(bestScoresService.classicCollection, newScore);
         let allScores = await bestScoresService.classicCollection.find({}).toArray();
-        console.log(allScores);
-        expect(allScores.indexOf(newScore)).to.greaterThan(-1);
-        // expect(bestScores1).to.deep.equals(dbData[1]);
+        expect(allScores.findIndex(scoreIndex => scoreIndex.score === newScore.score)).to.greaterThan(-1);
     });
-    it('should post a Score in Mongo Database if score is High', async () => {
+    it('should delete min score and post new score in Mongo Database if score is High', async () => {
         const newScore = {
             playerName: 'Dieyba',
             score: 200,
         } as BestScores;
+        let scoreBeforePost = await bestScoresService.classicCollection.find({}).toArray();
+        const minScore = scoreBeforePost[4];
         await bestScoresService.postBestScore(bestScoresService.classicCollection, newScore);
-        let allScores = await bestScoresService.classicCollection.find({}).toArray();
-        console.log(allScores);
-        expect(allScores.length).to.equal(2);
-        // expect(bestScores1).to.deep.equals(dbData[1]);
+        let scoreAfterPost = await bestScoresService.classicCollection.find({}).toArray();
+        expect(scoreAfterPost.length).to.equal(5);
+        expect(minScore).to.not.equals(scoreAfterPost[4]);
     });
     it('should not post a Score in Mongo Database if player is not eligible', async () => {
         const newScore = {
@@ -114,20 +116,19 @@ describe('BestScoresService', () => {
         } as BestScores;
         await bestScoresService.postBestScore(bestScoresService.classicCollection, newScore);
         let allScores = await bestScoresService.classicCollection.find({}).toArray();
-        console.log(allScores);
-        expect(allScores.length).to.equal(2);
+        expect(allScores.length).to.equal(5);
+        expect(allScores.indexOf(newScore)).to.equal(-1);
         // expect(bestScores1).to.deep.equals(dbData[1]);
     });
 
     it('should not post a Score in Mongo Database if player is already in with same score', async () => {
         const newScore = {
             playerName: 'Sara',
-            score: 0,
+            score: 8,
         } as BestScores;
         await bestScoresService.postBestScore(bestScoresService.classicCollection, newScore);
         let allScores = await bestScoresService.classicCollection.find({}).toArray();
-        console.log(allScores);
-        expect(allScores.length).to.equal(2);
+        expect(allScores.length).to.equal(5);
         // expect(bestScores1).to.deep.equals(dbData[1]);
     });
 
@@ -138,28 +139,25 @@ describe('BestScoresService', () => {
         }] as BestScores[];
         await bestScoresService.populateDB(newScore, DATABASE_COLLECTION[0]);
         let allScores = await bestScoresService.classicCollection.find({}).toArray();
-        console.log(allScores);
-        expect(allScores.length).to.equal(2);
+        expect(allScores.length).to.equal(5);
         // expect(bestScores1).to.deep.equals(dbData[1]);
     });
     it('should reset db with default value', async () => {
-        // const newScore = [{
-        //     playerName: 'Erika',
-        //     score: 1,
-        // },
-        // {
-        //     playerName: 'Sara',
-        //     score: 8,
-        // },
-        // {
-        //     playerName: 'Dieyba',
-        //     score: 200,
-        // }] as BestScores[];
-        // setTimeout(() => {
-        // await bestScoresService.resetCollectionInDb(bestScoresService.classicCollection, newScore, DATABASE_COLLECTION[0]);
-        // let allScores = await bestScoresService.classicCollection.find({}).toArray();
-        console.log(`After 3 sec`);
-        // expect(allScores.length).to.equal(2);
+        const newScore = [{
+            playerName: 'Erika',
+            score: 1,
+        },
+        {
+            playerName: 'Sara',
+            score: 8,
+        },
+        {
+            playerName: 'Dieyba',
+            score: 200,
+        }] as BestScores[];
+        await bestScoresService.resetCollectionInDb(bestScoresService.classicCollection, newScore, DATABASE_COLLECTION[0]);
+        let allScores = await bestScoresService.classicCollection.find({}).toArray();
+        expect(allScores.length).to.equal(3);
 
         // expect(bestScores1).to.deep.equals(dbData[1]);
     });
@@ -177,21 +175,14 @@ describe('BestScoresService', () => {
             playerName: 'Dieyba',
             score: 200,
         }] as BestScores[];
-        console.log('Before the reset')
         let allScores = await bestScoresService.classicCollection.find({}).toArray();
-        console.log(allScores);
         bestScoresService.defaultClassicBestScoresValue = newScore
         await bestScoresService.resetDataBase();
         allScores = await bestScoresService.classicCollection.find({}).toArray();
-        console.log(allScores);
         expect(allScores.length).to.equal(3);
-        // expect(bestScores1).to.deep.equals(dbData[1]);
     });
-    it('should throw an error when get all Scores in Mongo Database', async () => {
-        // const dbData = await bestScoresService.getBestScores(bestScoresService.classicCollection);
-        // expect(dbData.length).to.equal(2);
-        // expect(bestScores1).to.deep.equals(dbData[1]);
-        // client.close();
+    it('should throw an error when reset all Scores in  Mongo Database', async () => {
+        bestScoresService["client"].close();
         const newScore = [{
             playerName: 'Erika',
             score: 1,
@@ -205,19 +196,21 @@ describe('BestScoresService', () => {
             score: 200,
         }] as BestScores[];
         try {
-            await rejects(bestScoresService.resetCollectionInDb(bestScoresService.log2990Collection, newScore, DATABASE_COLLECTION[0]))
+            await rejects(bestScoresService.resetCollectionInDb(bestScoresService.classicCollection, newScore, DATABASE_COLLECTION[0]))
         } catch (error) {
             expect(error).to.not.be.undefined;
         }
     });
 
     it('should throw an error when post a Score in Mongo Database', async () => {
-        // const dbData = await bestScoresService.getBestScores(bestScoresService.classicCollection);
-        // expect(dbData.length).to.equal(2);
-        // expect(bestScores1).to.deep.equals(dbData[1]);
-        // client.close();
+        let bestScores = {
+            _id: new ObjectId(),
+            playerName: 'Riri',
+            score: 300,
+        } as BestScores;
+        await bestScoresService["client"].close();
         try {
-            await rejects(bestScoresService.postBestScore(bestScoresService.classicCollection, bestScores1))
+            await rejects(bestScoresService.postBestScore(bestScoresService.log2990Collection, bestScores))
         } catch (error) {
             expect(error).to.not.be.undefined;
         }
