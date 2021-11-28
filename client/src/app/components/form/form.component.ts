@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-// import { DictionaryType } from '@app/classes/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary';
 import { GameType } from '@app/classes/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
 import { ErrorCase } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';

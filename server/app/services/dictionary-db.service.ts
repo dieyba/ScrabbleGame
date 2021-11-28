@@ -48,6 +48,12 @@ export class DictionaryDBService {
             });
     }
     async postDictionary(dictionary: DictionaryInterface): Promise<void> {
+        if (!this.isDictionaryValid(dictionary)) {
+            throw new TypeError("Le dictionnaire n'a pas un format valide");
+        }
+        if (!(await this.isDictionaryUnique(dictionary))) {
+            throw new SyntaxError('Un dictionnaire avec le même nom existe déjà');
+        }
         this.dictionaryCollection
             .insertOne(dictionary)
             .then(() => {
@@ -57,22 +63,11 @@ export class DictionaryDBService {
                 throw new Error('Failed to post dictionary');
             });
     }
-    // async postLog2990BestScore(log2990BestScore: BestScores): Promise<void> {
-    //     this.classicCollection
-    //         .insertOne(log2990BestScore)
-    //         .then(() => {
-    //             /* do nothing */
-    //         })
-    //         .catch((error: Error) => {
-    //             throw error;
-    //         });
-    // }
 
     async populateDictionaryDB(): Promise<void> {
         if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments()) === 0) {
             const dictionaries: DictionaryInterface[] = [
                 {
-                    idDict: 1,
                     title: 'erika',
                     description: 'assiette de patates frites à erika',
                     words: ['patates frites #1', 'patates frites #2', 'patates frites #3', 'patates frites #4', 'patates frites #5'],
@@ -83,8 +78,6 @@ export class DictionaryDBService {
             }
         }
     }
-
-    // async checkBestScore() {
 
     // }
     // async deleteVirtualPlayerName(idName: string): Promise<void> {
@@ -97,4 +90,42 @@ export class DictionaryDBService {
     //             throw error;
     //         });
     // }
+
+    isDictionaryValid(dictionary: DictionaryInterface): boolean {
+        const isTitleValid = dictionary.title !== '' && typeof dictionary.title === 'string';
+        const isDescriptionValid = dictionary.description !== '' && typeof dictionary.description === 'string';
+        const isWordsValid = this.validateDictionaryWords(dictionary.words);
+        return isTitleValid && isDescriptionValid && isWordsValid;
+    }
+
+    validateDictionaryWords(words: string[]): boolean {
+        // check if iterable
+        if (words.length === 0) {
+            return false;
+        }
+
+        let isAllWordsString = true;
+
+        for (const word of words) {
+            if (typeof word !== 'string') {
+                isAllWordsString = false;
+                break;
+            }
+        }
+
+        return isAllWordsString;
+    }
+
+    async isDictionaryUnique(dictionary: DictionaryInterface): Promise<boolean> {
+        return this.getAllDictionaryDescription()
+            .then((dictionaryDescriptions: DictionaryInterface[]) => {
+                for (const dictionaryDescription of dictionaryDescriptions) {
+                    if (dictionary.title === dictionaryDescription.title) return false;
+                }
+                return true;
+            })
+            .catch(() => {
+                throw Error('Ne peut pas vérifier que le dictionnaire est unique');
+            });
+    }
 }

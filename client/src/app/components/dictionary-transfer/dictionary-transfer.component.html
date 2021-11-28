@@ -10,4 +10,13 @@
         </div>
     </div>
     <button mat-button (click)="onDownload()">Download</button>
+
+    <mat-card *ngIf="lastUploadedDictionary !== undefined">
+        <mat-card-subtitle> Dictionnaire téléversé </mat-card-subtitle>
+        <mat-card-title> {{ lastUploadedDictionary.title }} </mat-card-title>
+        <mat-card-content>
+            <p>Description :</p>
+            <p class="tab">{{ lastUploadedDictionary.description }}</p>
+        </mat-card-content>
+    </mat-card>
 </div>
