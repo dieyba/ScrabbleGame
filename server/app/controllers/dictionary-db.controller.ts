@@ -9,6 +9,7 @@ export class DictionaryDBController {
     router: Router;
 
     constructor(private readonly dictionaryDBService: DictionaryDBService) {
+        this.dictionaryDBService.clientConnection();
         this.configureRouter();
     }
 
@@ -42,46 +43,40 @@ export class DictionaryDBController {
             this.dictionaryDBService
                 .postDictionary(req.body)
                 .then(() => {
-                    res.sendStatus(StatusCodes.OK).send();
+                    res.status(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.BAD_REQUEST).send(error.message);
                 });
         });
-        // this.router.get('/log2990Mode', async (req: Request, res: Response, next: NextFunction) => {
-        //     this.bestScoresSrvice
-        //         .getLog2990BestScore()
-        //         .then((bestScores: BestScores[]) => {
-        //             res.json(bestScores);
-        //         })
-        //         .catch((error: Error) => {
-        //             res.status(StatusCodes.NOT_FOUND).send(error.message);
-        //         });
-        // });
-        // this.router.post('/log2990Mode', async (req: Request, res: Response, next: NextFunction) => {
-        //     this.bestScoresSrvice
-        //         .postLog2990BestScore(req.body)
-        //         .then(() => {
-        //             res.sendStatus(StatusCodes.OK).send();
-        //         })
-        //         .catch((error: Error) => {
-        //             res.status(StatusCodes.BAD_REQUEST).send(error.message);
-        //         });
-        // });
 
-        // this.router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
-        //     this.virtualPlayerNameService
-        //         .deleteVirtualPlayerName(req.params.id)
-        //         .then(() => {
-        //             res.sendStatus(StatusCodes.NO_CONTENT).send();
-        //         })
-        //         .catch((error: Error) => {
-        //             if (error.message === 'Cannot remove headers after they are sent to the client') {
-        //                 // do nothing
-        //             } else {
-        //                 res.status(StatusCodes.NOT_FOUND).send(error.message);
-        //             }
-        //         });
-        // });
+        this.router.patch('/beginners', async (req: Request, res: Response) => {
+            this.dictionaryDBService
+                .updateDictionary(req.body.id, req.body.newTitle, req.body.newDescription)
+                .then(() => {
+                    res.status(StatusCodes.OK).send();
+                })
+                .catch((error: Error) => {
+                    if (error.message === 'Cannot remove headers after they are sent to the client') {
+                        // do nothing
+                    } else {
+                        res.status(StatusCodes.BAD_REQUEST).send(error.message);
+                    }
+                });
+        });
+
+        this.router.delete('/', async (req: Request, res: Response) => {
+            this.dictionaryDBService.reset()
+                .then(() => {
+                    res.status(StatusCodes.NO_CONTENT).send();
+                })
+                .catch((error: Error) => {
+                    if (error.message === 'Cannot remove headers after they are sent to the client') {
+                        // do nothing
+                    } else {
+                        res.status(StatusCodes.BAD_REQUEST).send(error.message);
+                    }
+                })
+        });
     }
 }

@@ -2,12 +2,38 @@
     <!-- <mat-card for="file">Choose a dictionary (JSON file):</mat-card> -->
     <input #inputFile type="file" id="file" accept=".json" />
     <button mat-button (click)="onUpload()">Upload</button>
+    <button mat-button (click)="onDownload()">Download</button>
 
     <div class="dropdown">
-        <button class="dropbtn">{{ selectedDictionary }}</button>
+        <button class="dropbtn">{{ selectedDictionary.title }}</button>
         <div class="dropdown-content">
-            <span *ngFor="let dictionary of dictionaryList; index as i" (click)="onDictionarySelection(i)"> {{ dictionary }} </span>
+            <span class="error" *ngFor="let dictionary of dictionaryList; index as i" (click)="onDictionarySelection(i)"> {{ dictionary.title }} </span>
+        </div>
+        <div class="input">
+            <mat-form-field hintLabel="characters min: 3 max: 20" appearance="fill" *ngIf="selectedDictionary.title !== ''">
+                <mat-label>Modifiez le titre</mat-label>
+                <input
+                    matInput
+                    #input
+                    maxlength="20"
+                    #input2
+                    minlength="3"
+                    [formControl]="editTitle"
+                />
+                <div class="error" *ngIf="editTitle.errors?.pattern">Le titre ne doit pas contenir des chiffres ou des caractères spéciaux</div>
+            </mat-form-field>
+            <mat-form-field hintLabel="characters min: 10 max: 50" appearance="fill" *ngIf="selectedDictionary.description !== ''">
+                <mat-label>Modifiez la description</mat-label>
+                <input
+                    matInput
+                    #input
+                    maxlength="50"
+                    #input2
+                    minlength="10"
+                    [formControl]="editDescription"
+                />
+            </mat-form-field>
+            <button class="btn" (click)="updateTitleAndDescription(editTitle.value, editDescription.value)">Enregistrer les modifications</button>
         </div>
     </div>
-    <button mat-button (click)="onDownload()">Download</button>
 </div>

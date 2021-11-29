@@ -8,11 +8,11 @@ import { Router } from '@angular/router';
 import { GameType } from '@app/classes/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
-import { DictionaryInterface } from '@app/pages/admin-page/admin-page.component';
+import { DictionaryInterface } from '@app/services/virtual-player-name.service';
 import { DictionaryService, BASE_URL } from '@app/services/dictionary.service';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
-import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
+import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
 import { ErrorCase } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
 
 export const GAME_CAPACITY = 2;
@@ -50,7 +50,7 @@ export class FormComponent implements OnInit {
         private dialogRef: MatDialogRef<FormComponent>,
         private router: Router,
         private gameList: GameListService,
-        private virtualPlayerNameService: VirtualPlayerNameManager,
+        private virtualPlayerNameService: VirtualPlayerNameService,
         private dictionaryService: DictionaryService,
         private snack: MatSnackBar,
         @Inject(MAT_DIALOG_DATA) public isSolo: boolean,

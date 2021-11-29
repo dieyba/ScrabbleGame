@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ERROR_NUMBER } from '@app/classes/utilities';
-import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
+import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
 
 const maxLength = 12;
 // export const BEGINNER_VIRTUAL_PLAYER_NAMES_URL = 'http://localhost:3000/api/VirtualPlayerName/beginners';
@@ -34,7 +34,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     editName: FormControl;
     private index: number;
 
-    constructor(private virtualPlayerNameManagerService: VirtualPlayerNameManager, private snack: MatSnackBar) {
+    constructor(private virtualPlayerNameService: VirtualPlayerNameService, private snack: MatSnackBar) {
         this.beginnerNameList = [];
         this.expertNameList = [];
         this.selectedName = { _id: '', name: '' };
@@ -44,10 +44,10 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.virtualPlayerNameManagerService
+        this.virtualPlayerNameService
             .getVirtualPlayerNames(this.beginnerNameUrl)
             .subscribe((beginnerList) => (this.beginnerNameList = beginnerList));
-        this.virtualPlayerNameManagerService.getVirtualPlayerNames(this.expertNameUrl).subscribe((expertList) => (this.expertNameList = expertList));
+        this.virtualPlayerNameService.getVirtualPlayerNames(this.expertNameUrl).subscribe((expertList) => (this.expertNameList = expertList));
     }
 
     isUntouchable(): boolean {
@@ -60,7 +60,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             return;
         }
 
-        this.virtualPlayerNameManagerService.postVirtualPlayerNames(url, this.newName.value).subscribe(
+        this.virtualPlayerNameService.postVirtualPlayerNames(url, this.newName.value).subscribe(
             (added) => {
                 collection.push(added);
             },
@@ -115,7 +115,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             return;
         }
 
-        this.virtualPlayerNameManagerService.delete(url, this.selectedName.name).subscribe(
+        this.virtualPlayerNameService.delete(url, this.selectedName.name).subscribe(
             (deleted) => {
                 if (!deleted) {
                     collection.splice(this.index, 1);
@@ -142,7 +142,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             return;
         }
 
-        this.virtualPlayerNameManagerService.update(url, this.selectedName._id, this.editName.value).subscribe(
+        this.virtualPlayerNameService.update(url, this.selectedName._id, this.editName.value).subscribe(
             () => {
                 collection[this.index] = { _id: this.selectedName._id, name: this.editName.value };
                 this.selectedName.name = '';

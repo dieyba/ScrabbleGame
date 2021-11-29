@@ -1,5 +1,5 @@
 import { Dictionary, DictionaryInterface, DictionaryType } from '@app/classes/dictionary';
-import { Collection, MongoClient } from 'mongodb';
+import { Collection, MongoClient, ObjectId } from 'mongodb';
 import { Service } from 'typedi';
 
 const DATABASE_URL = 'mongodb+srv://Scrabble304:Scrabble304@cluster0.bvwkn.mongodb.net/database?retryWrites=true&w=majority';
@@ -50,7 +50,7 @@ export class DictionaryService {
     async populateDictionary(): Promise<void> {
         const defaultDict = new Dictionary(DictionaryType.Default);
         const dict: DictionaryInterface = {
-            idDict: 1,
+            _id : new ObjectId(),
             title: defaultDict.title,
             description: defaultDict.description,
             words: defaultDict.words,

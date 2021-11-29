@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogModule } from '@angular/material/dialog';
 
 import { StartingPageComponent } from './starting-page.component';
 
@@ -9,6 +10,7 @@ describe('StartingPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [StartingPageComponent],
+            imports: [MatDialogModule],
         }).compileComponents();
     });
 

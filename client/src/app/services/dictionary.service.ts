@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/h
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
-import { DictionaryInterface } from './virtual-player-name-manager';
+import { DictionaryInterface } from './virtual-player-name.service';
 
 export const BASE_URL = 'http://localhost:3000/api/dictionary';
 @Injectable({
@@ -28,9 +28,13 @@ export class DictionaryService {
         return this.http.post<DictionaryInterface>(url, dictionary);
     }
 
-    // resetDbBestScores() {
-    //     return this.http.delete<BestScores>(BASE_URL);
-    // }
+    reset(): Observable<DictionaryInterface> {
+        return this.http.delete<DictionaryInterface>(BASE_URL);
+    }
+
+    update(url: string, dictionaryName: string, dictionaryId: unknown, updatedTitle: string, updatedDescription: string) {
+        return this.http.patch<DictionaryInterface>(url + '/' + dictionaryName, { id: dictionaryId, newTitle: updatedTitle, newDescription: updatedDescription});
+    }
 
     handleErrorSnackBar(error: HttpErrorResponse): void {
         if (error.status !== HttpStatusCode.Ok) {

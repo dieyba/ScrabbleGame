@@ -1,7 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { DictionaryInterface } from '@app/services/virtual-player-name-manager';
+import { DictionaryInterface } from '@app/services/virtual-player-name.service';
 import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
+import { FormControl, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-dictionary-transfer',
@@ -10,12 +11,17 @@ import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
 })
 export class DictionaryTransferComponent implements AfterViewInit {
     @ViewChild('inputFile', { static: false }) private inputFile!: ElementRef<HTMLInputElement>;
-    selectedDictionary: string;
-    dictionaryList: string[];
+    selectedDictionary: DictionaryInterface;
+    dictionaryList: DictionaryInterface[];
+
+    editTitle: FormControl;
+    editDescription: FormControl;
 
     constructor(private dictionaryService: DictionaryService) {
-        this.selectedDictionary = '';
+        this.selectedDictionary = { _id: '', title: 'aucun dictionnaire sélectionné', description: '', words: ['']};
         this.dictionaryList = [];
+        this.editTitle = new FormControl('', [Validators.pattern('[a-zA-ZÉé ]*'), Validators.maxLength(20), Validators.minLength(3)]);
+        this.editDescription = new FormControl('', [Validators.maxLength(50), Validators.minLength(10)]);
     }
 
     ngAfterViewInit(): void {
@@ -52,10 +58,12 @@ export class DictionaryTransferComponent implements AfterViewInit {
 
     onDictionarySelection(pos: number) {
         this.selectedDictionary = this.dictionaryList[pos];
+        this.editTitle.setValue(this.selectedDictionary.title);
+        this.editDescription.setValue(this.selectedDictionary.description);
     }
 
     onDownload() {
-        this.dictionaryService.getDictionary(BASE_URL, this.selectedDictionary).subscribe(this.download, (error: HttpErrorResponse) => {
+        this.dictionaryService.getDictionary(BASE_URL, this.selectedDictionary.title).subscribe(this.download, (error: HttpErrorResponse) => {
             this.dictionaryService.handleErrorSnackBar(error);
         });
     }
@@ -77,8 +85,29 @@ export class DictionaryTransferComponent implements AfterViewInit {
     updateDictionariesTitle(dictionaries: DictionaryInterface[]) {
         this.dictionaryList = [];
         for (const dictionary of dictionaries) {
-            this.dictionaryList.push(dictionary.title);
+            let tempDictionary = { _id: '', title: '', description: '', words: ['']} as DictionaryInterface;
+            tempDictionary._id = dictionary._id;
+            tempDictionary.title = dictionary.title;
+            tempDictionary.description = dictionary.description;
+            this.dictionaryList.push(tempDictionary);
         }
         this.selectedDictionary = this.dictionaryList[0];
+    }
+
+    updateTitleAndDescription(title: string, description: string) {
+        if (!this.editTitle.valid || !this.editDescription) {
+            // snack bar
+            return;
+        }
+        
+        this.dictionaryService.update(BASE_URL, this.selectedDictionary.title, this.selectedDictionary._id, title, description).subscribe(
+            (dictionary) => {
+                const index = this.dictionaryList.indexOf(this.selectedDictionary);
+                this.dictionaryList[index] = dictionary;
+            },
+            (error: HttpErrorResponse) => {
+                // snack bar
+            }
+        );
     }
 }
