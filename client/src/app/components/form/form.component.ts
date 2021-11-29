@@ -4,12 +4,11 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-// import { DictionaryType } from '@app/classes/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary';
 import { GameType } from '@app/classes/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
 import { ErrorCase } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
-import { DictionaryInterface } from '@app/pages/admin-page/admin-page.component';
 import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
@@ -78,6 +77,9 @@ export class FormComponent implements OnInit {
                 this.beginnerNameList = list;
             },
             () => {
+                // TODO: make a default list of players name to use when cannot access database
+                // and pick a name diffrent from the human player name
+                this.beginnerNameList = [{ _id: '', name: 'Sara' }];
                 this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
             },
         );
@@ -87,6 +89,9 @@ export class FormComponent implements OnInit {
                 this.expertNameList = list;
             },
             () => {
+                // TODO: make a default list of players name to use when cannot access database
+                // and pick a name diffrent from the human player name
+                this.expertNameList = [{ _id: '', name: 'Ariane' }];
                 this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
             },
         );

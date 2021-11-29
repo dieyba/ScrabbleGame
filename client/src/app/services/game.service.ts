@@ -255,6 +255,7 @@ export class GameService {
             lettersToAddToRack.forEach((letter) => {
                 player.letters.push(letter);
             });
+            // End turn
             this.isTurnPassed = false;
             this.isTurnEndSubject.next(this.isTurnPassed);
             this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
