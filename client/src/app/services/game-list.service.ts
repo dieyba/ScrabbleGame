@@ -22,6 +22,12 @@ export class GameListService {
             this.waitingAreaGames = game;
         });
     }
+    getGames(isLog2990: boolean) {
+        this.socket.emit('getAllWaitingAreaGames', isLog2990);
+    }
+    getList(): WaitingAreaGameParameters[] {
+        return this.waitingAreaGames;
+    }
     createRoom(gameParams: WaitingAreaGameParameters): void {
         this.socket.emit('createWaitingAreaRoom', gameParams);
     }
@@ -29,7 +35,7 @@ export class GameListService {
         this.socket.emit('deleteWaitingAreaRoom');
     }
     start(game: WaitingAreaGameParameters, name: string): void {
-        this.socket.emit('joinWaitingAreaRoom', name, game.gameRoom.idGame);
+        this.socket.emit('joinWaitingAreaRoom', name, game.gameRoom.idGame, game.isLog2990);
     }
     initializeMultiplayerGame() {
         this.socket.emit('initializeMultiPlayerGame');

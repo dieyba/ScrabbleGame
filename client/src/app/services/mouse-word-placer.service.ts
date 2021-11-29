@@ -53,9 +53,9 @@ export class MouseWordPlacerService {
         // Square would be out of bounds.
         // Now we find the origin of the square in which we clicked
         let xBaseOfSquare = Math.floor(mousePositionX / ACTUAL_SQUARE_SIZE) * ACTUAL_SQUARE_SIZE;
-        xBaseOfSquare = xBaseOfSquare - ACTUAL_SQUARE_SIZE / 2;
+        xBaseOfSquare = xBaseOfSquare - ACTUAL_SQUARE_SIZE / 2 + 2;
         let yBaseOfSquare = Math.floor(mousePositionY / ACTUAL_SQUARE_SIZE) * ACTUAL_SQUARE_SIZE;
-        yBaseOfSquare = yBaseOfSquare - ACTUAL_SQUARE_SIZE / 2;
+        yBaseOfSquare = yBaseOfSquare - ACTUAL_SQUARE_SIZE / 2 + 2;
         const clickedSquare: Vec2 = new Vec2(xBaseOfSquare, yBaseOfSquare);
         const indexes = this.companionService.convertPositionToGridIndex(clickedSquare);
         if (indexes[0] >= BOARD_SIZE || indexes[1] >= BOARD_SIZE) return;

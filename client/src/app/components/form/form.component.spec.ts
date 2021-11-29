@@ -1,5 +1,6 @@
 // import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 // import { ComponentFixture, TestBed } from '@angular/core/testing';
+// import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 // import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 // import { MatCardModule } from '@angular/material/card';
 // import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -11,13 +12,14 @@
 // import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import { Router, RouterModule } from '@angular/router';
 // import { RouterTestingModule } from '@angular/router/testing';
+// import { VirtualPlayerName } from '@app/services/virtual-player-name-manager';
 // import { Observable } from 'rxjs';
 // import { FormComponent } from './form.component';
 
 // describe('FormComponent', () => {
 //     let component: FormComponent;
 //     let fixture: ComponentFixture<FormComponent>;
-//     // const list: string[] = ['dieyna', 'kevin', 'ariane'];
+//     const list: VirtualPlayerName[] = [{ _id: '0', name: 'dieyna' }, { _id: '0', name: 'kevin' }, { _id: '0', name: 'ariane' }];
 //     let dialogSpy: jasmine.Spy;
 //     let matdialog: jasmine.Spy;
 //     // let dialog: jasmine.SpyObj<MatDialogRef<FormComponent>> = jasmine.createSpyObj('dialog', ['close']);
@@ -124,7 +126,7 @@
 //             dictionaryForm: 'Francais',
 //             opponent: 'Sara',
 //         });
-//         component.isSolo = false;
+//         component.data.isSolo = false;
 //         component.submit();
 //         expect(matdialog).toHaveBeenCalled();
 //     });
@@ -140,7 +142,7 @@
 //             dictionaryForm: 'Francais',
 //             opponent: 'Sara',
 //         });
-//         component.isSolo = true;
+//         component.data.isSolo = true;
 //         component.submit();
 //         expect(router).toHaveBeenCalled();
 //     });

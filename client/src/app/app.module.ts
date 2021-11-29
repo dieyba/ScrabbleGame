@@ -14,7 +14,7 @@ import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
-import { ClassicModeComponent } from '@app/pages/classic-mode/classic-mode.component';
+import { GameModesComponent } from '@app/pages/game-modes-page/game-modes-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
@@ -26,10 +26,10 @@ import { EndGamePopupComponent } from './components/end-game-popup/end-game-popu
 import { FormComponent } from './components/form/form.component';
 import { RackComponent } from './components/rack/rack.component';
 import { TextEntryComponent } from './components/text-entry/text-entry.component';
+import { VirtualPlayerNameManagerComponent } from './components/virtual-player-name-manager/virtual-player-name-manager.component';
 import { WaitingAreaComponent } from './components/waiting-area/waiting-area.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
-import { VirtualPlayerNameManagerComponent } from './components/virtual-player-name-manager/virtual-player-name-manager.component';
 
 /**
  * Main module that is used in main.ts.
@@ -50,9 +50,7 @@ import { VirtualPlayerNameManagerComponent } from './components/virtual-player-n
         TextEntryComponent,
         AutofocusDirective,
         StartingPageComponent,
-        ClassicModeComponent,
-        StartingPageComponent,
-        ClassicModeComponent,
+        GameModesComponent,
         FormComponent,
         WaitingAreaComponent,
         RackComponent,

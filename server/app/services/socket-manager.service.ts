@@ -1,4 +1,4 @@
-import { GameInitInfo, WaitingAreaGameParameters } from '@app/classes/game-parameters';
+import { GameInitInfo, GoalType, WaitingAreaGameParameters } from '@app/classes/game-parameters';
 import { BoardUpdate, ERROR_NUMBER, LettersUpdate } from '@app/classes/utilities';
 import { VirtualPlayerName } from '@app/classes/virtual-player-name';
 import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
@@ -27,26 +27,29 @@ export class SocketManagerService {
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
             socket.on('addPlayer', () => {
                 this.playerMan.addPlayer(socket.id);
-                this.getAllWaitingAreaGames();
+                // console.log('addPlayer : ', this.playerMan.allPlayers[this.playerMan.allPlayers.length - 1]?.socketId);
             });
             socket.on('createWaitingAreaRoom', (gameParams: WaitingAreaGameParameters) => {
                 this.createWaitingAreaRoom(socket, gameParams);
-                this.getAllWaitingAreaGames();
+                // console.log('createWaitingAreaRoom, isLog2990: ' + gameParams.isLog2990);
+                this.getAllWaitingAreaGames(socket, gameParams.isLog2990);
             });
             // This is only called when creating a game in play
             socket.on('deleteWaitingAreaRoom', () => {
+                // console.log('deleteWaitingAreaRoom : ' + this.getIsLog2990FromId(socket.id));
                 this.deleteWaitingAreaRoom(socket);
-                this.getAllWaitingAreaGames();
+                this.getAllWaitingAreaGames(socket, this.getIsLog2990FromId(socket.id));
             });
-            socket.on('joinWaitingAreaRoom', (joinerName: string, roomToJoinId: number) => {
-                this.joinRoom(socket, joinerName, roomToJoinId);
-                this.getAllWaitingAreaGames();
+            socket.on('joinWaitingAreaRoom', (joinerName: string, roomToJoinId: number, isLog2990: boolean) => {
+                this.joinRoom(socket, joinerName, roomToJoinId, isLog2990);
+                // console.log('joinWaitingAreaRoom : ' + isLog2990);
+                this.getAllWaitingAreaGames(socket, isLog2990);
             });
             socket.on('initializeMultiPlayerGame', () => {
                 this.initializeMultiPlayerGame(socket);
             });
-            socket.on('getAllWaitingAreaGames', () => {
-                this.getAllWaitingAreaGames();
+            socket.on('getAllWaitingAreaGames', (isLog2990: boolean) => {
+                this.getAllWaitingAreaGames(socket, isLog2990);
             });
             socket.on('leaveRoom', () => {
                 this.leaveRoom(socket);
@@ -100,14 +103,36 @@ export class SocketManagerService {
                     this.sio.to(opponent.socketId).emit('update letters', update);
                 }
             });
+            socket.on('achieve goal', (goalAchieved: GoalType) => {
+                const sender = this.playerMan.getPlayerBySocketID(socket.id);
+                if (sender === undefined) {
+                    return;
+                }
+                const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.getOtherPlayerInRoom(sender.socketId);
+                if (opponent !== undefined) {
+                    this.sio.to(opponent.socketId).emit('goal achieved', goalAchieved);
+                }
+            });
             socket.on('change turn', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
                 this.changeTurn(socket, isCurrentTurnedPassed, consecutivePassedTurns);
             });
         });
     }
+    getIsLog2990FromId(id: string): boolean {
+        const room = this.playerMan.getPlayerBySocketID(id)?.roomId;
+        // console.log('Room : ' + room);
+        if (room === undefined) {
+            return false;
+        }
+        const waitingArea = this.gameListMan.getAWaitingAreaGame(room);
+        // console.log("waitingArea : " + waitingArea?.isLog2990);
+        if (waitingArea !== undefined) return waitingArea.isLog2990;
+        return false;
+    }
     private createWaitingAreaRoom(socket: io.Socket, gameParams: WaitingAreaGameParameters): void {
         const newRoom = this.gameListMan.createWaitingAreaGame(gameParams, socket.id);
         const creatorPlayer = this.playerMan.getPlayerBySocketID(socket.id);
+        // console.log('creatorPlayer : ' + creatorPlayer);
         if (creatorPlayer !== undefined) {
             // update player info in the player manager
             creatorPlayer.name = newRoom.creatorName;
@@ -163,7 +188,8 @@ export class SocketManagerService {
             this.deleteWaitingAreaRoom(socket);
         }
         const waitingAreaRoomUpdate = this.gameListMan.getAWaitingAreaGame(roomId);
-        this.getAllWaitingAreaGames();
+        // console.log("leaveWaitingAreaRoom fct : " + this.getIsLog2990FromId(socket.id));
+        this.getAllWaitingAreaGames(socket, this.getIsLog2990FromId(socket.id));
         this.sio.to(waitingAreaRoom.gameRoom.idGame.toString()).emit('roomLeft', waitingAreaRoomUpdate);
     }
     // Only removes the waiting area room from the waiting area rooms list in game manager service
@@ -179,10 +205,12 @@ export class SocketManagerService {
             this.sio.emit('waitingAreaRoomDeleted', roomGame);
         }
     }
-    private getAllWaitingAreaGames() {
-        this.sio.emit('updateWaitingAreaGames', this.gameListMan.getAllWaitingAreaGames());
+    private getAllWaitingAreaGames(socket: io.Socket, isLog2990: boolean) {
+        const senderId = socket.id;
+        this.sio.to(senderId).emit('updateWaitingAreaGames', this.gameListMan.getAllWaitingAreaGames(String(isLog2990)));
     }
-    private joinRoom(socket: io.Socket, joinerName: string, roomToJoinId: number) {
+    private joinRoom(socket: io.Socket, joinerName: string, roomToJoinId: number, isLog2990: boolean) {
+        // TODO: make a verification to prevent creation if player already part of a room?
         const joiner = this.playerMan.getPlayerBySocketID(socket.id);
         if (joiner === undefined) {
             return;
@@ -191,11 +219,12 @@ export class SocketManagerService {
         if (waitingAreaGame === undefined) {
             return;
         }
-        if (this.gameListMan.addJoinerPlayer(waitingAreaGame, joinerName, socket.id)) {
+        if (this.gameListMan.addJoinerPlayer(waitingAreaGame, joinerName, socket.id, isLog2990)) {
             // update player info in the player manager
             joiner.name = joinerName;
             joiner.roomId = waitingAreaGame.gameRoom.idGame;
             socket.join(waitingAreaGame.gameRoom.idGame.toString());
+
             this.sio.to(waitingAreaGame.gameRoom.idGame.toString()).emit('roomJoined', waitingAreaGame);
         }
     }
@@ -268,6 +297,17 @@ export class SocketManagerService {
         // eslint-disable-next-line no-console
         console.log(newWords, ' is valid:', result);
         this.sio.to(socket.id).emit('areWordsValid', result);
+        if (!result) {
+            return;
+        }
+        const sender = this.playerMan.getPlayerBySocketID(socket.id);
+        if (sender === undefined) {
+            return;
+        }
+        const opponent = this.gameListMan.getGameInPlay(sender.roomId)?.getOtherPlayerInRoom(sender.socketId);
+        if (opponent !== undefined) {
+            this.sio.to(opponent.socketId).emit('newValidWords', newWords);
+        }
     }
     private changeTurn(socket: io.Socket, isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) {
         const player = this.playerMan.getPlayerBySocketID(socket.id);

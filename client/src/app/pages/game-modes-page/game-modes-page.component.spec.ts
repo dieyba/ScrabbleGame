@@ -1,3 +1,4 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -7,23 +8,34 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterTestingModule } from '@angular/router/testing';
 import { Observable } from 'rxjs';
-import { ClassicModeComponent } from './classic-mode.component';
+import { GameModesComponent } from './game-modes-page.component';
 
-describe('ClassicModeComponent', () => {
-    let component: ClassicModeComponent;
-    let fixture: ComponentFixture<ClassicModeComponent>;
+describe('GameModesComponent', () => {
+    let component: GameModesComponent;
+    let fixture: ComponentFixture<GameModesComponent>;
     let matdialog: jasmine.Spy;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [ClassicModeComponent],
-            imports: [MatRadioModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatSelectModule, BrowserAnimationsModule],
+            declarations: [GameModesComponent],
+            imports: [
+                RouterTestingModule,
+                HttpClientModule,
+                MatRadioModule,
+                MatCardModule,
+                MatCheckboxModule,
+                MatFormFieldModule,
+                MatInputModule,
+                MatSelectModule,
+                BrowserAnimationsModule,
+            ],
             providers: [{ provide: MatDialog, useValue: { open: () => new Observable() } }],
         }).compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(ClassicModeComponent);
+        fixture = TestBed.createComponent(GameModesComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
