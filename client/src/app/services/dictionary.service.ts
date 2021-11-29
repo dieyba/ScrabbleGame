@@ -36,6 +36,10 @@ export class DictionaryService {
         return this.http.patch<DictionaryInterface>(url + '/' + dictionaryName, { id: dictionaryId, newTitle: updatedTitle, newDescription: updatedDescription });
     }
 
+    delete(dictionaryId: unknown): Observable<DictionaryInterface> {
+        return this.http.delete<DictionaryInterface>(BASE_URL + '/' + dictionaryId);
+    }
+
     handleErrorSnackBar(error: HttpErrorResponse): void {
         switch (error.status) {
             case HttpStatusCode.Ok: {

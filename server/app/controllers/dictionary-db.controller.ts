@@ -26,6 +26,7 @@ export class DictionaryDBController {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
+
         this.router.get('/:name', async (req: Request, res: Response) => {
             this.dictionaryDBService
                 .getDictionary(req.params.name)
@@ -36,6 +37,7 @@ export class DictionaryDBController {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
+
         this.router.post('/', async (req: Request, res: Response) => {
             this.dictionaryDBService
                 .postDictionary(req.body)
@@ -50,7 +52,7 @@ export class DictionaryDBController {
                 });
         });
 
-        this.router.patch('/beginners', async (req: Request, res: Response) => {
+        this.router.patch('/:title', async (req: Request, res: Response) => {
             this.dictionaryDBService
                 .updateDictionary(req.body.id, req.body.newTitle, req.body.newDescription)
                 .then(() => {
@@ -63,6 +65,21 @@ export class DictionaryDBController {
                         res.status(StatusCodes.BAD_REQUEST).send(error.message);
                     }
                 });
+        });
+
+        this.router.delete('/:id', async (req: Request, res: Response) => {
+            console.log('req : ', req.params);
+            this.dictionaryDBService.delete(req.params.id)
+                .then(() => {
+                    res.status(StatusCodes.NO_CONTENT).send();
+                })
+                .catch((error: Error) => {
+                    if (error.message === 'Cannot remove headers after they are sent to the client') {
+                        // do nothing
+                    } else {
+                        res.status(StatusCodes.BAD_REQUEST).send(error.message);
+                    }
+                })
         });
 
         this.router.delete('/', async (req: Request, res: Response) => {

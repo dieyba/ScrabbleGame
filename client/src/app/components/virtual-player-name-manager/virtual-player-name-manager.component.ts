@@ -10,12 +10,13 @@ const maxLength = 12;
 // export const BEGINNER_VIRTUAL_PLAYER_NAMES_URL = 'http://localhost:3000/api/VirtualPlayerName/beginners';
 // export const EXPERT_VIRTUAL_PLAYER_NAMES_URL = 'http://localhost:3000/api/VirtualPlayerName/experts';
 
-export enum ErrorCase {
+export enum ErrorCaseVirtualPlayerName {
     InvalidName = 'Ce nom est invalide',
-    AlreadyThere = 'Ce nom existe déjà dans la base de données, actualisez votre page.',
+    NameAlreadyThere = 'Ce nom existe déjà dans la base de données, actualisez votre page.',
     DeleteAfterDeleteOrUpdate = 'Le nom que vous essayez de supprimer a déjà été modifié ou supprimé, actualisez votre page.',
     UpdateAfterDelete = 'Le nom que vous essayez de modifié a été supprimé, actualisez votre page.',
     DatabaseServerCrash = 'La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard.',
+    Untouchable = 'Vous ne pouvez pas modifier ou supprimer ce nom'
 }
 
 @Component({
@@ -56,7 +57,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
 
     addName(collection: VirtualPlayerName[], url: string) {
         if (!this.newName.valid) {
-            this.snack.open(ErrorCase.InvalidName, 'close');
+            this.snack.open(ErrorCaseVirtualPlayerName.InvalidName, 'close');
             return;
         }
 
@@ -66,10 +67,10 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
-                    this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+                    this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
                     return;
                 }
-                this.snack.open(ErrorCase.AlreadyThere, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.NameAlreadyThere, 'close');
             },
         );
     }
@@ -84,6 +85,11 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     deleteName() {
+        if (this.isUntouchable()) {
+            this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
+            return
+        }
+
         if (this.isBeginnerTab()) {
             this.delete(this.beginnerNameList, this.beginnerNameUrl);
         } else {
@@ -92,9 +98,15 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     updateName() {
+        if (this.isUntouchable()) {
+            this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
+            return
+        }
+
         if (this.editName.value === '') {
             return;
         }
+
         if (this.isBeginnerTab()) {
             this.update(this.beginnerNameList, this.beginnerNameUrl);
         } else {
@@ -103,6 +115,10 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     onSelect(name: VirtualPlayerName) {
+        if (this.isUntouchable()) {
+            this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
+        }
+
         this.selectedName = name;
         this.isBeginnerTab();
         if (this.index > 2) {
@@ -111,8 +127,9 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     private delete(collection: VirtualPlayerName[], url: string) {
-        if (this.index <= 2) {
-            return;
+        if (this.isUntouchable()) {
+            this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
+            return
         }
 
         this.virtualPlayerNameService.delete(url, this.selectedName.name).subscribe(
@@ -124,21 +141,22 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
-                    this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+                    this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
                     return;
                 }
-                this.snack.open(ErrorCase.DeleteAfterDeleteOrUpdate, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.DeleteAfterDeleteOrUpdate, 'close');
             },
         );
     }
 
     private update(collection: VirtualPlayerName[], url: string) {
-        if (this.index <= 2) {
-            return;
+        if (this.isUntouchable()) {
+            this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
+            return
         }
 
         if (!this.editName.valid) {
-            this.snack.open(ErrorCase.InvalidName, 'close');
+            this.snack.open(ErrorCaseVirtualPlayerName.InvalidName, 'close');
             return;
         }
 
@@ -150,30 +168,16 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
-                    this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+                    this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
                     return;
                 }
 
                 if (error.error === 'Ce nom existe déjà') {
-                    this.snack.open(ErrorCase.AlreadyThere, 'close');
+                    this.snack.open(ErrorCaseVirtualPlayerName.NameAlreadyThere, 'close');
                     return;
                 }
-                this.snack.open(ErrorCase.UpdateAfterDelete, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.UpdateAfterDelete, 'close');
             },
         );
     }
-
-    // confirmName(tab: VirtualPlayerName[], nameToCompare: string): boolean {
-    //     this.nameAlreadyExist = false;
-    //     if (nameToCompare === '') {
-    //         return false;
-    //     }
-    //     for (const name of tab) {
-    //         if (name.name === nameToCompare) {
-    //             this.nameAlreadyExist = true;
-    //             return false;
-    //         }
-    //     }
-    //     return true;
-    // }
 }

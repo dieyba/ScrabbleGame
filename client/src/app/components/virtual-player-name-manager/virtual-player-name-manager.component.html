@@ -1,7 +1,5 @@
 <div class="virtualPlayers">
-    <div class="information">
-        <i>Veuillez sélectionner un nom pour le modifier/supprimer</i><br>
-    </div>
+    <div class="information"><i>Veuillez sélectionner un nom pour le modifier/supprimer</i><br /></div>
 
     <div class="lists">
         <h2>Joueurs débutants</h2>
@@ -24,7 +22,7 @@
     </div>
 
     <div class="add">
-        <div class="input" >
+        <div class="input">
             <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill">
                 <mat-label>Entrez le nom que vous souhaitez ajouter à la liste</mat-label>
                 <input matInput #input maxlength="10" #input2 minlength="3" placeholder="Ex : Riri" [formControl]="newName" />
@@ -68,5 +66,5 @@
             </div>
         </div>
     </div>
-    <p>{{ selectedName.name }}</p>
+    <!-- <p>{{ selectedName.name }}</p> -->
 </div>

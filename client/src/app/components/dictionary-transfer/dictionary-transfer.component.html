@@ -21,10 +21,10 @@
                 <mat-label>Modifiez la description</mat-label>
                 <input matInput #input maxlength="50" #input2 minlength="10" [formControl]="editDescription" />
             </mat-form-field>
-            <button class="btn" (click)="updateTitleAndDescription(editTitle.value, editDescription.value)">Enregistrer les modifications</button>
         </div>
+        <button class="btn" (click)="updateTitleAndDescription(editTitle.value, editDescription.value)">Enregistrer les modifications</button>
+        <button class="btn" (click)="deleteDictionary(selectedDictionary)">Supprimer {{ selectedDictionary.title }}</button>
     </div>
-    <button mat-button (click)="onDownload()">Download</button>
 
     <mat-card *ngIf="lastUploadedDictionary !== undefined">
         <mat-card-subtitle> Dictionnaire téléversé </mat-card-subtitle>
