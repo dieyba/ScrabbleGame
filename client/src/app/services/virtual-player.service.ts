@@ -101,6 +101,7 @@ export class VirtualPlayerService {
             // 80% chance to make a move on easy mode
             const value = this.selectRandomValue();
             setTimeout(() => {
+                console.log('board: ', this.gameService.game.scrabbleBoard.squares);
                 const possiblePermutations = this.permutationsWithBoard();
                 if (possiblePermutations.length === 0) {
                     // No permutations found, because the board is empty. let's play the first move.
