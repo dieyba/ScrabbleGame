@@ -1,18 +1,29 @@
 body {
     min-height: 100vh;
     line-height: 1;
-    margin: 0;
-    padding: 0;
+    padding: 5px;
     background-color: #dcecff;
 }
 
+.mat-expansion-panel {
+    margin-bottom: 20px;
+}
+
+.mat-expansion-panel-header {
+    margin: 5px 10px;
+}
+
+.mat-expansion-panel-header-title {
+    font-size: x-large;
+}
+
 .page {
-    display: flex;
+    margin: 30px;
 }
 
 .reset {
-    position: absolute;
-    left: 700px;
+    text-align: right;
+    margin: 5px 20px;
 }
 
 .image {

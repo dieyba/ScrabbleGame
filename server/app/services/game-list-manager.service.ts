@@ -11,12 +11,20 @@ export class GameListManager {
         this.gamesInPlay = new Array<GameInitInfo>();
         this.currentId = 0;
     }
-    getAllWaitingAreaGames(): WaitingAreaGameParameters[] {
-        return this.waitingAreaGames;
+    getAllWaitingAreaGames(isLog2990: string): WaitingAreaGameParameters[] {
+        const games: WaitingAreaGameParameters[] = [];
+        this.waitingAreaGames.forEach((game) => {
+            if (isLog2990 === 'true' && String(game.isLog2990) === 'true') {
+                games.push(game);
+            } else if (isLog2990 === 'false' && String(game.isLog2990) === 'false') {
+                games.push(game);
+            }
+        });
+        return games;
     }
     getAWaitingAreaGame(roomID: number): WaitingAreaGameParameters | undefined {
         const game = this.waitingAreaGames.find((r) => r.gameRoom.idGame === roomID);
-        if (game) {
+        if (game !== undefined) {
             return game;
         }
         return undefined;
@@ -29,8 +37,8 @@ export class GameListManager {
         this.currentId++;
         return game;
     }
-    addJoinerPlayer(game: WaitingAreaGameParameters, joinerName: string, joinerSocketId: string): boolean {
-        if (game.gameRoom.playersName.length < game.gameRoom.capacity) {
+    addJoinerPlayer(game: WaitingAreaGameParameters, joinerName: string, joinerSocketId: string, isLog2990: boolean): boolean {
+        if (game.gameRoom.playersName.length < game.gameRoom.capacity && game.isLog2990 === isLog2990) {
             game.joinerName = joinerName;
             game.gameRoom.joinerId = joinerSocketId;
             game.gameRoom.playersName = [game.creatorName, joinerName];

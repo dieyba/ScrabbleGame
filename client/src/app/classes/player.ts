@@ -1,3 +1,4 @@
+import { GoalType } from './goal';
 import { ScrabbleLetter } from './scrabble-letter';
 import { ERROR_NUMBER } from './utilities';
 
@@ -9,6 +10,7 @@ export class Player {
     letters: ScrabbleLetter[];
     isActive: boolean; // True if it is this player's turn, false if not.
     isWinner: boolean;
+    goal: GoalType;
 
     constructor(initInfo: string) {
         if (typeof initInfo === 'string') {

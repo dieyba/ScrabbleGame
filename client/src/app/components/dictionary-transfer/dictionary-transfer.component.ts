@@ -13,6 +13,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
     @ViewChild('inputFile', { static: false }) private inputFile!: ElementRef<HTMLInputElement>;
     selectedDictionary: string;
     dictionaryList: string[];
+    isSelected: boolean = false;
     lastUploadedDictionary: DictionaryInterface;
 
     constructor(private dictionaryService: DictionaryService, private snack: MatSnackBar) {

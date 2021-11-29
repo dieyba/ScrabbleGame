@@ -3,7 +3,7 @@ import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { GameType } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { ERROR_NUMBER } from '@app/classes/utilities';
+import { ERROR_NUMBER, MIN_WORD_LENGHT } from '@app/classes/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -18,6 +18,7 @@ export const WAIT_TIME = 3000;
     providedIn: 'root',
 })
 export class ValidationService {
+    validWordsFormed: string[];
     dictionary: Dictionary;
     words: string[];
     isTimerElapsed: boolean;
@@ -26,17 +27,20 @@ export class ValidationService {
     private readonly server: string;
 
     constructor(private readonly gridService: GridService, private bonusService: BonusService) {
+        this.validWordsFormed = [];
         this.dictionary = new Dictionary(DictionaryType.Default);
-        this.words = [];
         this.isTimerElapsed = false;
+        this.areWordsValid = false;
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
-        this.areWordsValid = false;
         this.socketOnConnect();
     }
     socketOnConnect() {
         this.socket.on('areWordsValid', (result: boolean) => {
             this.areWordsValid = result;
+        });
+        this.socket.on('newValidWords', (newWords: string[]) => {
+            this.validWordsFormed = this.validWordsFormed.concat(newWords);
         });
     }
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
@@ -113,6 +117,7 @@ export class ValidationService {
                     this.areWordsValid = areWordsValid;
                     wordsHaveBeenValidated = true;
                     if (areWordsValid) {
+                        this.validWordsFormed = this.validWordsFormed.concat(strWords);
                         resolve(areWordsValid);
                         clearTimeout(validationTimer);
                     }
@@ -136,6 +141,7 @@ export class ValidationService {
                 wordsHaveBeenValidated = true;
                 // return true if words are valid, wait untill the end of timeout if not
                 if (this.areWordsValid) {
+                    this.validWordsFormed = this.validWordsFormed.concat(strWords);
                     resolve(this.areWordsValid);
                     clearTimeout(validationTimer);
                 }
@@ -149,6 +155,6 @@ export class ValidationService {
         }
     }
     isWordValid(word: string): boolean {
-        return this.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
+        return this.dictionary.words.includes(word) && word.length >= MIN_WORD_LENGHT && !word.includes('-') && !word.includes("'") ? true : false;
     }
 }
