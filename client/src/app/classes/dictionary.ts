@@ -6,6 +6,11 @@ export enum DictionaryType {
     // Other dictionaries
 }
 
+export interface DictionaryInterface {
+    title: string;
+    description: string;
+    words: string[];
+}
 export class Dictionary {
     title: string;
     description: string;

@@ -5,7 +5,6 @@ export enum DictionaryType {
     // Other dictionaries
 }
 export interface DictionaryInterface {
-    idDict: number;
     title: string;
     description: string;
     words: string[];

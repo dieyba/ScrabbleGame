@@ -2,15 +2,8 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
 import { BestScoresService } from '@app/services/best-scores.service';
-
-export interface DictionaryInterface {
-    idDict: number;
-    title: string;
-    description: string;
-    words: string[];
-}
+import { VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
 
 @Component({
     selector: 'app-admin-page',
