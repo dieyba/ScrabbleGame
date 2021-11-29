@@ -1,12 +1,12 @@
 import * as dict_path from '@app/assets/dictionnary.json';
-import { ObjectId } from 'bson';
+// import { ObjectId } from 'bson';
 export enum DictionaryType {
     Default = 'Français',
     English = 'Anglais',
     // Other dictionaries
 }
 export interface DictionaryInterface {
-    _id: ObjectId;
+    // _id: ObjectId;
     title: string;
     description: string;
     words: string[];

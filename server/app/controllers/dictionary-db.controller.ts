@@ -27,7 +27,6 @@ export class DictionaryDBController {
                 });
         });
         this.router.get('/:name', async (req: Request, res: Response) => {
-            // TODO validate entry
             this.dictionaryDBService
                 .getDictionary(req.params.name)
                 .then((dictionary: DictionaryInterface) => {
@@ -38,12 +37,13 @@ export class DictionaryDBController {
                 });
         });
         this.router.post('/', async (req: Request, res: Response) => {
-            // TODO Validate entry
-            // TODO Client can't guarantee that it's a JSON file
             this.dictionaryDBService
                 .postDictionary(req.body)
                 .then(() => {
-                    res.status(StatusCodes.OK).send();
+                    res.send(req.body);
+                })
+                .catch((error: TypeError) => {
+                    res.status(StatusCodes.UNPROCESSABLE_ENTITY).send(error.message);
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.BAD_REQUEST).send(error.message);

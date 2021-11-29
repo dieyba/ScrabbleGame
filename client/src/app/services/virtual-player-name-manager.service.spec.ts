@@ -1,13 +1,12 @@
 // import { TestBed } from '@angular/core/testing';
+// import { VirtualPlayerNameManager } from './virtual-player-name-manager';
 
-// import { BestScoresService } from './best-scores.service';
-
-// describe('BestScoresService', () => {
-//     let service: BestScoresService;
+// describe('VirtualPlayerNameManager', () => {
+//     let service: VirtualPlayerNameManager;
 
 //     beforeEach(() => {
 //         TestBed.configureTestingModule({});
-//         service = TestBed.inject(BestScoresService);
+//         service = TestBed.inject(VirtualPlayerNameManager);
 //     });
 
 //     it('should be created', () => {

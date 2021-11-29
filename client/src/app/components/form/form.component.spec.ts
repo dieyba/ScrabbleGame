@@ -1,6 +1,6 @@
 // import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 // import { ComponentFixture, TestBed } from '@angular/core/testing';
-// import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+// import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 // import { MatCardModule } from '@angular/material/card';
 // import { MatCheckboxModule } from '@angular/material/checkbox';
 // import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -11,18 +11,13 @@
 // import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import { Router, RouterModule } from '@angular/router';
 // import { RouterTestingModule } from '@angular/router/testing';
-// import { VirtualPlayerName } from '@app/services/virtual-player-name.service';
 // import { Observable } from 'rxjs';
 // import { FormComponent } from './form.component';
 
 // describe('FormComponent', () => {
 //     let component: FormComponent;
 //     let fixture: ComponentFixture<FormComponent>;
-//     const list: VirtualPlayerName[] = [
-//         { _id: '1', name: 'Dieyba' },
-//         { _id: '2', name: 'Kevin' },
-//         { _id: '3', name: 'Ariane' },
-//     ];
+//     // const list: string[] = ['dieyna', 'kevin', 'ariane'];
 //     let dialogSpy: jasmine.Spy;
 //     let matdialog: jasmine.Spy;
 //     // let dialog: jasmine.SpyObj<MatDialogRef<FormComponent>> = jasmine.createSpyObj('dialog', ['close']);
@@ -70,21 +65,21 @@
 //         expect(dialogSpy).toHaveBeenCalled();
 //     });
 
-//     it('should call randomPlayer() ', () => {
-//         component.selectedPlayer = 'dieyna';
-//         const spy = spyOn(component, 'randomPlayer').and.stub();
-//         component.name = new FormControl('dieyna');
-//         component.changeName(list);
-//         expect(spy).toHaveBeenCalled();
-//     });
+//     // it('should call randomPlayer() ', () => {
+//     //     component.selectedPlayer = 'dieyna';
+//     //     const spy = spyOn(component, 'randomPlayer').and.stub();
+//     //     component.name = new FormControl('dieyna');
+//     //     component.changeName(list);
+//     //     expect(spy).toHaveBeenCalled();
+//     // });
 
-//     it('should not call randomPlayer() ', () => {
-//         component.selectedPlayer = 'kevin';
-//         const spy = spyOn(component, 'randomPlayer').and.stub();
-//         component.name = new FormControl('dieyna');
-//         component.changeName(list);
-//         expect(spy).not.toHaveBeenCalled();
-//     });
+//     // it('should not call randomPlayer() ', () => {
+//     //     component.selectedPlayer = 'kevin';
+//     //     const spy = spyOn(component, 'randomPlayer').and.stub();
+//     //     component.name = new FormControl('dieyna');
+//     //     component.changeName(list);
+//     //     expect(spy).not.toHaveBeenCalled();
+//     // });
 
 //     it('should return a value between the minimum and the maxmimum', () => {
 //         const minimum = 3;
@@ -94,11 +89,11 @@
 //         expect(component.randomNumber(minimum, maximum)).toBeGreaterThanOrEqual(minimum);
 //     });
 
-//     it('should call randomNumber() method', () => {
-//         const spy = spyOn(component, 'randomNumber');
-//         component.randomPlayer(list);
-//         expect(spy).toHaveBeenCalled();
-//     });
+//     // it('should call randomNumber() method', () => {
+//     //     const spy = spyOn(component, 'randomNumber');
+//     //     component.randomPlayer(list);
+//     //     expect(spy).toHaveBeenCalled();
+//     // });
 
 //     it('form invalid when empty', () => {
 //         component.submit();

@@ -1,8 +1,8 @@
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DictionaryInterface } from '@app/classes/dictionary';
 import { Observable } from 'rxjs';
-import { DictionaryInterface } from './virtual-player-name.service';
 
 export const BASE_URL = 'http://localhost:3000/api/dictionary';
 @Injectable({
@@ -33,12 +33,23 @@ export class DictionaryService {
     }
 
     update(url: string, dictionaryName: string, dictionaryId: unknown, updatedTitle: string, updatedDescription: string) {
-        return this.http.patch<DictionaryInterface>(url + '/' + dictionaryName, { id: dictionaryId, newTitle: updatedTitle, newDescription: updatedDescription});
+        return this.http.patch<DictionaryInterface>(url + '/' + dictionaryName, { id: dictionaryId, newTitle: updatedTitle, newDescription: updatedDescription });
     }
 
     handleErrorSnackBar(error: HttpErrorResponse): void {
-        if (error.status !== HttpStatusCode.Ok) {
-            this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'close');
+        switch (error.status) {
+            case HttpStatusCode.Ok: {
+                this.snack.open('Téléversement réussi!', 'Fermer');
+                break;
+            }
+            case HttpStatusCode.UnprocessableEntity: {
+                this.snack.open('Erreur : ' + error.error, 'Fermer');
+                break;
+            }
+            default: {
+                this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'Fermer');
+                break;
+            }
         }
     }
 }

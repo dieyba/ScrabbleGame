@@ -1,34 +1,35 @@
-// import { Player } from '@app/classes/player';
-// import { ScrabbleLetter } from './scrabble-letter';
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+import { calculateRackPoints, Player, removePlayerLetters } from '@app/classes/player';
+import { ScrabbleLetter } from './scrabble-letter';
 
-// describe('Player', () => {
-//     class PlayerTest extends Player {}
+describe('Player', () => {
+    let player: Player;
+    beforeEach(() => {
+        player = new Player('Sara');
+        player.letters = [new ScrabbleLetter('a', 1), new ScrabbleLetter('b', 1), new ScrabbleLetter('a', 1), new ScrabbleLetter('a', 1)];
+    });
 
-//     it('method addLetter should add the given letter', () => {
-//         const player: PlayerTest = new PlayerTest('Sara');
-//         const letter: ScrabbleLetter = new ScrabbleLetter('a', 1);
+    it('should remove the given letters', () => {
+        const result = removePlayerLetters('aa', player);
+        expect(result).toBeTruthy();
+        expect(player.letters).toEqual([new ScrabbleLetter('b', 1), new ScrabbleLetter('a', 1)]);
+    });
 
-//         expect(player.letters).toEqual([]);
+    it('should return false if the letter to remove is not  in the rack', () => {
+        expect(removePlayerLetters('c', player)).toBeFalse();
+        expect(player.letters).toEqual([
+            new ScrabbleLetter('a', 1),
+            new ScrabbleLetter('b', 1),
+            new ScrabbleLetter('a', 1),
+            new ScrabbleLetter('a', 1),
+        ]);
+    });
 
-//         player.addLetter(letter);
-
-//         expect(player.letters).toEqual([letter]);
-//     });
-
-//     it('method removeLetter should remove the given letters', () => {
-//         const player: PlayerTest = new PlayerTest('Sara');
-//         player.letters = [new ScrabbleLetter('a', 1)];
-//         const isRemove: boolean = player.removeLetter('a');
-
-//         expect(isRemove).toBeTruthy();
-//         expect(player.letters).toEqual([]);
-//     });
-
-//     it('method removeLetter should return false if the letter to remove is not  in the rack', () => {
-//         const player: PlayerTest = new PlayerTest('Sara');
-//         player.letters = [new ScrabbleLetter('a', 1)];
-//         const isRemove: boolean = player.removeLetter('b');
-
-//         expect(isRemove).toBeFalse();
-//     });
-// });
+    it('should calculate rack points', () => {
+        expect(calculateRackPoints(player)).toEqual(4);
+    });
+    it('should calculate no rack points', () => {
+        player.letters = [];
+        expect(calculateRackPoints(player)).toEqual(0);
+    });
+});
