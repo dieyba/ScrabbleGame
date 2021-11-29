@@ -13,10 +13,10 @@ const TOTAL_GOALS_COUNT = 8;
 export enum GoalType {
     PlaceLetterWorthTenPts = 0, // Place a word containing a letter with a 10 pts value
     FormTwoLettersStarsOnly = 1, // Form 2 letter word, both letters are *
-    FormWordWithLettersFromName = 2, /* Form a word containing at least 3 letters from the player's name
-        (can be same letter, but different occurence)*/
+    FormWordWithLettersFromName = 2 /* Form a word containing at least 3 letters from the player's name
+        (can be same letter, but different occurence)*/,
     FormAnExistingWord = 3, // Form a word already on the board
-    FormThreeWords = 4, // Form three words at the same time 
+    FormThreeWords = 4, // Form three words at the same time
     PlaceLetterOnBoardCorner = 5, // Place a letter on one of the 4 boaard corners
     ActivateTwoBonuses = 6, // Active 2 bonuses at the same time / place a word with 2 letters on a colour square
     PlaceLetterOnColorSquare = 7, // Place letter x on a square of color y. x and y are randomly chosen at start of game
@@ -73,19 +73,19 @@ export class GameInitInfo {
         this.stockLetters = stock.letterStock; // stock with the two players' letters removed
         this.sharedGoals = [];
         // set the players' letters
-        this.players.forEach(player => {
+        this.players.forEach((player) => {
             player.letters = stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         });
         // Set the private and public goals
         if (String(clientParametersChosen.isLog2990) === 'true') {
-            var usedGoals: GoalType[] = [];
+            const usedGoals: GoalType[] = [];
             this.pickSharedGoals(usedGoals);
             this.pickPrivateGoals(usedGoals);
         }
-        console.log('Shared goals:', this.sharedGoals);
-        this.players.forEach(player => {
-            console.log(player.name, ' goal:', player.goal);
-        });
+        // console.log('Shared goals:', this.sharedGoals);
+        // this.players.forEach((player) => {
+        //     console.log(player.name, ' goal:', player.goal);
+        // });
     }
 
     // pick the 4 public random objectives/goals from the list
@@ -104,12 +104,12 @@ export class GameInitInfo {
 
     // pick a private goal for each player
     pickPrivateGoals(usedGoals: GoalType[]) {
-        this.players.forEach(player => {
+        this.players.forEach((player) => {
             do {
                 const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
                 if (!usedGoals.includes(randomGoal)) {
                     player.goal = randomGoal;
-                    usedGoals.push(randomGoal)
+                    usedGoals.push(randomGoal);
                     if (randomGoal === GoalType.PlaceLetterOnColorSquare) {
                         this.randomLetterAndColor = this.pickRandomLetterAndColor(this.stockLetters);
                     }
@@ -158,4 +158,3 @@ export class GameInitInfo {
         return undefined;
     }
 }
-

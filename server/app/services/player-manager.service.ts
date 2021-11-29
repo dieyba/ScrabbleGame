@@ -17,7 +17,7 @@ export class PlayerManagerService {
         return undefined;
     }
 
-    addPlayer(socketId: string, playerName?: string,): Player | undefined {
+    addPlayer(socketId: string, playerName?: string): Player | undefined {
         let newPlayer = this.getPlayerBySocketID(socketId);
         if (newPlayer === undefined) {
             const name = playerName !== undefined ? playerName : '';

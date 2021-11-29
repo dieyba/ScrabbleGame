@@ -27,7 +27,7 @@ export class SocketManagerService {
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
             socket.on('addPlayer', () => {
                 this.playerMan.addPlayer(socket.id);
-                console.log('addPlayer : ', this.playerMan.allPlayers[this.playerMan.allPlayers.length - 1]?.socketId);
+                // console.log('addPlayer : ', this.playerMan.allPlayers[this.playerMan.allPlayers.length - 1]?.socketId);
             });
             socket.on('createWaitingAreaRoom', (gameParams: WaitingAreaGameParameters) => {
                 this.createWaitingAreaRoom(socket, gameParams);
@@ -117,6 +117,17 @@ export class SocketManagerService {
                 this.changeTurn(socket, isCurrentTurnedPassed, consecutivePassedTurns);
             });
         });
+    }
+    getIsLog2990FromId(id: string): boolean {
+        const room = this.playerMan.getPlayerBySocketID(id)?.roomId;
+        // console.log('Room : ' + room);
+        if (room === undefined) {
+            return false;
+        }
+        const waitingArea = this.gameListMan.getAWaitingAreaGame(room);
+        // console.log("waitingArea : " + waitingArea?.isLog2990);
+        if (waitingArea !== undefined) return waitingArea.isLog2990;
+        return false;
     }
     private createWaitingAreaRoom(socket: io.Socket, gameParams: WaitingAreaGameParameters): void {
         const newRoom = this.gameListMan.createWaitingAreaGame(gameParams, socket.id);
@@ -320,16 +331,5 @@ export class SocketManagerService {
         if (player.roomId !== ERROR_NUMBER) {
             this.sio.in(player.roomId.toString()).emit('gameEnded');
         }
-    }
-    getIsLog2990FromId(id: string): boolean {
-        let room = this.playerMan.getPlayerBySocketID(id)?.roomId;
-        // console.log('Room : ' + room);
-        if (room === undefined) {
-            return false;
-        }
-        let waitingArea = this.gameListMan.getAWaitingAreaGame(room);
-        // console.log("waitingArea : " + waitingArea?.isLog2990);
-        if (waitingArea !== undefined) return waitingArea.isLog2990;
-        return false;
     }
 }
