@@ -18,7 +18,8 @@ import {
     isValidLetter,
     removeAccents,
     scrabbleLetterstoString,
-    trimSpaces,
+    // eslint-disable-next-line prettier/prettier
+    trimSpaces
 } from '@app/classes/utilities';
 import { ChatDisplayService } from './chat-display.service';
 import { CommandInvokerService } from './command-invoker.service';
@@ -65,7 +66,7 @@ export class TextEntryService {
 
     /**
      * @description This function verifies if the input is a valid command or
-     * just text. It doesn't check the command's arguments of the command.
+     * just text. It doesn't check the command's arguments.
      *
      * @param text Text input from user
      */
