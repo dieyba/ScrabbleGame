@@ -12,10 +12,10 @@ import { RackService } from '@app/services/rack.service';
 import { TurnManagerService } from '@app/services/turn-manager.service';
 
 // TODO : See if needed elsewhere, else no need to move these constants
-export const DEFAULT_WIDTH = 640;
-export const DEFAULT_HEIGHT = 640;
-export const RACK_WIDTH = 500;
-export const RACK_HEIGHT = 60;
+export const DEFAULT_WIDTH = 580;
+export const DEFAULT_HEIGHT = 580;
+export const RACK_WIDTH = 440;
+export const RACK_HEIGHT = 50;
 export enum MouseButton {
     Left = 0,
     Middle = 1,

@@ -15,20 +15,17 @@ export class CommandInvokerService {
     constructor(private chatDisplayService: ChatDisplayService, private gameService: GameService) {}
 
     async executeCommand(command: Command): Promise<void> {
-        const commandResult = command.execute();
-        if (commandResult instanceof Promise) {
-            commandResult.then((executionResult: CommandResult) => {
-                this.displayExecutionResultMessages(executionResult, command);
-            });
-        } else {
-            this.displayExecutionResultMessages(commandResult, command);
-        }
-    }
-    displayExecutionResultMessages(commandResult: CommandResult, command: Command) {
         const isExchangeCmd = command instanceof ExchangeCmd;
         const isToDisplayRemotely = isExchangeCmd || command instanceof PassTurnCmd || command instanceof PlaceCmd;
+        const executionResult = await command.execute();
+        this.displayExecutionResultMessages(executionResult, command, isToDisplayRemotely);
+    }
+    displayExecutionResultMessages(commandResult: CommandResult, command: Command, isToDisplayRemotely: boolean) {
+        const isExchangeCmd = command instanceof ExchangeCmd;
         const isSendToServer = this.gameService.game.gameMode === GameType.MultiPlayer && isToDisplayRemotely && commandResult.isExecuted;
         const debugMessages = command.debugMessages;
+        // const isFromVirtualPlayer =
+        //    this.gameService.game.gameMode === GameType.Solo && commandResult.executionMessages[0]?.color === ChatEntryColor.RemotePlayer;
         if (isSendToServer) {
             this.displayExecutionWithServer(isExchangeCmd, commandResult);
         } else {

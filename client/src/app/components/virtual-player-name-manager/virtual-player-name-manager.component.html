@@ -1,72 +1,96 @@
 <div class="virtualPlayers">
-    <div class="information">
-        <i>Veuillez sélectionner un nom pour le modifier/supprimer</i><br>
-    </div>
+    <hr />
+    <div class="description">Ajoutez, modifiez et supprimer les noms des joueurs virtuels débutans et experts.</div>
+    <div class="information"><i>Veuillez sélectionner un nom pour le modifier/supprimer.</i><br /></div>
 
     <div class="lists">
-        <h2>Joueurs débutants</h2>
-        <div class="names">
-            <div class="beginnerNames" *ngFor="let name of beginnerNameList">
-                <button class="name-btn" (click)="onSelect(name)">{{ name.name }}</button>
+        <mat-card class="column">
+            <h2>Joueurs débutants</h2>
+            <div class="names">
+                <div class="beginnerNames" *ngFor="let name of beginnerNameList">
+                    <button class="name-btn" (click)="onSelect(name)">{{ name.name }}</button>
+                </div>
             </div>
-        </div>
+        </mat-card>
 
-        <h2>Joueurs experts</h2>
-        <div class="names">
-            <div class="expertNames" *ngFor="let name of expertNameList">
-                <button class="name-btn" (click)="onSelect(name)">{{ name.name }}</button>
+        <mat-card class="column">
+            <h2>Joueurs experts</h2>
+            <div class="names">
+                <div class="expertNames" *ngFor="let name of expertNameList">
+                    <button class="name-btn" (click)="onSelect(name)">{{ name.name }}</button>
+                </div>
             </div>
-        </div>
+        </mat-card>
     </div>
 
     <div class="information2">
         <i>NB : Vous ne pouvez ni supprimer ni modifer les 3 premiers noms de ces deux listes</i>
     </div>
 
-    <div class="add">
-        <div class="input" >
-            <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill">
-                <mat-label>Entrez le nom que vous souhaitez ajouter à la liste</mat-label>
-                <input matInput #input maxlength="10" #input2 minlength="3" placeholder="Ex : Riri" [formControl]="newName" />
-                <div *ngIf="newName.errors?.pattern">Le nom ne doit pas contenir des chiffres ou des caractères spéciaux</div>
-            </mat-form-field>
-            <span>Veuillez entrez un nom pour l'ajouter.</span>
-        </div>
-
-        <div class="addName">
-            <button class="btn" (click)="addName(beginnerNameList, beginnerNameUrl); newName.setValue('')">Ajouter joueur débutant</button>
-            <button class="btn" (click)="addName(expertNameList, expertNameUrl); newName.setValue('')">Ajouter joueur expert</button>
-        </div>
+    <div class="selected-player" *ngIf="!isUntouchable()">
+        <button class="close-btn" (click)="unselectName()">
+            <img src="https://img.icons8.com/ios/20/000000/delete-sign--v1.png" />
+        </button>
+        <h2>Joueur sélectionné</h2>
+        <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill" *ngIf="selectedName.name !== ''">
+            <mat-label>Modifiez le nom</mat-label>
+            <input
+                matInput
+                #input
+                maxlength="10"
+                #input2
+                minlength="3"
+                placeholder="Ex : Riri"
+                [formControl]="editName"
+                (keyup.enter)="updateName()"
+            />
+            <div *ngIf="newName.errors?.pattern">Le nom ne doit pas contenir des chiffres ou des caractères spéciaux</div>
+        </mat-form-field>
     </div>
-    <div class="deletUpdate">
-        <div class="deleteName">
-            <button class="btn" *ngIf="isUntouchable()" disabled="true">Supprimer</button>
-            <button class="btn" *ngIf="!isUntouchable()" (click)="deleteName(); editName.setValue('')">Supprimer {{ selectedName.name }}</button>
-            <span class="toolTipDelete">Sélectionner un nom puis cliquer sur Supprimer. </span>
-        </div>
-        <div>
-            <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill" *ngIf="selectedName.name !== ''">
-                <mat-label>Modifiez le nom</mat-label>
-                <input
-                    matInput
-                    #input
-                    maxlength="10"
-                    #input2
-                    minlength="3"
-                    placeholder="Ex : Riri"
-                    [formControl]="editName"
-                    (keyup.enter)="updateName()"
-                />
-                <div *ngIf="newName.errors?.pattern">Le nom ne doit pas contenir des chiffres ou des caractères spéciaux</div>
-            </mat-form-field>
-            <div class="updateName">
-                <button class="btn" *ngIf="isUntouchable()" (click)="updateName()" disabled="true">Modifier le nom</button>
-                <button class="btn" *ngIf="selectedName.name !== '' && !isUntouchable()" (click)="updateName()">
-                    Modifier {{ selectedName.name }}
-                </button>
-                <span class="toolTipUpdate">Sélectionner un nom pour le modifer. </span>
+    <button mat-fab class="delete-btn" *ngIf="isUntouchable()" disabled="true">
+        <span class="toolTipDelete">Supprimer</span>
+        <img
+        class="trash"
+        src="https://img.icons8.com/external-kiranshastry-lineal-kiranshastry/42/000000/external-delete-multimedia-kiranshastry-lineal-kiranshastry.png"
+        />
+    </button>
+    <button mat-fab class="delete-btn" *ngIf="selectedName.name !== '' && !isUntouchable()" (click)="deleteName(); editName.setValue('')">
+        <span class="toolTipDelete">Supprimer {{ selectedName.name }}</span>
+        <img
+        class="trash"
+        src="https://img.icons8.com/external-kiranshastry-lineal-kiranshastry/42/000000/external-delete-multimedia-kiranshastry-lineal-kiranshastry.png"
+        />
+    </button>
+    <button mat-fab class="edit-btn" *ngIf="isUntouchable()" disabled="true">
+        <span class="toolTipEdit">Modifier</span>
+        <img class="edit" src="https://img.icons8.com/dotty/40/000000/edit.png" />
+    </button>
+    <button mat-fab class="edit-btn" *ngIf="selectedName.name !== '' && !isUntouchable()" (click)="updateName()">
+        <span class="toolTipEdit">Modifier {{ selectedName.name }}</span>
+        <img class="edit" src="https://img.icons8.com/dotty/40/000000/edit.png" />
+    </button>
+    <button mat-fab class="plus-btn" (click)="openAddPlayerCard()">
+        <span class="toolTipAdd">Ajouter un joueur</span>
+        <img class="plus" src="https://img.icons8.com/ios/50/000000/plus-math.png" />
+    </button>
+    <mat-card class="add-mat-card" *ngIf="isAddPlayerCardVisible">
+        <button class="close-btn" (click)="closeAddPlayerCard()">
+            <img src="https://img.icons8.com/ios/20/000000/delete-sign--v1.png" />
+        </button>
+        <div class="add" align="center">
+            <div class="input">
+                <label class="text">Veuillez entrez un nom pour l'ajouter : </label>
+                <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill">
+                    <mat-label>Entrez le nom que vous souhaitez ajouter à la liste</mat-label>
+                    <input matInput #input maxlength="10" #input2 minlength="3" placeholder="Ex : Riri" [formControl]="newName" />
+                    <div *ngIf="newName.errors?.pattern">Le nom ne doit pas contenir des chiffres ou des caractères spéciaux</div>
+                </mat-form-field>
+            </div>
+
+            <div class="addName">
+                <button class="btn" (click)="addName(beginnerNameList, beginnerNameUrl); newName.setValue('')">Ajouter joueur débutant</button>
+                <button class="btn" (click)="addName(expertNameList, expertNameUrl); newName.setValue('')">Ajouter joueur expert</button>
             </div>
         </div>
-    </div>
-    <p>{{ selectedName.name }}</p>
+    </mat-card>
 </div>

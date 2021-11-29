@@ -1,12 +1,14 @@
+import { Column, Row } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
 import * as utilities from './utilities';
+import { isCoordInsideBoard } from './utilities';
 import { Vec2 } from './vec2';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('ScrabbleWord', () => {
-    it('scrabbleLetterstoString should convert a scrabble letter tab to a string', () => {
+    it('scrabbleLettersToString should convert a scrabble letter tab to a string', () => {
         const scrabbleLetters = [new ScrabbleLetter('t'), new ScrabbleLetter('e'), new ScrabbleLetter('s'), new ScrabbleLetter('t')];
-        const stringWord = utilities.scrabbleLetterstoString(scrabbleLetters);
+        const stringWord = utilities.scrabbleLettersToString(scrabbleLetters);
         expect(stringWord).toEqual('test');
     });
 
@@ -60,5 +62,14 @@ describe('ScrabbleWord', () => {
 
         letter = '';
         expect(utilities.isValidLetter(letter)).toBeFalse();
+    });
+
+    it('isCoordInsideBoard should return true for valid coordinates only', () => {
+        expect(isCoordInsideBoard(new Vec2(Column.One, Row.A))).toBeTrue();
+        expect(isCoordInsideBoard(new Vec2(Column.Fifteen, Row.O))).toBeTrue();
+        expect(isCoordInsideBoard(new Vec2(Column.One - 1, Row.A))).toBeFalse();
+        expect(isCoordInsideBoard(new Vec2(Column.One, Row.A - 1))).toBeFalse();
+        expect(isCoordInsideBoard(new Vec2(Column.Fifteen + 1, Row.O))).toBeFalse();
+        expect(isCoordInsideBoard(new Vec2(Column.Fifteen, Row.O + 1))).toBeFalse();
     });
 });

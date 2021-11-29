@@ -19,6 +19,7 @@ export const WAIT_TIME = 3000;
     providedIn: 'root',
 })
 export class ValidationService {
+    validWordsFormed: string[];
     dictionary: Dictionary;
     dictionaryTrie: Trie;
     words: string[];
@@ -28,19 +29,23 @@ export class ValidationService {
     private readonly server: string;
 
     constructor(private readonly gridService: GridService, private bonusService: BonusService) {
+        this.validWordsFormed = [];
         this.dictionary = new Dictionary(DictionaryType.Default);
         this.dictionaryTrie = new Trie();
         this.dictionaryTrie.initializeDictionary();
         this.words = [];
         this.isTimerElapsed = false;
+        this.areWordsValid = false;
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
-        this.areWordsValid = false;
         this.socketOnConnect();
     }
     socketOnConnect() {
         this.socket.on('areWordsValid', (result: boolean) => {
             this.areWordsValid = result;
+        });
+        this.socket.on('newValidWords', (newWords: string[]) => {
+            this.validWordsFormed = this.validWordsFormed.concat(newWords);
         });
     }
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
@@ -117,6 +122,7 @@ export class ValidationService {
                     this.areWordsValid = areWordsValid;
                     wordsHaveBeenValidated = true;
                     if (areWordsValid) {
+                        this.validWordsFormed = this.validWordsFormed.concat(strWords);
                         resolve(areWordsValid);
                         clearTimeout(validationTimer);
                     }
@@ -140,6 +146,7 @@ export class ValidationService {
                 wordsHaveBeenValidated = true;
                 // return true if words are valid, wait untill the end of timeout if not
                 if (this.areWordsValid) {
+                    this.validWordsFormed = this.validWordsFormed.concat(strWords);
                     resolve(this.areWordsValid);
                     clearTimeout(validationTimer);
                 }

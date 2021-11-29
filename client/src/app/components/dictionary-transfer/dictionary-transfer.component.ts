@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { DictionaryInterface } from '@app/services/virtual-player-name-manager';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DictionaryInterface } from '@app/classes/dictionary';
 import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
 
 @Component({
@@ -12,8 +13,10 @@ export class DictionaryTransferComponent implements AfterViewInit {
     @ViewChild('inputFile', { static: false }) private inputFile!: ElementRef<HTMLInputElement>;
     selectedDictionary: string;
     dictionaryList: string[];
+    isSelected: boolean = false;
+    lastUploadedDictionary: DictionaryInterface;
 
-    constructor(private dictionaryService: DictionaryService) {
+    constructor(private dictionaryService: DictionaryService, private snack: MatSnackBar) {
         this.selectedDictionary = '';
         this.dictionaryList = [];
     }
@@ -30,19 +33,27 @@ export class DictionaryTransferComponent implements AfterViewInit {
     }
 
     onUpload() {
-        if (this.inputFile !== undefined && this.inputFile.nativeElement.files !== null) {
-            const fileReader = new FileReader();
-            fileReader.onload = () => {
-                this.upload(fileReader.result?.toString() as string);
-            };
-            fileReader.readAsText(this.inputFile.nativeElement.files[0]);
+        if (!this.inputFileExist(this.inputFile)) {
+            return;
         }
+
+        if (!this.fileIsJSON((this.inputFile.nativeElement.files as FileList)[0].name)) {
+            return;
+        }
+
+        // Updloading after reading
+        const fileReader = new FileReader();
+        fileReader.onload = () => {
+            this.upload(fileReader.result?.toString() as string);
+        };
+        fileReader.readAsText((this.inputFile.nativeElement.files as FileList)[0]);
     }
 
     upload(dictionary: string) {
         this.dictionaryService.uploadFromString(dictionary).subscribe(
-            () => {
-                // TODO tell user the dictionary is successfully uploaded (snackbar?)
+            (dictionaryDescription) => {
+                this.lastUploadedDictionary = dictionaryDescription;
+                this.snack.open('Téléversement réussi!', 'Fermer');
             },
             (error: HttpErrorResponse) => {
                 this.dictionaryService.handleErrorSnackBar(error);
@@ -61,7 +72,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
     }
 
     download(dictionary: DictionaryInterface) {
-        const file = new Blob([JSON.stringify(dictionary, ['idDict', 'title', 'description', 'words'], '\t')], { type: '.json' });
+        const file = new Blob([JSON.stringify(dictionary, ['title', 'description', 'words'], '\t')], { type: '.json' });
         const a = document.createElement('a');
         const url = URL.createObjectURL(file);
         a.href = url;
@@ -80,5 +91,28 @@ export class DictionaryTransferComponent implements AfterViewInit {
             this.dictionaryList.push(dictionary.title);
         }
         this.selectedDictionary = this.dictionaryList[0];
+    }
+
+    inputFileExist(inputFile: ElementRef<HTMLInputElement>): boolean {
+        const isElementDefined = inputFile !== undefined;
+        const isFileListDefined = inputFile.nativeElement.files !== null;
+        let isFileDefined = false;
+        if (inputFile.nativeElement.files !== null) {
+            isFileDefined = inputFile.nativeElement.files[0] !== undefined;
+        }
+        return isElementDefined && isFileListDefined && isFileDefined;
+    }
+
+    fileIsJSON(fileName: string): boolean {
+        const fileNameExtension = fileName.split('.', 2)[1];
+        let isJSON = false;
+
+        if (fileNameExtension === 'json') {
+            isJSON = true;
+        } else {
+            isJSON = false;
+            this.snack.open('Le fichier doit être un «.json»', 'fermer');
+        }
+        return isJSON;
     }
 }
