@@ -78,7 +78,7 @@ describe('TextEntryService', () => {
 
     it('should send invalid command error message when needed', () => {
         // Having spaces before the ! or after the command input should not be an error of any type
-        const validNameCmds = [' !debug ', '!réserve', '!passer', '!échanger z', '!placer b5v mot'];
+        const validNameCmds = [' !debug ', '!réserve', '!aide', '!passer', '!échanger z', '!placer b5v mot'];
         // empty string is already prevented by checking if the string is empty beforehand
         const invalidCmds = ['!', '! debug', '!random name', '!echanger', '!123'];
 
@@ -118,6 +118,7 @@ describe('TextEntryService', () => {
             '!placer a31416h something',
             '!placer a5V nothing',
             '!réserve de lettres',
+            '!aide help',
         ];
 
         for (const input of validSyntaxCmds) {
