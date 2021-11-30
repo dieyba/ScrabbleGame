@@ -76,7 +76,7 @@ export class BestScoresService {
                 await this.populateDB(this.defaultLog2990BestScoresValue, DATABASE_COLLECTION[1]);
             })
             .catch((error) => {
-                throw error;
+                throw new Error("Connection with database fail");
             });
     }
 

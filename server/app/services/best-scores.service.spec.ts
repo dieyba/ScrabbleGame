@@ -2,6 +2,7 @@ import { BestScores } from "@app/classes/best-scores";
 import { rejects } from "assert";
 import { ObjectId } from "bson";
 import { expect } from "chai";
+import { Collection } from "mongodb";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { BestScoresService, DATABASE_COLLECTION } from "./best-scores.service";
 
@@ -26,7 +27,7 @@ describe('BestScoresService', () => {
         mongoServer = await MongoMemoryServer.create();
         const mongoUri = mongoServer.getUri();
         bestScoresService = new BestScoresService(mongoUri);
-        await bestScoresService.connectClient()
+        // await bestScoresService.connectClient()
         // const mongoUri = await mongoServer.getUri();
         // client = new MongoClient(mongoUri);
         // client = await MongoClient.connect(mongoUri);
@@ -62,7 +63,8 @@ describe('BestScoresService', () => {
 
     it('should throw an error when connecting to a bad url', async () => {
         try {
-            new BestScoresService('mongodb+srv://Scrabble:null@cluster0.plwpz.mongodb.net/null?retryWrites=true&w=majority');
+            bestScoresService.dbUrl = '**';
+            bestScoresService.connectClient();
         } catch (error) {
             expect(error).to.not.be.undefined;
         }
@@ -75,16 +77,33 @@ describe('BestScoresService', () => {
         expect(bestScores1).to.deep.equals(dbData[MinScoreInArray]);
     });
 
-    it('should throw an error when get all Scores in Mongo Database', async () => {
-        await bestScoresService["client"].close();
-        // try {
-        await rejects(bestScoresService.getBestScores(bestScoresService.log2990Collection)).catch((error: Error) => {
-            // throw error;
+    it.only('should throw an error when get all Scores in Mongo Database', async () => {
+
+        const fakeCollectionType = {
+            find: (paramFind: any) => ({
+                sort: (paramSort: any) => {
+                    return {
+                        toArray: () => {
+                            return {
+                                then: (paramThen: any) => {
+                                    return {
+                                        catch: (fun: (error: Error) => void) => {
+                                            fun(new Error(""));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+
+        } as Collection<BestScores>;
+        try {
+            await bestScoresService.getBestScores(fakeCollectionType);
+        } catch (error) {
             expect(error).to.not.be.undefined;
-        });
-        // } catch (error) {
-        //     expect(error).to.not.be.undefined;
-        // }
+        }
     });
 
     it('should only change score of player if already in db with a less score when posting in Mongo Database ', async () => {
