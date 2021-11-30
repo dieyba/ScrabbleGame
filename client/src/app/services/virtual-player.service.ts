@@ -229,7 +229,7 @@ export class VirtualPlayerService {
                             } else {
                                 const currentWord = list[l].stringify();
                                 const position = this.findPosition(list[l], axis);
-                                const otherWords: ScrabbleWord[] = this.wordBuilderService.buildWordsOnBoard(position, axis, currentWord);
+                                const otherWords: ScrabbleWord[] = this.wordBuilderService.buildWordsOnBoard(position, axis);
                                 let sum = 0;
                                 for (const word of otherWords) {
                                     sum += word.value;

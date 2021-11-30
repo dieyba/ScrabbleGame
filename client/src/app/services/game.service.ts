@@ -221,9 +221,9 @@ export class GameService {
         // Generate all words created
         let tempScrabbleWords: ScrabbleWord[];
         if (placeParams.orientation === Axis.H) {
-            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.position, Axis.H, placeParams.word);
+            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.position, Axis.H);
         } else {
-            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.position, Axis.V, placeParams.word);
+            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.position, Axis.V);
         }
         const strWords: string[] = [];
         const newlyPlacedLetters: ScrabbleLetter[] = [];
