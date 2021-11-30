@@ -114,6 +114,6 @@
 //         service.changeFillStyleColor(context, 'pink');
 //         expect(context.fillStyle).toBe('#FFA7C7');
 //         service.changeFillStyleColor(context, 'red');
-//         expect(context.fillStyle).toBe('#C03E3E');
+//         expect(context.fillStyle).toBe('#E60000');
 //     });
 // });

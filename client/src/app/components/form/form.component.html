@@ -53,7 +53,7 @@
         <div class="form-check">
             <mat-checkbox formControlName="bonus" [(ngModel)]="defaultBonus" class="form check-input">Bonus aléatoire</mat-checkbox>
         </div>
-        <div *ngIf="isSolo">
+        <div *ngIf="data.isSolo">
             <p>Veuillez choisir le niveau de votre adversaire</p>
             <mat-radio-group formControlName="level">
                 <mat-radio-button value="easy" (click)="randomPlayer(beginnerNameList)">Joueur Débutant</mat-radio-button>

@@ -32,6 +32,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     selectedName: VirtualPlayerName;
     newName: FormControl;
     editName: FormControl;
+    isAddPlayerCardVisible: boolean = false;
     private index: number;
 
     constructor(private virtualPlayerNameManagerService: VirtualPlayerNameManager, private snack: MatSnackBar) {
@@ -55,7 +56,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     addName(collection: VirtualPlayerName[], url: string) {
-        if (!this.newName.valid) {
+        if (!this.newName.valid || this.newName.value === '') {
             this.snack.open(ErrorCase.InvalidName, 'close');
             return;
         }
@@ -108,6 +109,19 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
         if (this.index > 2) {
             this.editName.setValue(this.selectedName.name);
         }
+    }
+
+    unselectName() {
+        this.selectedName = { _id: '', name: '' };
+        this.editName.setValue('');
+    }
+
+    openAddPlayerCard() {
+        this.isAddPlayerCardVisible = true;
+    }
+
+    closeAddPlayerCard() {
+        this.isAddPlayerCardVisible = false;
     }
 
     private delete(collection: VirtualPlayerName[], url: string) {

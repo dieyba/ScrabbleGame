@@ -1,6 +1,6 @@
 <div class="waitingArea">
     <img class="image" src="https://bit.ly/3m206ss" width="600" height="100" alt="Logo Scrabble" />
-    <div *ngIf="!isGameSelected">
+    <div *ngIf="!data.isGameSelected">
         <h1>Vous êtes en attente d'un autre joueur</h1>
         <mat-spinner class="load"></mat-spinner>
         <div>
@@ -18,7 +18,7 @@
         <button class="small-btn" (click)="convert(true); deleteRoom()">Convertir en Mode Solo</button>
         <button class="small-btn" (click)="closeDialog(); openForm(); deleteRoom()">Annuler</button>
     </div>
-    <div *ngIf="isGameSelected">
+    <div *ngIf="data.isGameSelected">
         <h1>Veuillez selectionner la partie que vous souhaitez rejoindre</h1>
         <mat-card class="games">
             <li *ngFor="let game of pendingGameslist" [class.selected]="game === selectedGame">

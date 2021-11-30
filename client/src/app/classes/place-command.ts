@@ -25,22 +25,19 @@ export class PlaceCmd extends Command {
         const executionMessages: ChatDisplayEntry[] = [];
         const stringCoord = convertCoordToString(this.position);
         const commandMessage = '!' + CommandName.PlaceCmd + ' ' + stringCoord + this.orientation + ' ' + this.word;
-
         const placeParams = { position: this.position, orientation: this.orientation, word: this.word };
-
-        return await this.gameService.place(this.player, placeParams).then((executionResult: ErrorType) => {
-            if (executionResult !== ErrorType.NoError) {
-                executionMessages.push(createErrorEntry(executionResult, commandMessage));
-            } else {
-                this.isExecuted = true;
-                const localPlayerName = this.gameService.game.getLocalPlayer().name;
-                const opponentPlayerName = this.gameService.game.getOpponent().name;
-                const playerName = this.player.name === localPlayerName ? localPlayerName : opponentPlayerName;
-                const color = this.player.name === localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
-                executionMessages.push({ color, message: playerName + ' >> ' + commandMessage });
-            }
+        const executionResult = await this.gameService.place(this.player, placeParams);
+        if (executionResult !== ErrorType.NoError) {
+            executionMessages.push(createErrorEntry(executionResult, commandMessage));
             return { isExecuted: this.isExecuted, executionMessages };
-        });
+        }
+        this.isExecuted = true;
+        const localPlayerName = this.gameService.game.getLocalPlayer().name;
+        const opponentPlayerName = this.gameService.game.getOpponent().name;
+        const playerName = this.player.name === localPlayerName ? localPlayerName : opponentPlayerName;
+        const color = this.player.name === localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
+        executionMessages.push({ color, message: playerName + ' >> ' + commandMessage });
+        return { isExecuted: this.isExecuted, executionMessages };
     }
 }
 

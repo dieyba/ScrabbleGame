@@ -1,4 +1,6 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { DictionaryTransferComponent } from './dictionary-transfer.component';
 
 describe('DictionaryTransferComponent', () => {
@@ -8,6 +10,7 @@ describe('DictionaryTransferComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [DictionaryTransferComponent],
+            imports: [HttpClientModule, MatSnackBarModule],
         }).compileComponents();
     });
 
