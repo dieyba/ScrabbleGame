@@ -1,8 +1,8 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { Goal } from '@app/classes/goal';
-import { Player } from '@app/classes/player';
+import { Goal } from '@app/classes/goal/goal';
+import { Player } from '@app/classes/player/player';
 import { EndGamePopupComponent } from '@app/components/end-game-popup/end-game-popup.component';
 import { GAME_CAPACITY } from '@app/components/form/form.component';
 import { SocketHandler } from '@app/modules/socket-handler';

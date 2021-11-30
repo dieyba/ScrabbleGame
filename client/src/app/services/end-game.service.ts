@@ -1,8 +1,8 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { GameType } from '@app/classes/game-parameters';
-import { calculateRackPoints } from '@app/classes/player';
+import { GameType } from '@app/classes/game-parameters/game-parameters';
+import { calculateRackPoints } from '@app/classes/player/player';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -68,8 +68,8 @@ export class EndGameService {
                     if (error.status !== HttpStatusCode.Ok) {
                         this.snack.open(
                             'Désolé votre score ne pourra pas être éligible au tableau' +
-                                'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
-                                'Veuillez réessayer plus tard!',
+                            'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
+                            'Veuillez réessayer plus tard!',
                             'close',
                         );
                     }

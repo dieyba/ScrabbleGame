@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { CanvasTestHelper } from '@app/classes/canvas-test-helper/canvas-test-helper';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { MAX_LETTER_COUNT, RackService } from './rack.service';
 
 export const RACK_WIDTH = 440;

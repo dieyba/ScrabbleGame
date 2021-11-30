@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ERROR_NUMBER } from '@app/classes/utilities';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 
 export const RACK_WIDTH = 440;
 export const RACK_HEIGHT = 50;

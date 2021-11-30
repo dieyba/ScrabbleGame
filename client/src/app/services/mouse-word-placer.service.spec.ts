@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 // import { TestBed } from '@angular/core/testing';
-// import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
-// import { GameParameters } from '@app/classes/game-parameters';
+// import { CanvasTestHelper } from '@app/classes/canvas-test-helper/canvas-test-helper';
+// import { GameParameters } from '@app/classes/game-parameters/game-parameters';
 // import { ScrabbleBoard } from '@app/classes/scrabble-board';
 // import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 // import { Axis } from '@app/classes/utilities';

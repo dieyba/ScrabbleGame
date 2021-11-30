@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { ScrabbleBoard } from '@app/classes/scrabble-board';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { SquareColor } from '@app/classes/square';
-import { Axis } from '@app/classes/utilities';
-import { Vec2 } from '@app/classes/vec2';
+import { ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
+import { SquareColor } from '@app/classes/square/square';
+import { Axis } from '@app/classes/utilities/utilities';
+import { Vec2 } from '@app/classes/vec2/vec2';
 import { BonusService } from '@app/services/bonus.service';
 import { GridService } from '@app/services/grid.service';
 

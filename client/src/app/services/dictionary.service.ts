@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DictionaryInterface } from '@app/classes/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { Observable } from 'rxjs';
 
 export const BASE_URL = 'http://localhost:3000/api/dictionary';

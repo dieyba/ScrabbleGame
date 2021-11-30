@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { PlaceParams } from '@app/classes/commands';
+import { PlaceParams } from '@app/classes/commands/commands';
 import { ErrorType } from '@app/classes/errors';
-import { Player } from '@app/classes/player';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Vec2 } from '@app/classes/vec2';
+import { Player } from '@app/classes/player/player';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { Vec2 } from '@app/classes/vec2/vec2';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 

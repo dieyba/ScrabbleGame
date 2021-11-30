@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { PlaceParams } from '@app/classes/commands';
+import { PlaceParams } from '@app/classes/commands/commands';
 import { ErrorType } from '@app/classes/errors';
-import { Player } from '@app/classes/player';
-import { Column, Row, ScrabbleBoard } from '@app/classes/scrabble-board';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Axis } from '@app/classes/utilities';
-import { Vec2 } from '@app/classes/vec2';
+import { Player } from '@app/classes/player/player';
+import { Column, Row, ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { Axis } from '@app/classes/utilities/utilities';
+import { Vec2 } from '@app/classes/vec2/vec2';
 import { GridService } from './grid.service';
 import { PlaceService } from './place.service';
 import { RackService } from './rack.service';

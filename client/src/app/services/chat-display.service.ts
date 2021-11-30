@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { ChatDisplayEntry, ChatEntryColor, createDebugEntry, ServerChatEntry } from '@app/classes/chat-display-entry';
-import { Player } from '@app/classes/player';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { scrabbleLettersToString } from '@app/classes/utilities';
+import { ChatDisplayEntry, ChatEntryColor, createDebugEntry, ServerChatEntry } from '@app/classes/chat-display-entry/chat-display-entry';
+import { Player } from '@app/classes/player/player';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { scrabbleLettersToString } from '@app/classes/utilities/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';

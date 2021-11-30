@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ERROR_NUMBER } from '@app/classes/utilities';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
 
 const maxLength = 12;

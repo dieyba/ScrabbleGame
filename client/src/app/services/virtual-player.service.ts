@@ -1,16 +1,16 @@
 /* eslint-disable max-lines */
 import { Injectable } from '@angular/core';
-import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
-import { Dictionary, DictionaryType } from '@app/classes/dictionary';
-import { ExchangeCmd } from '@app/classes/exchange-command';
-import { PassTurnCmd } from '@app/classes/pass-command';
-import { PlaceCmd } from '@app/classes/place-command';
-import { Player } from '@app/classes/player';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleRack } from '@app/classes/scrabble-rack';
-import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { Axis, ERROR_NUMBER } from '@app/classes/utilities';
-import { Vec2 } from '@app/classes/vec2';
+import { DefaultCommandParams, PlaceParams } from '@app/classes/commands/commands';
+import { Dictionary, DictionaryType } from '@app/classes/dictionary/dictionary';
+import { ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
+import { PassTurnCmd } from '@app/classes/pass-command/pass-command';
+import { PlaceCmd } from '@app/classes/place-command/place-command';
+import { Player } from '@app/classes/player/player';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { ScrabbleRack } from '@app/classes/scrabble-rack/scrabble-rack';
+import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
+import { Axis, ERROR_NUMBER } from '@app/classes/utilities/utilities';
+import { Vec2 } from '@app/classes/vec2/vec2';
 import { BonusService } from './bonus.service';
 import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';

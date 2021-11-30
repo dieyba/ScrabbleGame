@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
-import { ChatEntryColor, ServerChatEntry } from '@app/classes/chat-display-entry';
+import { ChatEntryColor, ServerChatEntry } from '@app/classes/chat-display-entry/chat-display-entry';
 import * as io from 'socket.io-client';
 import { ACTIVE_DEBUG_MESSAGE, ChatDisplayService, INACTIVE_DEBUG_MESSAGE } from './chat-display.service';
 
@@ -49,11 +49,6 @@ describe('ChatDisplayService', () => {
 
     it('should be created', () => {
         expect(service).toBeTruthy();
-    });
-    it('should emit sendSystemMessageToServer ', () => {
-        const message = 'allo';
-        service.sendSystemMessageToServer(message);
-        expect(socketEmitMockSpy).toHaveBeenCalledWith('sendSystemChatEntry', message);
     });
     it('should emit sendMessageToServer ', () => {
         const message = 'allo';

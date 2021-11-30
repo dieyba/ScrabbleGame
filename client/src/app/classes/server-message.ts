@@ -1,5 +1,5 @@
-import { ScrabbleLetter } from './scrabble-letter';
-import { Axis } from './utilities';
+import { ScrabbleLetter } from './scrabble-letter/scrabble-letter';
+import { Axis } from './utilities/utilities';
 
 export interface BoardUpdate {
     word: string;

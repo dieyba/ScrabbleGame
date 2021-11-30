@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { Vec2 } from '@app/classes/vec2';
+import { Vec2 } from '@app/classes/vec2/vec2';
 import { ExchangeService } from '@app/services/exchange.service';
 import { ManipulationRackService } from '@app/services/manipulation-rack.service';
 import { RackService } from '@app/services/rack.service';

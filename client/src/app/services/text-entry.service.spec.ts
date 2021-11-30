@@ -1,5 +1,5 @@
 // import { TestBed } from '@angular/core/testing';
-// import { createErrorEntry } from '@app/classes/chat-display-entry';
+// import { createErrorEntry } from '@app/classes/chat-display-entry/chat-display-entry';
 // import { ErrorType } from '@app/classes/errors';
 // import { GameParameters } from '@app/classes/game-parameters';
 // import { Player } from "@app/classes/player";

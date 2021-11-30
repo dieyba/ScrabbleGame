@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
-import { PlaceCmd } from '@app/classes/place-command';
-import { BOARD_SIZE } from '@app/classes/scrabble-board';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Axis, isValidLetter, removeAccents } from '@app/classes/utilities';
-import { Vec2 } from '@app/classes/vec2';
+import { DefaultCommandParams, PlaceParams } from '@app/classes/commands/commands';
+import { PlaceCmd } from '@app/classes/place-command/place-command';
+import { BOARD_SIZE } from '@app/classes/scrabble-board/scrabble-board';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { Axis, isValidLetter, removeAccents } from '@app/classes/utilities/utilities';
+import { Vec2 } from '@app/classes/vec2/vec2';
 import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
 import { BOARD_OFFSET, GridService, SQUARE_SIZE } from './grid.service';

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Dictionary, DictionaryType } from '@app/classes/dictionary';
-import { GameType } from '@app/classes/game-parameters';
-import { Player } from '@app/classes/player';
-import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { ERROR_NUMBER, MIN_WORD_LENGHT } from '@app/classes/utilities';
+import { Dictionary, DictionaryType } from '@app/classes/dictionary/dictionary';
+import { GameType } from '@app/classes/game-parameters/game-parameters';
+import { Player } from '@app/classes/player/player';
+import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
+import { ERROR_NUMBER, MIN_WORD_LENGHT } from '@app/classes/utilities/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';

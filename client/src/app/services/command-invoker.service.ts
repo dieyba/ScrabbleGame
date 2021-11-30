@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { ChatEntryColor } from '@app/classes/chat-display-entry';
-import { Command, CommandResult } from '@app/classes/commands';
-import { ExchangeCmd } from '@app/classes/exchange-command';
-import { GameType } from '@app/classes/game-parameters';
-import { PassTurnCmd } from '@app/classes/pass-command';
-import { PlaceCmd } from '@app/classes/place-command';
+import { ChatEntryColor } from '@app/classes/chat-display-entry/chat-display-entry';
+import { Command, CommandResult } from '@app/classes/commands/commands';
+import { ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
+import { GameType } from '@app/classes/game-parameters/game-parameters';
+import { PassTurnCmd } from '@app/classes/pass-command/pass-command';
+import { PlaceCmd } from '@app/classes/place-command/place-command';
 import { ChatDisplayService } from './chat-display.service';
 import { GameService } from './game.service';
 

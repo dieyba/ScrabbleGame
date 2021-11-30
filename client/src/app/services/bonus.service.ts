@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { DARK_BLUE_FACTOR, PALE_BLUE_FACTOR, ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { SquareColor } from '@app/classes/square';
-import { Axis, ERROR_NUMBER } from '@app/classes/utilities';
+import { DARK_BLUE_FACTOR, PALE_BLUE_FACTOR, ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
+import { SquareColor } from '@app/classes/square/square';
+import { Axis, ERROR_NUMBER } from '@app/classes/utilities/utilities';
 import { GridService } from './grid.service';
 
 const PINK_FACTOR = 2;

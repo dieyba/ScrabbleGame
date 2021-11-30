@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import { createErrorEntry, createPlayerEntry } from '@app/classes/chat-display-entry';
-import { Command, CommandName, CommandParams } from '@app/classes/commands';
-import { createDebugCmd } from '@app/classes/debug-command';
+import { createErrorEntry, createPlayerEntry } from '@app/classes/chat-display-entry/chat-display-entry';
+import { Command, CommandName, CommandParams } from '@app/classes/commands/commands';
+import { createDebugCmd } from '@app/classes/debug-command/debug-command';
 import { ErrorType } from '@app/classes/errors';
-import { createExchangeCmd } from '@app/classes/exchange-command';
-import { GameType } from '@app/classes/game-parameters';
-import { createHelpCmd } from '@app/classes/help-command';
-import { createPassCmd } from '@app/classes/pass-command';
-import { createPlaceCmd } from '@app/classes/place-command';
-import { Player } from '@app/classes/player';
-import { createStockCmd } from '@app/classes/stock-command';
+import { createExchangeCmd } from '@app/classes/exchange-command/exchange-command';
+import { GameType } from '@app/classes/game-parameters/game-parameters';
+import { createHelpCmd } from '@app/classes/help-command/help-command';
+import { createPassCmd } from '@app/classes/pass-command/pass-command';
+import { createPlaceCmd } from '@app/classes/place-command/place-command';
+import { Player } from '@app/classes/player/player';
+import { createStockCmd } from '@app/classes/stock-command/stock-command';
 import {
     Axis,
     convertStringToCoord,
@@ -18,8 +18,8 @@ import {
     isValidLetter,
     removeAccents,
     scrabbleLettersToString,
-    trimSpaces,
-} from '@app/classes/utilities';
+    trimSpaces
+} from '@app/classes/utilities/utilities';
 import { ChatDisplayService } from './chat-display.service';
 import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';

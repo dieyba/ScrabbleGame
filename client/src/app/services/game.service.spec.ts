@@ -1,5 +1,5 @@
 // import { TestBed } from '@angular/core/testing';
-// import { GameType } from '@app/classes/game-parameters';
+// import { GameType } from '@app/classes/game-parameters/game-parameters';
 // import { GameService } from './game.service';
 
 // describe('GameService', () => {

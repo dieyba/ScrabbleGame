@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { ScrabbleBoard } from '@app/classes/scrabble-board';
-import { ScrabbleLetter, UNPLACED } from '@app/classes/scrabble-letter';
-import { Square, SquareColor } from '@app/classes/square';
-import { Axis } from '@app/classes/utilities';
-import { Vec2 } from '@app/classes/vec2';
+import { ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
+import { ScrabbleLetter, UNPLACED } from '@app/classes/scrabble-letter/scrabble-letter';
+import { Square, SquareColor } from '@app/classes/square/square';
+import { Axis } from '@app/classes/utilities/utilities';
+import { Vec2 } from '@app/classes/vec2/vec2';
 
 export enum Colors {
     Teal = '#ACE3EE',

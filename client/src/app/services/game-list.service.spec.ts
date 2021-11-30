@@ -1,5 +1,5 @@
 // import { TestBed } from '@angular/core/testing';
-// import { GameParameters } from '@app/classes/game-parameters';
+// import { GameParameters } from '@app/classes/game-parameters/game-parameters';
 // import * as io from 'socket.io-client';
 // import { GameListService } from './game-list.service';
 

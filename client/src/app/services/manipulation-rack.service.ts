@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ERROR_NUMBER } from '@app/classes/utilities';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 import { RackService } from './rack.service';
 
 @Injectable({

@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
-import { DefaultCommandParams } from '@app/classes/commands';
-import { PassTurnCmd } from '@app/classes/pass-command';
-import { Vec2 } from '@app/classes/vec2';
+import { DefaultCommandParams } from '@app/classes/commands/commands';
+import { PassTurnCmd } from '@app/classes/pass-command/pass-command';
+import { Vec2 } from '@app/classes/vec2/vec2';
 import { ChatDisplayService } from '@app/services/chat-display.service';
 import { CommandInvokerService } from '@app/services/command-invoker.service';
 import { ExchangeService } from '@app/services/exchange.service';

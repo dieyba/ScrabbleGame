@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { DefaultCommandParams } from '@app/classes/commands';
-import { ExchangeCmd } from '@app/classes/exchange-command';
+import { DefaultCommandParams } from '@app/classes/commands/commands';
+import { ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
 import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
 import { RackService } from './rack.service';
