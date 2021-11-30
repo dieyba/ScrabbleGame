@@ -42,10 +42,11 @@ export enum Column {
 
 export class ScrabbleBoard {
     squares: Square[][];
-    actualBoardSize: number = BOARD_SIZE - 1;
+    actualBoardSize: number;
     colorStock: SquareColor[];
 
     constructor(isRandom: boolean) {
+        this.actualBoardSize == BOARD_SIZE - 1;
         this.squares = [];
         this.colorStock = [];
         this.addColorToStock(SquareColor.DarkBlue, ColorQuantity.DarkBlue);

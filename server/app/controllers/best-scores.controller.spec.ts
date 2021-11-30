@@ -1,8 +1,10 @@
 // import { BestScores } from '@app/classes/best-scores';
+// eslint-disable-next-line no-restricted-imports
+import { Application } from '@app/classes/app';
 import { BestScores } from '@app/classes/best-scores';
 import { BestScoresService } from '@app/services/best-scores.service';
 import { expect } from 'chai';
-// import { containerBootstrapper } from '../app/inversify.config';
+// import { containerBootstrapper } from '@app/classes/app/inversify.config';
 // import { BestScores } from '@app/classes/best-scores';
 // import { HttpStatus } from './best-scores.controller';
 import { StatusCodes } from 'http-status-codes';
@@ -11,8 +13,6 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import * as supertest from 'supertest';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
-// eslint-disable-next-line no-restricted-imports
-import { Application } from '../app';
 
 describe('BestScoresController', () => {
     const bestScore: BestScores[] = [
