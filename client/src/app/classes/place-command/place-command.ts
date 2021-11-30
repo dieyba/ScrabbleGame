@@ -1,9 +1,9 @@
+import { ChatDisplayEntry, ChatEntryColor, createErrorEntry } from '@app/classes/chat-display-entry/chat-display-entry';
+import { Command, CommandName, CommandResult, DefaultCommandParams, PlaceParams } from '@app/classes/commands/commands';
+import { ErrorType } from '@app/classes/errors';
+import { Axis, convertCoordToString } from '@app/classes/utilities/utilities';
+import { Vec2 } from '@app/classes/vec2/vec2';
 import { GameService } from '@app/services/game.service';
-import { ChatDisplayEntry, ChatEntryColor, createErrorEntry } from '../chat-display-entry/chat-display-entry';
-import { Command, CommandName, CommandResult, DefaultCommandParams, PlaceParams } from '../commands/commands';
-import { ErrorType } from '../errors';
-import { Axis, convertCoordToString } from '../utilities/utilities';
-import { Vec2 } from '../vec2/vec2';
 
 export class PlaceCmd extends Command {
     private gameService: GameService;

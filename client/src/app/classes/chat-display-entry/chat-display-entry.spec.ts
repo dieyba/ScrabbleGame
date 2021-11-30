@@ -1,4 +1,4 @@
-import { ErrorType, ERROR_MESSAGES } from '../errors';
+import { ErrorType, ERROR_MESSAGES } from '@app/classes/errors';
 import * as ChatEntryClass from './chat-display-entry';
 
 const IS_LOCAL_PLAYER = true;

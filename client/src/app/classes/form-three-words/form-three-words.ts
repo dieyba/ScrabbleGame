@@ -1,5 +1,5 @@
-import { Goal, GoalDescriptions, GoalPoints, GoalType } from '../goal/goal';
-import { ScrabbleWord } from '../scrabble-word/scrabble-word';
+import { Goal, GoalDescriptions, GoalPoints, GoalType } from '@app/classes/goal/goal';
+import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 
 const WORDS_FORMED_MIN_AMOUNT = 3;
 

@@ -3,7 +3,7 @@ import { ChatDisplayEntry, ChatEntryColor, createDebugEntry, ServerChatEntry } f
 import { Player } from '@app/classes/player/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { scrabbleLettersToString } from '@app/classes/utilities/utilities';
-import { SocketHandler } from '@app/modules/socket-handler';
+import * as SocketHandler from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 

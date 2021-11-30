@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ChatEntryColor } from '@app/classes/chat-display-entry/chat-display-entry';
 import { GameType } from '@app/classes/game-parameters/game-parameters';
 import { VirtualPlayer } from '@app/classes/virtual-player/virtual-player';
-import { SocketHandler } from '@app/modules/socket-handler';
+import * as SocketHandler from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { ChatDisplayService } from './chat-display.service';

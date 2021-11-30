@@ -1,12 +1,12 @@
+import { ChatEntryColor, createErrorEntry } from '@app/classes/chat-display-entry/chat-display-entry';
+import { DefaultCommandParams, PlaceParams } from '@app/classes/commands/commands';
+import { ErrorType } from '@app/classes/errors';
+import { GameParameters } from '@app/classes/game-parameters/game-parameters';
 import { createPlaceCmd, PlaceCmd } from '@app/classes/place-command/place-command';
+import { Player } from '@app/classes/player/player';
+import { Axis } from '@app/classes/utilities/utilities';
+import { Vec2 } from '@app/classes/vec2/vec2';
 import { GameService } from '@app/services/game.service';
-import { ChatEntryColor, createErrorEntry } from '../chat-display-entry/chat-display-entry';
-import { DefaultCommandParams, PlaceParams } from '../commands/commands';
-import { ErrorType } from '../errors';
-import { GameParameters } from '../game-parameters/game-parameters';
-import { Player } from '../player/player';
-import { Axis } from '../utilities/utilities';
-import { Vec2 } from '../vec2/vec2';
 
 const PLAYER_NAME = 'Sara';
 const OPPONENT_NAME = 'Not Sara';

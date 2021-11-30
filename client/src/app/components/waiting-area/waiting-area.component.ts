@@ -6,7 +6,7 @@ import { DictionaryType } from '@app/classes/dictionary/dictionary';
 import { GameInitInfo, GameType } from '@app/classes/game-parameters/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters/waiting-area-game-parameters';
 import { GameInitFormComponent, GAME_CAPACITY } from '@app/components/game-init-form/game-init-form.component';
-import { SocketHandler } from '@app/modules/socket-handler';
+import * as SocketHandler from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';

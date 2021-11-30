@@ -1,6 +1,6 @@
-import { Goal, GoalDescriptions, GoalPoints, GoalType } from '../goal/goal';
-import { ScrabbleLetter } from '../scrabble-letter/scrabble-letter';
-import { ScrabbleWord } from '../scrabble-word/scrabble-word';
+import { Goal, GoalDescriptions, GoalPoints, GoalType } from '@app/classes/goal/goal';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 
 const NAME_LETTERS_MIN_AMOUNT = 3;
 

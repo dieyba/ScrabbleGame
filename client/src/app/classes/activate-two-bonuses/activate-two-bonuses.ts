@@ -1,6 +1,6 @@
-import { Goal, GoalDescriptions, GoalPoints, GoalType } from '../goal/goal';
-import { ScrabbleWord } from '../scrabble-word/scrabble-word';
-import { SquareColor } from '../square/square';
+import { Goal, GoalDescriptions, GoalPoints, GoalType } from '@app/classes/goal/goal';
+import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
+import { SquareColor } from '@app/classes/square/square';
 
 const MIN_AMOUNT_BONUS_USED = 2;
 

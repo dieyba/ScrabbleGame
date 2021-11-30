@@ -14,7 +14,7 @@ import { Axis, ERROR_NUMBER } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
 import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player/virtual-player';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters/waiting-area-game-parameters';
-import { SocketHandler } from '@app/modules/socket-handler';
+import * as SocketHandler from '@app/modules/socket-handler';
 import { BehaviorSubject, Observable } from 'rxjs';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -221,9 +221,9 @@ export class GameService {
         // Generate all words created
         let tempScrabbleWords: ScrabbleWord[];
         if (placeParams.orientation === Axis.H) {
-            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
+            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.position, Axis.H, placeParams.word);
         } else {
-            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
+            tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.position, Axis.V, placeParams.word);
         }
         const strWords: string[] = [];
         const newlyPlacedLetters: ScrabbleLetter[] = [];

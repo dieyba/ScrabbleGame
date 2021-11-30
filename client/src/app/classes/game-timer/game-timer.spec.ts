@@ -1,4 +1,4 @@
-import { ERROR_NUMBER } from '../utilities/utilities';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 import { GameTimer } from './game-timer';
 
 const ONE_MINUTE = 60;

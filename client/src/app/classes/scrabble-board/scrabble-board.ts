@@ -1,6 +1,6 @@
-import { ColorQuantity, Square, SquareColor } from '../square/square';
-import { isCoordInsideBoard } from '../utilities/utilities';
-import { Vec2 } from '../vec2/vec2';
+import { ColorQuantity, Square, SquareColor } from '@app/classes/square/square';
+import { isCoordInsideBoard } from '@app/classes/utilities/utilities';
+import { Vec2 } from '@app/classes/vec2/vec2';
 
 export const BOARD_SIZE = 15;
 
@@ -44,10 +44,11 @@ export enum Column {
 
 export class ScrabbleBoard {
     squares: Square[][];
-    actualBoardSize: number = BOARD_SIZE - 1;
+    actualBoardSize: number;
     colorStock: SquareColor[];
 
     constructor(initParam?: boolean | Square[][]) {
+        this.actualBoardSize = BOARD_SIZE - 1;
         // in solo mode, game service initializes the board on the client, initParam tells if the board has random bonus tile
         if (typeof initParam === 'boolean') {
             this.squares = [];

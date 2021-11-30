@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
+import { ChatEntryColor } from '@app/classes/chat-display-entry/chat-display-entry';
+import { DefaultCommandParams } from '@app/classes/commands/commands';
 import { createDebugCmd, DebugCmd } from '@app/classes/debug-command/debug-command';
+import { Player } from '@app/classes/player/player';
 import { ACTIVE_DEBUG_MESSAGE, ChatDisplayService, INACTIVE_DEBUG_MESSAGE } from '@app/services/chat-display.service';
-import { ChatEntryColor } from '../chat-display-entry/chat-display-entry';
-import { DefaultCommandParams } from '../commands/commands';
-import { Player } from '../player/player';
 const PLAYER_NAME = 'Sara';
 
 describe('DebugCmd', () => {

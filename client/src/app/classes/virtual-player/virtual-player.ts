@@ -1,4 +1,4 @@
-import { Player } from '../player/player';
+import { Player } from '@app/classes/player/player';
 
 export enum Difficulty {
     Easy = 'easy',

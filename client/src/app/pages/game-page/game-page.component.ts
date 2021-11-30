@@ -1,7 +1,7 @@
 import { Component, HostListener } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { EndGamePopupComponent } from '@app/components/end-game-popup/end-game-popup.component';
-import { SocketHandler } from '@app/modules/socket-handler';
+import * as SocketHandler from '@app/modules/socket-handler';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';

@@ -1,7 +1,7 @@
+import { ChatDisplayEntry, ChatEntryColor, createErrorEntry, createPlayerEntry } from '@app/classes/chat-display-entry/chat-display-entry';
+import { Command, CommandName, CommandResult, DefaultCommandParams } from '@app/classes/commands/commands';
+import { ErrorType } from '@app/classes/errors';
 import { ChatDisplayService } from '@app/services/chat-display.service';
-import { ChatDisplayEntry, ChatEntryColor, createErrorEntry, createPlayerEntry } from '../chat-display-entry/chat-display-entry';
-import { Command, CommandName, CommandResult, DefaultCommandParams } from '../commands/commands';
-import { ErrorType } from '../errors';
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
 const IS_LOCAL_PLAYER = true; // debug is always only displayed locally

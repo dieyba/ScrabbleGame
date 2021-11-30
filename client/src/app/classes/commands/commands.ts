@@ -1,9 +1,9 @@
+import { ChatDisplayEntry } from '@app/classes/chat-display-entry/chat-display-entry';
 import { Player } from '@app/classes/player/player';
+import { Axis } from '@app/classes/utilities/utilities';
+import { Vec2 } from '@app/classes/vec2/vec2';
 import { ChatDisplayService } from '@app/services/chat-display.service';
 import { GameService } from '@app/services/game.service';
-import { ChatDisplayEntry } from '../chat-display-entry/chat-display-entry';
-import { Axis } from '../utilities/utilities';
-import { Vec2 } from '../vec2/vec2';
 
 export enum CommandName {
     DebugCmd = 'debug',

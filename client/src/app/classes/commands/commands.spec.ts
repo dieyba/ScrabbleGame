@@ -1,5 +1,5 @@
+import { ChatDisplayEntry, ChatEntryColor } from '@app/classes/chat-display-entry/chat-display-entry';
 import { Player } from '@app/classes/player/player';
-import { ChatDisplayEntry, ChatEntryColor } from '../chat-display-entry/chat-display-entry';
 import { Command, CommandResult } from './commands';
 
 describe('Commands', () => {

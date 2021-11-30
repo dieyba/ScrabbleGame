@@ -1,7 +1,7 @@
+import { ChatDisplayEntry, ChatEntryColor } from '@app/classes/chat-display-entry/chat-display-entry';
+import { DefaultCommandParams } from '@app/classes/commands/commands';
+import { Player } from '@app/classes/player/player';
 import { ChatDisplayService } from '@app/services/chat-display.service';
-import { ChatDisplayEntry, ChatEntryColor } from '../chat-display-entry/chat-display-entry';
-import { DefaultCommandParams } from '../commands/commands';
-import { Player } from '../player/player';
 import { createHelpCmd, HelpCmd, HELP_MESSAGES } from './help-command';
 
 const PLAYER_NAME = 'Sara';

@@ -1,11 +1,10 @@
-
+import { ChatEntryColor, createErrorEntry } from '@app/classes/chat-display-entry/chat-display-entry';
+import { DefaultCommandParams } from '@app/classes/commands/commands';
+import { ErrorType } from '@app/classes/errors';
 import { createExchangeCmd, ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
+import { GameParameters } from '@app/classes/game-parameters/game-parameters';
+import { Player } from '@app/classes/player/player';
 import { GameService } from '@app/services/game.service';
-import { ChatEntryColor, createErrorEntry } from '../chat-display-entry/chat-display-entry';
-import { DefaultCommandParams } from '../commands/commands';
-import { ErrorType } from '../errors';
-import { GameParameters } from '../game-parameters/game-parameters';
-import { Player } from '../player/player';
 
 const PLAYER_NAME = 'Sara';
 const OPPONENT_NAME = 'Not Sara';
@@ -66,7 +65,7 @@ describe('ExchangeCmd', () => {
         gameServiceSpy.exchangeLetters.and.returnValue(ErrorType.ImpossibleCommand);
         const errorLetters = 'AAAAAAAA';
         const errorMessage = createErrorEntry(ErrorType.ImpossibleCommand, '!échanger ' + errorLetters);
-        exchange['letters'] = errorLetters;
+        exchange.letters = errorLetters;
         exchange.player.isActive = false;
         expect(exchange.execute()).toEqual({ isExecuted: false, executionMessages: [errorMessage] });
     });

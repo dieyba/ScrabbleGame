@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
+import { Player } from '@app/classes/player/player';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 import { GAME_CAPACITY } from '@app/components/game-init-form/game-init-form.component';
-import { Player } from '../player/player';
-import { ERROR_NUMBER } from '../utilities/utilities';
 import { GameParameters } from './game-parameters';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */

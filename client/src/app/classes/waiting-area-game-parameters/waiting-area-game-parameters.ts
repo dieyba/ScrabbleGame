@@ -1,6 +1,6 @@
-import { DictionaryType } from '../dictionary/dictionary';
-import { GameType, UNDEFINE_ID } from '../game-parameters/game-parameters';
-import { ERROR_NUMBER } from '../utilities/utilities';
+import { DictionaryType } from '@app/classes/dictionary/dictionary';
+import { GameType, UNDEFINE_ID } from '@app/classes/game-parameters/game-parameters';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 
 export interface GameRoom {
     idGame: number;

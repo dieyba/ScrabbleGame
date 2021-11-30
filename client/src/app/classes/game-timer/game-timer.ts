@@ -1,4 +1,4 @@
-import { ERROR_NUMBER } from '../utilities/utilities';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 
 const DOUBLE_DIGIT = 10;
 const MINUTE_IN_SEC = 60;

@@ -1,4 +1,4 @@
-import { ScrabbleLetter } from '../scrabble-letter/scrabble-letter';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 export const RACK_SIZE = 7;
 export class ScrabbleRack {
     letters: ScrabbleLetter[];

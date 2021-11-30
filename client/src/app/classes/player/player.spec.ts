@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { calculateRackPoints, Player, removePlayerLetters } from '@app/classes/player/player';
-import { ScrabbleLetter } from '../scrabble-letter/scrabble-letter';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 
 describe('Player', () => {
     let player: Player;

@@ -1,6 +1,6 @@
-import { GoalType } from '../goal/goal';
-import { ScrabbleLetter } from '../scrabble-letter/scrabble-letter';
-import { ERROR_NUMBER } from '../utilities/utilities';
+import { GoalType } from '@app/classes/goal/goal';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 
 export class Player {
     socketId: string;
@@ -28,7 +28,6 @@ export const removePlayerLetters = (lettersToRemove: string, player: Player): bo
 
     for (const singleLetter of lettersToRemove) {
         const indexLetter = player.letters.findIndex((letter) => letter.character === singleLetter);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         if (indexLetter > ERROR_NUMBER) {
             player.letters.splice(indexLetter, 1);
         } else {

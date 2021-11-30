@@ -1,6 +1,6 @@
-import { Goal, GoalDescriptions, GoalPoints, GoalType } from '../goal/goal';
-import { ScrabbleWord } from '../scrabble-word/scrabble-word';
-import { MIN_WORD_LENGHT } from '../utilities/utilities';
+import { Goal, GoalDescriptions, GoalPoints, GoalType } from '@app/classes/goal/goal';
+import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
+import { MIN_WORD_LENGHT } from '@app/classes/utilities/utilities';
 
 export class FormTwoLettersStarsOnly extends Goal {
     constructor() {

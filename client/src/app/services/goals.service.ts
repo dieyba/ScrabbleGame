@@ -12,7 +12,7 @@ import { Player } from '@app/classes/player/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { TOTAL_COLORS } from '@app/classes/square/square';
-import { SocketHandler } from '@app/modules/socket-handler';
+import * as SocketHandler from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
@@ -23,7 +23,7 @@ const TOTAL_GOALS_COUNT = 8;
     providedIn: 'root',
 })
 export class GoalsService {
-    goalsCreationMap: Map<GoalType, Function>; // eslint-disable-line @typescript-eslint/ban-types
+    goalsCreationMap: Map<GoalType, Function>;
     sharedGoals: Goal[];
     privateGoals: Goal[];
     private socket: io.Socket;

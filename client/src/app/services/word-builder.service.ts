@@ -17,7 +17,7 @@ export class WordBuilderService {
 
     // TODO: Handle -1 error coordinates
     // TODO: make sure the scrabbleWords returned scrabbleLetters that have everything init properly (value, coord, color, isbonusUsed)
-    buildWordsOnBoard(word: string, coord: Vec2, axis: Axis): ScrabbleWord[] {
+    buildWordsOnBoard(coord: Vec2, axis: Axis, word?: string): ScrabbleWord[] {
         const result: ScrabbleWord[] = [];
 
         // get full word that can be read on the placed word's row/column

@@ -5,7 +5,7 @@ import { Goal } from '@app/classes/goal/goal';
 import { Player } from '@app/classes/player/player';
 import { EndGamePopupComponent } from '@app/components/end-game-popup/end-game-popup.component';
 import { GAME_CAPACITY } from '@app/components/game-init-form/game-init-form.component';
-import { SocketHandler } from '@app/modules/socket-handler';
+import * as SocketHandler from '@app/modules/socket-handler';
 import { GameService } from '@app/services/game.service';
 import { GoalsService } from '@app/services/goals.service';
 import * as io from 'socket.io-client';

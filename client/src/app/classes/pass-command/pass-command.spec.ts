@@ -1,10 +1,10 @@
+import { createErrorEntry } from '@app/classes/chat-display-entry/chat-display-entry';
+import { DefaultCommandParams } from '@app/classes/commands/commands';
+import { ErrorType } from '@app/classes/errors';
+import { GameParameters } from '@app/classes/game-parameters/game-parameters';
 import { createPassCmd, PassTurnCmd } from '@app/classes/pass-command/pass-command';
+import { Player } from '@app/classes/player/player';
 import { GameService } from '@app/services/game.service';
-import { createErrorEntry } from '../chat-display-entry/chat-display-entry';
-import { DefaultCommandParams } from '../commands/commands';
-import { ErrorType } from '../errors';
-import { GameParameters } from '../game-parameters/game-parameters';
-import { Player } from '../player/player';
 
 const PLAYER_NAME = 'Sara';
 const OPPONENT_NAME = 'Not Sara';

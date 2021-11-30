@@ -1,8 +1,8 @@
-import { Goal, GoalDescriptions, GoalPoints, GoalType } from '../goal/goal';
-import { Column, Row } from '../scrabble-board/scrabble-board';
-import { ScrabbleLetter } from '../scrabble-letter/scrabble-letter';
-import { ScrabbleWord } from '../scrabble-word/scrabble-word';
-import { Vec2 } from '../vec2/vec2';
+import { Goal, GoalDescriptions, GoalPoints, GoalType } from '@app/classes/goal/goal';
+import { Column, Row } from '@app/classes/scrabble-board/scrabble-board';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
+import { Vec2 } from '@app/classes/vec2/vec2';
 
 export class PlaceLetterOnBoardCorner extends Goal {
     targetCoordinates: Vec2[];

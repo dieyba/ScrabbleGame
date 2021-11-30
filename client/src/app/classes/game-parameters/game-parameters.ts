@@ -1,12 +1,11 @@
-/* eslint-disable max-classes-per-file */
+import { GameTimer } from '@app/classes/game-timer/game-timer';
+import { GoalType } from '@app/classes/goal/goal';
+import { LetterStock } from '@app/classes/letter-stock/letter-stock';
+import { Player } from '@app/classes/player/player';
+import { ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { Square } from '@app/classes/square/square';
 import { GAME_CAPACITY } from '@app/components/game-init-form/game-init-form.component';
-import { GameTimer } from '../game-timer/game-timer';
-import { GoalType } from '../goal/goal';
-import { LetterStock } from '../letter-stock/letter-stock';
-import { Player } from '../player/player';
-import { ScrabbleBoard } from '../scrabble-board/scrabble-board';
-import { ScrabbleLetter } from '../scrabble-letter/scrabble-letter';
-import { Square } from '../square/square';
 
 export const UNDEFINE_ID = 'none';
 export const DEFAULT_LOCAL_PLAYER_ID = 0;

@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
+import { ChatEntryColor, createErrorEntry } from '@app/classes/chat-display-entry/chat-display-entry';
+import { DefaultCommandParams } from '@app/classes/commands/commands';
+import { ErrorType } from '@app/classes/errors';
+import { LetterStock } from '@app/classes/letter-stock/letter-stock';
+import { Player } from '@app/classes/player/player';
+import { scrabbleLettersToString } from '@app/classes/utilities/utilities';
 import { ChatDisplayService } from '@app/services/chat-display.service';
-import { ChatEntryColor, createErrorEntry } from '../chat-display-entry/chat-display-entry';
-import { DefaultCommandParams } from '../commands/commands';
-import { ErrorType } from '../errors';
-import { LetterStock } from '../letter-stock/letter-stock';
-import { Player } from '../player/player';
-import { scrabbleLettersToString } from '../utilities/utilities';
 import { createStockCmd, StockCmd } from './stock-command';
 
 const PLAYER_NAME = 'Sara';

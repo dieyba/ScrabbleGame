@@ -1,6 +1,6 @@
-import { Column, Row } from '../scrabble-board/scrabble-board';
-import { ScrabbleLetter } from '../scrabble-letter/scrabble-letter';
-import { Vec2 } from '../vec2/vec2';
+import { Column, Row } from '@app/classes/scrabble-board/scrabble-board';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { Vec2 } from '@app/classes/vec2/vec2';
 
 const PARSE_INT_BASE = 10;
 const ROW_OFFSET = 'a'.charCodeAt(0);
