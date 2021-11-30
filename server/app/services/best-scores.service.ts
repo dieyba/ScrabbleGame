@@ -94,25 +94,25 @@ export class BestScoresService {
     }
 
     async postBestScore(collectionType: Collection<BestScores>, bestScore: BestScores): Promise<void> {
-        // if (await this.canSetInDb(collectionType, bestScore)) {
-        //     collectionType
-        //         .insertOne(bestScore)
-        //         .then(() => {
-        //             /* do nothing */
-        //         })
-        //         .catch((error: Error) => {
-        //             throw error;
-        //         });
-        // }
-        try {
-            if (await this.canSetInDb(collectionType, bestScore)) {
-                // if (await this.canSetInDb(collectionType, bestScore))
-                // console.log('insert')
-                await collectionType.insertOne(bestScore)
-            }
-        } catch (error) {
-            throw error;
+        if (await this.canSetInDb(collectionType, bestScore)) {
+            collectionType
+                .insertOne(bestScore)
+                .then(() => {
+                    /* do nothing */
+                })
+                .catch((error: Error) => {
+                    throw error;
+                });
         }
+        // try {
+        //     if (await this.canSetInDb(collectionType, bestScore)) {
+        //         // if (await this.canSetInDb(collectionType, bestScore))
+        //         // console.log('insert')
+        //         await collectionType.insertOne(bestScore)
+        //     }
+        // } catch (error) {
+        //     throw error;
+        // }
     }
 
     async checkingIfAlreadyInDb(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
