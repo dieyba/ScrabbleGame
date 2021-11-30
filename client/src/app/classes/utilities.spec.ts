@@ -6,9 +6,9 @@ import { Vec2 } from './vec2';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('ScrabbleWord', () => {
-    it('scrabbleLetterstoString should convert a scrabble letter tab to a string', () => {
+    it('scrabbleLettersToString should convert a scrabble letter tab to a string', () => {
         const scrabbleLetters = [new ScrabbleLetter('t'), new ScrabbleLetter('e'), new ScrabbleLetter('s'), new ScrabbleLetter('t')];
-        const stringWord = utilities.scrabbleLetterstoString(scrabbleLetters);
+        const stringWord = utilities.scrabbleLettersToString(scrabbleLetters);
         expect(stringWord).toEqual('test');
     });
 

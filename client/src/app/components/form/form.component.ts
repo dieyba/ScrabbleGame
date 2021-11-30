@@ -30,7 +30,7 @@ export class FormComponent implements OnInit {
     opponent: FormControl;
     dictionaryForm: FormControl;
 
-    isLOG2990: boolean;
+    debutantNameList: string[];
     beginnerNameList: VirtualPlayerName[];
     expertNameList: VirtualPlayerName[];
     dictionaryList: string[];
@@ -52,9 +52,9 @@ export class FormComponent implements OnInit {
         private virtualPlayerNameService: VirtualPlayerNameManager,
         private dictionaryService: DictionaryService,
         private snack: MatSnackBar,
-        @Inject(MAT_DIALOG_DATA) public isSolo: boolean,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
-        this.isLOG2990 = false; // TODO: implement actual isLOG2990 depending on which page created the form
         this.beginnerNameList = [];
         this.expertNameList = [];
         this.dictionaryList = []; // Object.values(DictionaryType);
@@ -66,7 +66,7 @@ export class FormComponent implements OnInit {
         this.beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
         this.expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
 
-        if (this.isSolo === true) {
+        if (this.data.isSolo === true) {
             this.level = new FormControl('', [Validators.required]);
         } else {
             this.level = new FormControl('');
@@ -157,7 +157,7 @@ export class FormComponent implements OnInit {
     }
 
     convert() {
-        this.dialog.open(FormComponent, { data: this.isSolo === true });
+        this.dialog.open(FormComponent, { data: { isSolo: true, isLog2990: this.data.isLog2990 } });
     }
 
     changeName(list: VirtualPlayerName[]): void {
@@ -169,14 +169,14 @@ export class FormComponent implements OnInit {
 
     submit(): void {
         if (this.myForm.valid) {
-            const gameMode = this.isSolo ? GameType.Solo : GameType.MultiPlayer;
+            const gameMode = this.data.isSolo ? GameType.Solo : GameType.MultiPlayer;
             const gameParams = new WaitingAreaGameParameters(
                 gameMode,
                 GAME_CAPACITY,
                 this.dictionaryForm.value,
                 this.timer.value,
                 this.bonus.value,
-                this.isLOG2990,
+                this.data.isLog2990,
                 this.name.value, // game creator name
             );
             if (gameMode === GameType.Solo) {
@@ -188,7 +188,7 @@ export class FormComponent implements OnInit {
             } else {
                 this.closeDialog();
                 this.gameList.createRoom(gameParams);
-                this.dialog.open(WaitingAreaComponent, { disableClose: true });
+                this.dialog.open(WaitingAreaComponent, { data: { isLog2990: this.data.isLog2990 }, disableClose: true });
             }
         }
     }

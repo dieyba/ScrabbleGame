@@ -1,24 +1,26 @@
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientModule } from '@angular/common/http';
+import { VirtualPlayerNameManagerComponent } from './virtual-player-name-manager.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
-// import { VirtualPlayerNameManagerComponent } from './virtual-player-name-manager.component';
+describe('VirtualPlayerNameManagerComponent', () => {
+    let component: VirtualPlayerNameManagerComponent;
+    let fixture: ComponentFixture<VirtualPlayerNameManagerComponent>;
 
-// describe('VirtualPlayerNameManagerComponent', () => {
-//     let component: VirtualPlayerNameManagerComponent;
-//     let fixture: ComponentFixture<VirtualPlayerNameManagerComponent>;
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            declarations: [VirtualPlayerNameManagerComponent],
+            imports: [HttpClientModule, MatSnackBarModule],
+        }).compileComponents();
+    });
 
-//     beforeEach(async () => {
-//         await TestBed.configureTestingModule({
-//             declarations: [VirtualPlayerNameManagerComponent],
-//         }).compileComponents();
-//     });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(VirtualPlayerNameManagerComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-//     beforeEach(() => {
-//         fixture = TestBed.createComponent(VirtualPlayerNameManagerComponent);
-//         component = fixture.componentInstance;
-//         fixture.detectChanges();
-//     });
-
-//     it('should create', () => {
-//         expect(component).toBeTruthy();
-//     });
-// });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+});

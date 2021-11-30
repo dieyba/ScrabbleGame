@@ -18,7 +18,7 @@ export class WaitingAreaGameParameters {
     totalCountDown: number;
     isRandomBonus: boolean;
     gameMode: GameType;
-    isLOG2990: boolean;
+    isLog2990: boolean;
 
     constructor(
         gameMode: GameType,
@@ -26,7 +26,7 @@ export class WaitingAreaGameParameters {
         dictionaryType: DictionaryType,
         totalCountDown: number,
         isRandomBonus: boolean,
-        isLOG2990: boolean,
+        isLog2990: boolean,
         creatorPlayerName: string,
         opponentName?: string,
     ) {
@@ -41,7 +41,7 @@ export class WaitingAreaGameParameters {
         this.dictionaryType = dictionaryType;
         this.totalCountDown = totalCountDown;
         this.isRandomBonus = isRandomBonus;
-        this.isLOG2990 = isLOG2990;
+        this.isLog2990 = isLog2990;
         this.creatorName = creatorPlayerName;
         this.joinerName = opponentName !== undefined ? opponentName : '';
     }
