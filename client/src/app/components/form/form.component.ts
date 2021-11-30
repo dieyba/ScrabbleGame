@@ -161,7 +161,12 @@ export class FormComponent implements OnInit {
         }
     }
 
-    submit(): void {
+    async submit(): Promise<void> {
+        if (!(await this.isDictionaryAvailable(this.dictionaryForm.value))) {
+            this.snack.open("Le dictionnaire choisi n'est plus disponible. Veuillez en choisir un autre", 'Fermer');
+            return;
+        }
+
         if (this.myForm.valid) {
             const gameMode = this.isSolo ? GameType.Solo : GameType.MultiPlayer;
             const gameParams = new WaitingAreaGameParameters(
@@ -185,5 +190,10 @@ export class FormComponent implements OnInit {
                 this.dialog.open(WaitingAreaComponent, { disableClose: true });
             }
         }
+    }
+
+    async isDictionaryAvailable(name: string): Promise<boolean> {
+        const dictionary = await this.dictionaryService.getDictionary(BASE_URL, name).toPromise();
+        return dictionary !== null;
     }
 }
