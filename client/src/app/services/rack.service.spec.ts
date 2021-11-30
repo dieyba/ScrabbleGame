@@ -8,7 +8,7 @@ export const RACK_HEIGHT = 50;
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-fdescribe('RackService', () => {
+describe('RackService', () => {
     let service: RackService;
     let ctxStub: CanvasRenderingContext2D;
 
