@@ -25,9 +25,6 @@ export class GameListService {
     getGames(isLog2990: boolean) {
         this.socket.emit('getAllWaitingAreaGames', isLog2990);
     }
-    getList(): WaitingAreaGameParameters[] {
-        return this.waitingAreaGames;
-    }
     createRoom(gameParams: WaitingAreaGameParameters): void {
         this.socket.emit('createWaitingAreaRoom', gameParams);
     }

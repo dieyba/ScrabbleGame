@@ -51,9 +51,6 @@ export class ChatDisplayService {
             this.socket.emit('sendChatEntry', messageFromLocalPlayer);
         }
     }
-    sendSystemMessageToServer(message: string) {
-        this.socket.emit('sendSystemChatEntry', message);
-    }
 
     addEntry(entry: ChatDisplayEntry): void {
         this.entries.push(entry);

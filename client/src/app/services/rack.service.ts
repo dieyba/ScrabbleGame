@@ -19,14 +19,12 @@ export class RackService {
     handlingSelected: boolean[];
     gridContext: CanvasRenderingContext2D;
     squareWidth: number;
-    squareHeight: number;
 
     constructor() {
         this.rackLetters = [];
         this.exchangeSelected = [false, false, false, false, false, false, false];
         this.handlingSelected = [false, false, false, false, false, false, false];
         this.squareWidth = RACK_WIDTH / MAX_LETTER_COUNT;
-        this.squareHeight = RACK_HEIGHT;
     }
 
     drawRack() {
