@@ -8,7 +8,8 @@ import { Service } from 'typedi';
 export class BestScoresController {
     router: Router;
 
-    constructor(private bestScoresSrvice: BestScoresService) {
+    constructor(private bestScoresService: BestScoresService) {
+        bestScoresService.connectClient();
         this.configureRouter();
     }
 
@@ -16,18 +17,19 @@ export class BestScoresController {
         this.router = Router();
 
         this.router.get('/classicMode', async (req: Request, res: Response) => {
-            this.bestScoresSrvice
-                .getBestScores(this.bestScoresSrvice.classicCollection)
+            this.bestScoresService
+                .getBestScores(this.bestScoresService.classicCollection)
                 .then((bestScores: BestScores[]) => {
                     res.json(bestScores);
                 })
                 .catch((error: Error) => {
+                    console.log(error)
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
         this.router.get('/log2990Mode', async (req: Request, res: Response) => {
-            this.bestScoresSrvice
-                .getBestScores(this.bestScoresSrvice.log2990Collection)
+            this.bestScoresService
+                .getBestScores(this.bestScoresService.log2990Collection)
                 .then((bestScores: BestScores[]) => {
                     res.json(bestScores);
                 })
@@ -37,20 +39,20 @@ export class BestScoresController {
         });
 
         this.router.post('/classicMode/send', async (req: Request, res: Response) => {
-            this.bestScoresSrvice
-                .postBestScore(this.bestScoresSrvice.classicCollection, req.body)
+            this.bestScoresService
+                .postBestScore(this.bestScoresService.classicCollection, req.body)
                 .then(() => {
-                    res.sendStatus(StatusCodes.OK).send();
+                    res.status(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.BAD_REQUEST).send(error.message);
                 });
         });
         this.router.post('/log2990Mode/send', async (req: Request, res: Response) => {
-            this.bestScoresSrvice
-                .postBestScore(this.bestScoresSrvice.log2990Collection, req.body)
+            this.bestScoresService
+                .postBestScore(this.bestScoresService.log2990Collection, req.body)
                 .then(() => {
-                    res.sendStatus(StatusCodes.OK).send();
+                    res.status(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.BAD_REQUEST).send(error.message);
@@ -58,10 +60,10 @@ export class BestScoresController {
         });
 
         this.router.delete('/', async (req: Request, res: Response) => {
-            this.bestScoresSrvice
+            this.bestScoresService
                 .resetDataBase()
                 .then(() => {
-                    res.sendStatus(StatusCodes.OK).send();
+                    res.status(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
