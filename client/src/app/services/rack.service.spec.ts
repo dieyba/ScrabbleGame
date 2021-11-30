@@ -8,7 +8,7 @@ export const RACK_HEIGHT = 50;
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-describe('RackService', () => {
+fdescribe('RackService', () => {
     let service: RackService;
     let ctxStub: CanvasRenderingContext2D;
 
@@ -180,5 +180,18 @@ describe('RackService', () => {
         expect(findSquareOriginSpy).toHaveBeenCalled();
         expect(drawExistingLetters).toHaveBeenCalled();
         expect(ctxStubSpy).toHaveBeenCalled();
+    });
+
+    it('clear rack should remove all rack letters and clear the ui', () => {
+        const drawRackSpy = spyOn(service, 'drawRack');
+        const ctxStubSpy = spyOn(ctxStub, 'clearRect');
+        const letter1 = new ScrabbleLetter('a', 1);
+        service.addLetter(letter1);
+
+        service.clearRack();
+
+        expect(ctxStubSpy).toHaveBeenCalled();
+        expect(drawRackSpy).toHaveBeenCalled();
+        expect(service.rackLetters).toEqual([]);
     });
 });
