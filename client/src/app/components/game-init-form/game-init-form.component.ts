@@ -18,10 +18,10 @@ export const GAME_CAPACITY = 2;
 
 @Component({
     selector: 'app-form',
-    templateUrl: './form.component.html',
-    styleUrls: ['./form.component.scss'],
+    templateUrl: './game-init-form.component.html',
+    styleUrls: ['./game-init-form.component.scss'],
 })
-export class FormComponent implements OnInit {
+export class GameInitFormComponent implements OnInit {
     myForm: FormGroup;
     name: FormControl;
     timer: FormControl;
@@ -46,7 +46,7 @@ export class FormComponent implements OnInit {
     constructor(
         private gameService: GameService,
         private dialog: MatDialog,
-        private dialogRef: MatDialogRef<FormComponent>,
+        private dialogRef: MatDialogRef<GameInitFormComponent>,
         private router: Router,
         private gameList: GameListService,
         private virtualPlayerNameService: VirtualPlayerNameManager,
@@ -157,7 +157,7 @@ export class FormComponent implements OnInit {
     }
 
     convert() {
-        this.dialog.open(FormComponent, { data: { isSolo: true, isLog2990: this.data.isLog2990 } });
+        this.dialog.open(GameInitFormComponent, { data: { isSolo: true, isLog2990: this.data.isLog2990 } });
     }
 
     changeName(list: VirtualPlayerName[]): void {

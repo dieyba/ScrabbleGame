@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { GAME_CAPACITY } from '@app/components/form/form.component';
+import { GAME_CAPACITY } from '@app/components/game-init-form/game-init-form.component';
 import { DictionaryType } from '../dictionary/dictionary';
 import { GameType } from '../game-parameters/game-parameters';
 import { WaitingAreaGameParameters } from './waiting-area-game-parameters';

@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { GAME_CAPACITY } from '@app/components/form/form.component';
+import { GAME_CAPACITY } from '@app/components/game-init-form/game-init-form.component';
 import { GameTimer } from '../game-timer/game-timer';
 import { GoalType } from '../goal/goal';
 import { LetterStock } from '../letter-stock/letter-stock';

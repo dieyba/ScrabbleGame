@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { DictionaryType } from '@app/classes/dictionary/dictionary';
 import { GameInitInfo, GameType } from '@app/classes/game-parameters/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters/waiting-area-game-parameters';
-import { FormComponent, GAME_CAPACITY } from '@app/components/form/form.component';
+import { GameInitFormComponent, GAME_CAPACITY } from '@app/components/game-init-form/game-init-form.component';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
@@ -149,13 +149,13 @@ export class WaitingAreaComponent implements AfterViewInit {
     }
 
     openForm() {
-        this.dialog.open(FormComponent, { data: { isSolo: this.data.isSolo, isLog2990: this.data.isLog2990 } });
+        this.dialog.open(GameInitFormComponent, { data: { isSolo: this.data.isSolo, isLog2990: this.data.isLog2990 } });
     }
 
     convert(isSolo: boolean) {
         this.name = false;
         this.closeDialog();
-        this.dialog.open(FormComponent, { data: { isSolo, isLog2990: this.data.isLog2990 } });
+        this.dialog.open(GameInitFormComponent, { data: { isSolo, isLog2990: this.data.isLog2990 } });
     }
 
     closeDialog() {

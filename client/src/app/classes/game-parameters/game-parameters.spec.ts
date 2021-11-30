@@ -1,8 +1,8 @@
 /* eslint-disable dot-notation */
-import { GAME_CAPACITY } from '@app/components/form/form.component';
+import { GAME_CAPACITY } from '@app/components/game-init-form/game-init-form.component';
+import { Player } from '../player/player';
+import { ERROR_NUMBER } from '../utilities/utilities';
 import { GameParameters } from './game-parameters';
-import { Player } from './player';
-import { ERROR_NUMBER } from './utilities';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('GameParameters', () => {
