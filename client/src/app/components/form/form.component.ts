@@ -168,8 +168,18 @@ export class FormComponent implements OnInit {
     }
 
     async submit(): Promise<void> {
-        if (!(await this.isDictionaryAvailable(this.dictionaryForm.value))) {
-            this.snack.open("Le dictionnaire choisi n'est plus disponible. Veuillez en choisir un autre", 'Fermer');
+        // Trying to get dictionary
+        const dictionary = await this.dictionaryService
+            .getDictionary(BASE_URL, this.dictionaryForm.value)
+            .toPromise()
+            .catch(() => {
+                return null;
+            });
+        if (dictionary === null) {
+            this.snack.open(
+                'Il y a eu un problème avec la base de donnée des dictionnaires. Veuillez choisi un autre dictionnaire ou réessayer plus tard',
+                'Fermer',
+            );
             return;
         }
 
@@ -196,10 +206,5 @@ export class FormComponent implements OnInit {
                 this.dialog.open(WaitingAreaComponent, { data: { isLog2990: this.data.isLog2990 }, disableClose: true });
             }
         }
-    }
-
-    async isDictionaryAvailable(name: string): Promise<boolean> {
-        const dictionary = await this.dictionaryService.getDictionary(BASE_URL, name).toPromise();
-        return dictionary !== null;
     }
 }
