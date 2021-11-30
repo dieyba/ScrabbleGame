@@ -20,7 +20,13 @@
             <mat-form-field appearance="fill" class="papy">
                 <mat-label>Dictonnaire :</mat-label>
                 <mat-select formControlName="dictionaryForm" [(ngModel)]="defaultDictionary" [placeholder]="defaultDictionary">
-                    <mat-option *ngFor="let dictionary of dictionaryList" [value]="dictionary.title">{{ dictionary.title }}</mat-option>
+                    <mat-option
+                        *ngFor="let dictionary of dictionaryList"
+                        [value]="dictionary.title"
+                        matTooltip="{{ dictionary.description }}"
+                        matTooltipPosition="left"
+                        >{{ dictionary.title }}</mat-option
+                    >
                 </mat-select>
                 <div class="error" *ngIf="dictionaryForm.invalid">Le champ est requis</div>
             </mat-form-field>
