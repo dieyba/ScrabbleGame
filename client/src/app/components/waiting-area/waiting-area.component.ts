@@ -1,11 +1,11 @@
-import { Component, HostListener, Inject } from '@angular/core';
+import { AfterViewInit, Component, HostListener, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DictionaryType } from '@app/classes/dictionary';
 import { GameInitInfo, GameType } from '@app/classes/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
-import { FormComponent, GAME_CAPACITY } from '@app/components/form/form.component';
+import { DialogData, FormComponent, GAME_CAPACITY } from '@app/components/form/form.component';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
@@ -21,7 +21,7 @@ const LIST_UPDATE_TIMEOUT = 500;
     templateUrl: './waiting-area.component.html',
     styleUrls: ['./waiting-area.component.scss'],
 })
-export class WaitingAreaComponent {
+export class WaitingAreaComponent implements AfterViewInit {
     selectedGame: WaitingAreaGameParameters;
     playerName: FormControl;
     playerList: string[];
@@ -48,7 +48,8 @@ export class WaitingAreaComponent {
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
         private dialog: MatDialog,
         public gameList: GameListService,
-        @Inject(MAT_DIALOG_DATA) public isGameSelected: boolean,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        @Inject(MAT_DIALOG_DATA) public data: DialogData,
     ) {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
@@ -56,7 +57,7 @@ export class WaitingAreaComponent {
         this.pendingGameslist = [];
         this.name = false;
         this.isStarting = false;
-        if (isGameSelected) {
+        if (data.isGameSelected) {
             this.selectedGame = new WaitingAreaGameParameters(GameType.MultiPlayer, GAME_CAPACITY, DictionaryType.Default, 0, false, false, '');
             this.playerName = new FormControl('', [
                 Validators.required,
@@ -73,6 +74,7 @@ export class WaitingAreaComponent {
         }, LIST_UPDATE_TIMEOUT);
         this.socketOnConnect();
     }
+
     @HostListener('window:beforeunload', ['$event'])
     onBeforeUnload() {
         this.gameList.someoneLeftRoom();
@@ -82,6 +84,11 @@ export class WaitingAreaComponent {
         this.gameList.someoneLeftRoom();
     }
 
+    ngAfterViewInit() {
+        this.gameList.getGames(this.data.isLog2990);
+    }
+
+    // mettre la fonction randomNumber de form dans utilities et l'appeler ici
     randomGame() {
         let randomFloat = Math.random() * this.pendingGameslist.length;
         randomFloat = Math.floor(randomFloat);
@@ -90,7 +97,7 @@ export class WaitingAreaComponent {
     }
 
     onSelect(game: WaitingAreaGameParameters): WaitingAreaGameParameters {
-        if (this.isGameSelected) {
+        if (this.data.isGameSelected) {
             this.selectedGame = game;
             // when selecting a new game, the previous game was cancelled message should be removed
             this.gameCancelled = false;
@@ -104,7 +111,7 @@ export class WaitingAreaComponent {
     }
 
     openName(selected: boolean): boolean {
-        if (this.isGameSelected) {
+        if (this.data.isGameSelected) {
             return (this.name = selected);
         }
         return false;
@@ -143,19 +150,20 @@ export class WaitingAreaComponent {
     }
 
     openForm() {
-        this.dialog.open(FormComponent, {});
+        this.dialog.open(FormComponent, { data: { isSolo: this.data.isSolo, isLog2990: this.data.isLog2990 } });
     }
 
     convert(isSolo: boolean) {
         this.name = false;
         this.closeDialog();
-        this.dialog.open(FormComponent, { data: isSolo });
+        this.dialog.open(FormComponent, { data: { isSolo, isLog2990: this.data.isLog2990 } });
     }
 
     closeDialog() {
         this.name = false;
         this.dialogRef.close();
     }
+
     socketOnConnect() {
         this.socket.on('initClientGame', (gameParams: GameInitInfo) => {
             clearTimeout(this.timer);

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { BOARD_SIZE, Column, Row, ScrabbleBoard } from '@app/classes/scrabble-board';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleLetter, UNPLACED } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Square } from '@app/classes/square';
 import { Axis } from '@app/classes/utilities';
@@ -124,6 +124,46 @@ describe('WordBuilderService', () => {
     it('should not build from coordinates out of range', () => {
         const outOfBoundCoord = new Vec2(Column.Seven, Row.C);
         expect(service.buildWordsOnBoard('somerandomword', outOfBoundCoord, Axis.H)).toEqual([]);
+    });
+
+    it('should not build opposite axis words from invalid scrabble letters coordinates', () => {
+        const startCoord = new Vec2(1, 1);
+        const letters = [
+            new ScrabbleLetter('e', 0),
+            new ScrabbleLetter('l', 0),
+            new ScrabbleLetter('e', 0),
+            new ScrabbleLetter('v', 0),
+            new ScrabbleLetter('e', 0),
+        ];
+        for (let y = startCoord.y; y <= startCoord.y + 1; y++) {
+            for (let x = 0; x < letters.length; x++) {
+                gridServiceSpy.scrabbleBoard.squares[x][y].letter = letters[x];
+                gridServiceSpy.scrabbleBoard.squares[x][y].occupied = true;
+                gridServiceSpy.scrabbleBoard.squares[x][y].letter.tile = new Square(UNPLACED, UNPLACED);
+                gridServiceSpy.scrabbleBoard.squares[x][y].letter.tile.occupied = true;
+            }
+        }
+        expect(service.buildWordsOnBoard('eleve', startCoord, Axis.H).length).toEqual(1);
+        expect(service.buildWordsOnBoard('eleve', startCoord, Axis.H)[0].content).toEqual(letters);
+    });
+
+    it('should not build word if cannot find its edges', () => {
+        const startCoord = new Vec2(1, 1);
+        const letters = [
+            new ScrabbleLetter('e', 0),
+            new ScrabbleLetter('l', 0),
+            new ScrabbleLetter('e', 0),
+            new ScrabbleLetter('v', 0),
+            new ScrabbleLetter('e', 0),
+        ];
+        for (let x = 0; x < letters.length; x++) {
+            gridServiceSpy.scrabbleBoard.squares[x][startCoord.y].letter = letters[x];
+            gridServiceSpy.scrabbleBoard.squares[x][startCoord.y].occupied = true;
+            gridServiceSpy.scrabbleBoard.squares[x][startCoord.y].letter.tile = new Square(x, startCoord.y);
+            gridServiceSpy.scrabbleBoard.squares[x][startCoord.y].letter.tile.occupied = true;
+        }
+        spyOn(service, 'findWordEdge').and.returnValue(new Vec2(UNPLACED, UNPLACED));
+        expect(service.buildScrabbleWord(startCoord, Axis.H)).toEqual(new ScrabbleWord());
     });
 
     it('should only build the new words formed by the new letters placed', () => {

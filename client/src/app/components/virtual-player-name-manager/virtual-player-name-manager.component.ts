@@ -33,6 +33,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     selectedName: VirtualPlayerName;
     newName: FormControl;
     editName: FormControl;
+    isAddPlayerCardVisible: boolean = false;
     private index: number;
 
     constructor(private virtualPlayerNameService: VirtualPlayerNameService, private snack: MatSnackBar) {
@@ -125,12 +126,20 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
         }
     }
 
-    private delete(collection: VirtualPlayerName[], url: string) {
-        // if (this.isUntouchable()) {
-        //     this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
-        //     return;
-        // }
+    unselectName() {
+        this.selectedName = { _id: '', name: '' };
+        this.editName.setValue('');
+    }
 
+    openAddPlayerCard() {
+        this.isAddPlayerCardVisible = true;
+    }
+
+    closeAddPlayerCard() {
+        this.isAddPlayerCardVisible = false;
+    }
+
+    private delete(collection: VirtualPlayerName[], url: string) {
         this.virtualPlayerNameService.delete(url, this.selectedName.name).subscribe(
             () => {
                 collection.splice(this.index, 1);
@@ -147,11 +156,6 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     private update(collection: VirtualPlayerName[], url: string) {
-        // if (this.isUntouchable()) {
-        //     this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
-        //     return;
-        // }
-
         if (!this.editName.valid) {
             this.snack.open(ErrorCaseVirtualPlayerName.InvalidName, 'close');
             return;

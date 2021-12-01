@@ -1,5 +1,5 @@
 <div class="container">
-    <img src="https://bit.ly/3m206ss" width="300" height="60" class="logo" alt="Logo Scrabble" />
+    <img src="https://bit.ly/3m206ss" width="250" height="50" class="logo" alt="Logo Scrabble" />
     <hr />
     <mat-card class="card" [ngStyle]="{ 'background-color': isPlayer1Active() ? '#8ABBF5' : '#DCECFF' }">
         <mat-card-title class="card-title" [ngStyle]="{ 'font-weight': isPlayer1Active() ? 'bold' : 'normal' }">{{
@@ -12,6 +12,35 @@
                 </div>
                 <div class="row" *ngIf="getPlayer1LetterCount() < 7">
                     <label class="info">Nombre de lettres: {{ getPlayer1LetterCount() }}</label>
+                </div>
+                <div class="row" *ngIf="isLog2990() === 'true'">
+                    <label class="column info goal-title">Objectif privé:</label>
+                    <div class="column privateGoals">
+                        <div
+                            *ngIf="!isPlayer1GoalAchieved()"
+                            class="rectangle"
+                            mat-raised-button
+                            matTooltip="{{ getPrivateGoalDescription() }}"
+                            matTooltipPosition="right"
+                        >
+                            <img
+                                class="goals"
+                                src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
+                            />
+                        </div>
+                        <div
+                            *ngIf="isPlayer1GoalAchieved()"
+                            class="achieved-rectangle"
+                            mat-raised-button
+                            matTooltip="{{ getPrivateGoalDescription() }}"
+                            matTooltipPosition="right"
+                        >
+                            <img
+                                class="goals"
+                                src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </mat-card-content>
@@ -28,21 +57,77 @@
                 <div class="row" *ngIf="getPlayer2LetterCount() < 7">
                     <label class="info">Nombre de lettres: {{ getPlayer2LetterCount() }}</label>
                 </div>
+                <div class="row" *ngIf="isLog2990() === 'true'">
+                    <label class="column info goal-title">Objectif privé:</label>
+                    <div class="column privateGoals">
+                        <div *ngIf="!isPlayer2GoalAchieved()" class="rectangle">
+                            <img
+                                class="goals"
+                                src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
+                            />
+                        </div>
+                        <div
+                            *ngIf="isPlayer2GoalAchieved()"
+                            class="achieved-rectangle"
+                            mat-raised-button
+                            matTooltip="{{ getOpponentGoalDescription() }}"
+                            matTooltipPosition="right"
+                        >
+                            <img
+                                class="goals"
+                                src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
         </mat-card-content>
     </mat-card>
-    <hr />
     <mat-card class="card">
         <mat-card-title class="card-title" align="center">Lettres restantes</mat-card-title>
         <label class="values">{{ getLettersLeftCount() }}</label>
-    </mat-card>
-    <mat-card class="card">
+        <hr style="margin: 15px 0px" />
         <mat-card-title class="card-title" align="center">Temps restant</mat-card-title>
         <mat-card-content>
             <label class="values">{{ getTimer() }}</label>
         </mat-card-content>
     </mat-card>
-    <mat-card *ngIf="isEndGame() && hasWinner()">
+    <mat-card *ngIf="isLog2990() === 'true'" class="card">
+        <mat-card-title class="card-title" align="center">Objectifs publics</mat-card-title>
+        <mat-card-content>
+            <div class="row publicGoals">
+                <div *ngFor="let sharedGoal of sharedGoals" class="column">
+                    <div
+                        *ngIf="!sharedGoal.isAchieved"
+                        class="rectangle"
+                        mat-raised-button
+                        matTooltip="{{ sharedGoal.description }}"
+                        matTooltipPosition="right"
+                        matTooltipClass="custom-tooltip"
+                    >
+                        <img
+                            class="goals"
+                            src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
+                        />
+                    </div>
+                    <div
+                        *ngIf="sharedGoal.isAchieved"
+                        class="achieved-rectangle"
+                        mat-raised-button
+                        matTooltip="{{ sharedGoal.description }}"
+                        matTooltipPosition="right"
+                        matTooltipClass="custom-tooltip"
+                    >
+                        <img
+                            class="goals"
+                            src="https://img.icons8.com/external-icongeek26-outline-colour-icongeek26/64/000000/external-reward-crowdfunding-icongeek26-outline-colour-icongeek26.png"
+                        />
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <mat-card *ngIf="isEndGame() && hasWinner()" class="card">
         <mat-card-title *ngIf="!isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br />tu as gagné!</mat-card-title>
         <mat-card-title *ngIf="isDrawnGame()" class="card-title" align="center">Félicitation {{ winnerName }}, <br />vous avez gagné!</mat-card-title>
     </mat-card>

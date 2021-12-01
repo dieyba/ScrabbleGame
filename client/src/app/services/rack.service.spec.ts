@@ -3,8 +3,8 @@ import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { MAX_LETTER_COUNT, RackService } from './rack.service';
 
-export const RACK_WIDTH = 500;
-export const RACK_HEIGHT = 60;
+export const RACK_WIDTH = 440;
+export const RACK_HEIGHT = 50;
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 /* eslint-disable  @typescript-eslint/no-explicit-any */
@@ -80,12 +80,12 @@ describe('RackService', () => {
         expect(drawLetterSpy).not.toHaveBeenCalled();
     });
 
-    it('clearRack should call "gridContext.clearRack()", "drawRack" and "drawExistingLetters"', () => {
+    it('redrawRack should call "gridContext.redrawRack()", "drawRack" and "drawExistingLetters"', () => {
         const clearRectSpy = spyOn<any>(ctxStub, 'clearRect').and.stub();
         const drawRackSpy = spyOn<any>(service, 'drawRack').and.stub();
         const drawExistingLettersSpy = spyOn<any>(service, 'drawExistingLetters').and.stub();
 
-        service.clearRack();
+        service.redrawRack();
 
         expect(clearRectSpy).toHaveBeenCalled();
         expect(drawRackSpy).toHaveBeenCalled();
@@ -180,5 +180,18 @@ describe('RackService', () => {
         expect(findSquareOriginSpy).toHaveBeenCalled();
         expect(drawExistingLetters).toHaveBeenCalled();
         expect(ctxStubSpy).toHaveBeenCalled();
+    });
+
+    it('clear rack should remove all rack letters and clear the ui', () => {
+        const drawRackSpy = spyOn(service, 'drawRack');
+        const ctxStubSpy = spyOn(ctxStub, 'clearRect');
+        const letter1 = new ScrabbleLetter('a', 1);
+        service.addLetter(letter1);
+
+        service.clearRack();
+
+        expect(ctxStubSpy).toHaveBeenCalled();
+        expect(drawRackSpy).toHaveBeenCalled();
+        expect(service.rackLetters).toEqual([]);
     });
 });

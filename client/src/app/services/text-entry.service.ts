@@ -17,7 +17,7 @@ import {
     isEmpty,
     isValidLetter,
     removeAccents,
-    scrabbleLetterstoString,
+    scrabbleLettersToString,
     trimSpaces,
 } from '@app/classes/utilities';
 import { ChatDisplayService } from './chat-display.service';
@@ -65,7 +65,7 @@ export class TextEntryService {
 
     /**
      * @description This function verifies if the input is a valid command or
-     * just text. It doesn't check the command's arguments of the command.
+     * just text. It doesn't check the command's arguments.
      *
      * @param text Text input from user
      */
@@ -147,7 +147,7 @@ export class TextEntryService {
     extractStockParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 0) {
             const defaultParams = { player, serviceCalled: this.chatDisplayService };
-            const stockLetters: string = scrabbleLetterstoString(this.gameService.game.stock.letterStock);
+            const stockLetters: string = scrabbleLettersToString(this.gameService.game.stock.letterStock);
             return { defaultParams, specificParams: stockLetters };
         }
         return undefined;

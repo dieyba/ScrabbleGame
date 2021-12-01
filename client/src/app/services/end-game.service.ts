@@ -1,4 +1,3 @@
-import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { GameType } from '@app/classes/game-parameters';
@@ -57,21 +56,22 @@ export class EndGameService {
         } else {
             this.endGameAfterPassedTurns();
         }
+        const URL = String(this.gameService.game.isLog2990) === 'true' ? '/log2990Mode/send' : '/classicMode/send';
         this.bestScoresService
-            .postBestScore(this.gameService.game.getLocalPlayer().name, this.gameService.game.getLocalPlayer().score, BASE_URL + '/classicMode/send')
+            .postBestScore(this.gameService.game.getLocalPlayer().name, this.gameService.game.getLocalPlayer().score, BASE_URL + URL)
             .subscribe(
                 () => {
                     /* Do nothing */
                 },
-                (error: HttpErrorResponse) => {
-                    if (error.status !== HttpStatusCode.Ok) {
-                        this.snack.open(
-                            'Désolé votre score ne pourra pas être éligible au tableau' +
-                                'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
-                                'Veuillez réessayer plus tard!',
-                            'close',
-                        );
-                    }
+                () => {
+                    // if (error.status !== HttpStatusCode.Ok) {
+                    this.snack.open(
+                        'Désolé votre score ne pourra pas être éligible au tableau' +
+                            'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
+                            'Veuillez réessayer plus tard!',
+                        'close',
+                    );
+                    // }
                 },
             );
         clearInterval(this.gameService.game.gameTimer.intervalValue);

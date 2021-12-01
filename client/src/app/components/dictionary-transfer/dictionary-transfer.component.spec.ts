@@ -7,9 +7,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DictionaryInterface } from '@app/classes/dictionary';
+import { DictionaryTransferComponent, ErrorCaseDictionaryTransfer } from '@app/components/dictionary-transfer/dictionary-transfer.component';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { of, throwError } from 'rxjs';
-import { DictionaryTransferComponent, ErrorCaseDictionaryTransfer } from './dictionary-transfer.component';
 
 describe('DictionaryTransferComponent', () => {
     let component: DictionaryTransferComponent;
