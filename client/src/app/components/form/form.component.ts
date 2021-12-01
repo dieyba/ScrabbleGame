@@ -7,12 +7,12 @@ import { Router } from '@angular/router';
 import { DictionaryInterface } from '@app/classes/dictionary';
 import { GameType } from '@app/classes/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
-import { ErrorCase } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
+import { ErrorCaseVirtualPlayerName } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
 import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
-import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
+import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
 import { environment } from 'src/environments/environment';
 
 export const GAME_CAPACITY = 2;
@@ -54,7 +54,7 @@ export class FormComponent implements OnInit {
         private dialogRef: MatDialogRef<FormComponent>,
         private router: Router,
         private gameList: GameListService,
-        private virtualPlayerNameService: VirtualPlayerNameManager,
+        private virtualPlayerNameService: VirtualPlayerNameService,
         private dictionaryService: DictionaryService,
         private snack: MatSnackBar,
         @Inject(MAT_DIALOG_DATA) public data: DialogData,
@@ -84,7 +84,7 @@ export class FormComponent implements OnInit {
                 // TODO: make a default list of players name to use when cannot access database
                 // and pick a name diffrent from the human player name
                 this.beginnerNameList = [{ _id: '', name: 'Sara' }];
-                this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
             },
         );
 
@@ -96,7 +96,7 @@ export class FormComponent implements OnInit {
                 // TODO: make a default list of players name to use when cannot access database
                 // and pick a name diffrent from the human player name
                 this.expertNameList = [{ _id: '', name: 'Ariane' }];
-                this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
             },
         );
 

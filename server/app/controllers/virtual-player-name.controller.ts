@@ -9,6 +9,7 @@ export class VirtualPlayerNameController {
     router: Router;
 
     constructor(private virtualPlayerNameService: VirtualPlayerNameService) {
+        this.virtualPlayerNameService.clientConnection();
         this.configureRouter();
     }
 

@@ -1,12 +1,7 @@
-// import { BestScores } from '@app/classes/best-scores';
 import { BestScores } from '@app/classes/best-scores';
 import { BestScoresService } from '@app/services/best-scores.service';
 import { expect } from 'chai';
-// import { containerBootstrapper } from '../app/inversify.config';
-// import { BestScores } from '@app/classes/best-scores';
-// import { HttpStatus } from './best-scores.controller';
 import { StatusCodes } from 'http-status-codes';
-// import sinon = require('sinon');
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import * as supertest from 'supertest';
 // eslint-disable-next-line import/no-named-as-default
