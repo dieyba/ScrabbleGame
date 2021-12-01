@@ -2,13 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-export interface DictionaryInterface {
-    _id: unknown;
-    title: string;
-    description: string;
-    words: string[];
-}
-
 export interface VirtualPlayerName {
     _id: unknown;
     name: string;

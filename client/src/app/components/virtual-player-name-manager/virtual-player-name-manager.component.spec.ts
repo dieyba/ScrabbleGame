@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable dot-notation */
 import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
@@ -8,37 +10,41 @@ import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtu
 import { of, throwError } from 'rxjs';
 import { VirtualPlayerNameManagerComponent } from './virtual-player-name-manager.component';
 
-
 describe('VirtualPlayerNameManagerComponent', () => {
     let component: VirtualPlayerNameManagerComponent;
     let fixture: ComponentFixture<VirtualPlayerNameManagerComponent>;
     let virtualPlayerNameServiceSpy: jasmine.SpyObj<VirtualPlayerNameService>;
 
-    let defaultBeginnerVirtualPlayerNames = [
+    const defaultBeginnerVirtualPlayerNames = [
         { _id: '1', name: 'Erika' },
         { _id: '2', name: 'Sara' },
         { _id: '3', name: 'Etienne' },
     ];
-    let defaultExpertVirtualPlayerNames = [
+    const defaultExpertVirtualPlayerNames = [
         { _id: '1', name: 'Dieyba' },
         { _id: '2', name: 'Kevin' },
         { _id: '3', name: 'Ariane' },
     ];
+    const randomName = { _id: '4', name: 'Riri' } as VirtualPlayerName;
 
     beforeEach(async () => {
-        virtualPlayerNameServiceSpy = jasmine.createSpyObj('VirtualPlayerNameService', ['getVirtualPlayerNames', 'postVirtualPlayerNames', 'delete', 'update', 'reset']);
+        virtualPlayerNameServiceSpy = jasmine.createSpyObj('VirtualPlayerNameService', [
+            'getVirtualPlayerNames',
+            'postVirtualPlayerNames',
+            'delete',
+            'update',
+            'reset',
+        ]);
 
         virtualPlayerNameServiceSpy.getVirtualPlayerNames.and.callFake(() => {
-            return of(defaultBeginnerVirtualPlayerNames)
+            return of(defaultBeginnerVirtualPlayerNames);
         });
 
         await TestBed.configureTestingModule({
             declarations: [VirtualPlayerNameManagerComponent],
             schemas: [CUSTOM_ELEMENTS_SCHEMA],
             imports: [HttpClientModule, HttpClientTestingModule, MatSnackBarModule, BrowserAnimationsModule],
-            providers: [
-                { provide: VirtualPlayerNameService, useValue: virtualPlayerNameServiceSpy },
-            ]
+            providers: [{ provide: VirtualPlayerNameService, useValue: virtualPlayerNameServiceSpy }],
         }).compileComponents();
     });
 
@@ -118,25 +124,68 @@ describe('VirtualPlayerNameManagerComponent', () => {
         expect(component.isBeginnerTab()).toBeFalse();
     });
 
+    it('deleteName should call isUntouchable', () => {
+        virtualPlayerNameServiceSpy.delete.and.callFake(() => {
+            return of({ _id: '4', name: 'Riri' } as VirtualPlayerName);
+        });
+
+        const spy = spyOn(component, 'isUntouchable');
+        component.deleteName();
+
+        expect(spy).toHaveBeenCalled();
+    });
+
     it('deleteName should call isBeginnerTab', () => {
+        virtualPlayerNameServiceSpy.delete.and.callFake(() => {
+            return of({ _id: '4', name: 'Riri' } as VirtualPlayerName);
+        });
+
+        component.beginnerNameList.push(randomName);
+        component.selectedName = randomName;
         const spy = spyOn(component, 'isBeginnerTab');
         component.deleteName();
 
         expect(spy).toHaveBeenCalled();
     });
 
-    it('deleteName should call delete', () => {
-        const spy = spyOn<any>(component, 'delete');
+    it('deleteName should not call delete if we try to delete or isBeginnerTab an untouchable name', () => {
         component.selectedName = component.beginnerNameList[0];
+        const deleteSpy = spyOn(component, 'delete' as any);
+        const isBeginnerTabSpy = spyOn(component, 'isBeginnerTab');
+        component.deleteName();
+
+        expect(deleteSpy).not.toHaveBeenCalled();
+        expect(isBeginnerTabSpy).not.toHaveBeenCalled();
+    });
+
+    it('deleteName should call delete', () => {
+        component.beginnerNameList.push(randomName);
+        component.expertNameList.push(randomName);
+
+        const spy = spyOn<any>(component, 'delete');
+        component.selectedName = component.beginnerNameList[3];
         component.deleteName();
         expect(spy).toHaveBeenCalled();
 
-        component.selectedName = component.expertNameList[0];
+        component.selectedName = component.expertNameList[3];
         component.deleteName();
         expect(spy).toHaveBeenCalled();
     });
 
+    it('updateName should call isUntouchable', () => {
+        const spy = spyOn(component, 'isUntouchable');
+        component.updateName();
+        expect(spy).toHaveBeenCalled();
+    });
+
     it('updateName should call isBeginnerTab if the updated name is empty', () => {
+        virtualPlayerNameServiceSpy.update.and.callFake(() => {
+            return of({ _id: '1', name: 'Riri' });
+        });
+
+        component.beginnerNameList.push(randomName);
+        // component.expertNameList.push(randomName);
+
         const spy = spyOn<any>(component, 'isBeginnerTab').and.callThrough();
         component.editName.setValue('');
         component.updateName();
@@ -144,17 +193,25 @@ describe('VirtualPlayerNameManagerComponent', () => {
 
         component.editName.setValue('Riri');
 
-        component.selectedName = component.beginnerNameList[0];
-        component.updateName();
-        expect(spy).toHaveBeenCalled();
-
-        component.selectedName = component.expertNameList[0];
+        component.selectedName = randomName;
         component.updateName();
         expect(spy).toHaveBeenCalled();
     });
 
-    it('onSelect should call isBeginnerTab', () => {
-        const spy = spyOn<any>(component, 'isBeginnerTab');
+    it('updateName should call delete', () => {
+        virtualPlayerNameServiceSpy.update.and.callFake(() => {
+            return of({ _id: '1', name: 'Riri' });
+        });
+        component.expertNameList.push(randomName);
+        component.selectedName = randomName;
+        component.editName.setValue('Riri');
+
+        component.updateName();
+        expect(virtualPlayerNameServiceSpy.update).toHaveBeenCalled();
+    });
+
+    it('onSelect should call isUntouchable', () => {
+        const spy = spyOn<any>(component, 'isUntouchable');
         component.onSelect({ _id: '4', name: 'Riri' });
         expect(spy).toHaveBeenCalled();
     });
@@ -165,34 +222,35 @@ describe('VirtualPlayerNameManagerComponent', () => {
         expect(component.selectedName).toEqual(component.beginnerNameList[0]);
 
         component.beginnerNameList.push({ _id: '4', name: 'Riri' });
+        component.selectedName = component.beginnerNameList[3];
         component.onSelect(component.beginnerNameList[3]);
         expect(component.editName.value).toEqual(component.beginnerNameList[3].name);
         expect(component.selectedName).toEqual(component.beginnerNameList[3]);
     });
 
     it('delete should call virtualPlayerNameService delete', () => {
-        component.beginnerNameList.push({ _id: '4', name: 'Riri' });
+        component.beginnerNameList.push(randomName);
         virtualPlayerNameServiceSpy.delete.and.callFake(() => {
-            return of({ _id: '4', name: 'Riri' } as VirtualPlayerName);
+            return of(randomName);
         });
 
-        component['index'] = 4;
+        component['index'] = 3;
         component['delete'](component.beginnerNameList, 'url');
         expect(virtualPlayerNameServiceSpy.delete).toHaveBeenCalled();
     });
 
-    // it('delete should delete the element sent by the delete request', () => {
-    //     component.beginnerNameList.push({ _id: '4', name: 'Riri' });
+    it('delete should delete the element sent by the delete request', () => {
+        const randomName2 = { _id: '4', name: 'Riri' };
+        component.beginnerNameList.push(randomName2);
+        component.selectedName = randomName2;
+        virtualPlayerNameServiceSpy.delete.and.returnValue(of(randomName2));
 
-    //     const deleteResponse = { _id: '4', name: 'Riri' } as VirtualPlayerName;
-    //     virtualPlayerNameServiceSpy.delete.and.returnValue(of(deleteResponse));
+        component['index'] = 3;
+        component['delete'](component.beginnerNameList, 'url');
 
-    //     component['index'] = 4;
-    //     component['delete'](component.beginnerNameList, 'url');
-
-    //     // expect snack bar
-    //     expect(virtualPlayerNameServiceSpy.delete).toHaveBeenCalled();
-    // });
+        expect(virtualPlayerNameServiceSpy.delete).toHaveBeenCalled();
+        expect(component.beginnerNameList.length).toEqual(3);
+    });
 
     it('delete should catch error when getting one', () => {
         const spy = spyOn(component['snack'], 'open');

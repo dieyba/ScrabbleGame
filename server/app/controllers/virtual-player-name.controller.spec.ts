@@ -83,7 +83,6 @@ describe('VirtualPlayerNameController', () => {
             })
             .catch((error) => {
                 expect(error);
-
             });
     });
 
@@ -115,7 +114,6 @@ describe('VirtualPlayerNameController', () => {
             })
             .catch((error) => {
                 expect(error);
-
             });
     });
 
@@ -129,7 +127,6 @@ describe('VirtualPlayerNameController', () => {
             })
             .catch((error) => {
                 expect(error);
-
             });
     });
 

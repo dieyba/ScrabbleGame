@@ -1,3 +1,4 @@
+/* eslint no-underscore-dangle: 0 */
 import * as dict_path from '@app/assets/dictionnary.json';
 import { Dictionary, DictionaryInterface } from '@app/classes/dictionary';
 import { Collection, Filter, FindOneAndUpdateOptions, FindOptions, MongoClient, ObjectId } from 'mongodb';
@@ -22,6 +23,7 @@ export class DictionaryDBService {
         return MongoClient.connect(this.dbUrl)
             .then(async (client: MongoClient) => {
                 this.client = client;
+                // console.log('client connection');
                 this.dictionaryCollection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]);
                 await this.populateDictionaryDB();
             })
@@ -90,7 +92,7 @@ export class DictionaryDBService {
 
     async delete(dictionaryId: string): Promise<void> {
         const id = new ObjectId(dictionaryId);
-        const isInCollection = await this.IsInCollection(id);
+        const isInCollection = await this.isInCollection(id);
 
         if (!isInCollection) {
             throw new Error('Pas dans la base de donnée');
@@ -104,7 +106,7 @@ export class DictionaryDBService {
             })
             .catch((error) => {
                 throw error;
-            })
+            });
     }
 
     async reset() {
@@ -115,7 +117,7 @@ export class DictionaryDBService {
             })
             .catch((error: Error) => {
                 throw error;
-            })
+            });
     }
 
     async populateDictionaryDB(): Promise<void> {
@@ -132,8 +134,7 @@ export class DictionaryDBService {
             //     await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(course);
             // }
             const dico = dict_path as Dictionary;
-            const dictionaries: DictionaryInterface =
-            {
+            const dictionaries: DictionaryInterface = {
                 _id: new ObjectId(),
                 title: dico.title,
                 description: dico.description,
@@ -192,7 +193,7 @@ export class DictionaryDBService {
         return isSameTitle;
     }
 
-    private async IsInCollection(dictionaryId: ObjectId): Promise<boolean> {
+    private async isInCollection(dictionaryId: ObjectId): Promise<boolean> {
         let isInCollection = false;
         await this.dictionaryCollection.find().forEach((dictionary) => {
             if (dictionary._id === dictionaryId) {
@@ -200,8 +201,6 @@ export class DictionaryDBService {
             }
         });
 
-        console.log('is in collection ? ', isInCollection);
         return isInCollection;
-
     }
 }

@@ -1,92 +1,54 @@
-import { VirtualPlayerName } from "@app/classes/virtual-player-name";
-import { rejects } from "assert";
-import { expect } from "chai";
-// import { Collection, FindCursor } from "mongodb";
-import { ObjectId } from "mongodb";
-import { MongoMemoryServer } from "mongodb-memory-server";
-import { VirtualPlayerNameService } from "./virtual-player-name.service";
-import sinon = require("sinon");
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable dot-notation */
+import { VirtualPlayerName } from '@app/classes/virtual-player-name';
+import { rejects } from 'assert';
+import { expect } from 'chai';
+import { ObjectId } from 'mongodb';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { VirtualPlayerNameService } from './virtual-player-name.service';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import sinon = require('sinon');
 
 describe('VirtualPlayerNameService', () => {
     let virtualPlayerNameService: VirtualPlayerNameService;
-    // let name1: VirtualPlayerName;
-    // let name2: VirtualPlayerName;
     let mongoServer: MongoMemoryServer;
-    // let db: Db;
-    // let client: MongoClient;
 
     beforeEach(async () => {
-        // name1 = { _id: new ObjectId(), name: 'Riri' } as VirtualPlayerName;
-        // name2 = { _id: new ObjectId(), name: 'Lulu' } as VirtualPlayerName;
-
         mongoServer = await MongoMemoryServer.create();
         const mongoUri = mongoServer.getUri();
         virtualPlayerNameService = new VirtualPlayerNameService(mongoUri);
         await virtualPlayerNameService.clientConnection();
-
-        // client = await MongoClient.connect(mongoUri);
-        // virtualPlayerNameService['client'] = client;
-        // db = new Db(client, 'test');
-        // virtualPlayerNameService.beginnersCollection = db.collection('beginners');
-        // await virtualPlayerNameService.beginnersCollection.insertOne(name1);
-        // await virtualPlayerNameService.beginnersCollection.insertOne(name2);
     });
 
     afterEach(async () => {
-        await virtualPlayerNameService["client"].close();
+        await virtualPlayerNameService['client'].close();
         await mongoServer.stop();
     });
 
     it('should connect client to the dataBase', async () => {
-        expect(virtualPlayerNameService['client']).to.not.be.undefined;
+        expect(virtualPlayerNameService['client']).to.not.equals(undefined);
     });
 
     it('should throw an error when connecting to a bad url', async () => {
         try {
-            let test = new VirtualPlayerNameService('fake_url');
+            const test = new VirtualPlayerNameService('fake_url');
             test.dbUrl = 'fakeUrl';
             await test.clientConnection();
         } catch (error) {
-            expect(error).to.not.be.undefined;
+            expect(error).to.not.equals(undefined);
         }
-    })
+    });
 
     it('getVirtualPlayerNames should get all beginner names in Mongo Database', async () => {
         const dbData = await virtualPlayerNameService.getVirtualPlayerNames(virtualPlayerNameService.beginnersCollection);
         expect(dbData.length).to.equal(3);
     });
 
-    // Ce test ne fonctionne pas.
     it('getVirtualPlayerNames should throw an error when get all beginner names in Mongo Database', async () => {
-        // const testError = new Error('test error');
-        // const functionToThrowError = function (error: Error) {
-        //     throw error;
-        // }
-        // class FakeCollection extends Collection {
-        //     override find(): FindCursor<VirtualPlayerName> {
-        //         const testError = new Error('test error');
-        //         throw testError;
-        //     }
-        // }
-        // let stubCollection = sinon.createStubInstance(FakeCollection);
-        // virtualPlayerNameService.beginnersCollection.find = stubCollection.find;
         try {
-            // await virtualPlayerNameService["client"].close();
-            // await mongoServer.stop();
-            // sinon.stub(virtualPlayerNameService.beginnersCollection, 'find').callsFake(functionToThrowError(testError));
             await rejects(virtualPlayerNameService.getVirtualPlayerNames(virtualPlayerNameService.beginnersCollection));
-            // await virtualPlayerNameService.getVirtualPlayerNames(virtualPlayerNameService.beginnersCollection);
         } catch (error) {
-            // console.log('erreur :', error);
-            expect(error).to.not.be.undefined;
-        }
-    });
-
-    it('getVirtualPlayerNames should throw an error when get all beginner names in Mongo Database', async () => {
-        try {
-            await rejects(virtualPlayerNameService.getVirtualPlayerNames(virtualPlayerNameService.beginnersCollection))
-        } catch (error) {
-            expect(error).to.not.be.undefined;
+            expect(error).to.not.equals(undefined);
         }
     });
 
@@ -94,8 +56,9 @@ describe('VirtualPlayerNameService', () => {
         const newName = { _id: new ObjectId(), name: 'Riri' } as VirtualPlayerName;
         await virtualPlayerNameService.postVirtualPlayerName(virtualPlayerNameService.beginnersCollection, newName);
         const names = await virtualPlayerNameService.beginnersCollection.find({}).toArray();
+        const tabLength = 4;
 
-        expect(names.length).to.equal(4);
+        expect(names.length).to.equal(tabLength);
         expect(newName).to.deep.equals(names[3]);
     });
 
@@ -107,10 +70,22 @@ describe('VirtualPlayerNameService', () => {
             names = await virtualPlayerNameService.beginnersCollection.find({}).toArray();
             await virtualPlayerNameService.postVirtualPlayerName(virtualPlayerNameService.beginnersCollection, newName);
         } catch (error) {
-            expect(error).to.not.be.undefined;
+            expect(error).to.not.equals(undefined);
             expect(names.length).to.equal(3);
         }
+    });
 
+    it('postVirtualPlayerName should handle an error when getting', async () => {
+        let names = await virtualPlayerNameService.beginnersCollection.find({}).toArray();
+        const newName = { _id: new ObjectId(names[0]._id), name: 'Riri' } as VirtualPlayerName;
+
+        try {
+            await virtualPlayerNameService.postVirtualPlayerName(virtualPlayerNameService.beginnersCollection, newName);
+            names = await virtualPlayerNameService.beginnersCollection.find({}).toArray();
+        } catch (error) {
+            expect(error).to.not.equals(undefined);
+            expect(names.length).to.equal(3);
+        }
     });
 
     it('deleteVirtualPlayerName should delete a name in Mongo Database ', async () => {
@@ -129,7 +104,7 @@ describe('VirtualPlayerNameService', () => {
         } catch (error) {
             const names = await virtualPlayerNameService.beginnersCollection.find({}).toArray();
             expect(names.length).to.equal(3);
-            expect(error).to.not.be.undefined;
+            expect(error).to.not.equals(undefined);
         }
     });
 
@@ -150,7 +125,8 @@ describe('VirtualPlayerNameService', () => {
             await virtualPlayerNameService.updateVirtualPlayerName(virtualPlayerNameService.beginnersCollection, names[0]._id, 'Sara');
             names = await virtualPlayerNameService.beginnersCollection.find({}).toArray();
         } catch (error) {
-            expect(error).to.not.be.undefined;
+            expect(error).to.not.equals(undefined);
+            // console.log(error);
             // expect(error).to.equal(new Error('Ce nom existe déjà'));
             expect(names[0]).to.equal(nameToUpdate);
             expect(names.length).to.equal(3);
@@ -158,14 +134,15 @@ describe('VirtualPlayerNameService', () => {
     });
 
     it('resetDataBase should call resetCollection', async () => {
-        const resetCollectionSpy = sinon.spy(virtualPlayerNameService, <any>'resetCollection');
+        /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
+        const resetCollectionSpy = sinon.spy(virtualPlayerNameService, 'resetCollection' as any);
         virtualPlayerNameService.resetDataBase();
 
         sinon.assert.called(resetCollectionSpy);
     });
 
-    it('populate should poulate when it is empty', async () => {
-        let names = await virtualPlayerNameService.beginnersCollection.find({}).toArray()
+    it('populate should populate when it is empty', async () => {
+        let names = await virtualPlayerNameService.beginnersCollection.find({}).toArray();
         expect(names.length).to.equal(3);
 
         await virtualPlayerNameService.beginnersCollection.deleteMany({});
@@ -177,8 +154,8 @@ describe('VirtualPlayerNameService', () => {
         expect(names.length).to.equal(3);
     });
 
-    it('populate should not poulate when it is not empty', async () => {
-        let names = await virtualPlayerNameService.beginnersCollection.find({}).toArray()
+    it('populate should not populate when it is not empty', async () => {
+        let names = await virtualPlayerNameService.beginnersCollection.find({}).toArray();
         expect(names.length).to.equal(3);
 
         await virtualPlayerNameService.beginnersCollection.findOneAndDelete({ name: 'Erika' });
@@ -188,13 +165,13 @@ describe('VirtualPlayerNameService', () => {
     });
 
     it('isSameName should return true if there is an element with the same name as the parameter', async () => {
-        let nameToCompare = { _id: new ObjectId(), name: 'Riri' } as VirtualPlayerName;
+        const nameToCompare = { _id: new ObjectId(), name: 'Riri' } as VirtualPlayerName;
         let isSame = await virtualPlayerNameService['isSameName'](nameToCompare, virtualPlayerNameService.beginnersCollection);
-        expect(isSame).to.be.false;
+        expect(isSame).to.equals(false);
 
         nameToCompare.name = 'Erika';
         isSame = await virtualPlayerNameService['isSameName'](nameToCompare, virtualPlayerNameService.beginnersCollection);
-        expect(isSame).to.be.true;
+        expect(isSame).to.equals(true);
     });
 
     it('resetCollection should reset the given collection', async () => {
@@ -205,68 +182,4 @@ describe('VirtualPlayerNameService', () => {
         names = await virtualPlayerNameService.beginnersCollection.find({}).toArray();
         expect(names.length).to.equal(0);
     });
-
-    // it('resetCollection should call populate', async () => {
-    //     const populateSpy = sinon.spy(virtualPlayerNameService, 'populate');
-    //     virtualPlayerNameService['resetCollection'](virtualPlayerNameService.beginnersCollection);
-
-    //     sinon.assert.called(populateSpy);
-    // });
-
-    // it('resetCollection should reset database with default value', async () => {
-    //     const defaultNames = [
-    //         { _id: new ObjectId(), name: 'Erika' },
-    //         { _id: new ObjectId(), name: 'Sara' },
-    //         { _id: new ObjectId(), name: 'Etienne' },
-    //     ];
-
-    //     await virtualPlayerNameService.beginnersCollection.insertOne({ _id: new ObjectId(), name: 'Riri' } as VirtualPlayerName);
-    //     let names = await virtualPlayerNameService.beginnersCollection.find({}).toArray();
-    //     expect(names.length).to.equal(4);
-
-    //     await virtualPlayerNameService['resetCollection'](virtualPlayerNameService.beginnersCollection);
-    //     names = await virtualPlayerNameService.beginnersCollection.find({}).toArray();
-    //     expect(names).to.equal(defaultNames);
-    // });
-
-    it('resetCollection should handle error when getting one', async () => {
-        try {
-            await rejects(virtualPlayerNameService['resetCollection'](virtualPlayerNameService.beginnersCollection));
-        } catch (error) {
-            expect(error).to.not.be.undefined;
-        }
-    });
-
-    // it('should reset db with default value', async () => {
-    //     const newScore = [{
-    //         playerName: 'Erika',
-    //         score: 1,
-    //     },
-    //     {
-    //         playerName: 'Sara',
-    //         score: 8,
-    //     },
-    //     {
-    //         playerName: 'Dieyba',
-    //         score: 200,
-    //     }] as BestScores[];
-    //     await bestScoresService.resetCollectionInDb(bestScoresService.classicCollection, newScore, DATABASE_COLLECTION[0]);
-    //     let allScores = await bestScoresService.classicCollection.find({}).toArray();
-    //     console.log(allScores);
-    //     expect(allScores.length).to.equal(2);
-    //     // expect(bestScores1).to.deep.equals(dbData[1]);
-    // });    // const newScore = [{
-
-
-    // it('should throw an error when post a Score in Mongo Database', async () => {
-    //     // const dbData = await bestScoresService.getBestScores(bestScoresService.classicCollection);
-    //     // expect(dbData.length).to.equal(2);
-    //     // expect(bestScores1).to.deep.equals(dbData[1]);
-    //     // client.close();
-    //     try {
-    //         await rejects(bestScoresService.postBestScore(bestScoresService.classicCollection, bestScores1))
-    //     } catch (error) {
-    //         expect(error).to.not.be.undefined;
-    //     }
-    // });
 });

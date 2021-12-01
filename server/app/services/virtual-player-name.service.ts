@@ -1,7 +1,6 @@
 import { VirtualPlayerName } from '@app/classes/virtual-player-name';
 import { Collection, Filter, FindOneAndUpdateOptions, MongoClient, ObjectId } from 'mongodb';
 import { Service } from 'typedi';
-// import { DatabaseService } from "./database.service";
 const DATABASE_URL = 'mongodb+srv://Scrabble304:Scrabble304@cluster0.bvwkn.mongodb.net/database?retryWrites=true&w=majority';
 const DATABASE_NAME = 'VirtualPlayerName';
 const DATABASE_COLLECTION = ['beginners', 'experts'];
@@ -10,10 +9,10 @@ const DATABASE_COLLECTION = ['beginners', 'experts'];
 export class VirtualPlayerNameService {
     beginnersCollection: Collection<VirtualPlayerName>;
     expertsCollection: Collection<VirtualPlayerName>;
+    dbUrl: string;
     private client: MongoClient;
     private originalBeginnerVirtualPlayerNames: VirtualPlayerName[];
     private originalExpertVirtualPlayerNames: VirtualPlayerName[];
-    dbUrl: string;
 
     constructor(url: string = DATABASE_URL) {
         this.dbUrl = url;
@@ -48,9 +47,6 @@ export class VirtualPlayerNameService {
             .toArray()
             .then((virtualPlayerName: VirtualPlayerName[]) => {
                 return virtualPlayerName;
-            })
-            .catch((error: Error) => {
-                throw error;
             });
     }
 
@@ -73,7 +69,7 @@ export class VirtualPlayerNameService {
 
     async deleteVirtualPlayerName(collection: Collection<VirtualPlayerName>, name: string): Promise<void> {
         return await collection
-            .findOneAndDelete({ name: name })
+            .findOneAndDelete({ name })
             .then((deleted) => {
                 if (!deleted.value) {
                     throw new Error('Could not find name');
@@ -92,14 +88,9 @@ export class VirtualPlayerNameService {
 
         const filterSameId: Filter<VirtualPlayerName> = { _id: new ObjectId(nameToUpdateId) };
         const options = { returnNewDocument: true } as FindOneAndUpdateOptions;
-        return await collection
-            .findOneAndUpdate(filterSameId, { $set: { name: updateName } }, options)
-            .then(() => {
-                /* Do nothing */
-            })
-            .catch((error) => {
-                throw error;
-            });
+        return await collection.findOneAndUpdate(filterSameId, { $set: { name: updateName } }, options).then(() => {
+            return;
+        });
     }
 
     async resetDataBase(): Promise<void> {
@@ -133,13 +124,8 @@ export class VirtualPlayerNameService {
     }
 
     private async resetCollection(collection: Collection<VirtualPlayerName>): Promise<void> {
-        return collection
-            .deleteMany({})
-            .then(() => {
-                this.populate();
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
+        return collection.deleteMany({}).then(() => {
+            this.populate();
+        });
     }
 }

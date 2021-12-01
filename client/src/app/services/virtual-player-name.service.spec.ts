@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -8,7 +9,7 @@ describe('VirtualPlayerNameService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientModule, HttpClientTestingModule ],
+            imports: [HttpClientModule, HttpClientTestingModule],
         });
         service = TestBed.inject(VirtualPlayerNameService);
     });

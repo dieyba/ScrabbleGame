@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
@@ -5,13 +6,18 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DictionaryInterface } from '@app/classes/dictionary';
 import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
 
-enum ErrorCaseDictionaryTransfer {
+export enum ErrorCaseDictionaryTransfer {
     TitleAlreadyThere = 'Un dictionnaire de la base de donnée possède déjà ce titre.',
     TitleOrDescriptionInvalid = 'Le titre ou la description est invalide.',
     DictionaryDeleted = 'Ce dictionnaire a déjà été supprimé',
     DatabaseServerCrash = 'La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard.',
-    Untouchable = 'Vous ne pouvez pas modifier ou supprimer ce dictionnaire'
+    Untouchable = 'Vous ne pouvez pas modifier ou supprimer ce dictionnaire',
 }
+
+const TITLE_MAX_LENGTH = 20;
+const TITLE_MIN_LENGTH = 3;
+const DESCRIPTION_MAX_LENGTH = 50;
+const DESCRIPTION_MIN_LENGTH = 10;
 
 @Component({
     selector: 'app-dictionary-transfer',
@@ -29,8 +35,12 @@ export class DictionaryTransferComponent implements AfterViewInit {
     constructor(private dictionaryService: DictionaryService, private snack: MatSnackBar) {
         this.selectedDictionary = { _id: '', title: '', description: '', words: [] };
         this.dictionaryList = [];
-        this.editTitle = new FormControl('', [Validators.pattern('[a-zA-ZÉé ]*'), Validators.maxLength(20), Validators.minLength(3)]);
-        this.editDescription = new FormControl('', [Validators.maxLength(50), Validators.minLength(10)]);
+        this.editTitle = new FormControl('', [
+            Validators.pattern('[a-zA-ZÉé ]*'),
+            Validators.maxLength(TITLE_MAX_LENGTH),
+            Validators.minLength(TITLE_MIN_LENGTH),
+        ]);
+        this.editDescription = new FormControl('', [Validators.maxLength(DESCRIPTION_MAX_LENGTH), Validators.minLength(DESCRIPTION_MIN_LENGTH)]);
     }
 
     ngAfterViewInit(): void {
@@ -102,7 +112,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
     updateDictionariesTitle(dictionaries: DictionaryInterface[]) {
         this.dictionaryList = [];
         for (const dictionary of dictionaries) {
-            let tempDictionary = { _id: '', title: '', description: '', words: [] } as DictionaryInterface;
+            const tempDictionary = { _id: '', title: '', description: '', words: [] } as DictionaryInterface;
             tempDictionary._id = dictionary._id;
             tempDictionary.title = dictionary.title;
             tempDictionary.description = dictionary.description;
@@ -113,7 +123,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
 
     updateTitleAndDescription(title: string, description: string) {
         const index = this.dictionaryList.indexOf(this.selectedDictionary);
-        if (index < 2) {
+        if (index < 1) {
             this.snack.open(ErrorCaseDictionaryTransfer.Untouchable, 'fermer');
             return;
         }
@@ -125,28 +135,26 @@ export class DictionaryTransferComponent implements AfterViewInit {
 
         this.dictionaryService.update(BASE_URL, this.selectedDictionary.title, this.selectedDictionary._id, title, description).subscribe(
             (dictionary) => {
-                const index = this.dictionaryList.indexOf(this.selectedDictionary);
                 this.dictionaryList[index].title = dictionary.title;
                 this.dictionaryList[index].description = dictionary.description;
             },
             (error: HttpErrorResponse) => {
-                if (error.message === 'Ce titre existe déjà') {
+                if (error.error === 'Ce titre existe déjà') {
                     this.snack.open(ErrorCaseDictionaryTransfer.TitleAlreadyThere, 'fermer');
                 }
-            }
+            },
         );
     }
 
     deleteDictionary(dictionaryToDelete: DictionaryInterface) {
         const index = this.dictionaryList.indexOf(this.selectedDictionary);
-        if (index < 2) {
+        if (index < 1) {
             this.snack.open(ErrorCaseDictionaryTransfer.Untouchable, 'fermer');
             return;
         }
 
         this.dictionaryService.delete(dictionaryToDelete._id).subscribe(
             () => {
-                const index = this.dictionaryList.indexOf(dictionaryToDelete);
                 this.dictionaryList.splice(index, 1);
             },
             (error: HttpErrorResponse) => {
@@ -155,7 +163,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
                     return;
                 }
                 this.snack.open(ErrorCaseDictionaryTransfer.DictionaryDeleted, 'fermer');
-            }
+            },
         );
     }
 

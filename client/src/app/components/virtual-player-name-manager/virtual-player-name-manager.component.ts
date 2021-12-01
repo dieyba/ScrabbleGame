@@ -16,7 +16,7 @@ export enum ErrorCaseVirtualPlayerName {
     DeleteAfterDeleteOrUpdate = 'Le nom que vous essayez de supprimer a déjà été modifié ou supprimé, actualisez votre page.',
     UpdateAfterDelete = 'Le nom que vous essayez de modifié a été supprimé, actualisez votre page.',
     DatabaseServerCrash = 'La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard.',
-    Untouchable = 'Vous ne pouvez pas modifier ou supprimer ce nom'
+    Untouchable = 'Vous ne pouvez pas modifier ou supprimer ce nom',
 }
 
 @Component({
@@ -45,9 +45,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.virtualPlayerNameService
-            .getVirtualPlayerNames(this.beginnerNameUrl)
-            .subscribe((beginnerList) => (this.beginnerNameList = beginnerList));
+        this.virtualPlayerNameService.getVirtualPlayerNames(this.beginnerNameUrl).subscribe((beginnerList) => (this.beginnerNameList = beginnerList));
         this.virtualPlayerNameService.getVirtualPlayerNames(this.expertNameUrl).subscribe((expertList) => (this.expertNameList = expertList));
     }
 
@@ -87,7 +85,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     deleteName() {
         if (this.isUntouchable()) {
             this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
-            return
+            return;
         }
 
         if (this.isBeginnerTab()) {
@@ -100,7 +98,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     updateName() {
         if (this.isUntouchable()) {
             this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
-            return
+            return;
         }
 
         if (this.editName.value === '') {
@@ -115,11 +113,12 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     onSelect(name: VirtualPlayerName) {
+        this.selectedName = name;
         if (this.isUntouchable()) {
             this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
+            return;
         }
 
-        this.selectedName = name;
         this.isBeginnerTab();
         if (this.index > 2) {
             this.editName.setValue(this.selectedName.name);
@@ -127,17 +126,15 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     private delete(collection: VirtualPlayerName[], url: string) {
-        if (this.isUntouchable()) {
-            this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
-            return
-        }
+        // if (this.isUntouchable()) {
+        //     this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
+        //     return;
+        // }
 
         this.virtualPlayerNameService.delete(url, this.selectedName.name).subscribe(
-            (deleted) => {
-                if (!deleted) {
-                    collection.splice(this.index, 1);
-                    this.selectedName.name = '';
-                }
+            () => {
+                collection.splice(this.index, 1);
+                this.selectedName.name = '';
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
@@ -150,10 +147,10 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     private update(collection: VirtualPlayerName[], url: string) {
-        if (this.isUntouchable()) {
-            this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
-            return
-        }
+        // if (this.isUntouchable()) {
+        //     this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
+        //     return;
+        // }
 
         if (!this.editName.valid) {
             this.snack.open(ErrorCaseVirtualPlayerName.InvalidName, 'close');

@@ -14,7 +14,12 @@ import { VirtualPlayerNameService } from '@app/services/virtual-player-name.serv
 export class AdminPageComponent {
     privateName: boolean;
 
-    constructor(public virtualPlayerNameService: VirtualPlayerNameService, private bestScoreService: BestScoresService, private dictionaryService: DictionaryService, private snack: MatSnackBar) {
+    constructor(
+        public virtualPlayerNameService: VirtualPlayerNameService,
+        private bestScoreService: BestScoresService,
+        private dictionaryService: DictionaryService,
+        private snack: MatSnackBar,
+    ) {
         this.privateName = false;
     }
 
@@ -55,7 +60,7 @@ export class AdminPageComponent {
                 } else {
                     this.snack.open(' La base de données a été réinitialisé avec succès!', 'close');
                 }
-            }
+            },
         );
     }
 }

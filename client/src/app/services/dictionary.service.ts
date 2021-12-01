@@ -33,7 +33,11 @@ export class DictionaryService {
     }
 
     update(url: string, dictionaryName: string, dictionaryId: unknown, updatedTitle: string, updatedDescription: string) {
-        return this.http.patch<DictionaryInterface>(url + '/' + dictionaryName, { id: dictionaryId, newTitle: updatedTitle, newDescription: updatedDescription });
+        return this.http.patch<DictionaryInterface>(url + '/' + dictionaryName, {
+            id: dictionaryId,
+            newTitle: updatedTitle,
+            newDescription: updatedDescription,
+        });
     }
 
     delete(dictionaryId: unknown): Observable<DictionaryInterface> {
