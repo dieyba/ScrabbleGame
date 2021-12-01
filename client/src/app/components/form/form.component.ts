@@ -13,6 +13,7 @@ import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
 import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
+import { environment } from 'src/environments/environment';
 
 export const GAME_CAPACITY = 2;
 export interface DialogData {
@@ -66,8 +67,8 @@ export class FormComponent implements OnInit {
         this.defaultTimer = '60';
         this.defaultDictionary = '0';
         this.defaultBonus = false;
-        this.beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
-        this.expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
+        this.beginnerNameUrl = environment.serverUrl + `/VirtualPlayerName/beginners`;
+        this.expertNameUrl = environment.serverUrl + `/VirtualPlayerName/experts`;
 
         if (this.data.isSolo === true) {
             this.level = new FormControl('', [Validators.required]);

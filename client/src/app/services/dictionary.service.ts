@@ -3,8 +3,9 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DictionaryInterface } from '@app/classes/dictionary';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
-export const BASE_URL = 'http://localhost:3000/api/dictionary';
+export const BASE_URL = environment.serverUrl + `/dictionary`;
 @Injectable({
     providedIn: 'root',
 })
