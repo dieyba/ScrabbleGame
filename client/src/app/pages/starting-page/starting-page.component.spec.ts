@@ -40,7 +40,8 @@ describe('StartingPageComponent', () => {
         // matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
         // component.openDialog();
         // expect(matdialog).toHaveBeenCalled();
-        const spy = spyOn(component.dialog, 'open');
+        // eslint-disable-next-line dot-notation
+        const spy = spyOn(component['dialog'], 'open');
         component.openDialog();
         expect(spy).toHaveBeenCalledTimes(1);
     });
