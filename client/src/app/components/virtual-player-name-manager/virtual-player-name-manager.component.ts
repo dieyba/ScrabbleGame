@@ -24,8 +24,8 @@ export enum ErrorCaseVirtualPlayerName {
     styleUrls: ['./virtual-player-name-manager.component.scss'],
 })
 export class VirtualPlayerNameManagerComponent implements OnInit {
-    beginnerNameUrl = environment.serverUrl + `/VirtualPlayerName/beginners`;
-    expertNameUrl = environment.serverUrl + `/VirtualPlayerName/experts`;
+    beginnerNameUrl = environment.serverUrl + '/VirtualPlayerName/beginners';
+    expertNameUrl = environment.serverUrl + '/VirtualPlayerName/experts';
     beginnerNameList: VirtualPlayerName[];
     expertNameList: VirtualPlayerName[];
 

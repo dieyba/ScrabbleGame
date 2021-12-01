@@ -261,7 +261,7 @@ export class GridService {
                 }
             }
         }
-        return removedScrabbleLetters; // TODO check if letter is a star
+        return removedScrabbleLetters;
     }
 
     updateBoard(word: string, orientation: string, position: Vec2) {
