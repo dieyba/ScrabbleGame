@@ -1,5 +1,5 @@
 import { Square, SquareColor } from './square';
-import { isAllLowerLetters, removeAccents } from './utilities';
+import { ERROR_NUMBER, isAllLowerLetters, removeAccents } from './utilities';
 
 export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;
@@ -28,17 +28,17 @@ export class ScrabbleLetter {
     }
     setDefaultValue(character: string) {
         // set the letter's default value
-        if ('aeilnorstu'.includes(character)) {
+        if ('aeilnorstu'.indexOf(character) !== ERROR_NUMBER) {
             this.value = 1;
-        } else if ('dgm'.includes(character)) {
+        } else if ('dgm'.indexOf(character) !== ERROR_NUMBER) {
             this.value = 2;
-        } else if ('bcp'.includes(character)) {
+        } else if ('bcp'.indexOf(character) !== ERROR_NUMBER) {
             this.value = 3;
-        } else if ('fhv'.includes(character)) {
+        } else if ('fhv'.indexOf(character) !== ERROR_NUMBER) {
             this.value = 4;
-        } else if ('jq'.includes(character)) {
+        } else if ('jq'.indexOf(character) !== ERROR_NUMBER) {
             this.value = 8;
-        } else if ('kwxyz'.includes(character)) {
+        } else if ('kwxyz'.indexOf(character) !== ERROR_NUMBER) {
             this.value = 10;
         } else {
             this.value = 0; // case where it is a * or capital letter

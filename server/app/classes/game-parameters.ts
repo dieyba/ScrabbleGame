@@ -4,6 +4,7 @@ import { Player } from './player';
 import { ScrabbleBoard } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
 import { Square, TOTAL_COLORS } from './square';
+import { ERROR_NUMBER } from './utilities';
 
 export const GAME_CAPACITY = 2;
 const DEFAULT_LETTER_COUNT = 7;
@@ -92,7 +93,7 @@ export class GameInitInfo {
     pickSharedGoals(usedGoals: GoalType[]) {
         for (let i = 0; this.sharedGoals.length < PUBLIC_GOALS_COUNT; i++) {
             const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
-            if (!this.sharedGoals.includes(randomGoal)) {
+            if (this.sharedGoals.indexOf(randomGoal) === ERROR_NUMBER) {
                 this.sharedGoals.push(randomGoal);
                 usedGoals.push(randomGoal);
                 if (randomGoal === GoalType.PlaceLetterOnColorSquare) {
@@ -107,7 +108,7 @@ export class GameInitInfo {
         this.players.forEach((player) => {
             do {
                 const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
-                if (!usedGoals.includes(randomGoal)) {
+                if (usedGoals.indexOf(randomGoal) === ERROR_NUMBER) {
                     player.goal = randomGoal;
                     usedGoals.push(randomGoal);
                     if (randomGoal === GoalType.PlaceLetterOnColorSquare) {

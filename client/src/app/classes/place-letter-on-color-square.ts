@@ -2,6 +2,7 @@ import { Goal, GoalDescriptions, GoalPoints, GoalType } from './goal';
 import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
 import { SquareColor } from './square';
+import { ERROR_NUMBER } from './utilities';
 
 export class PlaceLetterOnColorSquare extends Goal {
     targetLetter: string;
@@ -26,7 +27,7 @@ export class PlaceLetterOnColorSquare extends Goal {
         for (const scrabbleLetter of wordPlaced.content) {
             const isRightLetter = scrabbleLetter.character === this.targetLetter;
             const isRightColor = scrabbleLetter.color === this.targetColor;
-            const isNewlyPlacedLetter = newlyPlacedLetters.includes(scrabbleLetter);
+            const isNewlyPlacedLetter = newlyPlacedLetters.indexOf(scrabbleLetter) !== ERROR_NUMBER;
             if (isRightLetter && isRightColor && isNewlyPlacedLetter) {
                 this.isAchieved = true;
                 return GoalPoints.PlaceLetterOnColorSquare;

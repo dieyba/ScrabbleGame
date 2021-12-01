@@ -1,6 +1,7 @@
 import { Goal, GoalDescriptions, GoalPoints, GoalType } from './goal';
 import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
+import { ERROR_NUMBER } from './utilities';
 
 const NAME_LETTERS_MIN_AMOUNT = 3;
 
@@ -18,8 +19,8 @@ export class FormWordWithLettersFromName extends Goal {
         let nameLettersCounter = 0;
         const remainingNameLetters = activePlayerName;
         for (const scrabbleLetter of wordPlaced.content) {
-            const isNewlyPlacedLetter = newlyPlacedLetters.includes(scrabbleLetter);
-            if (remainingNameLetters.includes(scrabbleLetter.character) && isNewlyPlacedLetter) {
+            const isNewlyPlacedLetter = newlyPlacedLetters.indexOf(scrabbleLetter) !== ERROR_NUMBER;
+            if (remainingNameLetters.indexOf(scrabbleLetter.character) !== ERROR_NUMBER && isNewlyPlacedLetter) {
                 nameLettersCounter++;
                 remainingNameLetters.replace(scrabbleLetter.character, '');
             }
