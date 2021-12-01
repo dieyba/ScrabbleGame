@@ -15,7 +15,11 @@ import { GameService } from '@app/services/game.service';
 import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
 
 export const GAME_CAPACITY = 2;
-
+export interface DialogData {
+    isSolo: boolean;
+    isLog2990: boolean;
+    isGameSelected: boolean;
+}
 @Component({
     selector: 'app-form',
     templateUrl: './form.component.html',
@@ -52,8 +56,7 @@ export class FormComponent implements OnInit {
         private virtualPlayerNameService: VirtualPlayerNameManager,
         private dictionaryService: DictionaryService,
         private snack: MatSnackBar,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        @Inject(MAT_DIALOG_DATA) public data: any,
+        @Inject(MAT_DIALOG_DATA) public data: DialogData,
     ) {
         this.beginnerNameList = [];
         this.expertNameList = [];

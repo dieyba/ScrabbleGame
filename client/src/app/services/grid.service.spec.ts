@@ -236,4 +236,28 @@ describe('GridService', () => {
         expect(service.scrabbleBoard.squares[0][0].occupied).toEqual(false);
         expect(service.scrabbleBoard.squares[1][0].occupied).toEqual(true);
     });
+
+    it('updateBoard should updat the letters with the right direction (v)', () => {
+        const word = 'test';
+        const position = new Vec2();
+        const startPosition = new Vec2();
+        service.updateBoard(word, 'v', position);
+
+        for (startPosition.y; startPosition.y < word.length; startPosition.y++) {
+            expect(service.scrabbleBoard.squares[startPosition.x][startPosition.y].isValidated).toBeTrue();
+            expect(service.scrabbleBoard.squares[startPosition.x][startPosition.y].isBonusUsed).toBeTrue();
+        }
+    });
+
+    it('updateBoard should updat the letters with the right direction (h)', () => {
+        const word = 'test';
+        const position = new Vec2();
+        const startPosition = new Vec2();
+        service.updateBoard(word, 'h', position);
+
+        for (startPosition.x; startPosition.x < word.length; startPosition.x++) {
+            expect(service.scrabbleBoard.squares[startPosition.x][startPosition.y].isValidated).toBeTrue();
+            expect(service.scrabbleBoard.squares[startPosition.x][startPosition.y].isBonusUsed).toBeTrue();
+        }
+    });
 });
