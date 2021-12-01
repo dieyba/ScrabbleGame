@@ -12,7 +12,6 @@ import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { TOTAL_COLORS } from '@app/classes/square';
-import { ERROR_NUMBER } from '@app/classes/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -57,7 +56,7 @@ export class GoalsService {
         const newSharedGoals: GoalType[] = [];
         for (let i = 0; newSharedGoals.length < PUBLIC_GOALS_COUNT; i++) {
             const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
-            if (newSharedGoals.indexOf(randomGoal) === ERROR_NUMBER) {
+            if (!newSharedGoals.includes(randomGoal)) {
                 newSharedGoals.push(randomGoal);
                 usedGoals.push(randomGoal);
             }
@@ -69,7 +68,7 @@ export class GoalsService {
         players.forEach((player) => {
             do {
                 const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
-                if (usedGoals.indexOf(randomGoal) === ERROR_NUMBER) {
+                if (!usedGoals.includes(randomGoal)) {
                     player.goal = randomGoal;
                     usedGoals.push(randomGoal);
                 }
@@ -121,7 +120,7 @@ export class GoalsService {
         }
         // Synchronize the new goals achieved for multiplayer mode
         allGoals.forEach((goal) => {
-            if (alreadyAchievedGoals.indexOf(goal) === ERROR_NUMBER && goal.isAchieved) {
+            if (!alreadyAchievedGoals.includes(goal) && goal.isAchieved) {
                 this.socket.emit('achieve goal', goal.type);
                 // console.log('new goal achieved:', goal.constructor.name);
             }

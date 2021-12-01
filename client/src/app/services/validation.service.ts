@@ -155,9 +155,6 @@ export class ValidationService {
         }
     }
     isWordValid(word: string): boolean {
-        const isWordInDictionary = this.dictionary.words.indexOf(word) !== ERROR_NUMBER;
-        const isLongEnough = word.length >= MIN_WORD_LENGHT;
-        const isAllowedCharacters = word.indexOf('-') === ERROR_NUMBER && word.indexOf("'") === ERROR_NUMBER;
-        return isWordInDictionary && isLongEnough && isAllowedCharacters;
+        return this.dictionary.words.includes(word) && word.length >= MIN_WORD_LENGHT && !word.includes('-') && !word.includes("'") ? true : false;
     }
 }

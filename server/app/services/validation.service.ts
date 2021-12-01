@@ -1,5 +1,4 @@
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
-import { ERROR_NUMBER } from '@app/classes/utilities';
 import { Service } from 'typedi';
 
 @Service()
@@ -24,9 +23,6 @@ export class ValidationService {
     }
 
     isWordValid(word: string): boolean {
-        const isWordInDictionary = this.dictionary.words.indexOf(word) !== ERROR_NUMBER;
-        const isLongEnough = word.length >= 2;
-        const isAllowedCharacters = word.indexOf('-') === ERROR_NUMBER && word.indexOf("'") === ERROR_NUMBER;
-        return isWordInDictionary && isLongEnough && isAllowedCharacters;
+        return this.dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
     }
 }

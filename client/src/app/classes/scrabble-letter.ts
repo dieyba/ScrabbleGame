@@ -1,5 +1,5 @@
 import { Square, SquareColor } from './square';
-import { ERROR_NUMBER, isAllLowerLetters, removeAccents } from './utilities';
+import { isAllLowerLetters, removeAccents } from './utilities';
 
 export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;
@@ -28,17 +28,17 @@ export class ScrabbleLetter {
     }
     setDefaultValue(character: string) {
         // set the letter's default value
-        if ('aeilnorstu'.indexOf(character) !== ERROR_NUMBER) {
+        if ('aeilnorstu'.includes(character)) {
             this.value = 1;
-        } else if ('dgm'.indexOf(character) !== ERROR_NUMBER) {
+        } else if ('dgm'.includes(character)) {
             this.value = 2;
-        } else if ('bcp'.indexOf(character) !== ERROR_NUMBER) {
+        } else if ('bcp'.includes(character)) {
             this.value = 3;
-        } else if ('fhv'.indexOf(character) !== ERROR_NUMBER) {
+        } else if ('fhv'.includes(character)) {
             this.value = 4;
-        } else if ('jq'.indexOf(character) !== ERROR_NUMBER) {
+        } else if ('jq'.includes(character)) {
             this.value = 8;
-        } else if ('kwxyz'.indexOf(character) !== ERROR_NUMBER) {
+        } else if ('kwxyz'.includes(character)) {
             this.value = 10;
         } else {
             this.value = 0; // default value for *

@@ -2,7 +2,6 @@ import { Goal, GoalDescriptions, GoalPoints, GoalType } from './goal';
 import { Column, Row } from './scrabble-board';
 import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
-import { ERROR_NUMBER } from './utilities';
 import { Vec2 } from './vec2';
 
 export class PlaceLetterOnBoardCorner extends Goal {
@@ -25,8 +24,8 @@ export class PlaceLetterOnBoardCorner extends Goal {
         }
         const wordPlaced = wordsFormed[0];
         for (const scrabbleLetter of wordPlaced.content) {
-            const isInCorner = this.targetCoordinates.indexOf(scrabbleLetter.tile.position) !== ERROR_NUMBER;
-            const isNewlyPlacedLetter = newlyPlacedLetters.indexOf(scrabbleLetter) !== ERROR_NUMBER;
+            const isInCorner = this.targetCoordinates.includes(scrabbleLetter.tile.position);
+            const isNewlyPlacedLetter = newlyPlacedLetters.includes(scrabbleLetter);
             if (isInCorner && isNewlyPlacedLetter) {
                 this.isAchieved = true;
                 return GoalPoints.PlaceLetterOnBoardCorner;
