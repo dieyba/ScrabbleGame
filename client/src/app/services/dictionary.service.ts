@@ -28,9 +28,21 @@ export class DictionaryService {
         return this.http.post<DictionaryInterface>(url, dictionary);
     }
 
-    // resetDbBestScores() {
-    //     return this.http.delete<BestScores>(BASE_URL);
-    // }
+    reset(): Observable<DictionaryInterface> {
+        return this.http.delete<DictionaryInterface>(BASE_URL);
+    }
+
+    update(url: string, dictionaryName: string, dictionaryId: unknown, updatedTitle: string, updatedDescription: string) {
+        return this.http.patch<DictionaryInterface>(url + '/' + dictionaryName, {
+            id: dictionaryId,
+            newTitle: updatedTitle,
+            newDescription: updatedDescription,
+        });
+    }
+
+    delete(dictionaryId: unknown): Observable<DictionaryInterface> {
+        return this.http.delete<DictionaryInterface>(BASE_URL + '/' + dictionaryId);
+    }
 
     handleErrorSnackBar(error: HttpErrorResponse): void {
         switch (error.status) {
