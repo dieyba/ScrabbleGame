@@ -9,7 +9,7 @@ describe('BestScoresComponent', () => {
     let component: BestScoresComponent;
     let fixture: ComponentFixture<BestScoresComponent>;
     let bestScoresServiceSpy: jasmine.SpyObj<BestScoresService>;
-    let defaultClassicBestScoresValue = [
+    const defaultClassicBestScoresValue = [
         {
             playerName: 'Erika',
             score: 1,
@@ -26,8 +26,8 @@ describe('BestScoresComponent', () => {
     beforeEach(async () => {
         bestScoresServiceSpy = jasmine.createSpyObj('BestScoresService', ['getBestScores', 'handleErrorSnackBar']);
         bestScoresServiceSpy.getBestScores.and.callFake(() => {
-            return of(defaultClassicBestScoresValue)
-        })
+            return of(defaultClassicBestScoresValue);
+        });
         await TestBed.configureTestingModule({
             declarations: [BestScoresComponent],
             providers: [
@@ -69,7 +69,7 @@ describe('BestScoresComponent', () => {
     });
 
     it('closeDialog shoud close dialog', () => {
-        const spy = spyOn(component['dialogRef'], 'close');
+        const spy = spyOn(component.dialogRef, 'close');
         component.closeDialog();
         expect(spy).toHaveBeenCalledTimes(1);
     });

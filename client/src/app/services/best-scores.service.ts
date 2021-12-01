@@ -20,7 +20,7 @@ export class BestScoresService {
     }
 
     postBestScore(playerName: string, playerScore: number, url: string): Observable<BestScores> {
-        const bestScore: BestScores = { playerName: playerName, score: playerScore };
+        const bestScore: BestScores = { playerName, score: playerScore };
         return this.http.post<BestScores>(url, bestScore);
     }
 

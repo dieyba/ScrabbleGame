@@ -9,12 +9,12 @@ export const DATABASE_COLLECTION = ['ClassicMode', 'Log2990Mode'];
 const MAX_SCORE = 100000000000;
 @Service()
 export class BestScoresService {
-    private client: MongoClient;
     defaultClassicBestScoresValue: BestScores[];
     defaultLog2990BestScoresValue: BestScores[];
     classicCollection: Collection<BestScores>;
     log2990Collection: Collection<BestScores>;
-    dbUrl: string
+    dbUrl: string;
+    private client: MongoClient;
 
     constructor(url: string = DATABASE_URL) {
         this.dbUrl = url;
@@ -63,10 +63,9 @@ export class BestScoresService {
                 score: 3,
             },
         ];
-
     }
 
-    async connectClient(url?: string): Promise<void> {
+    async connectClient(): Promise<void> {
         return MongoClient.connect(this.dbUrl)
             .then(async (client: MongoClient) => {
                 this.client = client;
@@ -166,7 +165,7 @@ export class BestScoresService {
     }
 
     async populateDB(typeScores: BestScores[], dbCollection: string): Promise<void> {
-        const docCount = await this.client.db(DATABASE_NAME).collection(dbCollection).countDocuments()
+        const docCount = await this.client.db(DATABASE_NAME).collection(dbCollection).countDocuments();
         if (docCount === 0) {
             for (const score of typeScores) {
                 await this.client.db(DATABASE_NAME).collection(dbCollection).insertOne(score);
@@ -175,13 +174,8 @@ export class BestScoresService {
     }
 
     async resetCollectionInDb(tabScore: Collection<BestScores>, typeScores: BestScores[], dbCollection: string): Promise<void> {
-        try {
-            await tabScore.deleteMany({})
-            await this.populateDB(typeScores, dbCollection);
-        } catch (error) {
-            throw error;
-        }
-
+        await tabScore.deleteMany({});
+        await this.populateDB(typeScores, dbCollection);
     }
 
     async resetDataBase() {

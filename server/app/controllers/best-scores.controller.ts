@@ -23,7 +23,6 @@ export class BestScoresController {
                     res.json(bestScores);
                 })
                 .catch((error: Error) => {
-                    console.log(error)
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });

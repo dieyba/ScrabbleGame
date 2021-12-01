@@ -88,7 +88,7 @@ export class WaitingAreaComponent implements AfterViewInit {
         this.gameList.getGames(this.data.isLog2990);
     }
 
-    // mettre la fonction randomNumber de form dans utilities et l'appeler ici 
+    // mettre la fonction randomNumber de form dans utilities et l'appeler ici
     randomGame() {
         let randomFloat = Math.random() * this.pendingGameslist.length;
         randomFloat = Math.floor(randomFloat);

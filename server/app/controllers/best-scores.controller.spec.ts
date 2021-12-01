@@ -43,7 +43,6 @@ describe('BestScoresController', () => {
         return supertest(expressApp)
             .get('/api/bestScores/classicMode')
             .then((response) => {
-                console.log(response.body)
                 expect(response.statusCode).to.equal(StatusCodes.OK);
                 expect(response.body).to.deep.equal(bestScore);
             });
@@ -52,7 +51,6 @@ describe('BestScoresController', () => {
         return supertest(expressApp)
             .get('/api/bestScores/log2990Mode')
             .then((response) => {
-                console.log(response.body)
                 expect(response.statusCode).to.equal(StatusCodes.OK);
                 expect(response.body).to.deep.equal(bestScore);
             });
@@ -77,7 +75,6 @@ describe('BestScoresController', () => {
             })
             .catch((error) => {
                 expect(error);
-
             });
     });
 
@@ -109,7 +106,6 @@ describe('BestScoresController', () => {
             })
             .catch((error) => {
                 expect(error);
-
             });
     });
 
@@ -123,7 +119,6 @@ describe('BestScoresController', () => {
             })
             .catch((error) => {
                 expect(error);
-
             });
     });
 
