@@ -16,12 +16,12 @@ export class FormWordWithLettersFromName extends Goal {
         }
         const wordPlaced = wordsFormed[0];
         let nameLettersCounter = 0;
-        const remainingNameLetters = activePlayerName;
+        let remainingNameLetters = activePlayerName;
         for (const scrabbleLetter of wordPlaced.content) {
             const isNewlyPlacedLetter = newlyPlacedLetters.includes(scrabbleLetter);
             if (remainingNameLetters.includes(scrabbleLetter.character) && isNewlyPlacedLetter) {
                 nameLettersCounter++;
-                remainingNameLetters.replace(scrabbleLetter.character, '');
+                remainingNameLetters = remainingNameLetters.replace(scrabbleLetter.character, '');
             }
         }
         if (nameLettersCounter >= NAME_LETTERS_MIN_AMOUNT) {
