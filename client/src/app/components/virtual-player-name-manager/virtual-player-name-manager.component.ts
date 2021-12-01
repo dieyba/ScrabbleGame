@@ -5,10 +5,9 @@ import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ERROR_NUMBER } from '@app/classes/utilities';
 import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
+import { environment } from 'src/environments/environment';
 
 const maxLength = 12;
-// export const BEGINNER_VIRTUAL_PLAYER_NAMES_URL = 'http://localhost:3000/api/VirtualPlayerName/beginners';
-// export const EXPERT_VIRTUAL_PLAYER_NAMES_URL = 'http://localhost:3000/api/VirtualPlayerName/experts';
 
 export enum ErrorCaseVirtualPlayerName {
     InvalidName = 'Ce nom est invalide',
@@ -25,8 +24,8 @@ export enum ErrorCaseVirtualPlayerName {
     styleUrls: ['./virtual-player-name-manager.component.scss'],
 })
 export class VirtualPlayerNameManagerComponent implements OnInit {
-    beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
-    expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
+    beginnerNameUrl = environment.serverUrl + `/VirtualPlayerName/beginners`;
+    expertNameUrl = environment.serverUrl + `/VirtualPlayerName/experts`;
     beginnerNameList: VirtualPlayerName[];
     expertNameList: VirtualPlayerName[];
 

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 export interface VirtualPlayerName {
     _id: unknown;
@@ -11,9 +12,7 @@ export interface VirtualPlayerName {
     providedIn: 'root',
 })
 export class VirtualPlayerNameService {
-    private databaseUrl = 'http://localhost:3000/api/VirtualPlayerName';
-    // private beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
-    // private expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
+    private databaseUrl = environment.serverUrl + `/VirtualPlayerName`;
 
     constructor(private http: HttpClient) {}
 
