@@ -172,7 +172,7 @@ export class MouseWordPlacerService {
         )
             return;
         letterToDraw.color = this.gridService.scrabbleBoard.squares[pos.x][pos.y].color;
-        const letter = letterToDraw.character.toUpperCase();
+        const letter = letterToDraw.character === '*' ? letterToDraw.whiteLetterCharacter : letterToDraw.character.toUpperCase();
         // Draw background
         this.drawSquare(this.currentPosition, this.companionService.convertColorToString(letterToDraw.color));
         // Draw letter
@@ -210,6 +210,7 @@ export class MouseWordPlacerService {
             for (const rackLetter of this.rackService.rackLetters) {
                 if (rackLetter.character === '*') {
                     foundLetter = rackLetter;
+                    rackLetter.setLetter(letter); // sets the whiteLetterCharacter attributes
                     this.currentWord.push(rackLetter);
                     this.wordString += letter;
                     this.rackService.rackLetters.splice(this.rackService.rackLetters.indexOf(rackLetter), 1);
@@ -279,6 +280,9 @@ export class MouseWordPlacerService {
     removeLetter() {
         const lastLetter = this.currentWord.pop();
         if (lastLetter !== undefined) {
+            if (lastLetter.character === '*') {
+                lastLetter.whiteLetterCharacter = '*';
+            }
             this.rackService.rackLetters.push(lastLetter);
             const charPosition = this.wordString.lastIndexOf(lastLetter.character);
             const partOne = this.wordString.substring(0, charPosition);
