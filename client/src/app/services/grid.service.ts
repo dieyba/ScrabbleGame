@@ -28,6 +28,9 @@ const DEFAULT_LETTER_FONT_INDEX = 2;
 const DEFAULT_VALUE_FONT_INDEX = 2;
 const ROW_MAIN_LETTERS = 'ABCDEFGHIJKLMNO';
 
+export const ABSOLUTE_BOARD_SIZE = 580;
+export const ACTUAL_SQUARE_SIZE = SQUARE_SIZE + 2;
+
 @Injectable({
     providedIn: 'root',
 })

@@ -3,8 +3,7 @@ import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { SquareColor } from '@app/classes/square';
 import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
-import { BOARD_SIZE } from './grid.service';
-import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE } from './mouse-word-placer.service';
+import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE, BOARD_SIZE } from './grid.service';
 
 @Injectable({
     providedIn: 'root',

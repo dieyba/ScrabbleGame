@@ -3,6 +3,7 @@ import { GameParameters } from '@app/classes/game-parameters';
 import { LetterStock } from '@app/classes/letter-stock';
 import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { CommandInvokerService } from './command-invoker.service';
 import { ExchangeService } from './exchange.service';
 import { DEFAULT_LETTER_COUNT, GameService } from './game.service';
 import { RackService } from './rack.service';
@@ -12,8 +13,10 @@ describe('ExchangeService', () => {
     let service: ExchangeService;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let commandInvokerService: jasmine.SpyObj<CommandInvokerService>;
 
     beforeEach(() => {
+        commandInvokerService = jasmine.createSpyObj('CommandInvokerService', ['executeCommand']);
         rackServiceSpy = jasmine.createSpyObj('RackService', ['drawRack', 'select', 'deselect', 'deselectAll', 'handleExchangeSelection'], {
             ['exchangeSelected']: [false, false, false, false, false, false, false],
             ['handlingSelected']: [false, false, false, false, false, false, false],
@@ -23,6 +26,7 @@ describe('ExchangeService', () => {
             providers: [
                 { provide: RackService, useValue: rackServiceSpy },
                 { provide: GameService, useValue: gameServiceSpy },
+                { provide: CommandInvokerService, useValue: commandInvokerService },
             ],
         });
 
@@ -65,10 +69,15 @@ describe('ExchangeService', () => {
         expect(rackServiceSpy.select).not.toHaveBeenCalled();
     });
 
-    it('exchange should call soloGameService exchangeLettersSelected', () => {
+    it('exchange should call gameService exchangeLettersSelected', () => {
         service.exchange();
 
         expect(gameServiceSpy.getLettersSelected).toHaveBeenCalled();
+    });
+
+    it('exchange should call command invoker execute command', () => {
+        service.exchange();
+        expect(commandInvokerService.executeCommand).toHaveBeenCalled();
     });
 
     it('cancelExchange should call rackService deselect seven times', () => {

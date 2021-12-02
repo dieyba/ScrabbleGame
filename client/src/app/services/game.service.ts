@@ -247,6 +247,7 @@ export class GameService {
                 // Retake letters
                 lettersToAddToRack = this.gridService.removeInvalidLetters(placeParams.position, placeParams.word.length, placeParams.orientation);
             } else {
+                // console.log('all valid words:', strWords);
                 // Take new letters
                 this.validationService.updatePlayerScore(tempScrabbleWords, player);
                 if (String(this.game.isLog2990) === 'true') {
@@ -262,9 +263,6 @@ export class GameService {
             // End turn
             this.isTurnPassed = false;
             this.isTurnEndSubject.next(this.isTurnPassed);
-            // // console.log('after place, local letters:', this.game.getLocalPlayer().letters);
-            // // console.log('after place, opponent letters:', this.game.getOpponent().letters);
-            // console.log('board:', this.gridService.scrabbleBoard);
             this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
         });
         return errorResult;
