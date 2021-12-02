@@ -4,7 +4,7 @@ import { GameType } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { Trie } from '@app/classes/trie';
-import { ERROR_NUMBER } from '@app/classes/utilities';
+import { ERROR_NUMBER, MIN_WORD_LENGHT } from '@app/classes/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -160,6 +160,6 @@ export class ValidationService {
         }
     }
     isWordValid(word: string): boolean {
-        return this.dictionaryTrie.find(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
+        return this.dictionaryTrie.find(word) && word.length >= MIN_WORD_LENGHT && !word.includes('-') && !word.includes("'") ? true : false;
     }
 }
