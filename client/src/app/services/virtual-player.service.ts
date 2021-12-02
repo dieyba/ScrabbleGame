@@ -110,12 +110,12 @@ export class VirtualPlayerService {
                 }
                 // waits 3 second to try and find a word to place
                 moveMade = this.makeMoves(possiblePermutations, value)[0];
-                const params: PlaceParams = {
-                    position: moveMade.position,
-                    orientation: moveMade.axis,
-                    word: moveMade.word.stringify(),
-                };
-                if (moveMade.word.content.length > 1) {
+                if (moveMade !== undefined) {
+                    const params: PlaceParams = {
+                        position: moveMade.position,
+                        orientation: moveMade.axis,
+                        word: moveMade.word.stringify(),
+                    };
                     const command = new PlaceCmd(defaultParams, params);
                     this.commandInvoker.executeCommand(command);
                 } else {
@@ -139,12 +139,45 @@ export class VirtualPlayerService {
         const filteredPermutations: ScrabbleWord[] = [];
         for (const permutation of permutations) {
             const permutationString = permutation.stringify();
-            if (this.isWordValid(permutationString)) {
+            if (
+                this.isWordValid(permutationString) &&
+                (this.isPossiblePermutation(permutation, Axis.H) || this.isPossiblePermutation(permutation, Axis.V))
+            ) {
                 console.log('valid word: ' + permutationString);
                 filteredPermutations.push(permutation);
             }
         }
         return filteredPermutations;
+    }
+
+    isPossiblePermutation(word: ScrabbleWord, axis: Axis): boolean {
+        let variablePos = POSITION_ERROR;
+        let constantPos = POSITION_ERROR;
+        let posDifference = 0;
+        let letterCounter = 0;
+        for (const letter of word.content) {
+            if (letter.tile.isValidated) {
+                if (axis === Axis.H) {
+                    if (variablePos === POSITION_ERROR) {
+                        variablePos = letter.tile.position.x;
+                        constantPos = letter.tile.position.y;
+                    }
+                    if (constantPos !== letter.tile.position.y) return false;
+                    posDifference = letter.tile.position.x - variablePos;
+                }
+                if (axis === Axis.V) {
+                    if (variablePos === POSITION_ERROR) {
+                        variablePos = letter.tile.position.y;
+                        constantPos = letter.tile.position.x;
+                    }
+                    if (constantPos !== letter.tile.position.x) return false;
+                    posDifference = letter.tile.position.y - variablePos;
+                }
+                if (posDifference !== letterCounter && variablePos !== POSITION_ERROR) return false;
+            }
+            letterCounter++;
+        }
+        return true;
     }
 
     playFirstTurn(permutations: ScrabbleWord[], value: number): void {
@@ -153,7 +186,7 @@ export class VirtualPlayerService {
             serviceCalled: this.gameService,
         };
         const moveFound = this.findFirstValidMoves(permutations, value, true);
-        if (moveFound[0].position.x === POSITION_ERROR || moveFound[0].position.y === POSITION_ERROR || moveFound.length === 0) {
+        if (moveFound.length === 0) {
             setTimeout(() => {
                 const chosenTiles = this.chooseTilesFromRack(this.selectRandomValue());
                 const chosenTilesString = chosenTiles.map((tile) => tile.character).join('');
@@ -172,7 +205,7 @@ export class VirtualPlayerService {
         // Find the best position for the move for the points if VP is expert
         const params: PlaceParams = {
             position: moveFound[0].position,
-            orientation: this.orientation,
+            orientation: moveFound[0].axis,
             word: moveFound[0].word.stringify(),
         };
         const command = new PlaceCmd(defaultParams, params);
@@ -202,18 +235,17 @@ export class VirtualPlayerService {
         const filteredPermutations = this.filterPermutations(permutations);
         const resultArray: ScrabbleMove[] = [];
         let currentMinValue = 0;
-        let axis;
         let position = new Vec2(POSITION_ERROR, POSITION_ERROR);
         if (value === Points.MaxValue4) {
             for (const permutation of filteredPermutations) {
                 position = this.findPositionForWord(permutation, value, isFirstTurn, currentMinValue);
                 if (position.x !== POSITION_ERROR && position.y !== POSITION_ERROR) {
                     const axisChosen = this.getRandomIntInclusive(0, 1);
-                    if (axisChosen === 0) axis = Axis.H;
-                    else axis = Axis.V;
-                    const valueOfWord = this.valueOnPosition(permutation, position, axis);
+                    if (axisChosen === 0) this.orientation = Axis.H;
+                    else this.orientation = Axis.V;
+                    const valueOfWord = this.valueOnPosition(permutation, position, this.orientation);
                     if (valueOfWord > currentMinValue) {
-                        resultArray.push(new ScrabbleMove(permutation, position, axis, valueOfWord));
+                        resultArray.push(new ScrabbleMove(permutation, position, this.orientation, valueOfWord));
                         if (resultArray.length > MAX_ARRAY_SIZE) {
                             resultArray.sort((a, b) => b.value - a.value);
                             currentMinValue = resultArray[MAX_ARRAY_SIZE].value;
@@ -351,8 +383,11 @@ export class VirtualPlayerService {
             } else if (axis === Axis.V && currentCoord.y + 1 < BOARD_SIZE) {
                 currentCoord.y += 1;
             }
+            console.log('hello');
             if (!currentSquare || !currentSquare.letter) return;
+            console.log('there');
             if (currentSquare.isValidated) continue;
+            console.log('placed letter: ' + word.content[i].character);
             currentSquare.letter = word.content[i];
             currentSquare.occupied = true;
             currentSquare.isValidated = false;
@@ -431,6 +466,7 @@ export class VirtualPlayerService {
                         this.gridService.scrabbleBoard.squares[i][j].letter.character === word.content[letter].character &&
                         word.content[letter].tile.occupied
                     ) {
+                        console.log('testing word ', word.stringify(), ' on axis ', axis, ' at ', 'x=', i, 'y=', j);
                         const letterPos = new Vec2(i, j);
                         const realPos = this.getBeginningPosition(letter, letterPos, axis);
                         // Verify if the letters can be found in the rack.
@@ -442,6 +478,7 @@ export class VirtualPlayerService {
                         }
                         if (!this.wordHasBeenPlaced(word, wordsBuilt)) isErrorInWordsBuilt = true;
                         this.removalAfterTempPlacement(word, realPos, axis);
+                        console.log(isErrorInWordsBuilt);
                         if (isErrorInWordsBuilt) continue;
                         returnPos = realPos;
                     }
@@ -578,7 +615,6 @@ export class VirtualPlayerService {
     }
 
     makeMoves(permutations: ScrabbleWord[], value: number): ScrabbleMove[] {
-        // TODO: Modify this to show alternate placements
         const returnArray: ScrabbleMove[] = [];
         let currentMinValue;
         const filteredPermutations = this.filterPermutations(permutations);
