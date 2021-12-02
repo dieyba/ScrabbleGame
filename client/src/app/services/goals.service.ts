@@ -142,9 +142,9 @@ export class GoalsService {
     getGoalByType(goalType: GoalType) {
         const allGoals = this.sharedGoals.concat(this.privateGoals);
         const goalId = allGoals.findIndex((goal: Goal) => {
-            if (goal.type === undefined) {
-                return false;
-            }
+            // if (goal.type === undefined) {
+            //     return false;
+            // }
             return goal.type === goalType;
         });
         return allGoals[goalId];

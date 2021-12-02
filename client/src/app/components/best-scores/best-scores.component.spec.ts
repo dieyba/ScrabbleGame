@@ -69,7 +69,8 @@ describe('BestScoresComponent', () => {
     });
 
     it('closeDialog shoud close dialog', () => {
-        const spy = spyOn(component.dialogRef, 'close');
+        // eslint-disable-next-line dot-notation
+        const spy = spyOn(component['dialogRef'], 'close');
         component.closeDialog();
         expect(spy).toHaveBeenCalledTimes(1);
     });

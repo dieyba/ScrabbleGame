@@ -34,7 +34,8 @@ export class ExchangeService {
 
     exchange() {
         const defaultParams: DefaultCommandParams = { player: this.gameService.game.getLocalPlayer(), serviceCalled: this.gameService };
-        const letters = this.gameService.getLettersSelected();
+        // const letters = this.gameService.getLettersSelected();
+        const letters = this.getLettersSelected();
         const command = new ExchangeCmd(defaultParams, letters);
         this.commandInvokerService.executeCommand(command);
     }
@@ -52,5 +53,16 @@ export class ExchangeService {
             }
         }
         return false;
+    }
+
+    private getLettersSelected(): string {
+        let letters = '';
+        for (let i = 0; i < this.rackService.exchangeSelected.length; i++) {
+            if (this.rackService.exchangeSelected[i] === true) {
+                letters += this.rackService.rackLetters[i].character;
+                this.rackService.exchangeSelected[i] = false;
+            }
+        }
+        return letters;
     }
 }

@@ -149,10 +149,6 @@ export class RackService {
 
     drawSelection(position: number, ctx: CanvasRenderingContext2D) {
         const squareOrigin = this.findSquareOrigin(position);
-        // Les lettres sont réecrites en gras, on peut le régler en redessiant le rack mais ce n'est pas important.
-        // il faudrait remettre la couleur en blanc avant de la changer.
-        // ctx.fillRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
-        // this.drawRack();
         ctx.fillRect(squareOrigin, 0, SQUARE_WIDTH, RACK_HEIGHT);
         this.drawExistingLetters();
     }
