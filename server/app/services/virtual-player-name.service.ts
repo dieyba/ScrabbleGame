@@ -50,7 +50,7 @@ export class VirtualPlayerNameService {
     }
 
     async postVirtualPlayerName(collection: Collection<VirtualPlayerName>, virtualPlayerName: VirtualPlayerName): Promise<void> {
-        if (await this.isSameName(virtualPlayerName, this.beginnersCollection)) {
+        if (await this.isSameName(virtualPlayerName, collection)) {
             throw new Error('Ce nom existe déjà');
         }
 
@@ -78,7 +78,7 @@ export class VirtualPlayerNameService {
     }
 
     async updateVirtualPlayerName(collection: Collection<VirtualPlayerName>, nameToUpdateId: ObjectId, updateName: string): Promise<void> {
-        if (await this.isSameName({ _id: new ObjectId(), name: updateName }, this.beginnersCollection)) {
+        if (await this.isSameName({ _id: new ObjectId(), name: updateName }, collection)) {
             throw new Error('Ce nom existe déjà');
         }
 
