@@ -218,18 +218,27 @@ export class ScrabbleBoard {
         return result;
     }
 
+    // eslint-disable-next-line complexity
     isWordTouchingOtherWord(word: string, coord: Vec2, orientation: string): boolean {
         // Checking if touching word before or after
         const coordBeforeWord = new Vec2();
         const coordAfterWord = new Vec2();
-
+        // EL: I modified all lines with comments, maybe tests fail now because of this.
         if (orientation === 'v') {
             coordBeforeWord.x = coordAfterWord.x = coord.x;
-            coordBeforeWord.y = coord.y - 1;
+            if (coord.y === 0) coordBeforeWord.y = coord.y;
+            // Modification 1 above and below.
+            else coordBeforeWord.y = coord.y - 1;
+            if (coord.y + word.length >= BOARD_SIZE) return false;
+            // Modification 2 above
             coordAfterWord.y = coord.y + word.length;
         } else {
             coordBeforeWord.y = coordAfterWord.y = coord.y;
-            coordBeforeWord.x = coord.x - 1;
+            if (coord.x === 0) coordBeforeWord.x = coord.x;
+            // Modification 3 above and below.
+            else coordBeforeWord.x = coord.x - 1;
+            if (coord.x + word.length >= BOARD_SIZE) return false;
+            // Modification 4 above
             coordAfterWord.x = coord.x + word.length;
         }
 

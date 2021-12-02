@@ -193,8 +193,10 @@ export class GameService {
                 }
                 const lettersToAdd: ScrabbleLetter[] = this.game.stock.exchangeLetters(lettersToRemove);
                 for (let i = 0; i < lettersToAdd.length; i++) {
-                    this.rackService.removeLetter(lettersToRemove[i]);
-                    this.rackService.addLetter(lettersToAdd[i]);
+                    if (!(player instanceof VirtualPlayer)) {
+                        this.rackService.removeLetter(lettersToRemove[i]);
+                        this.rackService.addLetter(lettersToAdd[i]);
+                    }
                     player.letters.push(lettersToAdd[i]);
                 }
                 if (this.game.gameMode === GameType.MultiPlayer) {

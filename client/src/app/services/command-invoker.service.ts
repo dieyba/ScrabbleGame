@@ -27,10 +27,8 @@ export class CommandInvokerService {
         if (isSendToServer) {
             this.displayExecutionWithServer(isExchangeCmd, commandResult);
         } else {
-            this.displayExecutionLocally(isFromVirtualPlayer, isExchangeCmd, commandResult);
+            this.displayExecutionLocally(isFromVirtualPlayer, command, commandResult);
         }
-        // TODO: To be careful when merging with vp branch, we need to keep this version of the code for the command invokers
-        // and only add the debug message handling part from vp branch
     }
     displayExecutionWithServer(isExchangeCmd: boolean, commandResult: CommandResult) {
         // extract command is the only situation where the message is different for the local/remove player
@@ -44,13 +42,12 @@ export class CommandInvokerService {
             });
         }
     }
-    displayExecutionLocally(isFromVirtualPlayer: boolean, isExchangeCmd: boolean, commandResult: CommandResult) {
+    displayExecutionLocally(isFromVirtualPlayer: boolean, command: Command, commandResult: CommandResult) {
         if (isFromVirtualPlayer) {
             // TODO: see how exactly debug messages will be added in command invoker
             const commandMessage = commandResult.executionMessages[0].message;
-            const debugMessages = ['some debug message', 'some other debug message'];
-            this.chatDisplayService.addVirtalPlayerEntry(commandMessage, debugMessages);
-        } else if (isExchangeCmd) {
+            this.chatDisplayService.addVirtalPlayerEntry(commandMessage, command.debugMessages);
+        } else if (command instanceof ExchangeCmd) {
             // extract command returns both players message, but solo game only displays the local message
             this.chatDisplayService.addEntry(commandResult.executionMessages[0]);
         } else {
