@@ -6,7 +6,7 @@ import { scrabbleLettersToString } from './utilities';
 const MIN_WORD_LENGTH = 5;
 
 export class FormAnExistingWord extends Goal {
-    private validationService: ValidationService;
+    validationService: ValidationService;
     constructor() {
         super();
         this.type = GoalType.FormAnExistingWord;
@@ -19,7 +19,10 @@ export class FormAnExistingWord extends Goal {
         if (this.isAchieved) {
             return 0;
         }
-        const previousValidWordsFormed = this.validationService.validWordsFormed.slice(0, -wordsFormed.length);
+        const previousValidWordsFormed = this.validationService.validWordsFormed;
+        wordsFormed.forEach(word => {
+            previousValidWordsFormed.pop();
+        });
         for (const newWordFormed of wordsFormed) {
             // TODO: Voir pour les étoiles si les lettres si il faut toLower() dans validWordsFormed et newWordFormed
             if (

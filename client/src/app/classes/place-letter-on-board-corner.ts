@@ -24,7 +24,7 @@ export class PlaceLetterOnBoardCorner extends Goal {
         }
         const wordPlaced = wordsFormed[0];
         for (const scrabbleLetter of wordPlaced.content) {
-            const isInCorner = this.targetCoordinates.includes(scrabbleLetter.tile.position);
+            const isInCorner = this.isInCorner(scrabbleLetter.tile.position);
             const isNewlyPlacedLetter = newlyPlacedLetters.includes(scrabbleLetter);
             if (isInCorner && isNewlyPlacedLetter) {
                 this.isAchieved = true;
@@ -32,6 +32,15 @@ export class PlaceLetterOnBoardCorner extends Goal {
             }
         }
         return 0;
+    }
+    isInCorner(position: Vec2) {
+        let isInCorner = false;
+        this.targetCoordinates.forEach(coord => {
+            if (position.x === coord.x && position.y === coord.y) {
+                isInCorner = true;
+            }
+        });
+        return isInCorner;
     }
 }
 

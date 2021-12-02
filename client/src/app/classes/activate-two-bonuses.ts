@@ -1,4 +1,5 @@
 import { Goal, GoalDescriptions, GoalPoints, GoalType } from './goal';
+import { ScrabbleLetter } from './scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
 import { SquareColor } from './square';
 
@@ -10,14 +11,15 @@ export class ActivateTwoBonuses extends Goal {
         this.type = GoalType.ActivateTwoBonuses;
         this.description = GoalDescriptions.ActivateTwoBonuses;
     }
-    achieve(wordsFormed: ScrabbleWord[]) {
+    achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters: ScrabbleLetter[]) {
         if (this.isAchieved) {
             return 0;
         }
         const wordPlaced = wordsFormed[0];
         let newBonusUsedCounter = 0;
         for (const scrabbleLetter of wordPlaced.content) {
-            if (scrabbleLetter.tile.color !== SquareColor.None && scrabbleLetter.tile.isBonusUsed) {
+            const isNewlyPlacedLetter = newlyPlacedLetters.includes(scrabbleLetter);
+            if (scrabbleLetter.tile.color !== SquareColor.None && scrabbleLetter.tile.isBonusUsed && isNewlyPlacedLetter) {
                 newBonusUsedCounter++;
             }
         }
