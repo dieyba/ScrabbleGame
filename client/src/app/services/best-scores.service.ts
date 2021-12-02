@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-export const BASE_URL = environment.serverUrl + `/bestScores`;
+export const BASE_URL = environment.serverUrl + '/bestScores';
 
 export interface BestScores {
     playerName: string;

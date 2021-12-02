@@ -12,7 +12,7 @@ export interface VirtualPlayerName {
     providedIn: 'root',
 })
 export class VirtualPlayerNameService {
-    private databaseUrl = environment.serverUrl + `/VirtualPlayerName`;
+    private databaseUrl = environment.serverUrl + '/VirtualPlayerName';
 
     constructor(private http: HttpClient) {}
 

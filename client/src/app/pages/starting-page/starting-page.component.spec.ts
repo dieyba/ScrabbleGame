@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -40,7 +41,6 @@ describe('StartingPageComponent', () => {
         // matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
         // component.openDialog();
         // expect(matdialog).toHaveBeenCalled();
-        // eslint-disable-next-line dot-notation
         const spy = spyOn(component['dialog'], 'open');
         component.openDialog();
         expect(spy).toHaveBeenCalledTimes(1);

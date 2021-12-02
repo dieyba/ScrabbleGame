@@ -5,7 +5,7 @@ import { DictionaryInterface } from '@app/classes/dictionary';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-export const BASE_URL = environment.serverUrl + `/dictionary`;
+export const BASE_URL = environment.serverUrl + '/dictionary';
 @Injectable({
     providedIn: 'root',
 })

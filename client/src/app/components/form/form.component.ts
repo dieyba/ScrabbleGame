@@ -67,8 +67,8 @@ export class FormComponent implements OnInit {
         this.defaultTimer = '60';
         this.defaultDictionary = '0';
         this.defaultBonus = false;
-        this.beginnerNameUrl = environment.serverUrl + `/VirtualPlayerName/beginners`;
-        this.expertNameUrl = environment.serverUrl + `/VirtualPlayerName/experts`;
+        this.beginnerNameUrl = environment.serverUrl + '/VirtualPlayerName/beginners';
+        this.expertNameUrl = environment.serverUrl + '/VirtualPlayerName/experts';
 
         if (this.data.isSolo === true) {
             this.level = new FormControl('', [Validators.required]);

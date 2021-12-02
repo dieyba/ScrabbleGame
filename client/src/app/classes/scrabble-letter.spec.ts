@@ -16,4 +16,27 @@ describe('ScrabbleLetter', () => {
         letter.setLetter('à');
         expect(letter.character).toEqual('a');
     });
+
+    it('setLetter should set empty char', () => {
+        const letter = new ScrabbleLetter('z');
+        letter.setLetter('');
+        expect(letter.character).toEqual('');
+        expect(letter.value).toEqual(0);
+    });
+
+    it('setLetter should set * char', () => {
+        const letter = new ScrabbleLetter('z');
+        letter.setLetter('*');
+        expect(letter.character).toEqual('*');
+        expect(letter.whiteLetterCharacter).toEqual('*');
+        expect(letter.value).toEqual(0);
+    });
+
+    it('setLetter should set * char and its letter value', () => {
+        const letter = new ScrabbleLetter('z');
+        letter.setLetter('E');
+        expect(letter.character).toEqual('*');
+        expect(letter.whiteLetterCharacter).toEqual('E');
+        expect(letter.value).toEqual(0);
+    });
 });
