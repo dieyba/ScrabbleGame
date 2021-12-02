@@ -95,49 +95,49 @@ export class BestScoresService {
         }
     }
 
-    async checkingIfAlreadyInDb(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
-        let haveToChange = false;
-        await tabScore.find({}).forEach(async (score) => {
-            if (score.score < newScore.score && score.playerName === newScore.playerName) {
-                await tabScore.findOneAndDelete(score);
-                haveToChange = true;
-            }
-        });
-        return haveToChange;
-    }
+    // async checkingIfAlreadyInDb(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
+    //     let haveToChange = false;
+    //     await tabScore.find({}).forEach(async (score) => {
+    //         if (score.score < newScore.score && score.playerName === newScore.playerName) {
+    //             await tabScore.findOneAndDelete(score);
+    //             haveToChange = true;
+    //         }
+    //     });
+    //     return haveToChange;
+    // }
 
-    async isTwoSameBestScores(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
-        let twoSameBestScore = false;
-        const sameNameSameScore = await this.checkingIfAlreadyInDb(tabScore, newScore);
-        if (!sameNameSameScore) {
-            await tabScore.find({}).forEach((score) => {
-                if (score.score === newScore.score && score.playerName !== newScore.playerName) {
-                    twoSameBestScore = true;
-                }
-            });
-        }
-        return twoSameBestScore;
-    }
+    // async isTwoSameBestScores(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
+    //     let twoSameBestScore = false;
+    //     const sameNameSameScore = await this.checkingIfAlreadyInDb(tabScore, newScore);
+    //     if (!sameNameSameScore) {
+    //         await tabScore.find({}).forEach((score) => {
+    //             if (score.score === newScore.score && score.playerName !== newScore.playerName) {
+    //                 twoSameBestScore = true;
+    //             }
+    //         });
+    //     }
+    //     return twoSameBestScore;
+    // }
 
-    async isScoreHigh(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
-        let valid = false;
-        const deleteMinScore: BestScores = { playerName: '', score: MAX_SCORE };
-        const sameNameSameScore = await this.checkingIfAlreadyInDb(tabScore, newScore);
-        const twoBestScores = await this.isTwoSameBestScores(tabScore, newScore);
-        if (!sameNameSameScore && !twoBestScores) {
-            await tabScore.find({}).forEach((score) => {
-                if (score.score < deleteMinScore.score) {
-                    deleteMinScore.playerName = score.playerName;
-                    deleteMinScore.score = score.score;
-                }
-            });
-            if (deleteMinScore.score < newScore.score) {
-                await tabScore.findOneAndDelete(deleteMinScore);
-                valid = true;
-            }
-        }
-        return valid;
-    }
+    // async isScoreHigh(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
+    //     let valid = false;
+    //     const deleteMinScore: BestScores = { playerName: '', score: MAX_SCORE };
+    //     const sameNameSameScore = await this.checkingIfAlreadyInDb(tabScore, newScore);
+    //     const twoBestScores = await this.isTwoSameBestScores(tabScore, newScore);
+    //     if (!sameNameSameScore && !twoBestScores) {
+    //         await tabScore.find({}).forEach((score) => {
+    //             if (score.score < deleteMinScore.score) {
+    //                 deleteMinScore.playerName = score.playerName;
+    //                 deleteMinScore.score = score.score;
+    //             }
+    //         });
+    //         if (deleteMinScore.score < newScore.score) {
+    //             await tabScore.findOneAndDelete(deleteMinScore);
+    //             valid = true;
+    //         }
+    //     }
+    //     return valid;
+    // }
     // async canSetInDb(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
     //     const sameNameDifferentScore = await this.checkingIfAlreadyInDb(tabScore, newScore);
     //     const scoreIsHigh = await this.isScoreHigh(tabScore, newScore);
@@ -145,12 +145,37 @@ export class BestScoresService {
     //     return scoreIsHigh || twoSameScores || sameNameDifferentScore;
     // }
 
+
     async canSetInDb(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
-        const arrayScore = tabScore.find({}).toArray();
-        if (score.score < newScore.score && score.playerName === newScore.playerName) {
-            await tabScore.findOneAndDelete(score);
-            haveToChange = true;
+        const arrayScore = (await tabScore.find({}).sort({ score: -1 }).toArray());
+        const deleteMinScore = await this.minimumScore(tabScore);
+        let haveToChange = false;
+        // console.log(arrayScore)
+        console.log(deleteMinScore.score)
+        for (let dbScore of arrayScore) {
+            console.log('dbScore.score', dbScore.score)
+            console.log('dbScore.playerName', dbScore.playerName)
+            console.log('newScore', newScore)
+            console.log(dbScore.score === newScore.score, ' ', dbScore.playerName === newScore.playerName)
+            if (newScore.score < deleteMinScore.score) {
+                console.log('score trop petit')
+                return haveToChange;
+            }
+            if (dbScore.score === newScore.score && dbScore.playerName === newScore.playerName) {
+                console.log('same nom and same score no changes')
+                return haveToChange;
+            }
+            if (dbScore.score === newScore.score && dbScore.playerName !== newScore.playerName) {
+                console.log('different nom but same score')
+                haveToChange = true;
+            }
+            // if (score.score < newScore.score) {
+            //     console.log('score elevé')
+            //     await tabScore.findOneAndDelete(deleteMinScore);
+            //     haveToChange = true;
+            // }
         }
+        return haveToChange;
     }
 
     async populateDB(typeScores: BestScores[], dbCollection: string): Promise<void> {
@@ -170,5 +195,17 @@ export class BestScoresService {
     async resetDataBase() {
         await this.resetCollectionInDb(this.classicCollection, this.defaultClassicBestScoresValue, DATABASE_COLLECTION[0]);
         await this.resetCollectionInDb(this.log2990Collection, this.defaultLog2990BestScoresValue, DATABASE_COLLECTION[1]);
+    }
+
+    private async minimumScore(tabScore: Collection<BestScores>): Promise<BestScores> {
+        const arrayScore = (await tabScore.find({}).toArray());
+        const deleteMinScore: BestScores = { playerName: '', score: MAX_SCORE };
+        for (let score of arrayScore) {
+            if (score.score < deleteMinScore.score) {
+                deleteMinScore.playerName = score.playerName;
+                deleteMinScore.score = score.score;
+            }
+        }
+        return deleteMinScore
     }
 }
