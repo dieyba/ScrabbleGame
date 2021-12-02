@@ -192,7 +192,7 @@ export class FormComponent implements OnInit {
             const gameParams = new WaitingAreaGameParameters(
                 gameMode,
                 GAME_CAPACITY,
-                this.dictionaryForm.value,
+                dictionary,
                 this.timer.value,
                 this.bonus.value,
                 this.data.isLog2990,

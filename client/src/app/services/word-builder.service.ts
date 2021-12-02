@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { Axis, ERROR_NUMBER, invertAxis, isCoordInsideBoard, MIN_WORD_LENGHT } from '@app/classes/utilities';
+import { Axis, ERROR_NUMBER, invertAxis, isCoordInsideBoard, MIN_WORD_LENGTH } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from './grid.service';
 
@@ -24,7 +24,7 @@ export class WordBuilderService {
         let wordBuilt = this.buildScrabbleWord(coord, axis);
         wordBuilt.orientation = axis;
         const placedWord = wordBuilt;
-        if (wordBuilt.content.length >= MIN_WORD_LENGHT) {
+        if (wordBuilt.content.length >= MIN_WORD_LENGTH) {
             result.push(wordBuilt);
         }
 
@@ -41,7 +41,7 @@ export class WordBuilderService {
             const oppositeAxis = invertAxis[axis];
             wordBuilt = this.buildScrabbleWord(currentCoord, oppositeAxis);
             wordBuilt.orientation = axis;
-            if (wordBuilt.content.length >= MIN_WORD_LENGHT) {
+            if (wordBuilt.content.length >= MIN_WORD_LENGTH) {
                 result.push(wordBuilt);
             }
         }

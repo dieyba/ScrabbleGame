@@ -2,7 +2,7 @@ import { AfterViewInit, Component, HostListener, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { DictionaryType } from '@app/classes/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary';
 import { GameInitInfo, GameType } from '@app/classes/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
 import { DialogData, FormComponent, GAME_CAPACITY } from '@app/components/form/form.component';
@@ -10,10 +10,11 @@ import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
 import * as io from 'socket.io-client';
+import dict_path from 'src/assets/dictionnary.json';
 import { environment } from 'src/environments/environment';
 
-const MAX_NAME_LENGHT = 12;
-const MIN_NAME_LENGHT = 3;
+const MAX_NAME_LENGTH = 12;
+const MIN_NAME_LENGTH = 3;
 const LIST_UPDATE_TIMEOUT = 500;
 
 @Component({
@@ -58,12 +59,20 @@ export class WaitingAreaComponent implements AfterViewInit {
         this.name = false;
         this.isStarting = false;
         if (data.isGameSelected) {
-            this.selectedGame = new WaitingAreaGameParameters(GameType.MultiPlayer, GAME_CAPACITY, DictionaryType.Default, 0, false, false, '');
+            this.selectedGame = new WaitingAreaGameParameters(
+                GameType.MultiPlayer,
+                GAME_CAPACITY,
+                dict_path as DictionaryInterface,
+                0,
+                false,
+                false,
+                '',
+            );
             this.playerName = new FormControl('', [
                 Validators.required,
                 Validators.pattern('[a-zA-ZÉé]*'),
-                Validators.maxLength(MAX_NAME_LENGHT),
-                Validators.minLength(MIN_NAME_LENGHT),
+                Validators.maxLength(MAX_NAME_LENGTH),
+                Validators.minLength(MIN_NAME_LENGTH),
             ]);
         }
         this.full = false;

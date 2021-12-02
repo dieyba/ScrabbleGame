@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Dictionary, DictionaryType } from '@app/classes/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary';
 import { GameType } from '@app/classes/game-parameters';
 import { Player } from '@app/classes/player';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { ERROR_NUMBER, MIN_WORD_LENGHT } from '@app/classes/utilities';
+import { ERROR_NUMBER, MIN_WORD_LENGTH } from '@app/classes/utilities';
 import { SocketHandler } from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
+import dict_path from 'src/assets/dictionnary.json';
 import { environment } from 'src/environments/environment';
 import { BonusService } from './bonus.service';
 import { BOARD_SIZE, GridService } from './grid.service';
@@ -19,7 +20,7 @@ export const WAIT_TIME = 3000;
 })
 export class ValidationService {
     validWordsFormed: string[];
-    dictionary: Dictionary;
+    dictionary: DictionaryInterface;
     words: string[];
     isTimerElapsed: boolean;
     areWordsValid: boolean;
@@ -28,13 +29,18 @@ export class ValidationService {
 
     constructor(private readonly gridService: GridService, private bonusService: BonusService) {
         this.validWordsFormed = [];
-        this.dictionary = new Dictionary(DictionaryType.Default);
+        this.dictionary = dict_path as DictionaryInterface;
         this.isTimerElapsed = false;
         this.areWordsValid = false;
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
     }
+
+    setDictionary(dictionary: DictionaryInterface) {
+        this.dictionary = dictionary; // TODO change after Etienne merge
+    }
+
     socketOnConnect() {
         this.socket.on('areWordsValid', (result: boolean) => {
             this.areWordsValid = result;
@@ -43,6 +49,7 @@ export class ValidationService {
             this.validWordsFormed = this.validWordsFormed.concat(newWords);
         });
     }
+
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
         const wordsValue = this.calculateScore(newWords);
         // Retirer lettres du board
@@ -154,7 +161,8 @@ export class ValidationService {
             });
         }
     }
+
     isWordValid(word: string): boolean {
-        return this.dictionary.words.includes(word) && word.length >= MIN_WORD_LENGHT && !word.includes('-') && !word.includes("'") ? true : false;
+        return this.dictionary.words.includes(word) && word.length >= MIN_WORD_LENGTH && !word.includes('-') && !word.includes("'") ? true : false;
     }
 }

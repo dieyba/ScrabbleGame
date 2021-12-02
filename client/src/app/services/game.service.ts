@@ -97,7 +97,7 @@ export class GameService {
             this.game.getOpponent().letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
             const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
             this.game.players[starterPlayerIndex].isActive = true;
-            this.validationService.dictionary.selectDictionary(initInfo.dictionaryType);
+            this.validationService.setDictionary(initInfo.dictionary);
             if (String(this.game.isLog2990) === 'true') {
                 const usedGoals: GoalType[] = [];
                 const sharedGoals = this.goalsService.pickSharedGoals(usedGoals);
