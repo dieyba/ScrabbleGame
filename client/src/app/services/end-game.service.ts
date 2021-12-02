@@ -1,4 +1,3 @@
-import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { GameType } from '@app/classes/game-parameters';
@@ -64,15 +63,15 @@ export class EndGameService {
                 () => {
                     /* Do nothing */
                 },
-                (error: HttpErrorResponse) => {
-                    if (error.status !== HttpStatusCode.Ok) {
-                        this.snack.open(
-                            'Désolé votre score ne pourra pas être éligible au tableau' +
-                                'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
-                                'Veuillez réessayer plus tard!',
-                            'close',
-                        );
-                    }
+                () => {
+                    // if (error.status !== HttpStatusCode.Ok) {
+                    this.snack.open(
+                        'Désolé votre score ne pourra pas être éligible au tableau' +
+                            'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
+                            'Veuillez réessayer plus tard!',
+                        'close',
+                    );
+                    // }
                 },
             );
         clearInterval(this.gameService.game.gameTimer.intervalValue);

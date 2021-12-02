@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { DictionaryType } from '@app/classes/dictionary';
 import { GameInitInfo, GameType } from '@app/classes/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
-import { FormComponent, GAME_CAPACITY } from '@app/components/form/form.component';
+import { DialogData, FormComponent, GAME_CAPACITY } from '@app/components/form/form.component';
 import { SocketHandler } from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
@@ -49,7 +49,7 @@ export class WaitingAreaComponent implements AfterViewInit {
         private dialog: MatDialog,
         public gameList: GameListService,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        @Inject(MAT_DIALOG_DATA) public data: any,
+        @Inject(MAT_DIALOG_DATA) public data: DialogData,
     ) {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
@@ -88,6 +88,7 @@ export class WaitingAreaComponent implements AfterViewInit {
         this.gameList.getGames(this.data.isLog2990);
     }
 
+    // mettre la fonction randomNumber de form dans utilities et l'appeler ici
     randomGame() {
         let randomFloat = Math.random() * this.pendingGameslist.length;
         randomFloat = Math.floor(randomFloat);

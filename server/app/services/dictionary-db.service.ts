@@ -1,5 +1,7 @@
-import { DictionaryInterface } from '@app/classes/dictionary';
-import { Collection, FindOptions, MongoClient } from 'mongodb';
+/* eslint no-underscore-dangle: 0 */
+import * as dict_path from '@app/assets/dictionnary.json';
+import { Dictionary, DictionaryInterface } from '@app/classes/dictionary';
+import { Collection, Filter, FindOneAndUpdateOptions, FindOptions, MongoClient, ObjectId } from 'mongodb';
 import { Service } from 'typedi';
 
 // CHANGE the URL for your database information
@@ -11,13 +13,19 @@ const DATABASE_COLLECTION = ['Dictionary'];
 export class DictionaryDBService {
     client: MongoClient;
     dictionaryCollection: Collection<DictionaryInterface>;
+    dbUrl: string;
 
     constructor(url = DATABASE_URL) {
-        MongoClient.connect(url)
-            .then((client: MongoClient) => {
+        this.dbUrl = url;
+    }
+
+    async clientConnection(): Promise<void> {
+        return MongoClient.connect(this.dbUrl)
+            .then(async (client: MongoClient) => {
                 this.client = client;
+                // console.log('client connection');
                 this.dictionaryCollection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]);
-                this.populateDictionaryDB();
+                await this.populateDictionaryDB();
             })
             .catch((error) => {
                 throw error;
@@ -64,32 +72,77 @@ export class DictionaryDBService {
             });
     }
 
-    async populateDictionaryDB(): Promise<void> {
-        if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments()) === 0) {
-            const dictionaries: DictionaryInterface[] = [
-                {
-                    title: 'erika',
-                    description: 'assiette de patates frites à erika',
-                    words: ['patates frites #1', 'patates frites #2', 'patates frites #3', 'patates frites #4', 'patates frites #5'],
-                },
-            ];
-            for (const course of dictionaries) {
-                await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(course);
-            }
+    async updateDictionary(dictionaryId: ObjectId, newTitle: string, newDescription: string): Promise<void> {
+        const isSameTitle = await this.isSameTitle(newTitle);
+        if (isSameTitle) {
+            throw new Error('Ce titre existe déjà');
         }
+
+        const filterSameId: Filter<DictionaryInterface> = { _id: new ObjectId(dictionaryId) };
+        const options = { returnNewDocument: true } as FindOneAndUpdateOptions;
+        return this.dictionaryCollection
+            .findOneAndUpdate(filterSameId, { $set: { title: newTitle, description: newDescription } }, options)
+            .then(() => {
+                /* Do nothing */
+            })
+            .catch((error) => {
+                throw error;
+            });
     }
 
-    // }
-    // async deleteVirtualPlayerName(idName: string): Promise<void> {
-    //     this.collection
-    //         .findOneAndDelete({ _id: idName })
-    //         .then(() => {
-    //             /* do nothing */
-    //         })
-    //         .catch((error: Error) => {
-    //             throw error;
-    //         });
-    // }
+    async delete(dictionaryId: string): Promise<void> {
+        const id = new ObjectId(dictionaryId);
+        const isInCollection = await this.isInCollection(id);
+
+        if (!isInCollection) {
+            throw new Error('Pas dans la base de donnée');
+        }
+
+        const filterSameId: Filter<DictionaryInterface> = { _id: id };
+        return this.dictionaryCollection
+            .findOneAndDelete(filterSameId)
+            .then(() => {
+                /* Do nothing */
+            })
+            .catch((error) => {
+                throw error;
+            });
+    }
+
+    async reset() {
+        return this.dictionaryCollection
+            .deleteMany({})
+            .then(() => {
+                this.populateDictionaryDB();
+            })
+            .catch((error: Error) => {
+                throw error;
+            });
+    }
+
+    async populateDictionaryDB(): Promise<void> {
+        if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments()) === 0) {
+            // const dictionaries: DictionaryInterface[] = [
+            //     {
+            //         _id: new ObjectId(),
+            //         title: 'erika',
+            //         description: 'assiette de patates frites à erika',
+            //         words: ['patates frites #1', 'patates frites #2', 'patates frites #3', 'patates frites #4', 'patates frites #5'],
+            //     },
+            // ];
+            // for (const course of dictionaries) {
+            //     await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(course);
+            // }
+            const dico = dict_path as Dictionary;
+            const dictionaries: DictionaryInterface = {
+                _id: new ObjectId(),
+                title: dico.title,
+                description: dico.description,
+                words: dico.words,
+            };
+            await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(dictionaries);
+        }
+    }
 
     isDictionaryValid(dictionary: DictionaryInterface): boolean {
         const isTitleValid = dictionary.title !== '' && typeof dictionary.title === 'string';
@@ -127,5 +180,27 @@ export class DictionaryDBService {
             .catch(() => {
                 throw Error('Ne peut pas vérifier que le dictionnaire est unique');
             });
+    }
+
+    private async isSameTitle(titleToCompare: string): Promise<boolean> {
+        let isSameTitle = false;
+
+        await this.dictionaryCollection.find().forEach((dictionary) => {
+            if (dictionary.title === titleToCompare) {
+                isSameTitle = true;
+            }
+        });
+        return isSameTitle;
+    }
+
+    private async isInCollection(dictionaryId: ObjectId): Promise<boolean> {
+        let isInCollection = false;
+        await this.dictionaryCollection.find().forEach((dictionary) => {
+            if (dictionary._id === dictionaryId) {
+                isInCollection = true;
+            }
+        });
+
+        return isInCollection;
     }
 }

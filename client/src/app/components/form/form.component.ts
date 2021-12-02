@@ -7,15 +7,20 @@ import { Router } from '@angular/router';
 import { DictionaryInterface } from '@app/classes/dictionary';
 import { GameType } from '@app/classes/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
-import { ErrorCase } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
+import { ErrorCaseVirtualPlayerName } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
 import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
 import { GameListService } from '@app/services/game-list.service';
 import { GameService } from '@app/services/game.service';
-import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
+import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
+import { environment } from 'src/environments/environment';
 
 export const GAME_CAPACITY = 2;
-
+export interface DialogData {
+    isSolo: boolean;
+    isLog2990: boolean;
+    isGameSelected: boolean;
+}
 @Component({
     selector: 'app-form',
     templateUrl: './form.component.html',
@@ -49,11 +54,10 @@ export class FormComponent implements OnInit {
         private dialogRef: MatDialogRef<FormComponent>,
         private router: Router,
         private gameList: GameListService,
-        private virtualPlayerNameService: VirtualPlayerNameManager,
+        private virtualPlayerNameService: VirtualPlayerNameService,
         private dictionaryService: DictionaryService,
         private snack: MatSnackBar,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        @Inject(MAT_DIALOG_DATA) public data: any,
+        @Inject(MAT_DIALOG_DATA) public data: DialogData,
     ) {
         this.beginnerNameList = [];
         this.expertNameList = [];
@@ -63,8 +67,8 @@ export class FormComponent implements OnInit {
         this.defaultTimer = '60';
         this.defaultDictionary = '0';
         this.defaultBonus = false;
-        this.beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
-        this.expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
+        this.beginnerNameUrl = environment.serverUrl + '/VirtualPlayerName/beginners';
+        this.expertNameUrl = environment.serverUrl + '/VirtualPlayerName/experts';
 
         if (this.data.isSolo === true) {
             this.level = new FormControl('', [Validators.required]);
@@ -80,7 +84,7 @@ export class FormComponent implements OnInit {
                 // TODO: make a default list of players name to use when cannot access database
                 // and pick a name diffrent from the human player name
                 this.beginnerNameList = [{ _id: '', name: 'Sara' }];
-                this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
             },
         );
 
@@ -92,7 +96,7 @@ export class FormComponent implements OnInit {
                 // TODO: make a default list of players name to use when cannot access database
                 // and pick a name diffrent from the human player name
                 this.expertNameList = [{ _id: '', name: 'Ariane' }];
-                this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
             },
         );
 

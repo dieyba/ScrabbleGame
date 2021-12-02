@@ -32,7 +32,9 @@ export class WordBuilderService {
         // adding all the opposite axis words that could be created from the word placed
         for (const letter of placedWord.content) {
             const currentCoord = letter.tile.position;
-            if (currentCoord.x === ERROR_NUMBER || currentCoord.y === ERROR_NUMBER) continue;
+            if (currentCoord.x === ERROR_NUMBER || currentCoord.y === ERROR_NUMBER) {
+                continue;
+            }
             // if the current letter is not a newly placed letter, there is no need to check if word can be built from it
             if (!this.gridService.scrabbleBoard.squares[currentCoord.x]) return result;
             if (this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y].isValidated) {
@@ -54,10 +56,12 @@ export class WordBuilderService {
         if (isCoordInsideBoard(coord)) {
             if (this.gridService.scrabbleBoard.squares[coord.x][coord.y].occupied) {
                 const startCoord = this.findWordEdge(coord, axis, TOWARD_START);
-                if (startCoord.x === ERROR_NUMBER || startCoord.y === ERROR_NUMBER) {
+                const endCoord = this.findWordEdge(coord, axis, TOWARD_END);
+                const invalidStartCoord = startCoord.x === ERROR_NUMBER || startCoord.y === ERROR_NUMBER;
+                const invalidEndCoord = endCoord.x === ERROR_NUMBER || endCoord.y === ERROR_NUMBER;
+                if (invalidStartCoord || invalidEndCoord) {
                     return word;
                 }
-                const endCoord = this.findWordEdge(coord, axis, TOWARD_END);
                 // Adding 1 to get the correct word length since coordinates start at 0
                 const length = axis === Axis.H ? endCoord.x - startCoord.x + 1 : endCoord.y - startCoord.y + 1;
                 word.startPosition.x = startCoord.x;
