@@ -19,9 +19,9 @@ export class BestScoresService {
         return this.http.get<BestScores[]>(url);
     }
 
-    postBestScore(playerName: string, score: number, url: string): Observable<BestScores> {
-        // const bestScore: BestScores = { playerName, score };
-        return this.http.post<BestScores>(url, { playerName, score });
+    postBestScore(playerName: string, playerScore: number, url: string): Observable<BestScores> {
+        const bestScore = { playerName: playerName, score: playerScore } as BestScores;
+        return this.http.post<BestScores>(url, bestScore);
     }
 
     // postClassicBestScore(playerName: string, playerScore: number): Observable<BestScores> {
