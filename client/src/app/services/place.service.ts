@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { PlaceParams } from '@app/classes/commands';
 import { ErrorType } from '@app/classes/errors';
 import { Player } from '@app/classes/player';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { isAllLowerLetters } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
+import { VirtualPlayer } from '@app/classes/virtual-player';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
 
@@ -58,7 +58,7 @@ export class PlaceService {
         for (const letter of placeParams.word) {
             if (!this.gridService.scrabbleBoard.squares[tempCoord.x][tempCoord.y].occupied) {
                 // Taking letter from player and placing it
-                this.placeLetter(player.letters, letter, tempCoord);
+                this.placeLetter(player, letter, tempCoord);
             }
             if (placeParams.orientation === 'h') {
                 tempCoord.x++;
@@ -68,7 +68,7 @@ export class PlaceService {
         }
         return ErrorType.NoError;
     }
-    placeLetter(playerLetters: ScrabbleLetter[], letter: string, position: Vec2) {
+    placeLetter(player: Player, letter: string, position: Vec2) {
         // Position already occupied
         if (this.gridService.scrabbleBoard.squares[position.x][position.y].occupied) {
             return;
@@ -78,15 +78,18 @@ export class PlaceService {
         if (!isAllLowerLetters(tempLetter)) {
             tempLetter = '*';
         }
-        for (let i = 0; i < playerLetters.length; i++) {
-            if (playerLetters[i].character === tempLetter) {
+        for (let i = 0; i < player.letters.length; i++) {
+            if (player.letters[i].character === tempLetter) {
                 if (letter === letter.toUpperCase()) {
-                    playerLetters[i].character = letter;
+                    player.letters[i].character = letter;
                 }
-                playerLetters[i].tile = this.gridService.scrabbleBoard.squares[position.x][position.y];
-                this.gridService.drawLetter(playerLetters[i], position.x, position.y);
-                this.rackService.removeLetter(playerLetters[i]);
-                playerLetters.splice(i, 1);
+                player.letters[i].tile = this.gridService.scrabbleBoard.squares[position.x][position.y];
+                this.gridService.drawLetter(player.letters[i], position.x, position.y);
+                // Only remove the letters from the rack if the player is human
+                if (!(player instanceof VirtualPlayer)) {
+                    this.rackService.removeLetter(player.letters[i]);
+                }
+                player.letters.splice(i, 1);
                 break;
             }
         }
