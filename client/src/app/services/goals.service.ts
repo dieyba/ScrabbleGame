@@ -18,12 +18,13 @@ import { environment } from 'src/environments/environment';
 
 const PUBLIC_GOALS_COUNT = 2;
 const TOTAL_GOALS_COUNT = 8;
+type GoalCreationFunction = () => InstanceType<typeof Goal>;
 
 @Injectable({
     providedIn: 'root',
 })
 export class GoalsService {
-    goalsCreationMap: Map<GoalType, Function>; // eslint-disable-line @typescript-eslint/ban-types
+    goalsCreationMap: Map<GoalType, GoalCreationFunction>;
     sharedGoals: Goal[];
     privateGoals: Goal[];
     private socket: io.Socket;
