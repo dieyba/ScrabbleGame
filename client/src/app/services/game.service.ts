@@ -63,6 +63,8 @@ export class GameService {
             this.game.stock.letterStock = update.newStock;
             this.game.getOpponent().letters = update.newLetters;
             this.game.getOpponent().score = update.newScore;
+            // console.log('after synchro, local letters:', this.game.getLocalPlayer().letters);
+            // console.log('after synchro, opponent letters:', this.game.getOpponent().letters);
         });
         this.socket.on('convert to solo', (previousPlayerSocketId: string, virtualPlayerName: string) => {
             let newVirtualPlayer;
@@ -205,6 +207,8 @@ export class GameService {
                 }
                 this.isTurnPassed = false;
                 this.isTurnEndSubject.next(this.isTurnPassed);
+                // console.log('after exchange, local letters:', this.game.getLocalPlayer().letters);
+                // console.log('after exchange, opponent letters:', this.game.getOpponent().letters);
                 return ErrorType.NoError;
             }
         }
@@ -258,14 +262,26 @@ export class GameService {
             // End turn
             this.isTurnPassed = false;
             this.isTurnEndSubject.next(this.isTurnPassed);
+            // // console.log('after place, local letters:', this.game.getLocalPlayer().letters);
+            // // console.log('after place, opponent letters:', this.game.getOpponent().letters);
+            // console.log('board:', this.gridService.scrabbleBoard);
             this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
         });
         return errorResult;
     }
     synchronizeAfterPlaceCommand(errorResult: ErrorType, placeParams: PlaceParams, player: Player) {
         if (errorResult === ErrorType.NoError && this.game.gameMode === GameType.MultiPlayer) {
+            let wordUpdate = '';
+            for (let i = 0; i < placeParams.word.length; i++) {
+                const position =
+                    placeParams.orientation === Axis.H
+                        ? new Vec2(placeParams.position.x + i, placeParams.position.y)
+                        : new Vec2(placeParams.position.x, placeParams.position.y + i);
+                const boardLetter = this.game.scrabbleBoard.squares[position.x][position.y].letter;
+                wordUpdate += boardLetter.character === '*' ? boardLetter.whiteLetterCharacter : boardLetter.character;
+            }
             const boardUpdate: BoardUpdate = {
-                word: placeParams.word,
+                word: wordUpdate,
                 orientation: placeParams.orientation,
                 positionX: placeParams.position.x,
                 positionY: placeParams.position.y,

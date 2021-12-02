@@ -1,20 +1,25 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BASE_URL, BestScores, BestScoresService } from '@app/services/best-scores.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-best-scores',
     templateUrl: './best-scores.component.html',
     styleUrls: ['./best-scores.component.scss'],
 })
-export class BestScoresComponent implements OnInit {
+export class BestScoresComponent implements OnInit, OnDestroy {
     classicModeBestScores: BestScores[];
     log2990ModeBestScores: BestScores[];
+    classicBestScoresSubsciption: Subscription;
 
     constructor(private bestScoresService: BestScoresService, private dialogRef: MatDialogRef<BestScoresComponent>) {
         this.classicModeBestScores = [];
         this.log2990ModeBestScores = [];
+    }
+    ngOnDestroy(): void {
+        this.classicBestScoresSubsciption.unsubscribe();
     }
 
     ngOnInit() {
@@ -23,7 +28,7 @@ export class BestScoresComponent implements OnInit {
     }
 
     getClassicBestScores(url: string) {
-        this.bestScoresService.getBestScores(url).subscribe(
+        this.classicBestScoresSubsciption = this.bestScoresService.getBestScores(url).subscribe(
             (receiveBestScore) => {
                 this.classicModeBestScores = receiveBestScore;
             },

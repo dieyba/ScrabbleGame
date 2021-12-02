@@ -1,7 +1,6 @@
 import { VirtualPlayerName } from '@app/classes/virtual-player-name';
 import { Collection, Filter, FindOneAndUpdateOptions, MongoClient, ObjectId } from 'mongodb';
 import { Service } from 'typedi';
-// import { DatabaseService } from "./database.service";
 const DATABASE_URL = 'mongodb+srv://Scrabble304:Scrabble304@cluster0.bvwkn.mongodb.net/database?retryWrites=true&w=majority';
 const DATABASE_NAME = 'VirtualPlayerName';
 const DATABASE_COLLECTION = ['beginners', 'experts'];
@@ -10,27 +9,32 @@ const DATABASE_COLLECTION = ['beginners', 'experts'];
 export class VirtualPlayerNameService {
     beginnersCollection: Collection<VirtualPlayerName>;
     expertsCollection: Collection<VirtualPlayerName>;
+    dbUrl: string;
     private client: MongoClient;
     private originalBeginnerVirtualPlayerNames: VirtualPlayerName[];
     private originalExpertVirtualPlayerNames: VirtualPlayerName[];
 
-    constructor(url = DATABASE_URL) {
-        MongoClient.connect(url)
-            .then((client: MongoClient) => {
+    constructor(url: string = DATABASE_URL) {
+        this.dbUrl = url;
+        this.originalBeginnerVirtualPlayerNames = [
+            { _id: new ObjectId(), name: 'Erika' },
+            { _id: new ObjectId(), name: 'Sara' },
+            { _id: new ObjectId(), name: 'Etienne' },
+        ];
+        this.originalExpertVirtualPlayerNames = [
+            { _id: new ObjectId(), name: 'Dieyba' },
+            { _id: new ObjectId(), name: 'Kevin' },
+            { _id: new ObjectId(), name: 'Ariane' },
+        ];
+    }
+
+    async clientConnection(): Promise<void> {
+        return MongoClient.connect(this.dbUrl)
+            .then(async (client: MongoClient) => {
                 this.client = client;
-                this.originalBeginnerVirtualPlayerNames = [
-                    { _id: new ObjectId(), name: 'Erika' },
-                    { _id: new ObjectId(), name: 'Sara' },
-                    { _id: new ObjectId(), name: 'Etienne' },
-                ];
-                this.originalExpertVirtualPlayerNames = [
-                    { _id: new ObjectId(), name: 'Dieyba' },
-                    { _id: new ObjectId(), name: 'Kevin' },
-                    { _id: new ObjectId(), name: 'Ariane' },
-                ];
                 this.beginnersCollection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]);
                 this.expertsCollection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]);
-                this.populate();
+                await this.populate();
             })
             .catch((error) => {
                 throw error;
@@ -38,19 +42,18 @@ export class VirtualPlayerNameService {
     }
 
     async getVirtualPlayerNames(collection: Collection<VirtualPlayerName>): Promise<VirtualPlayerName[]> {
-        return collection
+        return await collection
             .find({})
             .toArray()
             .then((virtualPlayerName: VirtualPlayerName[]) => {
                 return virtualPlayerName;
-            })
-            .catch((error: Error) => {
-                throw error;
             });
     }
 
     async postVirtualPlayerName(collection: Collection<VirtualPlayerName>, virtualPlayerName: VirtualPlayerName): Promise<void> {
-        if (await this.isSameName(virtualPlayerName, this.beginnersCollection)) {
+        const isSame = await this.isSameName(virtualPlayerName, this.beginnersCollection);
+
+        if (isSame) {
             throw new Error('Ce nom existe déjà');
         }
 
@@ -65,7 +68,7 @@ export class VirtualPlayerNameService {
     }
 
     async deleteVirtualPlayerName(collection: Collection<VirtualPlayerName>, name: string): Promise<void> {
-        return collection
+        return await collection
             .findOneAndDelete({ name })
             .then((deleted) => {
                 if (!deleted.value) {
@@ -78,20 +81,16 @@ export class VirtualPlayerNameService {
     }
 
     async updateVirtualPlayerName(collection: Collection<VirtualPlayerName>, nameToUpdateId: ObjectId, updateName: string): Promise<void> {
-        if (await this.isSameName({ _id: new ObjectId(), name: updateName }, this.beginnersCollection)) {
+        const isSame = await this.isSameName({ _id: new ObjectId(), name: updateName }, this.beginnersCollection);
+        if (isSame) {
             throw new Error('Ce nom existe déjà');
         }
 
         const filterSameId: Filter<VirtualPlayerName> = { _id: new ObjectId(nameToUpdateId) };
         const options = { returnNewDocument: true } as FindOneAndUpdateOptions;
-        return collection
-            .findOneAndUpdate(filterSameId, { $set: { name: updateName } }, options)
-            .then(() => {
-                /* Do nothing */
-            })
-            .catch((error) => {
-                throw error;
-            });
+        return await collection.findOneAndUpdate(filterSameId, { $set: { name: updateName } }, options).then(() => {
+            return;
+        });
     }
 
     async resetDataBase(): Promise<void> {
@@ -125,13 +124,8 @@ export class VirtualPlayerNameService {
     }
 
     private async resetCollection(collection: Collection<VirtualPlayerName>): Promise<void> {
-        return collection
-            .deleteMany({})
-            .then(() => {
-                this.populate();
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
+        return collection.deleteMany({}).then(() => {
+            this.populate();
+        });
     }
 }

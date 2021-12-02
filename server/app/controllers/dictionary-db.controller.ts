@@ -8,7 +8,8 @@ import { Service } from 'typedi';
 export class DictionaryDBController {
     router: Router;
 
-    constructor(private readonly dictionaryDBService: DictionaryDBService) {
+    constructor(private dictionaryDBService: DictionaryDBService) {
+        this.dictionaryDBService.clientConnection();
         this.configureRouter();
     }
 
@@ -25,6 +26,7 @@ export class DictionaryDBController {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
+
         this.router.get('/:name', async (req: Request, res: Response) => {
             this.dictionaryDBService
                 .getDictionary(req.params.name)
@@ -35,6 +37,7 @@ export class DictionaryDBController {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
+
         this.router.post('/', async (req: Request, res: Response) => {
             this.dictionaryDBService
                 .postDictionary(req.body)
@@ -48,19 +51,55 @@ export class DictionaryDBController {
                     res.status(StatusCodes.BAD_REQUEST).send(error.message);
                 });
         });
-        // this.router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
-        //     this.virtualPlayerNameService
-        //         .deleteVirtualPlayerName(req.params.id)
-        //         .then(() => {
-        //             res.sendStatus(StatusCodes.NO_CONTENT).send();
-        //         })
-        //         .catch((error: Error) => {
-        //             if (error.message === 'Cannot remove headers after they are sent to the client') {
-        //                 // do nothing
-        //             } else {
-        //                 res.status(StatusCodes.NOT_FOUND).send(error.message);
-        //             }
-        //         });
-        // });
+
+        this.router.patch('/:title', async (req: Request, res: Response) => {
+            // console.log('collection in controller : ', this.dictionaryDBService.dictionaryCollection);
+            this.dictionaryDBService
+                .updateDictionary(req.body.id, req.body.newTitle, req.body.newDescription)
+                .then(() => {
+                    // console.log('then');
+                    res.status(StatusCodes.OK).send();
+                })
+                .catch((error: Error) => {
+                    // console.log('catch');
+                    // console.log(error);
+                    if (error.message === 'Cannot remove headers after they are sent to the client') {
+                        // do nothing
+                    } else {
+                        res.status(StatusCodes.BAD_REQUEST).send(error.message);
+                    }
+                });
+        });
+
+        this.router.delete('/:id', async (req: Request, res: Response) => {
+            // console.log('req : ', req.params);
+            this.dictionaryDBService
+                .delete(req.params.id)
+                .then(() => {
+                    res.status(StatusCodes.NO_CONTENT).send();
+                })
+                .catch((error: Error) => {
+                    if (error.message === 'Cannot remove headers after they are sent to the client') {
+                        // do nothing
+                    } else {
+                        res.status(StatusCodes.BAD_REQUEST).send(error.message);
+                    }
+                });
+        });
+
+        this.router.delete('/', async (req: Request, res: Response) => {
+            this.dictionaryDBService
+                .reset()
+                .then(() => {
+                    res.status(StatusCodes.NO_CONTENT).send();
+                })
+                .catch((error: Error) => {
+                    if (error.message === 'Cannot remove headers after they are sent to the client') {
+                        // do nothing
+                    } else {
+                        res.status(StatusCodes.BAD_REQUEST).send(error.message);
+                    }
+                });
+        });
     }
 }

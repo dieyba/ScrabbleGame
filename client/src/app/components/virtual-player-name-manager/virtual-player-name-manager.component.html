@@ -1,6 +1,6 @@
 <div class="virtualPlayers">
     <hr />
-    <div class="description">Ajoutez, modifiez et supprimer les noms des joueurs virtuels débutans et experts.</div>
+    <div class="description">Ajoutez, modifiez et supprimer les noms des joueurs virtuels débutants et experts.</div>
     <div class="information"><i>Veuillez sélectionner un nom pour le modifier/supprimer.</i><br /></div>
 
     <div class="lists">
@@ -50,15 +50,15 @@
     <button mat-fab class="delete-btn" *ngIf="isUntouchable()" disabled="true">
         <span class="toolTipDelete">Supprimer</span>
         <img
-        class="trash"
-        src="https://img.icons8.com/external-kiranshastry-lineal-kiranshastry/42/000000/external-delete-multimedia-kiranshastry-lineal-kiranshastry.png"
+            class="trash"
+            src="https://img.icons8.com/external-kiranshastry-lineal-kiranshastry/42/000000/external-delete-multimedia-kiranshastry-lineal-kiranshastry.png"
         />
     </button>
     <button mat-fab class="delete-btn" *ngIf="selectedName.name !== '' && !isUntouchable()" (click)="deleteName(); editName.setValue('')">
         <span class="toolTipDelete">Supprimer {{ selectedName.name }}</span>
         <img
-        class="trash"
-        src="https://img.icons8.com/external-kiranshastry-lineal-kiranshastry/42/000000/external-delete-multimedia-kiranshastry-lineal-kiranshastry.png"
+            class="trash"
+            src="https://img.icons8.com/external-kiranshastry-lineal-kiranshastry/42/000000/external-delete-multimedia-kiranshastry-lineal-kiranshastry.png"
         />
     </button>
     <button mat-fab class="edit-btn" *ngIf="isUntouchable()" disabled="true">
