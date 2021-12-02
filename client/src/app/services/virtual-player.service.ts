@@ -92,7 +92,7 @@ export class VirtualPlayerService {
                     this.commandInvoker.executeCommand(emptyRackPass);
                     return;
                 }
-                const chosenTilesString = chosenTiles.map((tile) => tile.character).join(''); // TEST THIS, may not work.
+                const chosenTilesString = chosenTiles.map((tile) => tile.character).join('');
                 const command = new ExchangeCmd(defaultParams, chosenTilesString);
                 command.debugMessages.push('lettres échangées: ' + chosenTilesString);
                 this.commandInvoker.executeCommand(command);
@@ -118,8 +118,16 @@ export class VirtualPlayerService {
                     const command = new PlaceCmd(defaultParams, params);
                     this.commandInvoker.executeCommand(command);
                 } else {
-                    const command = new PassTurnCmd(defaultParams);
-                    command.debugMessages.push('no move was found. Calling pass command');
+                    const chosenTiles = this.chooseTilesFromRack(this.selectRandomValue());
+                    // Converts chosen word to string
+                    if (chosenTiles.length === 0) {
+                        const emptyRackPass = new PassTurnCmd(defaultParams);
+                        this.commandInvoker.executeCommand(emptyRackPass);
+                        emptyRackPass.debugMessages.push('no move was found. Calling pass command');
+                        return;
+                    }
+                    const chosenTilesString = chosenTiles.map((tile) => tile.character).join('');
+                    const command = new ExchangeCmd(defaultParams, chosenTilesString);
                     this.commandInvoker.executeCommand(command);
                 }
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
@@ -131,6 +139,7 @@ export class VirtualPlayerService {
         for (const permutation of permutations) {
             const permutationString = permutation.stringify();
             if (this.isWordValid(permutationString)) {
+                console.log('valid word: ' + permutationString);
                 filteredPermutations.push(permutation);
             }
         }
@@ -143,13 +152,19 @@ export class VirtualPlayerService {
             serviceCalled: this.gameService,
         };
         const moveFound = this.findFirstValidMoves(permutations, value, true);
-        // console.log('moveFound: ', moveFound);
         if (moveFound.position.x === POSITION_ERROR || moveFound.position.y === POSITION_ERROR || moveFound.word.content.length === 0) {
-            // Pass turn
             setTimeout(() => {
-                const passTurn = new PassTurnCmd(defaultParams);
-                this.commandInvoker.executeCommand(passTurn);
+                const chosenTiles = this.chooseTilesFromRack(this.selectRandomValue());
+                const chosenTilesString = chosenTiles.map((tile) => tile.character).join('');
+                if (chosenTilesString === '') {
+                    const emptyRackPass = new PassTurnCmd(defaultParams);
+                    this.commandInvoker.executeCommand(emptyRackPass);
+                    return;
+                }
+                const exchange = new ExchangeCmd(defaultParams, chosenTilesString);
+                this.commandInvoker.executeCommand(exchange);
             }, NO_MOVE_TOTAL_WAIT_TIME - DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+            // Pass turn
             return;
         }
         // Play the word
@@ -329,14 +344,11 @@ export class VirtualPlayerService {
                 currentCoord.y += 1;
             }
             if (!currentSquare || !currentSquare.letter) return;
-            if (
-                currentSquare.isValidated ||
-                (currentSquare.position.x === word.content[i].tile.position.x && currentSquare.position.y === word.content[i].tile.position.y)
-            )
-                continue;
+            if (currentSquare.isValidated) continue;
             currentSquare.letter = word.content[i];
             currentSquare.occupied = true;
             currentSquare.isValidated = false;
+            word.content[i].tile.position = currentSquare.position;
         }
     }
 
@@ -357,6 +369,7 @@ export class VirtualPlayerService {
                 if (!currentSquare.isValidated) {
                     currentSquare.letter = new ScrabbleLetter('', 0);
                     currentSquare.occupied = false;
+                    word.content[i].tile.position = new Vec2(POSITION_ERROR, POSITION_ERROR);
                 }
             }
         }
@@ -415,14 +428,12 @@ export class VirtualPlayerService {
                         // Verify if the letters can be found in the rack.
                         this.tempPlacement(word, realPos, axis);
                         const wordsBuilt = this.wordBuilderService.buildWordsOnBoard(word.stringify(), realPos, axis);
-                        this.removalAfterTempPlacement(word, realPos, axis);
                         let isErrorInWordsBuilt = wordsBuilt.length >= 1 ? false : true;
-                        // if (!this.canBuildWordWithRack(word, realPos, axis)) isErrorInWordsBuilt = true;
-                        // Function above is not working properly but should check if the current letter is the right one for the word.
                         for (const wordBuilt of wordsBuilt) {
                             if (!this.isWordValid(wordBuilt.stringify())) isErrorInWordsBuilt = true;
                         }
                         if (!this.wordHasBeenPlaced(word, wordsBuilt)) isErrorInWordsBuilt = true;
+                        this.removalAfterTempPlacement(word, realPos, axis);
                         if (isErrorInWordsBuilt) continue;
                         returnPos = realPos;
                     }
@@ -435,7 +446,7 @@ export class VirtualPlayerService {
     canBuildWordWithRack(word: ScrabbleWord, startPos: Vec2, axis: Axis): boolean {
         const nextPosition = new Vec2(startPos.x, startPos.y);
         for (const letter of word.content) {
-            if (letter.tile.occupied) {
+            if (letter.tile.isValidated) {
                 const tilePosition = letter.tile.position;
                 if (tilePosition.x !== nextPosition.x || tilePosition.y !== nextPosition.x) return false;
             }
@@ -532,7 +543,7 @@ export class VirtualPlayerService {
                 if (newWords) {
                     for (const newWord of newWords) {
                         if (newWord) {
-                            if (!possibleMoves.includes(newWord) && (newWord.value < points || newWord.value > 0)) {
+                            if (newWord.value < points || newWord.value > 0) {
                                 if ((newWord.value < points || newWord.value > 0) && this.lettersInRack(newWord)) {
                                     possibleMoves.push(newWord);
                                 }
@@ -680,6 +691,8 @@ export class VirtualPlayerService {
 
     permutationsWithBoard(): ScrabbleWord[] {
         const returnPermutations: ScrabbleWord[] = [];
+        const rackString = this.rack.map((letter) => letter.character).join('');
+        console.log(rackString);
         for (const row of this.gridService.scrabbleBoard.squares) {
             for (const square of row) {
                 if (square.letter) {
@@ -691,7 +704,7 @@ export class VirtualPlayerService {
                                     if (word) {
                                         let boardTileCounter = 0;
                                         for (const letter of word.content) {
-                                            if (letter.tile.occupied) {
+                                            if (letter.tile.occupied && !rackString.includes(letter.character)) {
                                                 boardTileCounter++;
                                             }
                                         }
