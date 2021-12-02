@@ -156,19 +156,11 @@ export class ScrabbleBoard {
         }
     }
     isWordInsideBoard(word: string, coord: Vec2, orientation: string): boolean {
-        // Verifying if coordinates are good
         if (!isCoordInsideBoard(coord)) {
             return false;
         }
-        // Verifying if word is too long to stay inside board
-        if (orientation === 'h' && coord.x + word.length > Row.Length) {
-            return false;
-        }
-        if (orientation === 'v' && coord.y + word.length > Column.Length) {
-            return false;
-        }
-
-        return true;
+        // verifying if the word is longer than the board's edges
+        return orientation === 'h' ? coord.x + word.length <= Row.Length : coord.y + word.length <= Column.Length;
     }
 
     isWordPassingInCenter(word: string, coord: Vec2, orientation: string): boolean {
@@ -176,42 +168,31 @@ export class ScrabbleBoard {
         // Checking if word passing middle vertically
         const isWordInMiddleColumn = tempCoord.x === Column.Eight && orientation === 'v';
         const isVerticalWordOnCenter = tempCoord.y < Row.I && tempCoord.y + word.length - 1 >= Row.H;
-        if (isWordInMiddleColumn) {
-            if (isVerticalWordOnCenter) {
-                return true;
-            }
-        }
-
         // Checking if word passing middle horizontally
         const isWordInMiddleRow = tempCoord.y === Row.H && orientation === 'h';
         const isHorizontalWordOnCenter = tempCoord.x < Column.Nine && tempCoord.x + word.length - 1 >= Column.Eight;
-        if (isWordInMiddleRow) {
-            if (isHorizontalWordOnCenter) {
-                return true;
-            }
-        }
-        return false;
+        return (isWordInMiddleColumn && isVerticalWordOnCenter) || (isWordInMiddleRow && isHorizontalWordOnCenter);
     }
     isWordPartOfAnotherWord(word: string, coord: Vec2, orientation: string): boolean {
         let result = false;
         const isVertical = orientation === 'v';
 
         // For each letter in "word", verifies if a Scrabble letter is already place and if it's the same letter
+        const tempCoord = new Vec2(coord.x, coord.y);
         for (let i = 0; i < word.length; i++) {
-            const tempCoord = new Vec2(coord.x, coord.y);
-            if (isVertical) {
-                tempCoord.y += i;
-            } else {
-                tempCoord.x += i;
-            }
-
             if (this.squares[tempCoord.x][tempCoord.y].occupied) {
                 // Checking if the letter corresponds with the string's character
+                // TODO: see if works for * too
                 if (this.squares[tempCoord.x][tempCoord.y].letter.character.toLowerCase() === word[i]) {
                     result = true;
                 } else {
                     return false;
                 }
+            }
+            if (isVertical) {
+                tempCoord.y += i;
+            } else {
+                tempCoord.x += i;
             }
         }
 

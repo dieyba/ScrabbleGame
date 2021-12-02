@@ -92,6 +92,9 @@ export class GridService {
         // Saving information about square
         const color = this.scrabbleBoard.squares[i][j].color;
         const letter = this.scrabbleBoard.squares[i][j].letter;
+        if (letter.value === 0) {
+            letter.setLetter('*');
+        }
         // Unassign the letter and the letter coordinates (tile)
         letter.tile = new Square(UNPLACED, UNPLACED);
         this.scrabbleBoard.squares[i][j] = new Square(i, j);
@@ -253,15 +256,9 @@ export class GridService {
     removeInvalidLetters(coord: Vec2, length: number, orientation: Axis): ScrabbleLetter[] {
         const removedScrabbleLetters: ScrabbleLetter[] = [];
         for (let i = 0; i < length; i++) {
-            if (orientation === Axis.V) {
-                if (this.scrabbleBoard.squares[coord.x][coord.y + i].isValidated === false) {
-                    removedScrabbleLetters.push(this.removeSquare(coord.x, coord.y + i));
-                }
-            }
-            if (orientation === Axis.H) {
-                if (this.scrabbleBoard.squares[coord.x + i][coord.y].isValidated === false) {
-                    removedScrabbleLetters.push(this.removeSquare(coord.x + i, coord.y));
-                }
+            const tempCoord = orientation === Axis.V ? new Vec2(coord.x, coord.y + i) : new Vec2(coord.x + i, coord.y);
+            if (this.scrabbleBoard.squares[coord.x][coord.y + i].isValidated === false) {
+                removedScrabbleLetters.push(this.removeSquare(tempCoord.x, tempCoord.y + i));
             }
         }
         return removedScrabbleLetters;

@@ -17,6 +17,7 @@ export class ScrabbleLetter {
         this.color = SquareColor.None;
         this.tile = new Square(UNPLACED, UNPLACED); // -1, -1 means it is not placed yet
         this.setLetter(letter);
+        this.setDefaultValue(this.character);
         if (value !== undefined) {
             this.value = value;
         }
@@ -25,7 +26,6 @@ export class ScrabbleLetter {
     setLetter(character: string): void {
         if (character === '') {
             this.character = '';
-            this.setDefaultValue(this.character);
             return;
         }
         // if a captial letter is passed in, it represents a blank piece, meaning an asterisk
@@ -33,7 +33,6 @@ export class ScrabbleLetter {
         if (this.character === '*') {
             this.whiteLetterCharacter = character;
         }
-        this.setDefaultValue(this.character);
     }
     setDefaultValue(character: string) {
         // set the letter's default value

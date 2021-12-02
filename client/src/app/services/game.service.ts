@@ -215,6 +215,9 @@ export class GameService {
         return ErrorType.ImpossibleCommand;
     }
     async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
+        // console.log(this.game.scrabbleBoard);
+        console.log('start place:', this.game.stock);
+        console.log(this.game.getLocalPlayer().letters);
         if (!player.isActive) {
             return ErrorType.ImpossibleCommand;
         }
@@ -231,7 +234,7 @@ export class GameService {
         }
         const strWords: string[] = [];
         const newlyPlacedLetters: ScrabbleLetter[] = [];
-        tempScrabbleWords[0].content.forEach((newWordLetter) => {
+        tempScrabbleWords[0]?.content.forEach((newWordLetter) => {
             if (!newWordLetter.tile.isValidated) {
                 newlyPlacedLetters.push(newWordLetter);
             }
@@ -247,7 +250,7 @@ export class GameService {
                 // Retake letters
                 lettersToAddToRack = this.gridService.removeInvalidLetters(placeParams.position, placeParams.word.length, placeParams.orientation);
             } else {
-                // console.log('all valid words:', strWords);
+                console.log('all valid words:', strWords);
                 // Take new letters
                 this.validationService.updatePlayerScore(tempScrabbleWords, player);
                 if (String(this.game.isLog2990) === 'true') {
@@ -265,6 +268,9 @@ export class GameService {
             this.isTurnEndSubject.next(this.isTurnPassed);
             this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
         });
+        // console.log('after place:', this.game.scrabbleBoard);
+        console.log(this.game.stock);
+        console.log(this.game.getLocalPlayer().letters);
         return errorResult;
     }
     synchronizeAfterPlaceCommand(errorResult: ErrorType, placeParams: PlaceParams, player: Player) {

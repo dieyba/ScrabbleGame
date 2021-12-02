@@ -3,6 +3,7 @@ import { PlaceParams } from '@app/classes/commands';
 import { ErrorType } from '@app/classes/errors';
 import { Player } from '@app/classes/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { isAllLowerLetters } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { GridService } from './grid.service';
 import { RackService } from './rack.service';
@@ -74,7 +75,7 @@ export class PlaceService {
         }
         // Making a temporary letter and checking if "*" is needed (for upper cases)
         let tempLetter = letter;
-        if (tempLetter === tempLetter.toUpperCase()) {
+        if (!isAllLowerLetters(tempLetter)) {
             tempLetter = '*';
         }
         for (let i = 0; i < playerLetters.length; i++) {
@@ -91,14 +92,16 @@ export class PlaceService {
         }
     }
     canPlaceWord(placeParams: PlaceParams): boolean {
-        if (
-            !this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, placeParams.position, placeParams.orientation) ||
-            (!this.gridService.scrabbleBoard.isWordPassingInCenter(placeParams.word, placeParams.position, placeParams.orientation) &&
-                !this.gridService.scrabbleBoard.isWordPartOfAnotherWord(placeParams.word, placeParams.position, placeParams.orientation) &&
-                !this.gridService.scrabbleBoard.isWordTouchingOtherWord(placeParams.word, placeParams.position, placeParams.orientation))
-        ) {
-            return false;
-        }
-        return true;
+        const isInsideBoard = this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, placeParams.position, placeParams.orientation);
+        const isValidStartWord = this.gridService.scrabbleBoard.isWordPassingInCenter(
+            placeParams.word,
+            placeParams.position,
+            placeParams.orientation,
+        );
+        const isValidNonStartWord =
+            this.gridService.scrabbleBoard.isWordPartOfAnotherWord(placeParams.word, placeParams.position, placeParams.orientation) ||
+            this.gridService.scrabbleBoard.isWordTouchingOtherWord(placeParams.word, placeParams.position, placeParams.orientation);
+
+        return isInsideBoard && (isValidStartWord || isValidNonStartWord);
     }
 }
