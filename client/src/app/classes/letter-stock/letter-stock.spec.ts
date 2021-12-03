@@ -1,6 +1,6 @@
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { LetterStock } from './letter-stock';
-
+/* eslint-disable dot-notation */
 const VALUE_LETTER_10 = 10;
 const OCCURENCE_NUMBER_5 = 5;
 export const NUMBER_OF_LETTERS = 102;
@@ -39,7 +39,7 @@ describe('LetterStock', () => {
     });
 
     it('should add the right number of letter in the stock', () => {
-        stock.addLettersToStock(new ScrabbleLetter('z', VALUE_LETTER_10), OCCURENCE_NUMBER_5);
+        stock['addLettersToStock']('z', OCCURENCE_NUMBER_5);
         expect(stock.letterStock.length).toEqual(NUMBER_OF_LETTERS + OCCURENCE_NUMBER_5);
     });
 
@@ -83,7 +83,7 @@ describe('LetterStock', () => {
         stock.letterStock = [];
         const lettersToExchangeWithStock: ScrabbleLetter[] = [new ScrabbleLetter('a', 1)];
         const lettersFromStock: ScrabbleLetter[] = [new ScrabbleLetter('z', VALUE_LETTER_10)];
-        stock.addLettersToStock(lettersFromStock[0], 1);
+        stock['addLettersToStock'](lettersFromStock[0].character, 1);
 
         expect(stock.exchangeLetters(lettersToExchangeWithStock)).toEqual(lettersFromStock);
         expect(stock.letterStock[0]).toEqual(lettersToExchangeWithStock[0]);

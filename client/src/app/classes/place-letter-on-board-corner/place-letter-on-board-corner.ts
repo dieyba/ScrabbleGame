@@ -19,6 +19,7 @@ export class PlaceLetterOnBoardCorner extends Goal {
         this.type = GoalType.PlaceLetterOnBoardCorner;
         this.description = GoalDescriptions.PlaceLetterOnBoardCorner;
     }
+
     achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters: ScrabbleLetter[]) {
         if (this.isAchieved) {
             return 0;

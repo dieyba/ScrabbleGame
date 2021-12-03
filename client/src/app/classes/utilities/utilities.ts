@@ -6,7 +6,7 @@ const PARSE_INT_BASE = 10;
 const ROW_OFFSET = 'a'.charCodeAt(0);
 const COLUMN_OFFSET = 1;
 export const ERROR_NUMBER = -1;
-export const MIN_WORD_LENGHT = 2;
+export const MIN_WORD_LENGTH = 2;
 
 export enum Axis {
     H = 'h',
@@ -21,7 +21,7 @@ export const invertAxis = {
 export const scrabbleLettersToString = (letters: ScrabbleLetter[]): string => {
     let stringLetters = '';
     for (const letter of letters) {
-        stringLetters += letter.character;
+        stringLetters += letter.character === '*' ? letter.whiteLetterCharacter : letter.character;
     }
     return stringLetters.toLowerCase();
 };

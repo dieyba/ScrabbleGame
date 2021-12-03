@@ -10,6 +10,7 @@ export class PlaceLetterWorthTenPts extends Goal {
         this.type = GoalType.PlaceLetterWorthTenPts;
         this.description = GoalDescriptions.PlaceLetterWorthTenPts;
     }
+
     achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters: ScrabbleLetter[]) {
         if (this.isAchieved) {
             return 0;

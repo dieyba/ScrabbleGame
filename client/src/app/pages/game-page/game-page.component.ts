@@ -17,8 +17,6 @@ export class GamePageComponent {
     private socket: io.Socket;
     private readonly server: string;
     constructor(private dialog: MatDialog, private gameService: GameService) {
-        // this.server = 'http://' + window.location.hostname + ':3000';
-        this.canNavBack = false;
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         history.pushState(null, '', window.location.href);

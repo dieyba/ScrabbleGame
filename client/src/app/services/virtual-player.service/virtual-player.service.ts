@@ -1,17 +1,20 @@
 /* eslint-disable max-lines */
+/* eslint-disable  @typescript-eslint/no-unused-expressions */
+/* eslint-disable  no-unused-expressions */
 import { Injectable } from '@angular/core';
 import { DefaultCommandParams, PlaceParams } from '@app/classes/commands/commands';
 import { ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
 import { PassTurnCmd } from '@app/classes/pass-command/pass-command';
 import { PlaceCmd } from '@app/classes/place-command/place-command';
-import { VirtualPlayer, Difficulty } from '@app/classes/virtual-player/virtual-player';
 import { BOARD_SIZE } from '@app/classes/scrabble-board/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleMove } from '@app/classes/scrabble-move/scrabble-move';
+import { RACK_SIZE } from '@app/classes/scrabble-rack/scrabble-rack';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { SquareColor } from '@app/classes/square/square';
 import { Axis, convertYAxisToLetterCoordinates, isCoordInsideBoard } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
+import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player/virtual-player';
 import { BonusService } from '@app/services/bonus.service/bonus.service';
 import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
 import { GameService } from '@app/services/game.service/game.service';
@@ -19,7 +22,6 @@ import { GridService } from '@app/services/grid.service/grid.service';
 import { PlaceService } from '@app/services/place.service/place.service';
 import { ValidationService } from '@app/services/validation.service/validation.service';
 import { WordBuilderService } from '@app/services/word-builder.service/word-builder.service';
-import { RACK_SIZE } from '@app/classes/scrabble-rack/scrabble-rack';
 
 export enum Probability { //    Probabilities for the easy virtual player
     EndTurn = 10,
@@ -448,8 +450,8 @@ export class VirtualPlayerService {
     tempPlacement(word: ScrabbleWord, startPos: Vec2, axis: Axis) {
         if (!isCoordInsideBoard(startPos)) return;
         const currentCoord = new Vec2(startPos.x, startPos.y);
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < word.content.length; i++) {
+        for (const eachWord of word.content) {
+            const index = word.content.indexOf(eachWord);
             const currentSquare = this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y];
             if (axis === Axis.H && currentCoord.x + 1 < BOARD_SIZE) {
                 currentCoord.x += 1;
@@ -458,10 +460,10 @@ export class VirtualPlayerService {
             }
             if (!currentSquare) return;
             if (currentSquare.isValidated) continue;
-            currentSquare.letter = word.content[i];
+            currentSquare.letter = word.content[index];
             currentSquare.occupied = true;
             currentSquare.isValidated = false;
-            word.content[i].tile.position = currentSquare.position;
+            word.content[index].tile.position = currentSquare.position;
         }
     }
 
@@ -595,47 +597,6 @@ export class VirtualPlayerService {
         return returnVec;
     }
 
-    // Returns all valid combinations of the letter + the letters currently in the rack
-    movesWithGivenLetter(letter: ScrabbleLetter, moveLength: number, fromRack?: boolean): ScrabbleWord[] {
-        let lettersAvailable: ScrabbleLetter[] = [];
-        lettersAvailable[0] = letter;
-        const lettersInArray: boolean[] = [false, false, false, false, false, false, false];
-        for (let i = 1; i < moveLength; i++) {
-            if (fromRack) {
-                // Remove the letter from the pool since it is already used
-                lettersAvailable = this.rack;
-                break;
-            }
-            // Randomize length of word
-            let index = this.getRandomIntInclusive(0, this.rack.length - 1);
-            while (lettersInArray[index] === true) {
-                // If we've already generated this number before
-                if (index !== lettersInArray.length - 1) {
-                    index++;
-                } else index = 0; // Code coverage on this line
-            }
-            lettersAvailable[i] = this.rack[index];
-            lettersInArray[index] = true;
-        }
-        // check all possible permutations. Maximum of O(8!)
-        const permutations = this.permutationsOfLetters(lettersAvailable);
-        const possibleMoves = [];
-        let movesFound = 0;
-        const charArray = [];
-        for (const j of permutations) {
-            let index = 0;
-            for (const char of j) {
-                if (char) charArray[index] = char.character;
-                index++;
-            }
-            if (this.isWordValid(charArray.join(''))) {
-                possibleMoves[movesFound] = this.wordify(j);
-                movesFound++;
-            }
-        }
-        return possibleMoves;
-    }
-
     allSubsetPermutations(letter: ScrabbleLetter, fromRack?: boolean): ScrabbleWord[][] {
         const allPermutations: ScrabbleWord[][] = [];
         for (let i = 2; i <= this.rack.length; i++) {
@@ -754,7 +715,7 @@ export class VirtualPlayerService {
         } else return 'Erreur de placement';
     }
 
-    wordify(letters: ScrabbleLetter[]): ScrabbleWord {
+    wordsToLetters(letters: ScrabbleLetter[]): ScrabbleWord {
         const word = new ScrabbleWord();
         for (let i = 0; i < letters.length; i++) {
             word.content[i] = letters[i];
@@ -828,6 +789,7 @@ export class VirtualPlayerService {
         return returnPermutations;
         // We will then try to place the word on each space on the board
     }
+
     permutationsOfLetters(letters: ScrabbleLetter[]): ScrabbleLetter[][] {
         // Adapted from medium.com/weekly-webtips/step-by-step-guide-to-array-permutation-using-recursion-in-javascript-4e76188b88ff
         const result = [];
@@ -845,5 +807,46 @@ export class VirtualPlayerService {
             }
         }
         return result;
+    }
+
+    // Returns all valid combinations of the letter + the letters currently in the rack
+    private movesWithGivenLetter(letter: ScrabbleLetter, moveLength: number, fromRack?: boolean): ScrabbleWord[] {
+        let lettersAvailable: ScrabbleLetter[] = [];
+        lettersAvailable[0] = letter;
+        const lettersInArray: boolean[] = [false, false, false, false, false, false, false];
+        for (let i = 1; i < moveLength; i++) {
+            if (fromRack) {
+                // Remove the letter from the pool since it is already used
+                lettersAvailable = this.rack;
+                break;
+            }
+            // Randomize length of word
+            let index = this.getRandomIntInclusive(0, this.rack.length - 1);
+            while (lettersInArray[index]) {
+                // If we've already generated this number before
+                if (index !== lettersInArray.length - 1) {
+                    index++;
+                } else index = 0; // Code coverage on this line
+            }
+            lettersAvailable[i] = this.rack[index];
+            lettersInArray[index] = true;
+        }
+        // check all possible permutations. Maximum of O(8!)
+        const permutations = this.permutationsOfLetters(lettersAvailable);
+        const possibleMoves = [];
+        let movesFound = 0;
+        const charArray = [];
+        for (const j of permutations) {
+            let index = 0;
+            for (const char of j) {
+                if (char) charArray[index] = char.character;
+                index++;
+            }
+            if (this.isWordValid(charArray.join(''))) {
+                possibleMoves[movesFound] = this.wordsToLetters(j);
+                movesFound++;
+            }
+        }
+        return possibleMoves;
     }
 }

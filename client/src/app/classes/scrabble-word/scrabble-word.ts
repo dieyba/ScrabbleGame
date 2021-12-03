@@ -1,5 +1,5 @@
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
-import { Axis } from '@app/classes/utilities/utilities';
+import { Axis, scrabbleLettersToString } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
 export class ScrabbleWord {
     content: ScrabbleLetter[]; // Array of ScrabbleLetters continually growing to represent the word
@@ -12,13 +12,11 @@ export class ScrabbleWord {
         this.value = 0;
         this.startPosition = new Vec2();
     }
+
     stringify(): string {
-        let string = '';
-        for (const i of this.content) {
-            string += i.character;
-        }
-        return string;
+        return scrabbleLettersToString(this.content);
     }
+
     calculateValue(): number {
         let value = 0;
         for (const i of this.content) {

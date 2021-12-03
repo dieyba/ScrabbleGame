@@ -54,34 +54,7 @@ export class GameService {
         this.socketOnConnect();
         this.game = new GameParameters();
     }
-    socketOnConnect() {
-        // Synchronization for multiplayer mode
-        this.socket.on('update board', (boardUpdate: BoardUpdate) => {
-            this.gridService.updateBoard(boardUpdate.word, boardUpdate.orientation, new Vec2(boardUpdate.positionX, boardUpdate.positionY));
-        });
-        this.socket.on('update letters', (update: LettersUpdate) => {
-            this.game.stock.letterStock = update.newStock;
-            this.game.getOpponent().letters = update.newLetters;
-            this.game.getOpponent().score = update.newScore;
-            // console.log('after synchro, local letters:', this.game.getLocalPlayer().letters);
-            // console.log('after synchro, opponent letters:', this.game.getOpponent().letters);
-        });
-        this.socket.on('convert to solo', (previousPlayerSocketId: string, virtualPlayerName: string) => {
-            let newVirtualPlayer;
-            const playerArrayIndex = this.game.players.findIndex((p) => p.socketId === previousPlayerSocketId);
-            if (playerArrayIndex !== ERROR_NUMBER && !this.game.isEndGame) {
-                const previousPlayer = this.game.players[playerArrayIndex];
-                newVirtualPlayer = new VirtualPlayer(virtualPlayerName, Difficulty.Easy);
-                newVirtualPlayer.letters = previousPlayer.letters;
-                newVirtualPlayer.isActive = previousPlayer.isActive;
-                newVirtualPlayer.score = previousPlayer.score;
-                newVirtualPlayer.goal = previousPlayer.goal;
-                this.game.players[playerArrayIndex] = newVirtualPlayer;
-                this.game.gameMode = GameType.Solo;
-                this.chatDisplayService.addEntry(createSystemEntry('Conversion en mode solo'));
-            }
-        });
-    }
+
     initializeSoloGame(initInfo: WaitingAreaGameParameters, virtualPlayerDifficulty: Difficulty) {
         if (initInfo.gameMode === GameType.Solo) {
             this.game.scrabbleBoard = new ScrabbleBoard(initInfo.isRandomBonus);
@@ -97,7 +70,7 @@ export class GameService {
             this.game.getOpponent().letters = this.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
             const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
             this.game.players[starterPlayerIndex].isActive = true;
-            this.validationService.dictionary.selectDictionary(initInfo.dictionaryType);
+            this.validationService.setDictionary(initInfo.dictionary);
             if (String(this.game.isLog2990) === 'true') {
                 const usedGoals: GoalType[] = [];
                 const sharedGoals = this.goalsService.pickSharedGoals(usedGoals);
@@ -155,7 +128,10 @@ export class GameService {
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
         this.addRackLetters(this.game.getLocalPlayer().letters);
         this.startCountdown();
+        console.log('stock:', this.game.stock);
+        // console.log('start game', this.game.getLocalPlayer().letters);
     }
+
     startCountdown() {
         if (!this.game.isEndGame) {
             this.game.gameTimer.secondsToMinutes();
@@ -170,12 +146,14 @@ export class GameService {
             }, TIMER_INTERVAL);
         }
     }
+
     resetTimer() {
         this.game.gameTimer.timerMs = +this.game.gameTimer.totalCountDown;
         this.game.gameTimer.secondsToMinutes();
         clearInterval(this.game.gameTimer.intervalValue);
         this.startCountdown();
     }
+
     passTurn(player: Player): ErrorType {
         if (player.isActive) {
             this.isTurnPassed = true;
@@ -184,10 +162,11 @@ export class GameService {
         }
         return ErrorType.ImpossibleCommand;
     }
+
     exchangeLetters(player: Player, letters: string): ErrorType {
         if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
             const lettersToRemove: ScrabbleLetter[] = [];
-            if (removePlayerLetters(letters, player) === true) {
+            if (removePlayerLetters(letters, player)) {
                 for (let i = 0; i < letters.length; i++) {
                     lettersToRemove[i] = new ScrabbleLetter(letters[i]);
                 }
@@ -209,14 +188,14 @@ export class GameService {
                 }
                 this.isTurnPassed = false;
                 this.isTurnEndSubject.next(this.isTurnPassed);
-                // console.log('after exchange, local letters:', this.game.getLocalPlayer().letters);
-                // console.log('after exchange, opponent letters:', this.game.getOpponent().letters);
                 return ErrorType.NoError;
             }
         }
         return ErrorType.ImpossibleCommand;
     }
+
     async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
+        // console.log(this.game.scrabbleBoard);
         if (!player.isActive) {
             return ErrorType.ImpossibleCommand;
         }
@@ -233,7 +212,7 @@ export class GameService {
         }
         const strWords: string[] = [];
         const newlyPlacedLetters: ScrabbleLetter[] = [];
-        tempScrabbleWords[0].content.forEach((newWordLetter) => {
+        tempScrabbleWords[0]?.content.forEach((newWordLetter) => {
             if (!newWordLetter.tile.isValidated) {
                 newlyPlacedLetters.push(newWordLetter);
             }
@@ -249,6 +228,7 @@ export class GameService {
                 // Retake letters
                 lettersToAddToRack = this.gridService.removeInvalidLetters(placeParams.position, placeParams.word.length, placeParams.orientation);
             } else {
+                console.log('all valid words:', strWords);
                 // Take new letters
                 this.validationService.updatePlayerScore(tempScrabbleWords, player);
                 if (String(this.game.isLog2990) === 'true') {
@@ -264,13 +244,13 @@ export class GameService {
             // End turn
             this.isTurnPassed = false;
             this.isTurnEndSubject.next(this.isTurnPassed);
-            // // console.log('after place, local letters:', this.game.getLocalPlayer().letters);
-            // // console.log('after place, opponent letters:', this.game.getOpponent().letters);
-            // console.log('board:', this.gridService.scrabbleBoard);
             this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
         });
+        console.log('after place:', this.game.scrabbleBoard);
+        // console.log(this.game.getLocalPlayer().letters);
         return errorResult;
     }
+
     synchronizeAfterPlaceCommand(errorResult: ErrorType, placeParams: PlaceParams, player: Player) {
         if (errorResult === ErrorType.NoError && this.game.gameMode === GameType.MultiPlayer) {
             let wordUpdate = '';
@@ -297,15 +277,18 @@ export class GameService {
             this.socket.emit('place word', lettersUpdate);
         }
     }
+
     addRackLetters(letters: ScrabbleLetter[]): void {
         for (const letter of letters) {
             this.rackService.addLetter(letter);
         }
     }
+
     removeRackLetter(scrabbleLetter: ScrabbleLetter): void {
         const i = this.rackService.removeLetter(scrabbleLetter);
         this.game.getLocalPlayer().letters.splice(i, 1);
     }
+
     drawRack(newWords: ScrabbleWord[]): void {
         newWords.forEach((newWord) => {
             for (let j = 0; j < newWord.content.length; j++) {
@@ -322,14 +305,42 @@ export class GameService {
             }
         });
     }
+
     getLettersSelected(): string {
         let letters = '';
         for (let i = 0; i < this.rackService.exchangeSelected.length; i++) {
-            if (this.rackService.exchangeSelected[i] === true) {
+            if (this.rackService.exchangeSelected[i]) {
                 letters += this.rackService.rackLetters[i].character;
                 this.rackService.exchangeSelected[i] = false;
             }
         }
         return letters;
+    }
+
+    private socketOnConnect() {
+        // Synchronization for multiplayer mode
+        this.socket.on('update board', (boardUpdate: BoardUpdate) => {
+            this.gridService.updateBoard(boardUpdate.word, boardUpdate.orientation, new Vec2(boardUpdate.positionX, boardUpdate.positionY));
+        });
+        this.socket.on('update letters', (update: LettersUpdate) => {
+            this.game.stock.letterStock = update.newStock;
+            this.game.getOpponent().letters = update.newLetters;
+            this.game.getOpponent().score = update.newScore;
+        });
+        this.socket.on('convert to solo', (previousPlayerSocketId: string, virtualPlayerName: string) => {
+            let newVirtualPlayer;
+            const playerArrayIndex = this.game.players.findIndex((p) => p.socketId === previousPlayerSocketId);
+            if (playerArrayIndex !== ERROR_NUMBER && !this.game.isEndGame) {
+                const previousPlayer = this.game.players[playerArrayIndex];
+                newVirtualPlayer = new VirtualPlayer(virtualPlayerName, Difficulty.Easy);
+                newVirtualPlayer.letters = previousPlayer.letters;
+                newVirtualPlayer.isActive = previousPlayer.isActive;
+                newVirtualPlayer.score = previousPlayer.score;
+                newVirtualPlayer.goal = previousPlayer.goal;
+                this.game.players[playerArrayIndex] = newVirtualPlayer;
+                this.game.gameMode = GameType.Solo;
+                this.chatDisplayService.addEntry(createSystemEntry('Conversion en mode solo'));
+            }
+        });
     }
 }

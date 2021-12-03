@@ -15,6 +15,7 @@ export class GameModesComponent {
     openDialog(isSolo: boolean): void {
         this.dialog.open(GameInitFormComponent, { data: { isSolo, isLog2990: this.route.snapshot.params.isLog2990 } });
     }
+
     openJoinRoom(isGameSelected: boolean) {
         this.dialog.open(WaitingAreaComponent, {
             data: {

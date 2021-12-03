@@ -1,8 +1,8 @@
+import { Column, Row, ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { Square } from '@app/classes/square/square';
 import { isCoordInsideBoard } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { ScrabbleBoard } from './scrabble-board';
 
 describe('ScrabbleBoard', () => {
     let board: ScrabbleBoard;
@@ -52,8 +52,8 @@ describe('ScrabbleBoard', () => {
     });
 
     it('isWordInsideBoard should return false if the word is not completely inside the board', () => {
-        position.x = 10;
-        position.y = 10;
+        position.x = Column.Fifteen - motAPlacer.length + 2;
+        position.y = Row.O - motAPlacer.length + 2;
         expect(board.isWordInsideBoard(motAPlacer, position, orientation)).toBeFalse();
 
         orientation = 'v';
@@ -61,6 +61,8 @@ describe('ScrabbleBoard', () => {
     });
 
     it('isWordInsideBoard should return true if the word inside the board', () => {
+        position.x = Column.Fifteen - motAPlacer.length + 1;
+        position.y = Row.O - motAPlacer.length + 1;
         expect(board.isWordInsideBoard(motAPlacer, position, orientation)).toBeTrue();
     });
 

@@ -1,4 +1,4 @@
-import { DictionaryType } from '@app/classes/dictionary/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { LetterStock } from '@app/classes/letter-stock/letter-stock';
 import { Player } from '@app/classes/player/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
@@ -14,10 +14,10 @@ export enum GoalType {
     PlaceLetterWorthTenPts = 0, // Place a word containing a letter with a 10 pts value
     FormTwoLettersStarsOnly = 1, // Form 2 letter word, both letters are *
     FormWordWithLettersFromName = 2 /* Form a word containing at least 3 letters from the player's name
-        (can be same letter, but different occurence)*/,
+        (can be same letter, but different occurrence)*/,
     FormAnExistingWord = 3, // Form a word already on the board
     FormThreeWords = 4, // Form three words at the same time
-    PlaceLetterOnBoardCorner = 5, // Place a letter on one of the 4 boaard corners
+    PlaceLetterOnBoardCorner = 5, // Place a letter on one of the 4 board corners
     ActivateTwoBonuses = 6, // Active 2 bonuses at the same time / place a word with 2 letters on a colour square
     PlaceLetterOnColorSquare = 7, // Place letter x on a square of color y. x and y are randomly chosen at start of game
 }
@@ -34,11 +34,12 @@ export interface GameRoom {
     creatorId: string;
     joinerId: string;
 }
+
 export interface WaitingAreaGameParameters {
     gameRoom: GameRoom;
     creatorName: string;
     joinerName: string;
-    dictionaryType: DictionaryType;
+    dictionary: DictionaryInterface;
     totalCountDown: number;
     isRandomBonus: boolean;
     isLog2990: boolean;
@@ -55,6 +56,7 @@ export class GameInitInfo {
     gameMode: GameType;
     sharedGoals: GoalType[];
     randomLetterAndColor: ScrabbleLetter;
+    dictionary: DictionaryInterface;
 
     constructor(clientParametersChosen: WaitingAreaGameParameters) {
         this.gameRoomId = clientParametersChosen.gameRoom.idGame;
@@ -62,6 +64,7 @@ export class GameInitInfo {
         this.isLog2990 = clientParametersChosen.isLog2990;
         this.totalCountDown = clientParametersChosen.totalCountDown;
         this.scrabbleBoard = new ScrabbleBoard(clientParametersChosen.isRandomBonus).squares;
+        this.dictionary = clientParametersChosen.dictionary;
 
         // Initializing the players and the stock
         const stock = new LetterStock();
@@ -82,10 +85,6 @@ export class GameInitInfo {
             this.pickSharedGoals(usedGoals);
             this.pickPrivateGoals(usedGoals);
         }
-        // console.log('Shared goals:', this.sharedGoals);
-        // this.players.forEach((player) => {
-        //     console.log(player.name, ' goal:', player.goal);
-        // });
     }
 
     // pick the 4 public random objectives/goals from the list

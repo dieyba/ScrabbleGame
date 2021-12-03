@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -14,6 +14,7 @@ import { BASE_URL, DictionaryService } from '@app/services/dictionary.service/di
 import { GameListService } from '@app/services/game-list.service/game-list.service';
 import { GameService } from '@app/services/game.service/game.service';
 import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
+import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 export const GAME_CAPACITY = 2;
@@ -27,7 +28,7 @@ export interface DialogData {
     templateUrl: './game-init-form.component.html',
     styleUrls: ['./game-init-form.component.scss'],
 })
-export class GameInitFormComponent implements OnInit {
+export class GameInitFormComponent implements OnInit, OnDestroy {
     myForm: FormGroup;
     name: FormControl;
     timer: FormControl;
@@ -39,7 +40,7 @@ export class GameInitFormComponent implements OnInit {
     debutantNameList: string[];
     beginnerNameList: VirtualPlayerName[];
     expertNameList: VirtualPlayerName[];
-    dictionaryList: string[];
+    dictionaryList: DictionaryInterface[];
     selectedPlayer: string;
     randomPlayerId: number;
     defaultTimer: string;
@@ -48,6 +49,9 @@ export class GameInitFormComponent implements OnInit {
 
     private beginnerNameUrl: string;
     private expertNameUrl: string;
+    private beginnerNameSubscription: Subscription;
+    private expertNameSubscription: Subscription;
+    private dictionarySubscription: Subscription;
 
     constructor(
         private gameService: GameService,
@@ -66,45 +70,45 @@ export class GameInitFormComponent implements OnInit {
         this.selectedPlayer = '';
         this.randomPlayerId = 0;
         this.defaultTimer = '60';
-        this.defaultDictionary = '0';
+        this.defaultDictionary = 'Mon dictionnaire'; // TODO give the dictionary a name
         this.defaultBonus = false;
         this.beginnerNameUrl = environment.serverUrl + '/VirtualPlayerName/beginners';
         this.expertNameUrl = environment.serverUrl + '/VirtualPlayerName/experts';
 
-        if (this.data.isSolo === true) {
+        if (this.data.isSolo) {
             this.level = new FormControl('', [Validators.required]);
         } else {
             this.level = new FormControl('');
         }
 
-        this.virtualPlayerNameService.getVirtualPlayerNames(this.beginnerNameUrl).subscribe(
+        this.beginnerNameSubscription = this.virtualPlayerNameService.getVirtualPlayerNames(this.beginnerNameUrl).subscribe(
             (list) => {
                 this.beginnerNameList = list;
             },
             () => {
                 // TODO: make a default list of players name to use when cannot access database
-                // and pick a name diffrent from the human player name
+                // and pick a name different from the human player name
                 this.beginnerNameList = [{ _id: '', name: 'Sara' }];
-                this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'Fermer');
             },
         );
 
-        this.virtualPlayerNameService.getVirtualPlayerNames(this.expertNameUrl).subscribe(
+        this.expertNameSubscription = this.virtualPlayerNameService.getVirtualPlayerNames(this.expertNameUrl).subscribe(
             (list) => {
                 this.expertNameList = list;
             },
             () => {
                 // TODO: make a default list of players name to use when cannot access database
-                // and pick a name diffrent from the human player name
+                // and pick a name different from the human player name
                 this.expertNameList = [{ _id: '', name: 'Ariane' }];
-                this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'Fermer');
             },
         );
 
-        this.dictionaryService.getDictionaries(BASE_URL).subscribe(
+        this.dictionarySubscription = this.dictionaryService.getDictionaries(BASE_URL).subscribe(
             (dictionaries: DictionaryInterface[]) => {
                 for (const dictionary of dictionaries) {
-                    this.dictionaryList.push(dictionary.title);
+                    this.dictionaryList.push(dictionary);
                 }
             },
             (error: HttpErrorResponse) => {
@@ -116,6 +120,12 @@ export class GameInitFormComponent implements OnInit {
     ngOnInit() {
         this.createFormControl();
         this.createForm();
+    }
+
+    ngOnDestroy() {
+        this.beginnerNameSubscription.unsubscribe();
+        this.expertNameSubscription.unsubscribe();
+        this.dictionarySubscription.unsubscribe();
     }
 
     createFormControl() {
@@ -172,20 +182,36 @@ export class GameInitFormComponent implements OnInit {
         }
     }
 
-    submit(): void {
+    async submit(): Promise<void> {
         if (this.myForm.valid) {
             const gameMode = this.data.isSolo ? GameType.Solo : GameType.MultiPlayer;
             const gameParams = new WaitingAreaGameParameters(
                 gameMode,
                 GAME_CAPACITY,
-                this.dictionaryForm.value,
+                { _id: 0, title: this.dictionaryForm.value, description: 'no description', words: ['words'] },
                 this.timer.value,
                 this.bonus.value,
                 this.data.isLog2990,
                 this.name.value, // game creator name
             );
             if (gameMode === GameType.Solo) {
+                // Trying to get dictionary
+                const dictionary = await this.dictionaryService
+                    .getDictionary(BASE_URL, this.dictionaryForm.value)
+                    .toPromise()
+                    .catch(() => {
+                        return null;
+                    });
+                if (dictionary === null) {
+                    this.snack.open(
+                        'Il y a eu un problème avec la base de donnée des dictionnaires.' +
+                        'Veuillez choisi un autre dictionnaire ou réessayer plus tard',
+                        'Fermer',
+                    );
+                    return;
+                }
                 this.closeDialog();
+                gameParams.dictionary = dictionary;
                 gameParams.joinerName = this.opponent.value;
                 const difficulty: Difficulty = this.level.value === 'easy' ? Difficulty.Easy : Difficulty.Difficult;
                 this.dialogRef.close();

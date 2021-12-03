@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Dictionary, DictionaryType } from '@app/classes/dictionary/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { GameType } from '@app/classes/game-parameters/game-parameters';
 import { Player } from '@app/classes/player/player';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { Trie } from '@app/classes/trie/trie';
-import { ERROR_NUMBER, MIN_WORD_LENGHT } from '@app/classes/utilities/utilities';
+import { ERROR_NUMBER, MIN_WORD_LENGTH } from '@app/classes/utilities/utilities';
 import * as SocketHandler from '@app/modules/socket-handler';
 import { BonusService } from '@app/services/bonus.service/bonus.service';
 import { BOARD_SIZE, GridService } from '@app/services/grid.service/grid.service';
 import * as io from 'socket.io-client';
+import dict_path from 'src/assets/dictionary.json';
 import { environment } from 'src/environments/environment';
 
 const BONUS_LETTER_COUNT = 7;
@@ -20,7 +21,7 @@ export const WAIT_TIME = 3000;
 })
 export class ValidationService {
     validWordsFormed: string[];
-    dictionary: Dictionary;
+    dictionary: DictionaryInterface;
     dictionaryTrie: Trie;
     words: string[];
     isTimerElapsed: boolean;
@@ -30,9 +31,8 @@ export class ValidationService {
 
     constructor(private readonly gridService: GridService, private bonusService: BonusService) {
         this.validWordsFormed = [];
-        this.dictionary = new Dictionary(DictionaryType.Default);
-        this.dictionaryTrie = new Trie();
-        this.dictionaryTrie.initializeDictionary();
+        this.dictionary = dict_path as DictionaryInterface;
+        this.dictionaryTrie = new Trie(this.dictionary);
         this.words = [];
         this.isTimerElapsed = false;
         this.areWordsValid = false;
@@ -40,17 +40,15 @@ export class ValidationService {
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
     }
-    socketOnConnect() {
-        this.socket.on('areWordsValid', (result: boolean) => {
-            this.areWordsValid = result;
-        });
-        this.socket.on('newValidWords', (newWords: string[]) => {
-            this.validWordsFormed = this.validWordsFormed.concat(newWords);
-        });
+
+    setDictionary(dictionary: DictionaryInterface) {
+        this.dictionary = dictionary;
+        this.dictionaryTrie = new Trie(dictionary);
     }
+
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
         const wordsValue = this.calculateScore(newWords);
-        // Retirer lettres du board
+        // remove letters on board
         if (this.areWordsValid) {
             newWords.forEach((newWord) => {
                 if (wordsValue === ERROR_NUMBER) {
@@ -91,10 +89,7 @@ export class ValidationService {
         let newLetters = 0;
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
-                if (
-                    this.gridService.scrabbleBoard.squares[i][j].occupied === true &&
-                    this.gridService.scrabbleBoard.squares[i][j].isValidated === false
-                ) {
+                if (this.gridService.scrabbleBoard.squares[i][j].occupied && !this.gridService.scrabbleBoard.squares[i][j].isValidated) {
                     newLetters++;
                 }
             }
@@ -104,7 +99,7 @@ export class ValidationService {
 
     // Calls the server to validate the words passed in.
     // If the words were not valid, wait 3 seconds before returning result.
-    // If the server doesnt answer after 3 sec, validation result is false by default
+    // If the server doesn't answer after 3 sec, validation result is false by default
     async validateWords(newWords: ScrabbleWord[], gameMode: GameType) {
         const strWords: string[] = [];
         newWords?.forEach((newWord) => {
@@ -144,7 +139,7 @@ export class ValidationService {
                     }
                 }
                 wordsHaveBeenValidated = true;
-                // return true if words are valid, wait untill the end of timeout if not
+                // return true if words are valid, wait until the end of timeout if not
                 if (this.areWordsValid) {
                     this.validWordsFormed = this.validWordsFormed.concat(strWords);
                     resolve(this.areWordsValid);
@@ -159,7 +154,17 @@ export class ValidationService {
             });
         }
     }
+
     isWordValid(word: string): boolean {
-        return this.dictionaryTrie.find(word) && word.length >= MIN_WORD_LENGHT && !word.includes('-') && !word.includes("'") ? true : false;
+        return this.dictionaryTrie.find(word) && word.length >= MIN_WORD_LENGTH && !word.includes('-') && !word.includes("'") ? true : false;
+    }
+
+    private socketOnConnect() {
+        this.socket.on('areWordsValid', (result: boolean) => {
+            this.areWordsValid = result;
+        });
+        this.socket.on('newValidWords', (newWords: string[]) => {
+            this.validWordsFormed = this.validWordsFormed.concat(newWords);
+        });
     }
 }
