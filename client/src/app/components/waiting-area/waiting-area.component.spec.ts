@@ -20,6 +20,7 @@ import { WaitingAreaComponent } from './waiting-area.component';
 /* eslint-disable no-unused-vars */
 /* eslint-disable dot-notation */
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable max-lines */
 class SocketMock {
     id: string = 'Socket mock';
     events: Map<string, CallableFunction> = new Map();
@@ -60,6 +61,7 @@ describe('WaitingAreaComponent', () => {
             'start',
             'deleteRoom',
             'someoneLeftRoom',
+            'getGames',
         ]);
         multiplayerMode = jasmine.createSpyObj('GameService', ['initializeMultiplayerGame']);
         await TestBed.configureTestingModule({
@@ -90,7 +92,7 @@ describe('WaitingAreaComponent', () => {
     });
 
     it('onSelect should set selectedGame if gameSelected is true', () => {
-        component.isGameSelected = true;
+        component.data.isGameSelected = true;
         const gameSelected = {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
@@ -99,7 +101,7 @@ describe('WaitingAreaComponent', () => {
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
-            isLOG2990: false,
+            isLog2990: false,
         };
         // const game = new GameParameters('Ari', 60, false);
         component.onSelect(gameSelected);
@@ -107,7 +109,7 @@ describe('WaitingAreaComponent', () => {
     });
 
     it('onSelect should not set selectedGame if gameSelected is false', () => {
-        component.isGameSelected = false;
+        component.data.isGameSelected = false;
         // const selectedGame = new GameParameters('', 0, false);
         // const game = new GameParameters('Ari', 60, false);
         const gameSelected = {
@@ -118,19 +120,19 @@ describe('WaitingAreaComponent', () => {
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
-            isLOG2990: false,
+            isLog2990: false,
         };
         component.onSelect(gameSelected);
-        expect(component.selectedGame.creatorName).toEqual('');
+        expect(component.selectedGame).toBeUndefined();
     });
 
     it('openName should return true if game is selected and parameter is true', () => {
-        component.isGameSelected = true;
+        component.data.isGameSelected = true;
         expect(component.openName(true)).toEqual(true);
     });
 
     it('openName should return true if game is not selected', () => {
-        component.isGameSelected = false;
+        component.data.isGameSelected = false;
         expect(component.openName(true)).toEqual(false);
     });
 
@@ -144,7 +146,7 @@ describe('WaitingAreaComponent', () => {
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
-            isLOG2990: false,
+            isLog2990: false,
         };
         component.startIfFull();
         expect(component.isStarting).toEqual(true);
@@ -167,7 +169,7 @@ describe('WaitingAreaComponent', () => {
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
-            isLOG2990: false,
+            isLog2990: false,
         };
         component.selectedGame.gameRoom.playersName = ['Ari'];
         component.playerName = new FormControl('Ari');
@@ -185,7 +187,7 @@ describe('WaitingAreaComponent', () => {
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
-            isLOG2990: false,
+            isLog2990: false,
         };
         component.selectedGame.gameRoom.playersName = ['Ari', 'Sara'];
         component.playerName = new FormControl('Ari');
@@ -203,7 +205,7 @@ describe('WaitingAreaComponent', () => {
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
-            isLOG2990: false,
+            isLog2990: false,
         };
         // game.creatorPlayer = game.localPlayer;
         component.playerName = new FormControl('Ari');
@@ -220,7 +222,7 @@ describe('WaitingAreaComponent', () => {
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
-            isLOG2990: false,
+            isLog2990: false,
         };
         // game.creatorPlayer = game.localPlayer;
         component.playerName = new FormControl('Sara');

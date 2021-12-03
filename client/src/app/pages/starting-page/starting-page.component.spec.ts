@@ -1,5 +1,8 @@
+/* eslint-disable dot-notation */
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { RouterTestingModule } from '@angular/router/testing';
 import { BestScoresComponent } from '@app/components/best-scores/best-scores.component';
 import { Observable } from 'rxjs';
 import { StartingPageComponent } from './starting-page.component';
@@ -12,6 +15,7 @@ describe('StartingPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [StartingPageComponent],
+            imports: [HttpClientModule, MatDialogModule, RouterTestingModule],
             providers: [
                 {
                     provide: MatDialog,

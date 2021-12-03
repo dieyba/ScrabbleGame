@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { HttpClientModule, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -49,8 +50,9 @@ describe('BestScoresService', () => {
     });
 
     it('postBestScore should post', () => {
+        const score = 80;
         const spy = spyOn(service['http'], 'post');
-        service.postBestScore('Dieyba', 80, 'url');
+        service.postBestScore('Dieyba', score, 'url');
         expect(spy).toHaveBeenCalled();
     });
 

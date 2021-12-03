@@ -170,7 +170,7 @@ describe('RackComponent', () => {
         const testEvent1 = new MouseEvent('click', { clientX: 45 });
         expect(component.selectedLetterPosition(testEvent1)).toEqual(1);
 
-        const testEvent2 = new MouseEvent('click', { clientX: 450 });
+        const testEvent2 = new MouseEvent('click', { clientX: 439 });
         expect(component.selectedLetterPosition(testEvent2)).toEqual(MAX_LETTER_COUNT);
     });
 
@@ -178,7 +178,7 @@ describe('RackComponent', () => {
         const testEvent1 = new MouseEvent('click', { clientX: -1 });
         expect(component.selectedLetterPosition(testEvent1)).toEqual(0);
 
-        const testEvent2 = new MouseEvent('click', { clientX: 501 });
+        const testEvent2 = new MouseEvent('click', { clientX: 441 });
         expect(component.selectedLetterPosition(testEvent2)).toEqual(0);
     });
 });

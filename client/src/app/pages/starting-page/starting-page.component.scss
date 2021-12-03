@@ -14,17 +14,16 @@ body {
 }
 
 .button {
-    border: 1px solid black;
     display: block;
     margin-left: auto;
     margin-right: auto;
     margin-top: 30px;
     padding: 10px;
     border-radius: 10px;
-    font-size: xx-large;
+    font-size: 30px;
     background-color: #6aa0e0;
-    border-width: 10px;
-    border-style: double;
+    border-color: #6aa0e0;
+    border-width: 2px;
     display: flex;
     text-align: center;
     flex-direction: column;
@@ -35,27 +34,5 @@ body {
 }
 
 .button:hover {
-    opacity: 0.6;
-}
-
-.return {
-    border: 1px solid black;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 100px;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: xx-large;
-    background-color: #6aa0e0;
-    border-width: 10px;
-    border-style: double;
-    display: flex;
-    text-align: center;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-}
-.return:hover {
     opacity: 0.6;
 }

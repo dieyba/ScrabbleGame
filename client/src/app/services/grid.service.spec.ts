@@ -12,8 +12,8 @@ describe('GridService', () => {
     let service: GridService;
     let ctxStub: CanvasRenderingContext2D;
 
-    const DEFAULT_WIDTH = 600;
-    const DEFAULT_HEIGHT = 600;
+    const DEFAULT_WIDTH = 540;
+    const DEFAULT_HEIGHT = 540;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
@@ -235,5 +235,29 @@ describe('GridService', () => {
         service.removeInvalidLetters(startCoord, 2, Axis.H);
         expect(service.scrabbleBoard.squares[0][0].occupied).toEqual(false);
         expect(service.scrabbleBoard.squares[1][0].occupied).toEqual(true);
+    });
+
+    it('updateBoard should updat the letters with the right direction (v)', () => {
+        const word = 'test';
+        const position = new Vec2();
+        const startPosition = new Vec2();
+        service.updateBoard(word, 'v', position);
+
+        for (startPosition.y; startPosition.y < word.length; startPosition.y++) {
+            expect(service.scrabbleBoard.squares[startPosition.x][startPosition.y].isValidated).toBeTrue();
+            expect(service.scrabbleBoard.squares[startPosition.x][startPosition.y].isBonusUsed).toBeTrue();
+        }
+    });
+
+    it('updateBoard should updat the letters with the right direction (h)', () => {
+        const word = 'test';
+        const position = new Vec2();
+        const startPosition = new Vec2();
+        service.updateBoard(word, 'h', position);
+
+        for (startPosition.x; startPosition.x < word.length; startPosition.x++) {
+            expect(service.scrabbleBoard.squares[startPosition.x][startPosition.y].isValidated).toBeTrue();
+            expect(service.scrabbleBoard.squares[startPosition.x][startPosition.y].isBonusUsed).toBeTrue();
+        }
     });
 });

@@ -1,4 +1,6 @@
+import { ObjectId } from 'bson';
+
 export interface VirtualPlayerName {
-    idName: string;
-    virtualPlayerName: string;
+    _id: ObjectId;
+    name: string;
 }

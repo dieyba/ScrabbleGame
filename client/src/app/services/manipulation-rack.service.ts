@@ -14,22 +14,6 @@ export class ManipulationRackService {
         this.firstOccurencePosition = ERROR_NUMBER;
     }
 
-    set setLetterSelectedPosition(newValue: number) {
-        this.letterSelectedPosition = newValue;
-    }
-
-    set setFirstOccurencePosition(newValue: number) {
-        this.firstOccurencePosition = newValue;
-    }
-
-    get getLetterSelectedPosition() {
-        return this.letterSelectedPosition;
-    }
-
-    get getFirstOccurencePosition() {
-        return this.firstOccurencePosition;
-    }
-
     handleSelection(position: number) {
         if (this.rackService.handlingSelected[position - 1] === false) {
             if (this.rackService.exchangeSelected[position - 1] === true) {
@@ -99,13 +83,13 @@ export class ManipulationRackService {
                 this.rackService.rackLetters.shift();
                 this.rackService.rackLetters.push(letterToSwitchLeft);
                 this.letterSelectedPosition = this.rackService.rackLetters.length - 1;
-                this.rackService.clearRack();
+                this.rackService.redrawRack();
                 this.rackService.select(this.rackService.rackLetters.length, this.rackService.gridContext, false);
             } else {
                 this.rackService.rackLetters[this.letterSelectedPosition] = this.rackService.rackLetters[this.letterSelectedPosition - 1];
                 this.rackService.rackLetters[this.letterSelectedPosition - 1] = letterToSwitchLeft;
                 this.letterSelectedPosition = this.letterSelectedPosition - 1;
-                this.rackService.clearRack();
+                this.rackService.redrawRack();
                 this.rackService.select(this.letterSelectedPosition + 1, this.rackService.gridContext, false);
             }
         }
@@ -121,13 +105,13 @@ export class ManipulationRackService {
                 // Placing letter at the beginning
                 this.rackService.rackLetters.unshift(letterToSwitchRight);
                 this.letterSelectedPosition = 0;
-                this.rackService.clearRack();
+                this.rackService.redrawRack();
                 this.rackService.select(1, this.rackService.gridContext, false);
             } else {
                 this.rackService.rackLetters[this.letterSelectedPosition] = this.rackService.rackLetters[this.letterSelectedPosition + 1];
                 this.rackService.rackLetters[this.letterSelectedPosition + 1] = letterToSwitchRight;
                 this.letterSelectedPosition = this.letterSelectedPosition + 1;
-                this.rackService.clearRack();
+                this.rackService.redrawRack();
                 this.rackService.select(this.letterSelectedPosition + 1, this.rackService.gridContext, false);
             }
         }

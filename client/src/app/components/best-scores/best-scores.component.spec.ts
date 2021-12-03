@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { HttpClientModule, HttpStatusCode } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';

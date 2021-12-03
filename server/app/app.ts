@@ -10,7 +10,7 @@ import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
 import { BestScoresController } from './controllers/best-scores.controller';
-import { DictionarController } from './controllers/dictionary.controller';
+import { DictionaryDBController } from './controllers/dictionary-db.controller';
 import { VirtualPlayerNameController } from './controllers/virtual-player-name.controller';
 
 @Service()
@@ -22,9 +22,9 @@ export class Application {
     constructor(
         private readonly exampleController: ExampleController,
         private readonly dateController: DateController,
+        private readonly dictionaryDBController: DictionaryDBController,
         private readonly virtualPlayerNameController: VirtualPlayerNameController,
         private readonly bestScoresController: BestScoresController,
-        private readonly dictionaryController: DictionarController,
     ) {
         this.app = express();
 
@@ -48,9 +48,9 @@ export class Application {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/api/example', this.exampleController.router);
         this.app.use('/api/date', this.dateController.router);
+        this.app.use('/api/dictionary', this.dictionaryDBController.router);
         this.app.use('/api/VirtualPlayerName', this.virtualPlayerNameController.router);
         this.app.use('/api/bestScores', this.bestScoresController.router);
-        this.app.use('/api/Dictionary', this.dictionaryController.router);
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
         });
