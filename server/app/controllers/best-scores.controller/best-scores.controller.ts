@@ -26,6 +26,7 @@ export class BestScoresController {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
+
         this.router.get('/log2990Mode', async (req: Request, res: Response) => {
             this.bestScoresService
                 .getBestScores(this.bestScoresService.log2990Collection)
@@ -47,6 +48,7 @@ export class BestScoresController {
                     res.status(StatusCodes.BAD_REQUEST).send(error.message);
                 });
         });
+
         this.router.post('/log2990Mode/send', async (req: Request, res: Response) => {
             this.bestScoresService
                 .postBestScore(this.bestScoresService.log2990Collection, req.body)

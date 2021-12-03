@@ -12,12 +12,14 @@ export class PlaceLetterOnColorSquare extends Goal {
         this.type = GoalType.PlaceLetterOnColorSquare;
         this.description = GoalDescriptions.PlaceLetterOnColorSquare;
     }
+
     initialize(targetLetterAndColor: ScrabbleLetter) {
         this.targetLetter = targetLetterAndColor.character;
         this.targetColor = targetLetterAndColor.color;
         const description = GoalDescriptions.PlaceLetterOnColorSquare.replace('x', this.targetLetter);
         this.description = description.replace('y', this.colorToString(this.targetColor));
     }
+
     achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters: ScrabbleLetter[]) {
         if (this.isAchieved) {
             return 0;
@@ -34,6 +36,7 @@ export class PlaceLetterOnColorSquare extends Goal {
         }
         return 0;
     }
+
     colorToString(color: SquareColor): string {
         switch (color) {
             case SquareColor.DarkBlue:

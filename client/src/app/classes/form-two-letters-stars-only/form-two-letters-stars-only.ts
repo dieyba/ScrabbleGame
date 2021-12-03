@@ -8,6 +8,7 @@ export class FormTwoLettersStarsOnly extends Goal {
         this.type = GoalType.FormTwoLettersStarsOnly;
         this.description = GoalDescriptions.FormTwoLettersStarsOnly;
     }
+
     achieve(wordsFormed: ScrabbleWord[]) {
         if (this.isAchieved) {
             return 0;
@@ -17,9 +18,9 @@ export class FormTwoLettersStarsOnly extends Goal {
         for (const scrabbleLetter of wordPlaced.content) {
             if (scrabbleLetter.character === '*') numberOfStars++;
         }
-        const isValidWordLenght = wordPlaced.content.length >= MIN_WORD_LENGTH;
+        const isValidWordLength = wordPlaced.content.length >= MIN_WORD_LENGTH;
         const isOnlyStarsWord = numberOfStars === wordPlaced.content.length;
-        if (isValidWordLenght && isOnlyStarsWord) {
+        if (isValidWordLength && isOnlyStarsWord) {
             this.isAchieved = true;
             return GoalPoints.FormTwoLettersStarsOnly;
         }

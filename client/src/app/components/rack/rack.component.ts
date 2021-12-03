@@ -41,7 +41,7 @@ export class RackComponent implements AfterViewInit {
     onRightClick(event: Event) {
         event.preventDefault();
         const position = this.selectedLetterPosition(event as MouseEvent);
-        this.manipulationRackService.clearManipValues();
+        this.manipulationRackService.clearManipulationValues();
         this.exchangeService.handleSelection(position);
     }
 
@@ -59,7 +59,7 @@ export class RackComponent implements AfterViewInit {
             } else {
                 this.rackService.deselectAll(this.rackContext);
             }
-            this.manipulationRackService.clearManipValues();
+            this.manipulationRackService.clearManipulationValues();
         }
     }
 

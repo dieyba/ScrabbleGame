@@ -9,7 +9,7 @@
                 <button class="small-btn" (click)="startIfFull()">Commencer</button>
             </div>
         </div>
-        <div class="games" *ngFor="let game of pendingGameslist">
+        <div class="games" *ngFor="let game of pendingGamesList">
             <button class="game-btn" (click)="openName(true); onSelect(game)">
                 Partie #{{ game.gameRoom.idGame }} - Créateur: {{ game.creatorName }} - Dictionnaire: {{ game.dictionary.title }} - Temps:
                 {{ game.totalCountDown }} secondes
@@ -21,7 +21,7 @@
     <div *ngIf="data.isGameSelected">
         <h1>Veuillez selectionner la partie que vous souhaitez rejoindre</h1>
         <mat-card class="games">
-            <li *ngFor="let game of pendingGameslist" [class.selected]="game === selectedGame">
+            <li *ngFor="let game of pendingGamesList" [class.selected]="game === selectedGame">
                 <option selected (click)="openName(true); onSelect(game)">
                     Partie #{{ game.gameRoom.idGame }} - Créateur: {{ game.creatorName }} - Dictionnaire: {{ game.dictionary.title }} - Temps:
                     {{ game.totalCountDown }} sec.
@@ -41,7 +41,7 @@
             <div *ngIf="gameCancelled">
                 <h3>La partie #{{ roomDeletedId }} a été supprimé, veuillez selectionner une autre partie si vous souhaitiez la joindre</h3>
             </div>
-            <div class="row" *ngIf="joindre">
+            <div class="row" *ngIf="join">
                 <h3 class="column">Veuillez cliquer ici pour joindre la partie :</h3>
                 <div class="column">
                     <button class="small-btn" (click)="start()">Joindre</button>
@@ -56,7 +56,7 @@
             </div>
         </div>
         <button class="small-btn" (click)="closeDialog(); someoneLeftRoom()">Retour</button>
-        <button class="small-btn" *ngIf="pendingGameslist.length === 1" style="visibility: visible" disabled="true">Placement Aleatoire</button>
-        <button class="small-btn" *ngIf="pendingGameslist.length >= 2" style="visibility: visible" (click)="randomGame()">Placement Aleatoire</button>
+        <button class="small-btn" *ngIf="pendingGamesList.length === 1" style="visibility: visible" disabled="true">Placement Aleatoire</button>
+        <button class="small-btn" *ngIf="pendingGamesList.length >= 2" style="visibility: visible" (click)="randomGame()">Placement Aleatoire</button>
     </div>
 </div>

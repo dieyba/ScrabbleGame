@@ -19,7 +19,6 @@ export class Trie {
             return;
         }
         word = word.toLowerCase();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let current = this.root;
         for (const character of word) {
             if (current.children.get(character) === undefined) {
@@ -29,6 +28,7 @@ export class Trie {
         }
         current.isWord = true;
     }
+
     find(word: string): boolean {
         let current = this.root;
         for (let i = 0; i < word.length; i++) {

@@ -9,7 +9,7 @@ import { GameService } from '@app/services/game.service/game.service';
 const PLAYER_NAME = 'Sara';
 const OPPONENT_NAME = 'Not Sara';
 const LETTERS = 'abcd';
-
+/* eslint-disable dot-notation */
 describe('ExchangeCmd', () => {
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let exchange: ExchangeCmd;

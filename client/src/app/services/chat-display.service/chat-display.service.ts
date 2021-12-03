@@ -28,15 +28,6 @@ export class ChatDisplayService {
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
     }
-    socketOnConnect() {
-        this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
-            const chatEntryColor = chatEntry.senderName === this.localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
-            this.addEntry({ color: chatEntryColor, message: chatEntry.message });
-        });
-        this.socket.on('addSystemChatEntry', (systemMessage: string) => {
-            this.addEntry({ color: ChatEntryColor.SystemColor, message: systemMessage });
-        });
-    }
 
     initialize(localPlayerName: string): void {
         this.entries = [];
@@ -56,7 +47,7 @@ export class ChatDisplayService {
         this.entries.push(entry);
     }
 
-    addVirtalPlayerEntry(commandInput: string, debugMessages?: string[]) {
+    addVirtualPlayerEntry(commandInput: string, debugMessages?: string[]) {
         this.addEntry({ color: ChatEntryColor.RemotePlayer, message: commandInput }); // display command entered
         if (this.isActiveDebug && debugMessages) {
             for (const message of debugMessages) {
@@ -91,5 +82,15 @@ export class ChatDisplayService {
     invertDebugState(): string {
         this.isActiveDebug = !this.isActiveDebug;
         return this.isActiveDebug ? ACTIVE_DEBUG_MESSAGE : INACTIVE_DEBUG_MESSAGE;
+    }
+
+    private socketOnConnect() {
+        this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
+            const chatEntryColor = chatEntry.senderName === this.localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
+            this.addEntry({ color: chatEntryColor, message: chatEntry.message });
+        });
+        this.socket.on('addSystemChatEntry', (systemMessage: string) => {
+            this.addEntry({ color: ChatEntryColor.SystemColor, message: systemMessage });
+        });
     }
 }

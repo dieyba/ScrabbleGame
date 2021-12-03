@@ -12,6 +12,7 @@ export class ScrabbleWord {
         this.value = 0;
         this.startPosition = new Vec2();
     }
+
     stringify(): string {
         let string = '';
         for (const i of this.content) {
@@ -21,6 +22,7 @@ export class ScrabbleWord {
         }
         return string;
     }
+
     calculateValue(): number {
         let value = 0;
         for (const i of this.content) {

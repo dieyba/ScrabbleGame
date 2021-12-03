@@ -15,6 +15,7 @@ export class GameTimer {
         this.timerMs = this.totalCountDown;
         this.timer = UNDEFINED_TIMER;
     }
+
     initializeTotalCountDown(totalCountDown: number) {
         if (totalCountDown > ERROR_NUMBER) {
             this.totalCountDown = totalCountDown;
@@ -22,6 +23,7 @@ export class GameTimer {
             this.secondsToMinutes();
         }
     }
+
     secondsToMinutes() {
         const s = this.timerMs >= 0 ? Math.floor(this.timerMs / MINUTE_IN_SEC) : 0;
         const ms = this.timerMs >= 0 ? this.timerMs % MINUTE_IN_SEC : 0;

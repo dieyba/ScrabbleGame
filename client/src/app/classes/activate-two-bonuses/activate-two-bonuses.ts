@@ -10,6 +10,7 @@ export class ActivateTwoBonuses extends Goal {
         this.type = GoalType.ActivateTwoBonuses;
         this.description = GoalDescriptions.ActivateTwoBonuses;
     }
+
     achieve(wordsFormed: ScrabbleWord[]) {
         if (this.isAchieved) {
             return 0;

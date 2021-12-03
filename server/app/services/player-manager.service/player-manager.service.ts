@@ -26,6 +26,7 @@ export class PlayerManagerService {
         }
         return newPlayer;
     }
+
     removePlayer(socketId: string) {
         const playerArrayIndex = this.allPlayers.findIndex((p) => p.socketId === socketId);
         if (playerArrayIndex !== ERROR_NUMBER) {

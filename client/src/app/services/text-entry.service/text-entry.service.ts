@@ -36,9 +36,8 @@ type CommandCreationResult = Command | ErrorType.SyntaxError | ErrorType.Invalid
 
 // All eslint-disable-lines were disabled to allow calling the map's functions taking different arguments.
 export class TextEntryService {
-    commandsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
-    paramsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
-    isSolo: boolean;
+    private commandsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
+    private paramsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
 
     constructor(
         private chatDisplayService: ChatDisplayService,
@@ -159,7 +158,7 @@ export class TextEntryService {
      * @param defaultParams the game service and who the command is from
      * @param paramsInput the params entered after the command name. Should have 2 elements,
      * the placing parameters and the word to place.
-     * @returns Default parameteres and place commands parameters. If invalid syntax, returns undefined
+     * @returns Default parameters and place commands parameters. If invalid syntax, returns undefined
      */
     extractPlaceParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 2) {
@@ -190,7 +189,7 @@ export class TextEntryService {
      * @param defaultParams the game service and who the command is from
      * @param paramsInput string[] for the params entered after the command name.
      * Should only have 1 element, the letters to exchange.
-     * @returns Default parameteres and a string for the letters to exchange. If invalid syntax, returns undefined
+     * @returns Default parameters and a string for the letters to exchange. If invalid syntax, returns undefined
      */
     extractExchangeParams(player: Player, paramsInput: string[]): CommandParams {
         if (paramsInput.length === 1) {
@@ -247,7 +246,7 @@ export class TextEntryService {
      * Takes the command input entered by player, removes the ! and splits the string at the white spaces.
      *
      * @param commandInput the string to split
-     * @returns sintrg[]. Returns empty array if the input was empty or only had white spaces
+     * @returns string[]. Returns empty array if the input was empty or only had white spaces
      */
     splitCommandInput(commandInput: string): string[] {
         if (commandInput.startsWith('!')) {

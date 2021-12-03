@@ -108,7 +108,7 @@ export class BonusService {
         }
     }
 
-    useHorizontalWordBonus(scrabbleWord: ScrabbleWord, i: number) {
+    private useHorizontalWordBonus(scrabbleWord: ScrabbleWord, i: number) {
         const color = this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x + i][scrabbleWord.startPosition.y].color;
         switch (color) {
             case SquareColor.Teal:
@@ -128,7 +128,7 @@ export class BonusService {
         }
     }
 
-    useVerticalWordBonus(scrabbleWord: ScrabbleWord, i: number) {
+    private useVerticalWordBonus(scrabbleWord: ScrabbleWord, i: number) {
         const color = this.gridService.scrabbleBoard.squares[scrabbleWord.startPosition.x][scrabbleWord.startPosition.y + i].color;
         switch (color) {
             case SquareColor.Teal:
