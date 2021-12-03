@@ -810,7 +810,7 @@ export class VirtualPlayerService {
     }
 
     // Returns all valid combinations of the letter + the letters currently in the rack
-    private movesWithGivenLetter(letter: ScrabbleLetter, moveLength: number, fromRack?: boolean): ScrabbleWord[] {
+    movesWithGivenLetter(letter: ScrabbleLetter, moveLength: number, fromRack?: boolean): ScrabbleWord[] {
         let lettersAvailable: ScrabbleLetter[] = [];
         lettersAvailable[0] = letter;
         const lettersInArray: boolean[] = [false, false, false, false, false, false, false];
