@@ -146,7 +146,7 @@ export class VirtualPlayerService {
         for (let i = 0; i < moves[0].word.content.length; i++) {
             if (moves[0].word.content[i].tile.position.x === POSITION_ERROR || moves[0].word.content[i].tile.position.y === POSITION_ERROR) {
                 if (moves[0].axis === Axis.H) {
-                    const nextPos = moves[0].position.x + i;
+                    const nextPos = moves[0].position.x + i + 1;
                     message +=
                         convertYAxisToLetterCoordinates(moves[0].position.y).toUpperCase() +
                         nextPos +
@@ -157,7 +157,7 @@ export class VirtualPlayerService {
                     const nextPos = moves[0].position.y + i;
                     message +=
                         convertYAxisToLetterCoordinates(nextPos).toUpperCase() +
-                        moves[0].position.x +
+                        (moves[0].position.x + 1) +
                         ':' +
                         moves[0].word.content[i].character.toUpperCase() +
                         '  ';
@@ -198,6 +198,14 @@ export class VirtualPlayerService {
     filterPermutations(permutations: ScrabbleWord[]): ScrabbleWord[] {
         const filteredPermutations: ScrabbleWord[] = [];
         for (const permutation of permutations) {
+            // Let's check if the permutation is just a word that is already on the board and skip it if it is the case
+            let notOnBoardFound = true;
+            for (const letter of permutation.content) {
+                if (letter.tile.position.x === POSITION_ERROR && letter.tile.position.y === POSITION_ERROR) {
+                    notOnBoardFound = true;
+                }
+            }
+            if (!notOnBoardFound) continue;
             const permutationString = permutation.stringify();
             if (
                 this.isWordValid(permutationString) &&
@@ -249,9 +257,11 @@ export class VirtualPlayerService {
             setTimeout(() => {
                 const chosenTiles = this.chooseTilesFromRack(this.selectRandomValue());
                 const chosenTilesString = chosenTiles.map((tile) => tile.character).join('');
-                if (this.type === Difficulty.Easy || chosenTilesString === '') {
+                if (this.type === Difficulty.Difficult || chosenTilesString === '') {
                     const emptyRackPass = new PassTurnCmd(defaultParams);
-                    emptyRackPass.debugMessages.push("Aucun placement dans la plage de points n'a été trouvé. Le joueur virtuel passe son tour.");
+                    emptyRackPass.debugMessages.push(
+                        "Aucun placement n'a été trouvé dane la plage de points pour le joueur virtuel. Il passe son tour.",
+                    );
                     this.commandInvoker.executeCommand(emptyRackPass);
                     return;
                 }
