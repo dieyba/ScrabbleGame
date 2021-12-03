@@ -81,6 +81,7 @@ export class VirtualPlayerService {
             setTimeout(() => {
                 // 10% chance to end turn on easy mode
                 const command = new PassTurnCmd(defaultParams);
+                command.debugMessages.push('Le joueur virtuel a choisi de passer son tour.');
                 this.commandInvoker.executeCommand(command);
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
@@ -90,6 +91,7 @@ export class VirtualPlayerService {
                 // Converts chosen word to string
                 if (chosenTiles.length === 0) {
                     const emptyRackPass = new PassTurnCmd(defaultParams);
+                    emptyRackPass.debugMessages.push("Le joueur virtuel a choisi d'échanger ses lettres.");
                     this.commandInvoker.executeCommand(emptyRackPass);
                     return;
                 }
@@ -125,11 +127,14 @@ export class VirtualPlayerService {
                     if (chosenTiles.length === 0) {
                         const emptyRackPass = new PassTurnCmd(defaultParams);
                         this.commandInvoker.executeCommand(emptyRackPass);
-                        emptyRackPass.debugMessages.push('No move was found. Calling Pass Command');
+                        emptyRackPass.debugMessages.push(
+                            "Aucun placement dans la plage de points sélectionnée n'a été trouvé. Le joueur virtuel passe son tour.",
+                        );
                         return;
                     }
                     const chosenTilesString = chosenTiles.map((tile) => tile.character).join('');
                     const command = new ExchangeCmd(defaultParams, chosenTilesString);
+                    command.debugMessages.push("Aucun placement n'a été trouvé pour le joueur virtuel. Il échange ses lettres.");
                     this.commandInvoker.executeCommand(command);
                 }
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
@@ -162,13 +167,17 @@ export class VirtualPlayerService {
         const sliceNumber = -1;
         message.slice(0, sliceNumber);
         // Only one space, as asked in the documentation
-        message += '(' + moves[0].value + ')' + '\n';
+        message += '(' + moves[0].value + ')' + '\n\n';
+
+        if (moves.length === 1) {
+            message += "Aucun placement alternatif n'a été trouvé.";
+        }
 
         for (let i = 1; i < moves.length; i++) {
             for (const letter of moves[i].word.content) {
                 message += letter.character.toUpperCase();
             }
-            message += ' (' + moves[i].value + ')' + '\n';
+            message += ' (' + moves[i].value + ')' + '\n\n';
         }
         const bingoRack = [];
         for (const letter in this.rack) {
@@ -240,12 +249,14 @@ export class VirtualPlayerService {
             setTimeout(() => {
                 const chosenTiles = this.chooseTilesFromRack(this.selectRandomValue());
                 const chosenTilesString = chosenTiles.map((tile) => tile.character).join('');
-                if (chosenTilesString === '') {
+                if (this.type === Difficulty.Easy || chosenTilesString === '') {
                     const emptyRackPass = new PassTurnCmd(defaultParams);
+                    emptyRackPass.debugMessages.push("Aucun placement dans la plage de points n'a été trouvé. Le joueur virtuel passe son tour.");
                     this.commandInvoker.executeCommand(emptyRackPass);
                     return;
                 }
                 const exchange = new ExchangeCmd(defaultParams, chosenTilesString);
+                exchange.debugMessages.push("Aucun placement n'a été trouvé pour le joueur virtuel. Il échange ses lettres.");
                 this.commandInvoker.executeCommand(exchange);
             }, NO_MOVE_TOTAL_WAIT_TIME - DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
             // Pass turn
@@ -259,6 +270,7 @@ export class VirtualPlayerService {
             word: moveFound[0].word.stringify(),
         };
         const command = new PlaceCmd(defaultParams, params);
+        command.debugMessages.push(this.debugMessageGenerator(moveFound));
         this.commandInvoker.executeCommand(command);
     }
 
@@ -446,8 +458,7 @@ export class VirtualPlayerService {
     removalAfterTempPlacement(word: ScrabbleWord, startPos: Vec2, axis: Axis) {
         if (!isCoordInsideBoard(startPos)) return;
         const currentCoord = new Vec2(startPos.x, startPos.y);
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < word.content.length; i++) {
+        for (const letter of word.content) {
             const currentSquare = this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y];
             if (axis === Axis.H && currentCoord.x + 1 < BOARD_SIZE) {
                 currentCoord.x += 1;
@@ -459,7 +470,7 @@ export class VirtualPlayerService {
             if (currentSquare.isValidated) continue;
             currentSquare.letter = new ScrabbleLetter('', 0);
             currentSquare.occupied = false;
-            word.content[i].tile.position = new Vec2(POSITION_ERROR, POSITION_ERROR);
+            letter.tile.position = new Vec2(POSITION_ERROR, POSITION_ERROR);
         }
     }
 
