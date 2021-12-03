@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { BASE_URL, BestScores, BestScoresService } from '@app/services/best-scores.service';
+import { BASE_URL, BestScores, BestScoresService } from '@app/services/best-scores.service/best-scores.service';
 import { Subscription } from 'rxjs';
 
 @Component({

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
-import { TextEntryService } from '@app/services/text-entry.service';
+import { TextEntryService } from '@app/services/text-entry.service/text-entry.service';
 import { TextEntryComponent } from './text-entry.component';
 import SpyObj = jasmine.SpyObj;
 

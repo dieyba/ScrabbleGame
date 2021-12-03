@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { ChatDisplayEntry } from '@app/classes/chat-display-entry';
-import { ChatDisplayService } from '@app/services/chat-display.service';
+import { ChatDisplayEntry } from '@app/classes/chat-display-entry/chat-display-entry';
+import { ChatDisplayService } from '@app/services/chat-display.service/chat-display.service';
 
 @Component({
     selector: 'app-chat-display',
