@@ -120,12 +120,14 @@ export class GameInitFormComponent implements OnInit, OnDestroy {
         this.createFormControl();
         this.createForm();
     }
+
     ngOnDestroy() {
         this.beginnerNameSubscription.unsubscribe();
         this.expertNameSubscription.unsubscribe();
         this.dictionarySubscription.unsubscribe();
 
     }
+
     createFormControl() {
         this.name = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
         this.timer = new FormControl('', [Validators.required]);

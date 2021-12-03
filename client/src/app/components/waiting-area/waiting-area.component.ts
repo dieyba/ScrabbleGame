@@ -48,7 +48,6 @@ export class WaitingAreaComponent implements AfterViewInit {
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
         private dialog: MatDialog,
         public gameList: GameListService,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         @Inject(MAT_DIALOG_DATA) public data: DialogData,
     ) {
         this.server = environment.socketUrl;
@@ -79,6 +78,7 @@ export class WaitingAreaComponent implements AfterViewInit {
     onBeforeUnload() {
         this.gameList.someoneLeftRoom();
     }
+
     @HostListener('window:popstate', ['$event'])
     onPopState() {
         this.gameList.someoneLeftRoom();
@@ -104,6 +104,7 @@ export class WaitingAreaComponent implements AfterViewInit {
         }
         return this.selectedGame;
     }
+
     someoneLeftRoom() {
         if (!this.isStarting) {
             this.gameList.someoneLeftRoom();

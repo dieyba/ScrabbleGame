@@ -30,6 +30,7 @@ export class CommandInvokerService {
             this.displayExecutionLocally(isFromVirtualPlayer, command, commandResult);
         }
     }
+
     private displayExecutionWithServer(isExchangeCmd: boolean, commandResult: CommandResult) {
         // extract command is the only situation where the message is different for the local/remove player
         if (isExchangeCmd) {
@@ -42,6 +43,7 @@ export class CommandInvokerService {
             });
         }
     }
+
     private displayExecutionLocally(isFromVirtualPlayer: boolean, command: Command, commandResult: CommandResult) {
         if (isFromVirtualPlayer) {
             // TODO: see how exactly debug messages will be added in command invoker

@@ -51,6 +51,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit, OnDestroy {
         this.beginnerNameSubscription = this.virtualPlayerNameService.getVirtualPlayerNames(this.beginnerNameUrl).subscribe((beginnerList) => (this.beginnerNameList = beginnerList));
         this.expertNameSubscription = this.virtualPlayerNameService.getVirtualPlayerNames(this.expertNameUrl).subscribe((expertList) => (this.expertNameList = expertList));
     }
+
     ngOnDestroy() {
         this.beginnerNameSubscription.unsubscribe();
         this.expertNameSubscription.unsubscribe();

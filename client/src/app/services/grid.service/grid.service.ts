@@ -12,6 +12,10 @@ export enum Colors {
     Red = '#E60000',
     None = 'white',
 }
+export interface Case {
+    type: Colors, colorType: string, valueType: string
+
+}
 
 // TODO : Make a file for constants
 export const DEFAULT_WIDTH = 540;
@@ -97,7 +101,6 @@ export class GridService {
         return letter;
     }
 
-    // To remove a square, set scrabbleBoard.squares[x][y].occupied to false, set scrabbleBoard.square[x][y].letter = new Scrabble
     private drawSingleSquareColor(i: number, j: number) {
         const startX = (this.width * i) / BOARD_SIZE + 1 + BOARD_OFFSET;
         const startY = (this.height * j) / BOARD_SIZE + 1 + BOARD_OFFSET;
@@ -105,40 +108,16 @@ export class GridService {
         // If colored square, hide text
         switch (this.scrabbleBoard.squares[i][j].color) {
             case SquareColor.DarkBlue:
-                this.gridContext.fillStyle = Colors.DarkBlue;
-                this.gridContext.fillRect(startX, startY, SQUARE_SIZE, SQUARE_SIZE);
-                if (!this.scrabbleBoard.squares[i][j].occupied) {
-                    this.gridContext.fillStyle = 'black';
-                    this.gridContext.fillText('LETTRE', startX + 2, startY + SMALL_OFFSET_Y);
-                    this.gridContext.fillText('x3', startX + BIG_OFFSET_X, startY + BIG_OFFSET_Y);
-                }
+                this.fill({ type: Colors.DarkBlue, colorType: 'LETTRE', valueType: 'x3' }, i, j);
                 break;
             case SquareColor.Teal:
-                this.gridContext.fillStyle = Colors.Teal;
-                this.gridContext.fillRect(startX, startY, SQUARE_SIZE, SQUARE_SIZE);
-                if (!this.scrabbleBoard.squares[i][j].occupied) {
-                    this.gridContext.fillStyle = 'black';
-                    this.gridContext.fillText('LETTRE', startX + 2, startY + SMALL_OFFSET_Y);
-                    this.gridContext.fillText('x2', startX + BIG_OFFSET_X, startY + BIG_OFFSET_Y);
-                }
+                this.fill({ type: Colors.Teal, colorType: 'LETTRE', valueType: 'x2' }, i, j);
                 break;
             case SquareColor.Pink:
-                this.gridContext.fillStyle = Colors.Pink;
-                this.gridContext.fillRect(startX, startY, SQUARE_SIZE, SQUARE_SIZE);
-                if (!this.scrabbleBoard.squares[i][j].occupied) {
-                    this.gridContext.fillStyle = 'black';
-                    this.gridContext.fillText('MOT', startX + SMALL_OFFSET_X, startY + SMALL_OFFSET_Y);
-                    this.gridContext.fillText('x2', startX + BIG_OFFSET_X, startY + BIG_OFFSET_Y);
-                }
+                this.fill({ type: Colors.Pink, colorType: 'MOT', valueType: 'x2' }, i, j);
                 break;
             case SquareColor.Red:
-                this.gridContext.fillStyle = Colors.Red;
-                this.gridContext.fillRect(startX, startY, SQUARE_SIZE, SQUARE_SIZE);
-                if (!this.scrabbleBoard.squares[i][j].occupied) {
-                    this.gridContext.fillStyle = 'black';
-                    this.gridContext.fillText('MOT', startX + SMALL_OFFSET_X, startY + SMALL_OFFSET_Y);
-                    this.gridContext.fillText('x3', startX + BIG_OFFSET_X, startY + BIG_OFFSET_Y);
-                }
+                this.fill({ type: Colors.Red, colorType: 'MOT', valueType: 'x3' }, i, j);
                 break;
             case SquareColor.None:
                 this.gridContext.fillStyle = Colors.None;
@@ -146,6 +125,20 @@ export class GridService {
                 break;
         }
     }
+
+    fill(type: Case, i: number, j: number) {
+        const startX = (this.width * i) / BOARD_SIZE + 1 + BOARD_OFFSET;
+        const startY = (this.height * j) / BOARD_SIZE + 1 + BOARD_OFFSET;
+        this.gridContext.font = '10px system-ui';
+        this.gridContext.fillStyle = type.type;
+        this.gridContext.fillRect(startX, startY, SQUARE_SIZE, SQUARE_SIZE);
+        if (!this.scrabbleBoard.squares[i][j].occupied) {
+            this.gridContext.fillStyle = 'black';
+            this.gridContext.fillText(type.colorType, startX + 2, startY + SMALL_OFFSET_Y);
+            this.gridContext.fillText(type.valueType, startX + BIG_OFFSET_X, startY + BIG_OFFSET_Y);
+        }
+    }
+
 
     // Draw single letters
     drawLetter(scrabbleLetter: ScrabbleLetter, i: number, j: number): void {

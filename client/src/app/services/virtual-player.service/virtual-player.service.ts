@@ -143,7 +143,6 @@ export class VirtualPlayerService {
             serviceCalled: this.gameService,
         };
         const moveFound = this.findFirstValidMoves(permutations, value, true);
-        // console.log('moveFound: ', moveFound);
         if (moveFound.position.x === POSITION_ERROR || moveFound.position.y === POSITION_ERROR || moveFound.word.content.length === 0) {
             // Pass turn
             setTimeout(() => {
@@ -320,8 +319,8 @@ export class VirtualPlayerService {
     tempPlacement(word: ScrabbleWord, startPos: Vec2, axis: Axis) {
         if (!isCoordInsideBoard(startPos)) return;
         const currentCoord = new Vec2(startPos.x, startPos.y);
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < word.content.length; i++) {
+        for (let eachWord of word.content) {
+            let index = word.content.indexOf(eachWord)
             const currentSquare = this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y];
             if (axis === Axis.H && currentCoord.x + 1 < BOARD_SIZE) {
                 currentCoord.x += 1;
@@ -331,10 +330,10 @@ export class VirtualPlayerService {
             if (!currentSquare || !currentSquare.letter) return;
             if (
                 currentSquare.isValidated ||
-                (currentSquare.position.x === word.content[i].tile.position.x && currentSquare.position.y === word.content[i].tile.position.y)
+                (currentSquare.position.x === word.content[index].tile.position.x && currentSquare.position.y === word.content[index].tile.position.y)
             )
                 continue;
-            currentSquare.letter = word.content[i];
+            currentSquare.letter = word.content[index];
             currentSquare.occupied = true;
             currentSquare.isValidated = false;
         }
@@ -343,8 +342,8 @@ export class VirtualPlayerService {
     removalAfterTempPlacement(word: ScrabbleWord, startPos: Vec2, axis: Axis) {
         if (!isCoordInsideBoard(startPos)) return;
         const currentCoord = new Vec2(startPos.x, startPos.y);
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < word.content.length; i++) {
+        for (let eachWord of word.content) {
+            eachWord;
             const currentSquare = this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y];
             if (axis === Axis.H && currentCoord.x + 1 < BOARD_SIZE) {
                 currentCoord.x += 1;
@@ -710,6 +709,7 @@ export class VirtualPlayerService {
         return returnPermutations;
         // We will then try to place the word on each space on the board
     }
+
     permutationsOfLetters(letters: ScrabbleLetter[]): ScrabbleLetter[][] {
         // Adapted from medium.com/weekly-webtips/step-by-step-guide-to-array-permutation-using-recursion-in-javascript-4e76188b88ff
         const result = [];

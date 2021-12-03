@@ -23,7 +23,6 @@ export class DictionaryDBService {
         return MongoClient.connect(this.dbUrl)
             .then(async (client: MongoClient) => {
                 this.client = client;
-                // console.log('client connection');
                 this.dictionaryCollection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]);
                 await this.populateDictionaryDB();
             })
@@ -55,6 +54,7 @@ export class DictionaryDBService {
                 throw new Error('Failed to get dictionary');
             });
     }
+
     async postDictionary(dictionary: DictionaryInterface): Promise<void> {
         if (!this.isDictionaryValid(dictionary)) {
             throw new TypeError("Le dictionnaire n'a pas un format valide");
@@ -122,17 +122,6 @@ export class DictionaryDBService {
 
     async populateDictionaryDB(): Promise<void> {
         if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments()) === 0) {
-            // const dictionaries: DictionaryInterface[] = [
-            //     {
-            //         _id: new ObjectId(),
-            //         title: 'erika',
-            //         description: 'assiette de patates frites à erika',
-            //         words: ['patates frites #1', 'patates frites #2', 'patates frites #3', 'patates frites #4', 'patates frites #5'],
-            //     },
-            // ];
-            // for (const course of dictionaries) {
-            //     await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(course);
-            // }
             const dico = dict_path as Dictionary;
             const dictionaries: DictionaryInterface = {
                 _id: new ObjectId(),

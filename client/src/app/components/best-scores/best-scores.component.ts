@@ -10,14 +10,17 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./best-scores.component.scss'],
 })
 export class BestScoresComponent implements OnInit, OnDestroy {
+
     classicModeBestScores: BestScores[];
     log2990ModeBestScores: BestScores[];
     classicBestScoresSubscription: Subscription;
     log2990BestScoresSubscription: Subscription;
+
     constructor(private bestScoresService: BestScoresService, private dialogRef: MatDialogRef<BestScoresComponent>) {
         this.classicModeBestScores = [];
         this.log2990ModeBestScores = [];
     }
+
     ngOnDestroy(): void {
         this.classicBestScoresSubscription.unsubscribe();
         this.log2990BestScoresSubscription.unsubscribe();

@@ -5,11 +5,13 @@ import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 const NAME_LETTERS_MIN_AMOUNT = 3;
 
 export class FormWordWithLettersFromName extends Goal {
+
     constructor() {
         super();
         this.type = GoalType.FormWordWithLettersFromName;
         this.description = GoalDescriptions.FormWordWithLettersFromName;
     }
+
     achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters: ScrabbleLetter[], activePlayerName: string) {
         if (this.isAchieved) {
             return 0;

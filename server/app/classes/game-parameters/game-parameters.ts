@@ -34,6 +34,7 @@ export interface GameRoom {
     creatorId: string;
     joinerId: string;
 }
+
 export interface WaitingAreaGameParameters {
     gameRoom: GameRoom;
     creatorName: string;
@@ -82,10 +83,6 @@ export class GameInitInfo {
             this.pickSharedGoals(usedGoals);
             this.pickPrivateGoals(usedGoals);
         }
-        // console.log('Shared goals:', this.sharedGoals);
-        // this.players.forEach((player) => {
-        //     console.log(player.name, ' goal:', player.goal);
-        // });
     }
 
     // pick the 4 public random objectives/goals from the list

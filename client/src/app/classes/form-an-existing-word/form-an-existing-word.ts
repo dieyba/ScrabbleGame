@@ -12,9 +12,11 @@ export class FormAnExistingWord extends Goal {
         this.type = GoalType.FormAnExistingWord;
         this.description = GoalDescriptions.FormAnExistingWord;
     }
+
     initialize(validationService: ValidationService) {
         this.validationService = validationService;
     }
+
     achieve(wordsFormed: ScrabbleWord[]) {
         if (this.isAchieved) {
             return 0;

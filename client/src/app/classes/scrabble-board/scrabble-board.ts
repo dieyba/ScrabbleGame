@@ -156,6 +156,7 @@ export class ScrabbleBoard {
             this.setSquareColor(i, j, SquareColor.Teal, isRandom);
         }
     }
+
     isWordInsideBoard(word: string, coord: Vec2, orientation: string): boolean {
         // Verifying if coordinates are good
         if (!isCoordInsideBoard(coord)) {
@@ -193,6 +194,7 @@ export class ScrabbleBoard {
         }
         return false;
     }
+
     isWordPartOfAnotherWord(word: string, coord: Vec2, orientation: string): boolean {
         let result = false;
         const isVertical = orientation === Axis.V;

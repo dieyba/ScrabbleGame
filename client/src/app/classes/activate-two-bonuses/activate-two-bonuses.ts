@@ -5,11 +5,13 @@ import { SquareColor } from '@app/classes/square/square';
 const MIN_AMOUNT_BONUS_USED = 2;
 
 export class ActivateTwoBonuses extends Goal {
+
     constructor() {
         super();
         this.type = GoalType.ActivateTwoBonuses;
         this.description = GoalDescriptions.ActivateTwoBonuses;
     }
+
     achieve(wordsFormed: ScrabbleWord[]) {
         if (this.isAchieved) {
             return 0;

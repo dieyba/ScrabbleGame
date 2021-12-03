@@ -26,6 +26,7 @@ export class AdminPageComponent implements OnDestroy {
     ) {
         this.privateName = false;
     }
+
     ngOnDestroy() {
         this.dictionarySubscription.unsubscribe();
         this.virtualPlayerNameSubscription.unsubscribe();

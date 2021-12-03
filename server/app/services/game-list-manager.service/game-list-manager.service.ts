@@ -11,6 +11,7 @@ export class GameListManager {
         this.gamesInPlay = new Array<GameInitInfo>();
         this.currentId = 0;
     }
+
     getAllWaitingAreaGames(isLog2990: string): WaitingAreaGameParameters[] {
         const games: WaitingAreaGameParameters[] = [];
         this.waitingAreaGames.forEach((game) => {
@@ -22,6 +23,7 @@ export class GameListManager {
         });
         return games;
     }
+
     getAWaitingAreaGame(roomID: number): WaitingAreaGameParameters | undefined {
         const game = this.waitingAreaGames.find((r) => r.gameRoom.idGame === roomID);
         if (game !== undefined) {
@@ -29,6 +31,7 @@ export class GameListManager {
         }
         return undefined;
     }
+
     createWaitingAreaGame(game: WaitingAreaGameParameters, creatorSocketId: string): WaitingAreaGameParameters {
         game.gameRoom.idGame = this.currentId;
         game.gameRoom.creatorId = creatorSocketId;
@@ -37,6 +40,7 @@ export class GameListManager {
         this.currentId++;
         return game;
     }
+
     addJoinerPlayer(game: WaitingAreaGameParameters, joinerName: string, joinerSocketId: string, isLog2990: boolean): boolean {
         if (game.gameRoom.playersName.length < game.gameRoom.capacity && game.isLog2990 === isLog2990) {
             game.joinerName = joinerName;
@@ -46,6 +50,7 @@ export class GameListManager {
         }
         return false;
     }
+
     removeJoinerPlayer(roomId: number): WaitingAreaGameParameters | undefined {
         const waitingAreaRoom = this.getAWaitingAreaGame(roomId);
         if (waitingAreaRoom !== undefined) {
@@ -55,12 +60,14 @@ export class GameListManager {
         }
         return waitingAreaRoom;
     }
+
     deleteWaitingAreaGame(roomId: number): void {
         const index = this.waitingAreaGames.findIndex((r) => r.gameRoom.idGame === roomId);
         if (index > ERROR_NUMBER) {
             this.waitingAreaGames.splice(index, 1);
         }
     }
+
     getGameInPlay(roomID: number): GameInitInfo | undefined {
         const game = this.gamesInPlay.find((r) => r.gameRoomId === roomID);
         if (game !== undefined) {
@@ -68,11 +75,13 @@ export class GameListManager {
         }
         return undefined;
     }
+
     createGameInPlay(clientParametersChosen: WaitingAreaGameParameters): GameInitInfo {
         const newGame = new GameInitInfo(clientParametersChosen);
         this.gamesInPlay.push(newGame);
         return newGame;
     }
+
     deleteGameInPlay(roomId: number): void {
         const index = this.gamesInPlay.findIndex((r) => r.gameRoomId === roomId);
         if (index !== ERROR_NUMBER) {

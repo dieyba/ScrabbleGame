@@ -40,6 +40,7 @@ export class MouseWordPlacerService {
         this.currentWord = [];
         this.wordString = '';
     }
+
     onMouseClick(e: MouseEvent) {
         if (!this.gameService.game.getLocalPlayer().isActive || this.currentWord.length > 0 || this.gameService.game.isEndGame) return;
         this.clearOverlay();
@@ -84,6 +85,7 @@ export class MouseWordPlacerService {
             this.latestPosition = clickedSquare;
         }
     }
+
     onKeyDown(e: KeyboardEvent) {
         if (this.gameService.game.getLocalPlayer().isActive === false) return;
         if (this.initialPosition.x === 0 && this.initialPosition.y === 0) return;
@@ -110,6 +112,7 @@ export class MouseWordPlacerService {
                 break;
         }
     }
+
     onBlur() {
         this.currentAxis = Axis.H;
         this.latestPosition = new Vec2();
@@ -119,6 +122,7 @@ export class MouseWordPlacerService {
         this.overlayContext.beginPath();
         this.clearOverlay();
     }
+
     findPlaceForLetter(keyPressed: string) {
         let pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
         let i = 0;
@@ -137,6 +141,7 @@ export class MouseWordPlacerService {
         if (pos[0] >= BOARD_SIZE || pos[1] >= BOARD_SIZE) return;
         this.placeLetter(removeAccents(keyPressed));
     }
+
     // Draws an arrow on the canvas in the square specified by the position
     drawArrow(position: Vec2, axis: Axis) {
         const indexes = this.companionService.convertPositionToGridIndex(position);
@@ -157,6 +162,7 @@ export class MouseWordPlacerService {
         this.overlayContext.textBaseline = 'alphabetic';
         this.overlayContext.font = 'normal 12px Arial';
     }
+
     // Draws a square on the canvas at the given position with the given color
     drawSquare(position: Vec2, color: string) {
         const indexes = this.companionService.convertPositionToGridIndex(position);
@@ -165,6 +171,7 @@ export class MouseWordPlacerService {
         this.companionService.changeFillStyleColor(this.overlayContext, color);
         this.overlayContext.fillRect(position.x + 1, position.y + 1, SQUARE_SIZE, SQUARE_SIZE);
     }
+
     private drawLetter(letterToDraw: ScrabbleLetter, pos: Vec2) {
         if (
             pos.x >= BOARD_SIZE ||
@@ -201,6 +208,7 @@ export class MouseWordPlacerService {
             );
         }
     }
+
     private placeLetter(letter: string) {
         if (this.currentPosition.x === ABSOLUTE_BOARD_SIZE || this.currentPosition.y === ABSOLUTE_BOARD_SIZE)
             this.deletePosition = this.currentPosition;
@@ -247,11 +255,13 @@ export class MouseWordPlacerService {
             // Arrow display bug is here, need to fix before final commit. Works for 1st skip but not further ones.
         } else return;
     }
+
     updateRack() {
         this.rackService.gridContext.clearRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
         this.rackService.drawRack();
         this.rackService.drawExistingLetters();
     }
+
     confirmWord() {
         const posArray = this.companionService.convertPositionToGridIndex(this.initialPosition);
         const posVec = new Vec2(posArray[0], posArray[1]);
@@ -263,11 +273,13 @@ export class MouseWordPlacerService {
         this.commandInvokerService.executeCommand(command);
         this.clearOverlay();
     }
+
     // Removes the latest drawn arrow indicator
     removeArrow() {
         this.overlayContext.beginPath();
         this.overlayContext.clearRect(this.currentPosition.x, this.currentPosition.y, ACTUAL_SQUARE_SIZE, ACTUAL_SQUARE_SIZE);
     }
+
     removeAllLetters() {
         while (this.currentWord.length > 0) {
             const popped = this.currentWord.pop();
@@ -278,6 +290,7 @@ export class MouseWordPlacerService {
         this.wordString = '';
         this.currentWord = [];
     }
+
     removeLetter() {
         const lastLetter = this.currentWord.pop();
         if (lastLetter !== undefined) {
@@ -308,6 +321,7 @@ export class MouseWordPlacerService {
             this.drawArrow(this.currentPosition, this.currentAxis);
         }
     }
+
     drawCurrentWord() {
         const indexes = this.companionService.convertPositionToGridIndex(this.initialPosition);
         for (let i = 0; i < this.currentWord.length; i++) {
@@ -324,6 +338,7 @@ export class MouseWordPlacerService {
             }
         }
     }
+
     clearOverlay() {
         this.overlayContext.clearRect(0, 0, this.overlayContext.canvas.width, this.overlayContext.canvas.height);
     }

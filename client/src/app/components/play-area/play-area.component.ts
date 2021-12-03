@@ -52,10 +52,12 @@ export class PlayAreaComponent implements AfterViewInit, OnDestroy {
         this.canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         this.rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
     }
+
     @HostListener('keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
         this.mouseWordPlacerService.onKeyDown(event);
     }
+
     @HostListener('focusout', ['$event'])
     onBlur(evt: FocusEvent) {
         if (document.hasFocus()) {
@@ -68,6 +70,7 @@ export class PlayAreaComponent implements AfterViewInit, OnDestroy {
             }
         }
     }
+
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.mouseWordPlacerService.overlayContext = this.overlayCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
@@ -84,6 +87,7 @@ export class PlayAreaComponent implements AfterViewInit, OnDestroy {
             this.turnManagerService.changeTurn();
         });
     }
+
     ngOnDestroy() {
         this.turnSubscription.unsubscribe();
     }
@@ -128,12 +132,15 @@ export class PlayAreaComponent implements AfterViewInit, OnDestroy {
     sizeDownLetters(): void {
         this.gridService.sizeDownLetters();
     }
+
     onMouseDown(event: MouseEvent) {
         this.mouseWordPlacerService.onMouseClick(event);
     }
+
     confirmWord() {
         this.mouseWordPlacerService.confirmWord();
     }
+
     atLeastOneLetterSelected(): boolean {
         return this.exchangeService.atLeastOneLetterSelected();
     }

@@ -54,6 +54,7 @@ export class GameService {
         this.socketOnConnect();
         this.game = new GameParameters();
     }
+
     private socketOnConnect() {
         // Synchronization for multiplayer mode
         this.socket.on('update board', (boardUpdate: BoardUpdate) => {
@@ -63,8 +64,6 @@ export class GameService {
             this.game.stock.letterStock = update.newStock;
             this.game.getOpponent().letters = update.newLetters;
             this.game.getOpponent().score = update.newScore;
-            // console.log('after synchro, local letters:', this.game.getLocalPlayer().letters);
-            // console.log('after synchro, opponent letters:', this.game.getOpponent().letters);
         });
         this.socket.on('convert to solo', (previousPlayerSocketId: string, virtualPlayerName: string) => {
             let newVirtualPlayer;
@@ -82,6 +81,7 @@ export class GameService {
             }
         });
     }
+
     initializeSoloGame(initInfo: WaitingAreaGameParameters, virtualPlayerDifficulty: Difficulty) {
         if (initInfo.gameMode === GameType.Solo) {
             this.game.scrabbleBoard = new ScrabbleBoard(initInfo.isRandomBonus);
@@ -156,6 +156,7 @@ export class GameService {
         this.addRackLetters(this.game.getLocalPlayer().letters);
         this.startCountdown();
     }
+
     startCountdown() {
         if (!this.game.isEndGame) {
             this.game.gameTimer.secondsToMinutes();
@@ -170,12 +171,14 @@ export class GameService {
             }, TIMER_INTERVAL);
         }
     }
+
     resetTimer() {
         this.game.gameTimer.timerMs = +this.game.gameTimer.totalCountDown;
         this.game.gameTimer.secondsToMinutes();
         clearInterval(this.game.gameTimer.intervalValue);
         this.startCountdown();
     }
+
     passTurn(player: Player): ErrorType {
         if (player.isActive) {
             this.isTurnPassed = true;
@@ -184,6 +187,7 @@ export class GameService {
         }
         return ErrorType.ImpossibleCommand;
     }
+
     exchangeLetters(player: Player, letters: string): ErrorType {
         if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
             const lettersToRemove: ScrabbleLetter[] = [];
@@ -209,13 +213,12 @@ export class GameService {
                 }
                 this.isTurnPassed = false;
                 this.isTurnEndSubject.next(this.isTurnPassed);
-                // console.log('after exchange, local letters:', this.game.getLocalPlayer().letters);
-                // console.log('after exchange, opponent letters:', this.game.getOpponent().letters);
                 return ErrorType.NoError;
             }
         }
         return ErrorType.ImpossibleCommand;
     }
+
     async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
         if (!player.isActive) {
             return ErrorType.ImpossibleCommand;
@@ -264,13 +267,11 @@ export class GameService {
             // End turn
             this.isTurnPassed = false;
             this.isTurnEndSubject.next(this.isTurnPassed);
-            // // console.log('after place, local letters:', this.game.getLocalPlayer().letters);
-            // // console.log('after place, opponent letters:', this.game.getOpponent().letters);
-            // console.log('board:', this.gridService.scrabbleBoard);
             this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
         });
         return errorResult;
     }
+
     synchronizeAfterPlaceCommand(errorResult: ErrorType, placeParams: PlaceParams, player: Player) {
         if (errorResult === ErrorType.NoError && this.game.gameMode === GameType.MultiPlayer) {
             let wordUpdate = '';
@@ -297,15 +298,18 @@ export class GameService {
             this.socket.emit('place word', lettersUpdate);
         }
     }
+
     addRackLetters(letters: ScrabbleLetter[]): void {
         for (const letter of letters) {
             this.rackService.addLetter(letter);
         }
     }
+
     removeRackLetter(scrabbleLetter: ScrabbleLetter): void {
         const i = this.rackService.removeLetter(scrabbleLetter);
         this.game.getLocalPlayer().letters.splice(i, 1);
     }
+
     drawRack(newWords: ScrabbleWord[]): void {
         newWords.forEach((newWord) => {
             for (let j = 0; j < newWord.content.length; j++) {
@@ -322,6 +326,7 @@ export class GameService {
             }
         });
     }
+
     getLettersSelected(): string {
         let letters = '';
         for (let i = 0; i < this.rackService.exchangeSelected.length; i++) {

@@ -35,6 +35,7 @@ export class EndGameService {
             this.gameService.resetTimer(); // to stop the timer
         });
     }
+
     endGame() {
         if (this.gameService.game.gameMode === GameType.Solo) {
             this.chatDisplayService.displayEndGameMessage(
@@ -48,6 +49,7 @@ export class EndGameService {
             this.socket.emit('endGame');
         }
     }
+
     private endLocalGame() {
         const isEmptyPlayerRack =
             this.gameService.game.getLocalPlayer().letters.length === 0 || this.gameService.game.getOpponent().letters.length === 0;
@@ -80,6 +82,7 @@ export class EndGameService {
         this.gameService.game.gameTimer.secondsToMinutes();
         this.gameService.game.isEndGame = true;
     }
+
     private endGameAfterPlace() {
         const winnerPlayer =
             this.gameService.game.getLocalPlayer().letters.length === 0
@@ -95,6 +98,7 @@ export class EndGameService {
         winnerPlayer.isWinner = true;
         loserPlayer.isWinner = false;
     }
+
     private endGameAfterPassedTurns() {
         let maxScore = this.gameService.game.players[0].score - calculateRackPoints(this.gameService.game.players[0]);
         this.gameService.game.players.forEach((player) => {

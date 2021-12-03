@@ -26,6 +26,7 @@ const DESCRIPTION_MIN_LENGTH = 10;
     styleUrls: ['./dictionary-transfer.component.scss'],
 })
 export class DictionaryTransferComponent implements AfterViewInit, OnDestroy {
+
     @ViewChild('inputFile', { static: false }) private inputFile!: ElementRef<HTMLInputElement>;
     selectedDictionary: DictionaryInterface;
     dictionaryList: DictionaryInterface[];
@@ -55,6 +56,7 @@ export class DictionaryTransferComponent implements AfterViewInit, OnDestroy {
             },
         );
     }
+
     ngOnDestroy() {
         this.dictionarySubscription.unsubscribe();
     }

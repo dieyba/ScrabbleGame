@@ -29,6 +29,7 @@ export class TurnManagerService {
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
     }
+
     initialize() {
         this.consecutivePassedTurns = 0;
     }
@@ -49,6 +50,7 @@ export class TurnManagerService {
             }
         });
     }
+
     changeTurn() {
         if (this.gameService.game.isEndGame) {
             return;
@@ -69,6 +71,7 @@ export class TurnManagerService {
             this.socket.emit('change turn', this.gameService.isTurnPassed, this.consecutivePassedTurns);
         }
     }
+
     updateConsecutivePassedTurns() {
         // Check if last 5 turns have been passed (by the command or the timer running out)
         this.consecutivePassedTurns = this.gameService.isTurnPassed ? this.consecutivePassedTurns + 1 : 0;
@@ -76,6 +79,7 @@ export class TurnManagerService {
             this.endGameService.endGame();
         }
     }
+
     updateActivePlayer() {
         if (this.gameService.game.isEndGame) {
             this.gameService.game.getLocalPlayer().isActive = false;
@@ -97,6 +101,7 @@ export class TurnManagerService {
         activePlayer.isActive = false;
         inactivePlayer.isActive = true;
     }
+
     displayPassTurnMessage() {
         if (this.gameService.isTurnPassed) {
             const activePlayer = this.gameService.game.getLocalPlayer().isActive

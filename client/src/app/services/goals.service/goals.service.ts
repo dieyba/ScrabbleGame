@@ -36,9 +36,9 @@ export class GoalsService {
         this.initialize();
         this.socket.on('goal achieved', (goalAchieved: GoalType) => {
             this.getGoalByType(goalAchieved).isAchieved = true;
-            // console.log('opponent new goal achieved:', this.getGoalByType(goalAchieved).constructor.name);
         });
     }
+
     initialize() {
         this.sharedGoals = new Array<Goal>();
         this.privateGoals = new Array<Goal>();
@@ -122,7 +122,6 @@ export class GoalsService {
         allGoals.forEach((goal) => {
             if (!alreadyAchievedGoals.includes(goal) && goal.isAchieved) {
                 this.socket.emit('achieve goal', goal.type);
-                // console.log('new goal achieved:', goal.constructor.name);
             }
         });
 

@@ -40,6 +40,7 @@ export class ValidationService {
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
     }
+
     private socketOnConnect() {
         this.socket.on('areWordsValid', (result: boolean) => {
             this.areWordsValid = result;
@@ -48,6 +49,7 @@ export class ValidationService {
             this.validWordsFormed = this.validWordsFormed.concat(newWords);
         });
     }
+
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
         const wordsValue = this.calculateScore(newWords);
         // remove letters on board
@@ -159,6 +161,7 @@ export class ValidationService {
             });
         }
     }
+
     isWordValid(word: string): boolean {
         return this.dictionaryTrie.find(word) && word.length >= MIN_WORD_LENGTH && !word.includes('-') && !word.includes("'") ? true : false;
     }

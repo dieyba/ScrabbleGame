@@ -12,6 +12,7 @@ export interface DictionaryInterface {
     description: string;
     words: string[];
 }
+
 export class Dictionary {
     title: string;
     description: string;

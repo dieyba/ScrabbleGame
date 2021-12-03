@@ -17,6 +17,7 @@ export class MouseWordPlacerCompanionService {
         if (position.x > ABSOLUTE_BOARD_SIZE || position.y > ABSOLUTE_BOARD_SIZE) return (gridIndex = [BOARD_SIZE, BOARD_SIZE]); // Out of bounds
         return gridIndex;
     }
+
     // Resets the canvas and the word in progress
     findNextSquare(axis: Axis, position: Vec2, board: ScrabbleBoard): Vec2 {
         const newPosition = new Vec2(position.x, position.y);
@@ -30,6 +31,7 @@ export class MouseWordPlacerCompanionService {
         if (board.squares[newPositionIndexes[0]][newPositionIndexes[1]].occupied) this.findNextSquare(axis, newPosition, board);
         return newPosition;
     }
+
     findPreviousSquare(axis: Axis, position: Vec2, board: ScrabbleBoard): Vec2 {
         const newPosition = new Vec2(position.x, position.y);
         if (axis === Axis.H) {
@@ -42,9 +44,11 @@ export class MouseWordPlacerCompanionService {
         if (board.squares[newPositionIndexes[0]][newPositionIndexes[1]].occupied) this.findPreviousSquare(axis, newPosition, board);
         return newPosition;
     }
+
     samePosition(pos: Vec2, otherPos: Vec2): boolean {
         return pos.x === otherPos.x && pos.y === otherPos.y;
     }
+
     convertColorToString(color: SquareColor) {
         let stringColor = '';
         switch (color) {
@@ -66,6 +70,7 @@ export class MouseWordPlacerCompanionService {
         }
         return stringColor;
     }
+
     changeFillStyleColor(context: CanvasRenderingContext2D, color: string) {
         switch (color) {
             case 'white':

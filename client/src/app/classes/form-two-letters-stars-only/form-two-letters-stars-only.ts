@@ -8,6 +8,7 @@ export class FormTwoLettersStarsOnly extends Goal {
         this.type = GoalType.FormTwoLettersStarsOnly;
         this.description = GoalDescriptions.FormTwoLettersStarsOnly;
     }
+
     achieve(wordsFormed: ScrabbleWord[]) {
         if (this.isAchieved) {
             return 0;
