@@ -1,6 +1,6 @@
 /* eslint no-underscore-dangle: 0 */
 import * as dict_path from '@app/assets/dictionary.json';
-import { Dictionary, DictionaryInterface } from '@app/classes/dictionary/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { Collection, Filter, FindOneAndUpdateOptions, FindOptions, MongoClient, ObjectId } from 'mongodb';
 import { Service } from 'typedi';
 
@@ -122,14 +122,9 @@ export class DictionaryDBService {
 
     async populateDictionaryDB(): Promise<void> {
         if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments()) === 0) {
-            const dico = dict_path as Dictionary;
-            const dictionaries: DictionaryInterface = {
-                _id: new ObjectId(),
-                title: dico.title,
-                description: dico.description,
-                words: dico.words,
-            };
-            await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(dictionaries);
+            const dictionary = dict_path as DictionaryInterface;
+            dictionary._id = new ObjectId();
+            await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(dictionary);
         }
     }
 

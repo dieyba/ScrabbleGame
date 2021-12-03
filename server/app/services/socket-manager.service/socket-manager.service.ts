@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */ // TODO Remove this eslint-disable and fix the 350 line error
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { GameInitInfo, GoalType, WaitingAreaGameParameters } from '@app/classes/game-parameters/game-parameters';
 import { BoardUpdate, ERROR_NUMBER, LettersUpdate } from '@app/classes/utilities/utilities';
 import { VirtualPlayerName } from '@app/classes/virtual-player-name';
@@ -87,7 +89,14 @@ export class SocketManagerService {
             });
 
             socket.on('validateWords', (newWords: string[]) => {
-                this.validateWords(socket, newWords);
+                // TODO return error in case there is not player attached to socket and if there is no room attached to player?
+                const player = this.playerMan.getPlayerBySocketID(socket.id);
+                if (player === undefined) return;
+
+                const game = this.gameListMan.getGameInPlay(player.roomId);
+                if (game === undefined) return;
+
+                this.validateWords(socket, newWords, game.dictionary);
             });
 
             socket.on('word placed', (word: BoardUpdate) => {
@@ -307,8 +316,8 @@ export class SocketManagerService {
         }
     }
 
-    private validateWords(socket: io.Socket, newWords: string[]) {
-        const result = this.validationService.validateWords(newWords);
+    private validateWords(socket: io.Socket, newWords: string[], dictionary: DictionaryInterface) {
+        const result = this.validationService.validateWords(newWords, dictionary);
         this.sio.to(socket.id).emit('areWordsValid', result);
         if (!result) {
             return;

@@ -40,7 +40,7 @@ export class GameInitFormComponent implements OnInit, OnDestroy {
     debutantNameList: string[];
     beginnerNameList: VirtualPlayerName[];
     expertNameList: VirtualPlayerName[];
-    dictionaryList: string[];
+    dictionaryList: DictionaryInterface[];
     selectedPlayer: string;
     randomPlayerId: number;
     defaultTimer: string;
@@ -70,7 +70,7 @@ export class GameInitFormComponent implements OnInit, OnDestroy {
         this.selectedPlayer = '';
         this.randomPlayerId = 0;
         this.defaultTimer = '60';
-        this.defaultDictionary = '0';
+        this.defaultDictionary = 'Mon dictionnaire'; // TODO give the dictionary a name
         this.defaultBonus = false;
         this.beginnerNameUrl = environment.serverUrl + '/VirtualPlayerName/beginners';
         this.expertNameUrl = environment.serverUrl + '/VirtualPlayerName/experts';
@@ -108,7 +108,7 @@ export class GameInitFormComponent implements OnInit, OnDestroy {
         this.dictionarySubscription = this.dictionaryService.getDictionaries(BASE_URL).subscribe(
             (dictionaries: DictionaryInterface[]) => {
                 for (const dictionary of dictionaries) {
-                    this.dictionaryList.push(dictionary.title);
+                    this.dictionaryList.push(dictionary);
                 }
             },
             (error: HttpErrorResponse) => {
@@ -182,13 +182,28 @@ export class GameInitFormComponent implements OnInit, OnDestroy {
         }
     }
 
-    submit(): void {
+    async submit(): Promise<void> {
+        // Trying to get dictionary
+        const dictionary = await this.dictionaryService
+            .getDictionary(BASE_URL, this.dictionaryForm.value)
+            .toPromise()
+            .catch(() => {
+                return null;
+            });
+        if (dictionary === null) {
+            this.snack.open(
+                'Il y a eu un problème avec la base de donnée des dictionnaires. Veuillez choisi un autre dictionnaire ou réessayer plus tard',
+                'Fermer',
+            );
+            return;
+        }
+
         if (this.myForm.valid) {
             const gameMode = this.data.isSolo ? GameType.Solo : GameType.MultiPlayer;
             const gameParams = new WaitingAreaGameParameters(
                 gameMode,
                 GAME_CAPACITY,
-                this.dictionaryForm.value,
+                dictionary,
                 this.timer.value,
                 this.bonus.value,
                 this.data.isLog2990,

@@ -15,14 +15,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { DictionaryType } from '@app/classes/dictionary/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { GameParameters } from '@app/classes/game-parameters/game-parameters';
 import { Player } from '@app/classes/player/player';
+import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
 import { GameListService } from '@app/services/game-list.service/game-list.service';
 import { GameService } from '@app/services/game.service/game.service';
 import { Observable } from 'rxjs';
 import * as io from 'socket.io-client';
-import { WaitingAreaComponent } from './waiting-area.component';
+import dict_path from 'src/assets/dictionary.json';
 class SocketMock {
     id: string = 'Socket mock';
     events: Map<string, CallableFunction> = new Map();
@@ -99,7 +100,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -118,7 +119,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -144,7 +145,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -167,7 +168,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -185,7 +186,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -203,7 +204,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Ari', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Ari',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -220,7 +221,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -276,7 +277,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -291,7 +292,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -306,7 +307,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -321,7 +322,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,

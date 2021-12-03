@@ -1,16 +1,14 @@
-import { Dictionary, DictionaryType } from './dictionary';
+import { DictionaryInterface } from './dictionary';
 
 describe('Dictionary', () => {
-    const dictionary = new Dictionary(DictionaryType.Default);
+    const dictionaryInterface: DictionaryInterface = {
+        _id: 123456, // False ID
+        title: 'Dictionary title',
+        description: 'Dictionary description',
+        words: ['word1', 'word2'],
+    };
 
     it('should create an instance', () => {
-        expect(dictionary).toBeTruthy();
-    });
-
-    it('selectDictionary should call initializeDictionary', () => {
-        const spy = spyOn(dictionary, 'initializeDictionary');
-        dictionary.selectDictionary(DictionaryType.Default);
-
-        expect(spy).toHaveBeenCalled();
+        expect(dictionaryInterface).toBeTruthy();
     });
 });
