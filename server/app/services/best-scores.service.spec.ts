@@ -6,7 +6,7 @@ import { BestScoresService, DATABASE_COLLECTION } from './best-scores.service';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
-describe('BestScoresService', () => {
+xdescribe('BestScoresService', () => {
     let bestScoresService: BestScoresService;
     let bestScores1: BestScores;
     // let bestScores2: BestScores;

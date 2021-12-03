@@ -7,11 +7,9 @@ import { Axis, isValidLetter, removeAccents } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
-import { BOARD_OFFSET, GridService, SQUARE_SIZE } from './grid.service';
+import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE, BOARD_OFFSET, GridService, SQUARE_SIZE } from './grid.service';
 import { MouseWordPlacerCompanionService } from './mouse-word-placer-companion.service';
 import { RackService, RACK_HEIGHT, RACK_WIDTH } from './rack.service';
-export const ABSOLUTE_BOARD_SIZE = 580;
-export const ACTUAL_SQUARE_SIZE = SQUARE_SIZE + 2;
 @Injectable({
     providedIn: 'root',
 })

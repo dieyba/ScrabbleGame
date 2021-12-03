@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { HttpClientModule, HttpStatusCode } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -69,7 +70,7 @@ describe('BestScoresComponent', () => {
     });
 
     it('closeDialog shoud close dialog', () => {
-        const spy = spyOn(component.dialogRef, 'close');
+        const spy = spyOn(component['dialogRef'], 'close');
         component.closeDialog();
         expect(spy).toHaveBeenCalledTimes(1);
     });

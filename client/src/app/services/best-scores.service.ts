@@ -2,7 +2,9 @@ import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/h
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
-export const BASE_URL = 'http://localhost:3000/api/bestScores';
+import { environment } from 'src/environments/environment';
+
+export const BASE_URL = environment.serverUrl + '/bestScores';
 
 export interface BestScores {
     playerName: string;

@@ -28,6 +28,9 @@ const DEFAULT_LETTER_FONT_INDEX = 2;
 const DEFAULT_VALUE_FONT_INDEX = 2;
 const ROW_MAIN_LETTERS = 'ABCDEFGHIJKLMNO';
 
+export const ABSOLUTE_BOARD_SIZE = 580;
+export const ACTUAL_SQUARE_SIZE = SQUARE_SIZE + 2;
+
 @Injectable({
     providedIn: 'root',
 })
@@ -152,7 +155,8 @@ export class GridService {
         scrabbleLetter.color = this.scrabbleBoard.squares[i][j].color;
         this.scrabbleBoard.squares[i][j].letter = scrabbleLetter;
         this.scrabbleBoard.squares[i][j].occupied = true;
-        const letter = scrabbleLetter.character.toUpperCase();
+        const letter =
+            scrabbleLetter.character === '*' ? scrabbleLetter.whiteLetterCharacter.toLocaleUpperCase() : scrabbleLetter.character.toUpperCase();
         const startX = (this.width * i) / BOARD_SIZE + BOARD_OFFSET + 1;
         const startY = (this.height * j) / BOARD_SIZE + BOARD_OFFSET + 1;
 
@@ -183,11 +187,12 @@ export class GridService {
 
                     this.gridContext.fillStyle = 'black';
                     this.gridContext.font = this.currentLetterFont;
-                    this.gridContext.fillText(
-                        this.scrabbleBoard.squares[i][j].letter.character.toUpperCase(),
-                        positionX + 2,
-                        positionY + SQUARE_SIZE / 2 + BOARD_SIZE,
-                    );
+                    const scrabbleLetter = this.scrabbleBoard.squares[i][j].letter;
+                    const letterChar =
+                        scrabbleLetter.character === '*'
+                            ? scrabbleLetter.whiteLetterCharacter.toLocaleUpperCase()
+                            : scrabbleLetter.character.toUpperCase();
+                    this.gridContext.fillText(letterChar, positionX + 2, positionY + SQUARE_SIZE / 2 + BOARD_SIZE);
 
                     // Draw letter value
                     this.gridContext.font = this.currentValueFont;
@@ -259,30 +264,21 @@ export class GridService {
                 }
             }
         }
-        return removedScrabbleLetters; // TODO check if letter is a star
+        return removedScrabbleLetters;
     }
 
     updateBoard(word: string, orientation: string, position: Vec2) {
-        if (orientation === 'h') {
-            for (const letter of word) {
-                const character = new ScrabbleLetter(letter);
-                character.tile.position.x = position.x;
-                character.tile.position.y = position.y;
-                this.drawLetter(character, position.x, position.y);
-                this.scrabbleBoard.squares[position.x][position.y].isValidated = true;
-                this.scrabbleBoard.squares[position.x][position.y].isBonusUsed = true;
-                position.x++;
-            }
-        } else {
-            for (const letter of word) {
-                const character = new ScrabbleLetter(letter);
-                character.tile.position.x = position.x;
-                character.tile.position.y = position.y;
-                this.drawLetter(character, position.x, position.y);
-                this.scrabbleBoard.squares[position.x][position.y].isBonusUsed = true;
-                this.scrabbleBoard.squares[position.x][position.y].isValidated = true;
-                position.y++;
-            }
+        const positionInc = orientation === 'h' ? new Vec2(1, 0) : new Vec2(0, 1);
+        for (const letter of word) {
+            const scrabbleLetter = new ScrabbleLetter(letter);
+            scrabbleLetter.setLetter(letter);
+            scrabbleLetter.tile.position.x = position.x;
+            scrabbleLetter.tile.position.y = position.y;
+            this.drawLetter(scrabbleLetter, position.x, position.y);
+            this.scrabbleBoard.squares[position.x][position.y].isValidated = true;
+            this.scrabbleBoard.squares[position.x][position.y].isBonusUsed = true;
+            position.x += positionInc.x;
+            position.y += positionInc.y;
         }
     }
 }

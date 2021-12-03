@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { HttpClientModule, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -18,7 +19,7 @@ describe('BestScoresService', () => {
     });
 
     it('handleError should return success message', () => {
-        const spy = spyOn(service.snack, 'open');
+        const spy = spyOn(service['snack'], 'open');
         service.handleErrorSnackBar(
             new HttpErrorResponse({
                 status: HttpStatusCode.Ok,
@@ -28,7 +29,7 @@ describe('BestScoresService', () => {
     });
 
     it('handleError should return error message', () => {
-        const spy = spyOn(service.snack, 'open');
+        const spy = spyOn(service['snack'], 'open');
         service.handleErrorSnackBar(
             new HttpErrorResponse({
                 status: HttpStatusCode.NotFound,
@@ -41,20 +42,20 @@ describe('BestScoresService', () => {
     });
 
     it('getBestScores should get', () => {
-        const spy = spyOn(service.http, 'get');
+        const spy = spyOn(service['http'], 'get');
         service.getBestScores('url');
         expect(spy).toHaveBeenCalled();
     });
 
     it('postBestScore should post', () => {
         const score = 80;
-        const spy = spyOn(service.http, 'post');
+        const spy = spyOn(service['http'], 'post');
         service.postBestScore('Dieyba', score, 'url');
         expect(spy).toHaveBeenCalled();
     });
 
     it('resetDbBestScores should post', () => {
-        const spy = spyOn(service.http, 'delete');
+        const spy = spyOn(service['http'], 'delete');
         service.resetDbBestScores();
         expect(spy).toHaveBeenCalled();
     });
