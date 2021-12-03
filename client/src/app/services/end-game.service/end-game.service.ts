@@ -6,9 +6,9 @@ import { calculateRackPoints } from '@app/classes/player/player';
 import * as SocketHandler from '@app/modules/socket-handler';
 import { BASE_URL, BestScoresService } from '@app/services/best-scores.service/best-scores.service';
 import { ChatDisplayService } from '@app/services/chat-display.service/chat-display.service';
+import { GameService } from '@app/services/game.service/game.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { GameService } from '../game.service/game.service';
 
 @Injectable({
     providedIn: 'root',
@@ -68,8 +68,8 @@ export class EndGameService {
                     if (error.status !== HttpStatusCode.Ok) {
                         this.snack.open(
                             'Désolé votre score ne pourra pas être éligible au tableau' +
-                            'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
-                            'Veuillez réessayer plus tard!',
+                                'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
+                                'Veuillez réessayer plus tard!',
                             'close',
                         );
                     }

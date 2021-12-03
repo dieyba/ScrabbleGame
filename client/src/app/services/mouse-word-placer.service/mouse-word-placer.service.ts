@@ -6,10 +6,10 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { Axis, isValidLetter, removeAccents } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
 import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
+import { GameService } from '@app/services/game.service/game.service';
+import { BOARD_OFFSET, GridService, SQUARE_SIZE } from '@app/services/grid.service/grid.service';
+import { MouseWordPlacerCompanionService } from '@app/services/mouse-word-placer-companion.service/mouse-word-placer-companion.service';
 import { RackService, RACK_HEIGHT, RACK_WIDTH } from '@app/services/rack.service/rack.service';
-import { GameService } from '../game.service/game.service';
-import { BOARD_OFFSET, GridService, SQUARE_SIZE } from '../grid.service/grid.service';
-import { MouseWordPlacerCompanionService } from '../mouse-word-placer-companion.service/mouse-word-placer-companion.service';
 export const ABSOLUTE_BOARD_SIZE = 580;
 export const ACTUAL_SQUARE_SIZE = SQUARE_SIZE + 2;
 @Injectable({

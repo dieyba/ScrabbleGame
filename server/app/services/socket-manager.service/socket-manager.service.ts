@@ -1,12 +1,12 @@
 import { GameInitInfo, GoalType, WaitingAreaGameParameters } from '@app/classes/game-parameters/game-parameters';
 import { BoardUpdate, ERROR_NUMBER, LettersUpdate } from '@app/classes/utilities/utilities';
 import { VirtualPlayerName } from '@app/classes/virtual-player-name';
+import { GameListManager } from '@app/services/game-list-manager.service/game-list-manager.service';
+import { PlayerManagerService } from '@app/services/player-manager.service/player-manager.service';
+import { ValidationService } from '@app/services/validation.service/validation.service';
 import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
 import * as http from 'http';
 import * as io from 'socket.io';
-import { GameListManager } from '../game-list-manager.service/game-list-manager.service';
-import { PlayerManagerService } from '../player-manager.service/player-manager.service';
-import { ValidationService } from '../validation.service/validation.service';
 
 const DISCONNECT_TIME_INTERVAL = 5000;
 

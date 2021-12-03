@@ -7,7 +7,7 @@ import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtu
 import { environment } from 'src/environments/environment';
 
 const maxLength = 12;
-
+/* eslint-disable no-underscore-dangle */
 export enum ErrorCaseVirtualPlayerName {
     InvalidName = 'Ce nom est invalide',
     NameAlreadyThere = 'Ce nom existe déjà dans la base de données, actualisez votre page.',

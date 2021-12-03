@@ -6,7 +6,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
+import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
 import { of, throwError } from 'rxjs';
 import { VirtualPlayerNameManagerComponent } from './virtual-player-name-manager.component';
 

@@ -1,6 +1,6 @@
-import { ScrabbleWord } from '../scrabble-word/scrabble-word';
-import { Axis, ERROR_NUMBER } from '../utilities/utilities';
-import { Vec2 } from '../vec2/vec2';
+import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
+import { Axis, ERROR_NUMBER } from '@app/classes/utilities/utilities';
+import { Vec2 } from '@app/classes/vec2/vec2';
 
 export class ScrabbleMove {
     word: ScrabbleWord;

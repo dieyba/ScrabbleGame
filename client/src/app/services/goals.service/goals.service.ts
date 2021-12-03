@@ -23,7 +23,7 @@ const TOTAL_GOALS_COUNT = 8;
     providedIn: 'root',
 })
 export class GoalsService {
-    goalsCreationMap: Map<GoalType, Function>;
+    goalsCreationMap: Map<GoalType, Function>; // eslint-disable-line @typescript-eslint/ban-types
     sharedGoals: Goal[];
     privateGoals: Goal[];
     private socket: io.Socket;

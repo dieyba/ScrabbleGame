@@ -6,7 +6,6 @@ import { BestScoresService } from '@app/services/best-scores.service/best-scores
 import { DictionaryService } from '@app/services/dictionary.service/dictionary.service';
 import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
 
-
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',

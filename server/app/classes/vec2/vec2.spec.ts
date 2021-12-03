@@ -1,5 +1,5 @@
-import { Vec2 } from '@app/classes/vec2';
 import { expect } from 'chai';
+import { Vec2 } from './vec2';
 
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
 /* eslint-disable  no-unused-expressions */

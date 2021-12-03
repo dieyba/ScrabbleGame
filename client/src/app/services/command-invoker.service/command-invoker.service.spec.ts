@@ -1,20 +1,20 @@
 import { TestBed } from '@angular/core/testing';
-import { ChatDisplayEntry, ChatEntryColor } from '@app/classes/chat-display-entry';
-import { DefaultCommandParams } from '@app/classes/commands';
+import { ChatDisplayEntry, ChatEntryColor } from '@app/classes/chat-display-entry/chat-display-entry';
+import { DefaultCommandParams } from '@app/classes/commands/commands';
 import { ErrorType } from '@app/classes/errors';
-import { ExchangeCmd } from '@app/classes/exchange-command';
-import { GameParameters, GameType } from '@app/classes/game-parameters';
-import { HelpCmd } from '@app/classes/help-command';
-import { PassTurnCmd } from '@app/classes/pass-command';
-import { PlaceCmd } from '@app/classes/place-command';
-import { Player } from '@app/classes/player';
-import { StockCmd } from '@app/classes/stock-command';
-import { Axis } from '@app/classes/utilities';
-import { Vec2 } from '@app/classes/vec2';
-import { VirtualPlayer } from '@app/classes/virtual-player';
-import { ChatDisplayService } from './chat-display.service';
+import { ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
+import { GameParameters, GameType } from '@app/classes/game-parameters/game-parameters';
+import { HelpCmd } from '@app/classes/help-command/help-command';
+import { PassTurnCmd } from '@app/classes/pass-command/pass-command';
+import { PlaceCmd } from '@app/classes/place-command/place-command';
+import { Player } from '@app/classes/player/player';
+import { StockCmd } from '@app/classes/stock-command/stock-command';
+import { Axis } from '@app/classes/utilities/utilities';
+import { Vec2 } from '@app/classes/vec2/vec2';
+import { VirtualPlayer } from '@app/classes/virtual-player/virtual-player';
+import { ChatDisplayService } from '@app/services/chat-display.service/chat-display.service';
+import { GameService } from '@app/services/game.service/game.service';
 import { CommandInvokerService } from './command-invoker.service';
-import { GameService } from './game.service';
 
 describe('CommandInvokerService', () => {
     let service: CommandInvokerService;

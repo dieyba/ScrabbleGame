@@ -1,4 +1,4 @@
-import { ColorQuantity, Square, SquareColor } from '../square/square';
+import { ColorQuantity, Square, SquareColor } from '@app/classes/square/square';
 
 export const BOARD_SIZE = 15;
 
@@ -46,7 +46,7 @@ export class ScrabbleBoard {
     colorStock: SquareColor[];
 
     constructor(isRandom: boolean) {
-        this.actualBoardSize == BOARD_SIZE - 1;
+        this.actualBoardSize = BOARD_SIZE - 1;
         this.squares = [];
         this.colorStock = [];
         this.addColorToStock(SquareColor.DarkBlue, ColorQuantity.DarkBlue);

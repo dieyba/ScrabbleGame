@@ -13,13 +13,13 @@ import { SquareColor } from '@app/classes/square/square';
 import { Axis, isCoordInsideBoard } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
 import { Difficulty } from '@app/classes/virtual-player/virtual-player';
-import { BonusService } from '../bonus.service/bonus.service';
-import { CommandInvokerService } from '../command-invoker.service/command-invoker.service';
-import { GameService } from '../game.service/game.service';
-import { GridService } from '../grid.service/grid.service';
-import { PlaceService } from '../place.service/place.service';
-import { ValidationService } from '../validation.service/validation.service';
-import { WordBuilderService } from '../word-builder.service/word-builder.service';
+import { BonusService } from '@app/services/bonus.service/bonus.service';
+import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
+import { GameService } from '@app/services/game.service/game.service';
+import { GridService } from '@app/services/grid.service/grid.service';
+import { PlaceService } from '@app/services/place.service/place.service';
+import { ValidationService } from '@app/services/validation.service/validation.service';
+import { WordBuilderService } from '@app/services/word-builder.service/word-builder.service';
 
 export enum Probability { //    Probabilities for the easy virtual player
     EndTurn = 10,

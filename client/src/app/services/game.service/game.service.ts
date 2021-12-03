@@ -19,7 +19,7 @@ import { ChatDisplayService } from '@app/services/chat-display.service/chat-disp
 import { GoalsService } from '@app/services/goals.service/goals.service';
 import { GridService } from '@app/services/grid.service/grid.service';
 import { PlaceService } from '@app/services/place.service/place.service';
-import { RackService } from "@app/services/rack.service/rack.service";
+import { RackService } from '@app/services/rack.service/rack.service';
 import { ValidationService } from '@app/services/validation.service/validation.service';
 import { WordBuilderService } from '@app/services/word-builder.service/word-builder.service';
 import { BehaviorSubject, Observable } from 'rxjs';

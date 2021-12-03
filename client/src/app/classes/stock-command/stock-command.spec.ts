@@ -5,7 +5,7 @@ import { ErrorType } from '@app/classes/errors';
 import { LetterStock } from '@app/classes/letter-stock/letter-stock';
 import { Player } from '@app/classes/player/player';
 import { scrabbleLettersToString } from '@app/classes/utilities/utilities';
-import { ChatDisplayService } from '@app/services/chat-display.service';
+import { ChatDisplayService } from '@app/services/chat-display.service/chat-display.service';
 import { createStockCmd, StockCmd } from './stock-command';
 
 const PLAYER_NAME = 'Sara';

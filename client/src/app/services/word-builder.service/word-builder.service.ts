@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { Axis, ERROR_NUMBER, invertAxis, isCoordInsideBoard } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { GridService } from '../grid.service/grid.service';
+import { GridService } from '@app/services/grid.service/grid.service';
 
 const TOWARD_START = true;
 const TOWARD_END = false;

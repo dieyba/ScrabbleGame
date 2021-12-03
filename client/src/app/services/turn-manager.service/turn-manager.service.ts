@@ -4,11 +4,11 @@ import { GameType } from '@app/classes/game-parameters/game-parameters';
 import { VirtualPlayer } from '@app/classes/virtual-player/virtual-player';
 import * as SocketHandler from '@app/modules/socket-handler';
 import { ChatDisplayService } from '@app/services/chat-display.service/chat-display.service';
+import { EndGameService } from '@app/services/end-game.service/end-game.service';
 import { GameService } from '@app/services/game.service/game.service';
+import { VirtualPlayerService } from '@app/services/virtual-player.service/virtual-player.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { EndGameService } from '../end-game.service/end-game.service';
-import { VirtualPlayerService } from '../virtual-player.service/virtual-player.service';
 export const MAX_TURNS_PASSED = 6;
 
 @Injectable({

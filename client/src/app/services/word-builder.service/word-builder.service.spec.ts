@@ -5,7 +5,7 @@ import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { Square } from '@app/classes/square/square';
 import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { GridService } from '../grid.service/grid.service';
+import { GridService } from '@app/services/grid.service/grid.service';
 import { WordBuilderService } from './word-builder.service';
 
 const TOWARD_START = true;
