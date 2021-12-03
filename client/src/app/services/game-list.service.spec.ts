@@ -36,28 +36,28 @@ class SocketMock {
 describe('GameListService', () => {
     let service: GameListService;
     let socketMock: SocketMock;
-    // let socketOnMockSpy: jasmine.SpyObj<any>;
+    let socketOnMockSpy: jasmine.SpyObj<any>;
     let socketEmitMockSpy: jasmine.SpyObj<any>;
 
     // eslint-disable-next-line max-len
     const game: WaitingAreaGameParameters = new WaitingAreaGameParameters(GameType.Solo, 2, DictionaryType.Default, 60, false, false, 'Riri', 'Lulu');
-    // const game2: WaitingAreaGameParameters = new WaitingAreaGameParameters(
-    //     GameType.MultiPlayer,
-    //     2,
-    //     DictionaryType.English,
-    //     60,
-    //     true,
-    //     true,
-    //     'Didi',
-    //     'Kevin',
-    // );
+    const game2: WaitingAreaGameParameters = new WaitingAreaGameParameters(
+        GameType.MultiPlayer,
+        2,
+        DictionaryType.English,
+        60,
+        true,
+        true,
+        'Didi',
+        'Kevin',
+    );
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(GameListService);
         socketMock = new SocketMock();
         service['socket'] = socketMock as unknown as io.Socket;
-        // socketOnMockSpy = spyOn(socketMock, 'on').and.callThrough();
+        socketOnMockSpy = spyOn(socketMock, 'on').and.callThrough();
         socketEmitMockSpy = spyOn(socketMock, 'emit').and.callThrough();
     });
 
@@ -65,16 +65,12 @@ describe('GameListService', () => {
         expect(service).toBeTruthy();
     });
 
-    // TODO: fix 'arrowFunction is not a function' error
-    // it('should catch socket updateWaitingAreaGames event', () => {
-    //     const allGames: WaitingAreaGameParameters[] = [game, game2];
-    //     socketMock.triggerEvent('updateWaitingAreaGames', allGames);
-
-    //     // expect(socketOnMockSpy).toHaveBeenCalledWith('updateWaitingAreaGames', (games: WaitingAreaGameParameters[]) => {
-    //     //     service.waitingAreaGames = games;
-    //     // });
-    //     expect(socketOnMockSpy).toHaveBeenCalled();
-    // });
+    it('should catch socket updateWaitingAreaGames event', () => {
+        service.socketOnConnect();
+        const allGames: WaitingAreaGameParameters[] = [game, game2];
+        socketMock.triggerEvent('updateWaitingAreaGames', allGames);
+        expect(socketOnMockSpy).toHaveBeenCalled();
+    });
 
     it('getGames should call socket emit with the right parameters', () => {
         service.getGames(true);

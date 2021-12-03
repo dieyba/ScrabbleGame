@@ -18,6 +18,9 @@ export class GameListService {
         this.socket = SocketHandler.requestSocket(this.server);
         this.waitingAreaGames = new Array<WaitingAreaGameParameters>();
         this.socket.emit('addPlayer');
+    }
+
+    socketOnConnect() {
         this.socket.on('updateWaitingAreaGames', (game: WaitingAreaGameParameters[]) => {
             this.waitingAreaGames = game;
         });
