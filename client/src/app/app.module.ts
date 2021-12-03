@@ -23,7 +23,7 @@ import { BestScoresComponent } from './components/best-scores/best-scores.compon
 import { ChatDisplayComponent } from './components/chat-display/chat-display.component';
 import { DictionaryTransferComponent } from './components/dictionary-transfer/dictionary-transfer.component';
 import { EndGamePopupComponent } from './components/end-game-popup/end-game-popup.component';
-import { FormComponent } from './components/form/form.component';
+import { GameInitFormComponent } from './components/game-init-form/game-init-form.component';
 import { RackComponent } from './components/rack/rack.component';
 import { TextEntryComponent } from './components/text-entry/text-entry.component';
 import { VirtualPlayerNameManagerComponent } from './components/virtual-player-name-manager/virtual-player-name-manager.component';
@@ -51,7 +51,7 @@ import { AdminPageComponent } from './pages/admin-page/admin-page.component';
         AutofocusDirective,
         StartingPageComponent,
         GameModesComponent,
-        FormComponent,
+        GameInitFormComponent,
         WaitingAreaComponent,
         RackComponent,
         EndGamePopupComponent,

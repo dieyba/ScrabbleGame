@@ -6,17 +6,17 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { DictionaryInterface } from '@app/classes/dictionary';
-import { GameParameters } from '@app/classes/game-parameters';
-import { Player } from '@app/classes/player';
-import { GameListService } from '@app/services/game-list.service';
-import { GameService } from '@app/services/game.service';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
+import { GameParameters } from '@app/classes/game-parameters/game-parameters';
+import { Player } from '@app/classes/player/player';
+import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
+import { GameListService } from '@app/services/game-list.service/game-list.service';
+import { GameService } from '@app/services/game.service/game.service';
 // import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
 import { Observable } from 'rxjs';
 import * as io from 'socket.io-client';
 import dict_path from 'src/assets/dictionnary.json';
-import { WaitingAreaComponent } from './waiting-area.component';
-
+/* eslint-disable max-lines */
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 /* eslint-disable dot-notation */

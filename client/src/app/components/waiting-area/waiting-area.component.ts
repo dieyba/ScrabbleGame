@@ -2,13 +2,13 @@ import { AfterViewInit, Component, HostListener, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { DictionaryInterface } from '@app/classes/dictionary';
-import { GameInitInfo, GameType } from '@app/classes/game-parameters';
-import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
-import { DialogData, FormComponent, GAME_CAPACITY } from '@app/components/form/form.component';
-import { SocketHandler } from '@app/modules/socket-handler';
-import { GameListService } from '@app/services/game-list.service';
-import { GameService } from '@app/services/game.service';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
+import { GameInitInfo, GameType } from '@app/classes/game-parameters/game-parameters';
+import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters/waiting-area-game-parameters';
+import { DialogData, GameInitFormComponent, GAME_CAPACITY } from '@app/components/game-init-form/game-init-form.component';
+import * as SocketHandler from '@app/modules/socket-handler';
+import { GameListService } from '@app/services/game-list.service/game-list.service';
+import { GameService } from '@app/services/game.service/game.service';
 import * as io from 'socket.io-client';
 import dict_path from 'src/assets/dictionnary.json';
 import { environment } from 'src/environments/environment';
@@ -159,13 +159,13 @@ export class WaitingAreaComponent implements AfterViewInit {
     }
 
     openForm() {
-        this.dialog.open(FormComponent, { data: { isSolo: this.data.isSolo, isLog2990: this.data.isLog2990 } });
+        this.dialog.open(GameInitFormComponent, { data: { isSolo: this.data.isSolo, isLog2990: this.data.isLog2990 } });
     }
 
     convert(isSolo: boolean) {
         this.name = false;
         this.closeDialog();
-        this.dialog.open(FormComponent, { data: { isSolo, isLog2990: this.data.isLog2990 } });
+        this.dialog.open(GameInitFormComponent, { data: { isSolo, isLog2990: this.data.isLog2990 } });
     }
 
     closeDialog() {

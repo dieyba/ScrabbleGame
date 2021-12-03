@@ -1,14 +1,13 @@
-/* eslint no-underscore-dangle: 0 */
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ERROR_NUMBER } from '@app/classes/utilities';
-import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
+import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
 import { environment } from 'src/environments/environment';
 
 const maxLength = 12;
-
+/* eslint-disable no-underscore-dangle */
 export enum ErrorCaseVirtualPlayerName {
     InvalidName = 'Ce nom est invalide',
     NameAlreadyThere = 'Ce nom existe déjà dans la base de données, actualisez votre page.',
