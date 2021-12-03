@@ -193,7 +193,6 @@ export class VirtualPlayerService {
                 this.isWordValid(permutationString) &&
                 (this.isPossiblePermutation(permutation, Axis.H) || this.isPossiblePermutation(permutation, Axis.V))
             ) {
-                console.log('valid word: ' + permutationString);
                 filteredPermutations.push(permutation);
             }
         }
@@ -510,7 +509,6 @@ export class VirtualPlayerService {
                         this.gridService.scrabbleBoard.squares[i][j].letter.character === word.content[letter].character &&
                         word.content[letter].tile.occupied
                     ) {
-                        console.log('testing word ', word.stringify(), ' on axis ', axis, ' at ', 'x=', i, 'y=', j);
                         const letterPos = new Vec2(i, j);
                         const realPos = this.getBeginningPosition(letter, letterPos, axis);
                         // Verify if the letters can be found in the rack.
@@ -522,7 +520,6 @@ export class VirtualPlayerService {
                         }
                         if (!this.wordHasBeenPlaced(word, wordsBuilt)) isErrorInWordsBuilt = true;
                         this.removalAfterTempPlacement(word, realPos, axis);
-                        console.log(isErrorInWordsBuilt);
                         if (isErrorInWordsBuilt) continue;
                         returnPos = realPos;
                     }
@@ -778,7 +775,6 @@ export class VirtualPlayerService {
     permutationsWithBoard(): ScrabbleWord[] {
         const returnPermutations: ScrabbleWord[] = [];
         const rackString = this.rack.map((letter) => letter.character).join('');
-        console.log(rackString);
         for (const row of this.gridService.scrabbleBoard.squares) {
             for (const square of row) {
                 if (square.letter) {
