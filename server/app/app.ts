@@ -1,4 +1,4 @@
-import { HttpException } from '@app/classes/http.exception';
+import { HttpException } from '@app/classes/http.exception/http.exception';
 import { DateController } from '@app/controllers/date.controller';
 import { ExampleController } from '@app/controllers/example.controller';
 import * as cookieParser from 'cookie-parser';
@@ -9,9 +9,9 @@ import * as logger from 'morgan';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
-import { BestScoresController } from './controllers/best-scores.controller';
-import { DictionaryDBController } from './controllers/dictionary-db.controller';
-import { VirtualPlayerNameController } from './controllers/virtual-player-name.controller';
+import { BestScoresController } from './controllers/best-scores.controller/best-scores.controller';
+import { DictionaryDBController } from './controllers/dictionary-db.controller/dictionary-db.controller';
+import { VirtualPlayerNameController } from './controllers/virtual-player-name.controller/virtual-player-name.controller';
 
 @Service()
 export class Application {

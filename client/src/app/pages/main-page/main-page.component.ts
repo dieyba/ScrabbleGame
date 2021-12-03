@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Message } from '@app/classes/message';
-import { CommunicationService } from '@app/services/communication.service';
+import { CommunicationService } from '@app/services/communication.service/communication.service';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 

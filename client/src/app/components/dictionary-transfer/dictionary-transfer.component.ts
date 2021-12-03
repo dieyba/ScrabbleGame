@@ -3,8 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DictionaryInterface } from '@app/classes/dictionary';
-import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
+import { BASE_URL, DictionaryService } from '@app/services/dictionary.service/dictionary.service';
 
 export enum ErrorCaseDictionaryTransfer {
     TitleAlreadyThere = 'Un dictionnaire de la base de donnée possède déjà ce titre.',

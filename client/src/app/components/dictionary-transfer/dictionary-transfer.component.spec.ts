@@ -6,9 +6,9 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DictionaryInterface } from '@app/classes/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { DictionaryTransferComponent, ErrorCaseDictionaryTransfer } from '@app/components/dictionary-transfer/dictionary-transfer.component';
-import { DictionaryService } from '@app/services/dictionary.service';
+import { DictionaryService } from '@app/services/dictionary.service/dictionary.service';
 import { of, throwError } from 'rxjs';
 
 describe('DictionaryTransferComponent', () => {
@@ -23,7 +23,7 @@ describe('DictionaryTransferComponent', () => {
             description: 'description',
             words: [],
         },
-    ] as DictionaryInterface[];
+    ] as unknown as DictionaryInterface[];
     const dico1 = {
         _id: '1',
         title: 'dico1',

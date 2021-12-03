@@ -2,7 +2,7 @@ import { Application } from '@app/app';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
-import { SocketManagerService } from './services/socket-manager.service';
+import { SocketManagerService } from './services/socket-manager.service/socket-manager.service';
 
 @Service()
 export class Server {

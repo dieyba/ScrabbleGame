@@ -2,10 +2,11 @@
 import { HttpClientModule, HttpStatusCode } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { BASE_URL, BestScores, BestScoresService } from '@app/services/best-scores.service';
+import { BASE_URL, BestScores, BestScoresService } from '@app/services/best-scores.service/best-scores.service';
 import { of, throwError } from 'rxjs';
 import { BestScoresComponent } from './best-scores.component';
-
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable dot-notation */
 describe('BestScoresComponent', () => {
     let component: BestScoresComponent;
     let fixture: ComponentFixture<BestScoresComponent>;

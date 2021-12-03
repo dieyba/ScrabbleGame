@@ -2,8 +2,8 @@
 // import { FormControl, FormGroup } from '@angular/forms';
 // import { MatCardModule } from '@angular/material/card';
 // import { Router, RouterModule } from '@angular/router';
-// import { Dictionary } from '@app/classes/dictionary';
-// import { GameParameters, GameType } from '@app/classes/game-parameters';
+// import { Dictionary } from '@app/classes/dictionary/dictionary';
+// import { GameParameters, GameType } from '@app/classes/game-parameters/game-parameters';
 // import { ScrabbleBoard } from '@app/classes/scrabble-board';
 // import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 // import { VirtualPlayer } from '@app/classes/virtual-player';
