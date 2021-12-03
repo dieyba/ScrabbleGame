@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
 import { PlaceCmd } from '@app/classes/place-command';
 import { BOARD_SIZE } from '@app/classes/scrabble-board';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { Axis, isValidLetter, removeAccents } from '@app/classes/utilities';
+import { ScrabbleLetter, setLetter } from '@app/classes/scrabble-letter';
+import { Axis, isCoordInsideBoard, isValidLetter, removeAccents } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
 import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
@@ -56,8 +56,8 @@ export class MouseWordPlacerService {
         yBaseOfSquare = yBaseOfSquare - ACTUAL_SQUARE_SIZE / 2 + 2;
         const clickedSquare: Vec2 = new Vec2(xBaseOfSquare, yBaseOfSquare);
         const indexes = this.companionService.convertPositionToGridIndex(clickedSquare);
-        if (indexes[0] >= BOARD_SIZE || indexes[1] >= BOARD_SIZE) return;
-        if (this.gridService.scrabbleBoard.squares[indexes[0]][indexes[1]].occupied === true) return;
+        if (indexes.x >= BOARD_SIZE || indexes.y >= BOARD_SIZE) return;
+        if (this.gridService.scrabbleBoard.squares[indexes.x][indexes.y].occupied === true) return;
         this.currentPosition = clickedSquare;
         this.initialPosition = clickedSquare;
         if (!this.companionService.samePosition(clickedSquare, this.latestPosition)) {
@@ -98,10 +98,16 @@ export class MouseWordPlacerService {
                 this.onBlur();
                 break;
             default:
+                console.log(
+                    'on key down cur pos:',
+                    this.currentPosition,
+                    ' = ',
+                    this.companionService.convertPositionToGridIndex(this.currentPosition),
+                );
                 if (
                     isValidLetter(removeAccents(keyPressed)) &&
-                    this.currentPosition.x <= ABSOLUTE_BOARD_SIZE &&
-                    this.currentPosition.y <= ABSOLUTE_BOARD_SIZE
+                    this.currentPosition.x < ABSOLUTE_BOARD_SIZE &&
+                    this.currentPosition.y < ABSOLUTE_BOARD_SIZE
                 ) {
                     this.findPlaceForLetter(keyPressed);
                 }
@@ -119,28 +125,26 @@ export class MouseWordPlacerService {
     }
     findPlaceForLetter(keyPressed: string) {
         let pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
-        let i = 0;
-        if (pos[0] < 0 || pos[0] >= BOARD_SIZE || pos[1] < 0 || pos[1] >= BOARD_SIZE) return;
-        while (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied === true && pos[0] < BOARD_SIZE && pos[1] < BOARD_SIZE) {
-            this.wordString += this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].letter.character;
-            if (pos[0] + i >= BOARD_SIZE || pos[1] + i >= BOARD_SIZE) return;
-            if (this.currentAxis === Axis.H) {
-                this.currentPosition.x = this.currentPosition.x + ACTUAL_SQUARE_SIZE;
-            } else if (this.currentAxis === Axis.V) {
-                this.currentPosition.y = this.currentPosition.y + ACTUAL_SQUARE_SIZE;
-            }
+        while (this.gridService.scrabbleBoard.squares[pos.x][pos.y].occupied && isCoordInsideBoard(pos)) {
+            const boardLetter = this.gridService.scrabbleBoard.squares[pos.x][pos.y].letter;
+            this.wordString += boardLetter.character === '*' ? boardLetter.whiteLetterCharacter : boardLetter.character;
+            // Update the current position to the next position
+            this.currentPosition =
+                this.currentAxis === Axis.H
+                    ? new Vec2(this.currentPosition.x + ACTUAL_SQUARE_SIZE, this.currentPosition.y)
+                    : new Vec2(this.currentPosition.x, this.currentPosition.y + ACTUAL_SQUARE_SIZE);
             pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
-            i++;
         }
-        if (pos[0] >= BOARD_SIZE || pos[1] >= BOARD_SIZE) return;
+        // Place a new letter only if the next position is unoccupied and in the board
+        if (!isCoordInsideBoard(pos)) return;
         this.placeLetter(removeAccents(keyPressed));
     }
     // Draws an arrow on the canvas in the square specified by the position
     drawArrow(position: Vec2, axis: Axis) {
         const indexes = this.companionService.convertPositionToGridIndex(position);
-        if (indexes[0] < 0 || indexes[0] >= BOARD_SIZE || indexes[1] < 0 || indexes[1] >= BOARD_SIZE) return;
-        this.drawSquare(position, this.companionService.convertColorToString(this.gridService.scrabbleBoard.squares[indexes[0]][indexes[1]].color));
-        if (indexes[0] >= BOARD_SIZE || indexes[1] >= BOARD_SIZE) return;
+        if (indexes.x < 0 || indexes.x >= BOARD_SIZE || indexes.y < 0 || indexes.y >= BOARD_SIZE) return;
+        this.drawSquare(position, this.companionService.convertColorToString(this.gridService.scrabbleBoard.squares[indexes.x][indexes.y].color));
+        if (indexes.x >= BOARD_SIZE || indexes.y >= BOARD_SIZE) return;
         this.overlayContext.textAlign = 'center';
         this.overlayContext.textBaseline = 'middle';
         this.overlayContext.font = 'bold 20px Arial';
@@ -158,7 +162,7 @@ export class MouseWordPlacerService {
     // Draws a square on the canvas at the given position with the given color
     drawSquare(position: Vec2, color: string) {
         const indexes = this.companionService.convertPositionToGridIndex(position);
-        if (indexes[0] >= BOARD_SIZE || indexes[1] >= BOARD_SIZE) return;
+        if (indexes.x >= BOARD_SIZE || indexes.y >= BOARD_SIZE) return;
         this.overlayContext.beginPath();
         this.companionService.changeFillStyleColor(this.overlayContext, color);
         this.overlayContext.fillRect(position.x + 1, position.y + 1, SQUARE_SIZE, SQUARE_SIZE);
@@ -203,14 +207,14 @@ export class MouseWordPlacerService {
         if (this.currentPosition.x === ABSOLUTE_BOARD_SIZE || this.currentPosition.y === ABSOLUTE_BOARD_SIZE)
             this.deletePosition = this.currentPosition;
         const indexes = this.companionService.convertPositionToGridIndex(this.currentPosition);
-        if (indexes[0] >= BOARD_SIZE || indexes[1] >= BOARD_SIZE) return;
+        if (indexes.x >= BOARD_SIZE || indexes.y >= BOARD_SIZE) return;
         let foundLetter: ScrabbleLetter = new ScrabbleLetter('', 0);
         if (letter === letter.toUpperCase()) {
             // Look for a blank piece on the rack
-            for (const rackLetter of this.rackService.rackLetters) {
+            for (let rackLetter of this.rackService.rackLetters) {
                 if (rackLetter.character === '*') {
                     foundLetter = rackLetter;
-                    rackLetter.setLetter(letter); // sets the whiteLetterCharacter attributes
+                    rackLetter = setLetter(letter, rackLetter); // sets the whiteLetterCharacter attributes
                     this.currentWord.push(rackLetter);
                     this.wordString += letter;
                     this.rackService.rackLetters.splice(this.rackService.rackLetters.indexOf(rackLetter), 1);
@@ -238,13 +242,15 @@ export class MouseWordPlacerService {
             const nextSquare = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
             this.currentPosition = nextSquare;
             const pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
-            if (pos[0] >= BOARD_SIZE || pos[1] >= BOARD_SIZE) return;
-            let nextArrow = this.currentPosition;
-            if (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied === true)
-                nextArrow = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
-            this.drawArrow(nextArrow, this.currentAxis);
+            if (pos.x >= BOARD_SIZE || pos.y >= BOARD_SIZE) return;
+            // let nextArrow = this.currentPosition;
+            // if (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied === true)
+            //     nextArrow = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
+            this.drawArrow(this.currentPosition, this.currentAxis);
             // Arrow display bug is here, need to fix before final commit. Works for 1st skip but not further ones.
-        } else return;
+            console.log('current word:', this.currentWord);
+            console.log('word string:', this.wordString);
+        }
     }
     updateRack() {
         this.rackService.gridContext.clearRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
@@ -252,14 +258,18 @@ export class MouseWordPlacerService {
         this.rackService.drawExistingLetters();
     }
     confirmWord() {
-        const posArray = this.companionService.convertPositionToGridIndex(this.initialPosition);
-        const posVec = new Vec2(posArray[0], posArray[1]);
+        console.log('currentword: ', this.currentWord, ' and wordstring:', this.wordString);
+        const posVec = this.companionService.convertPositionToGridIndex(this.initialPosition);
         const defaultParams: DefaultCommandParams = { player: this.gameService.game.getLocalPlayer(), serviceCalled: this.gameService };
         const params: PlaceParams = { position: posVec, orientation: this.currentAxis, word: this.wordString };
+        console.log('before remove all letters', this.gameService.game.scrabbleBoard);
+        // console.log(this.gameService.game.getLocalPlayer().letters);
         // Refund letters to rack before placing
         this.removeAllLetters();
         const command = new PlaceCmd(defaultParams, params);
         this.commandInvokerService.executeCommand(command);
+        console.log('start place', this.gameService.game.scrabbleBoard);
+        // console.log('start place', this.gameService.game.getLocalPlayer().letters);
         this.clearOverlay();
     }
     // Removes the latest drawn arrow indicator
@@ -280,14 +290,16 @@ export class MouseWordPlacerService {
     removeLetter() {
         const lastLetter = this.currentWord.pop();
         if (lastLetter !== undefined) {
+            let stringLetter = lastLetter.character;
             if (lastLetter.character === '*') {
+                stringLetter = lastLetter.whiteLetterCharacter;
                 lastLetter.whiteLetterCharacter = '*';
             }
             this.rackService.rackLetters.push(lastLetter);
-            const charPosition = this.wordString.lastIndexOf(lastLetter.character);
+            const charPosition = this.wordString.lastIndexOf(stringLetter);
             const partOne = this.wordString.substring(0, charPosition);
-            const partTwo = this.wordString.substring(charPosition + 1);
-            this.wordString = partOne + partTwo;
+            // const partTwo = this.wordString.substring(charPosition + 1);
+            this.wordString = partOne;
         }
         // Draw letter on the end of the canvas
         this.rackService.drawExistingLetters();
@@ -300,6 +312,8 @@ export class MouseWordPlacerService {
         if (this.currentWord.length >= 0 && previousSquare.x >= this.initialPosition.x && previousSquare.y >= this.initialPosition.y) {
             // Shift one spot left/up
             this.currentPosition = previousSquare;
+            console.log('current word:', this.currentWord);
+            console.log('word string:', this.wordString);
             this.drawCurrentWord();
             this.overlayContext.clearRect(
                 this.currentPosition.x,
@@ -314,14 +328,14 @@ export class MouseWordPlacerService {
         const indexes = this.companionService.convertPositionToGridIndex(this.initialPosition);
         for (let i = 0; i < this.currentWord.length; i++) {
             if (this.currentAxis === Axis.H) {
-                if (indexes[0] + i < BOARD_SIZE && indexes[1] < BOARD_SIZE) {
-                    if (this.gridService.scrabbleBoard.squares[indexes[0] + i][indexes[1]].occupied) indexes[0]++;
-                    this.drawLetter(this.currentWord[i], new Vec2(indexes[0] + i, indexes[1]));
+                if (indexes.x + i < BOARD_SIZE && indexes.y < BOARD_SIZE) {
+                    if (this.gridService.scrabbleBoard.squares[indexes.x + i][indexes.y].occupied) indexes.x++;
+                    this.drawLetter(this.currentWord[i], new Vec2(indexes.x + i, indexes.y));
                 }
             } else {
-                if (indexes[0] < BOARD_SIZE && indexes[1] + i < BOARD_SIZE) {
-                    if (this.gridService.scrabbleBoard.squares[indexes[0]][indexes[1] + i].occupied) indexes[1]++;
-                    this.drawLetter(this.currentWord[i], new Vec2(indexes[0], indexes[1] + i));
+                if (indexes.x < BOARD_SIZE && indexes.y + i < BOARD_SIZE) {
+                    if (this.gridService.scrabbleBoard.squares[indexes.x][indexes.y + i].occupied) indexes.y++;
+                    this.drawLetter(this.currentWord[i], new Vec2(indexes.x, indexes.y + i));
                 }
             }
         }

@@ -32,3 +32,12 @@ export const isAllLowerLetters = (letters: string): boolean => {
 export const removeAccents = (letters: string): string => {
     return letters.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 };
+
+export const isValidLetter = (letter: string): boolean => {
+    if (letter.length === 1) {
+        const charCode = letter.toLowerCase().charCodeAt(0);
+        const isALetter = charCode >= 'a'.charCodeAt(0) && charCode <= 'z'.charCodeAt(0);
+        return isALetter;
+    }
+    return false;
+};

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleBoard } from '@app/classes/scrabble-board';
-import { ScrabbleLetter, UNPLACED } from '@app/classes/scrabble-letter';
+import { ScrabbleLetter, setLetter, UNPLACED } from '@app/classes/scrabble-letter';
 import { Square, SquareColor } from '@app/classes/square';
 import { Axis } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
@@ -91,9 +91,10 @@ export class GridService {
     removeSquare(i: number, j: number): ScrabbleLetter {
         // Saving information about square
         const color = this.scrabbleBoard.squares[i][j].color;
-        const letter = this.scrabbleBoard.squares[i][j].letter;
-        if (letter.value === 0) {
-            letter.setLetter('*');
+        let letter = this.scrabbleBoard.squares[i][j].letter;
+        // Reset white letters
+        if (letter?.value === 0) {
+            letter = setLetter('*', letter);
         }
         // Unassign the letter and the letter coordinates (tile)
         letter.tile = new Square(UNPLACED, UNPLACED);
@@ -257,8 +258,8 @@ export class GridService {
         const removedScrabbleLetters: ScrabbleLetter[] = [];
         for (let i = 0; i < length; i++) {
             const tempCoord = orientation === Axis.V ? new Vec2(coord.x, coord.y + i) : new Vec2(coord.x + i, coord.y);
-            if (this.scrabbleBoard.squares[coord.x][coord.y + i].isValidated === false) {
-                removedScrabbleLetters.push(this.removeSquare(tempCoord.x, tempCoord.y + i));
+            if (!this.scrabbleBoard.squares[tempCoord.x][tempCoord.y].isValidated && this.scrabbleBoard.squares[tempCoord.x][tempCoord.y].occupied) {
+                removedScrabbleLetters.push(this.removeSquare(tempCoord.x, tempCoord.y));
             }
         }
         return removedScrabbleLetters;
@@ -267,8 +268,8 @@ export class GridService {
     updateBoard(word: string, orientation: string, position: Vec2) {
         const positionInc = orientation === 'h' ? new Vec2(1, 0) : new Vec2(0, 1);
         for (const letter of word) {
-            const scrabbleLetter = new ScrabbleLetter(letter);
-            scrabbleLetter.setLetter(letter);
+            let scrabbleLetter = new ScrabbleLetter(letter);
+            scrabbleLetter = setLetter(letter, scrabbleLetter);
             scrabbleLetter.tile.position.x = position.x;
             scrabbleLetter.tile.position.y = position.y;
             this.drawLetter(scrabbleLetter, position.x, position.y);

@@ -155,6 +155,8 @@ export class GameService {
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
         this.addRackLetters(this.game.getLocalPlayer().letters);
         this.startCountdown();
+        console.log('stock:', this.game.stock);
+        // console.log('start game', this.game.getLocalPlayer().letters);
     }
     startCountdown() {
         if (!this.game.isEndGame) {
@@ -217,9 +219,7 @@ export class GameService {
         return ErrorType.ImpossibleCommand;
     }
     async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
-        console.log(this.game.scrabbleBoard);
-        console.log('start place:', this.game.stock);
-        console.log(this.game.getLocalPlayer().letters);
+        // console.log(this.game.scrabbleBoard);
         if (!player.isActive) {
             return ErrorType.ImpossibleCommand;
         }
@@ -271,8 +271,7 @@ export class GameService {
             this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
         });
         console.log('after place:', this.game.scrabbleBoard);
-        console.log(this.game.stock);
-        console.log(this.game.getLocalPlayer().letters);
+        // console.log(this.game.getLocalPlayer().letters);
         return errorResult;
     }
     synchronizeAfterPlaceCommand(errorResult: ErrorType, placeParams: PlaceParams, player: Player) {

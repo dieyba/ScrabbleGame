@@ -34,10 +34,13 @@ export class LetterStock {
     letterStock: ScrabbleLetter[];
 
     constructor(stockLetters?: ScrabbleLetter[]) {
+        this.letterStock = [];
         if (stockLetters !== undefined) {
-            this.letterStock = stockLetters;
+            // to create client instances of scrabble letters
+            stockLetters.forEach((letter) => {
+                this.addLettersToStock(letter.character, 1);
+            });
         } else {
-            this.letterStock = [];
             this.addLettersToStock('a', LetterQuantity.A); // A
             this.addLettersToStock('b', LetterQuantity.B); // B
             this.addLettersToStock('c', LetterQuantity.C); // C
