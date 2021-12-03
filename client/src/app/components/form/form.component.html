@@ -18,7 +18,7 @@
 
         <div>
             <mat-form-field appearance="fill" class="papy">
-                <mat-label>Dictonnaire :</mat-label>
+                <mat-label>Dictionnaire :</mat-label>
                 <mat-select formControlName="dictionaryForm" [(ngModel)]="defaultDictionary" [placeholder]="defaultDictionary">
                     <mat-option value="0">{{ dictionaryList[0] }}</mat-option>
                     <mat-option value="1">{{ dictionaryList[1] }}</mat-option>
@@ -51,8 +51,8 @@
         <div *ngIf="data.isSolo">
             <p>Veuillez choisir le niveau de votre adversaire</p>
             <mat-radio-group formControlName="level">
-                <mat-radio-button value="easy" (click)="randomPlayer(beginnerNameList)">Joueur Débutant</mat-radio-button>
-                <mat-radio-button disabled value="difficult">Joueur Expert</mat-radio-button>
+                <mat-radio-button value="easy" (click)="randomPlayer(beginnerNameList)"> Joueur Débutant</mat-radio-button>
+                <mat-radio-button value="difficult" (click)="randomPlayer(expertNameList)"> Joueur Expert</mat-radio-button>
             </mat-radio-group>
             <p id="opponents">
                 Vous allez jouer contre <strong>{{ selectedPlayer }}</strong>

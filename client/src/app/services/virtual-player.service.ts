@@ -4,15 +4,14 @@ import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
 import { ExchangeCmd } from '@app/classes/exchange-command';
 import { PassTurnCmd } from '@app/classes/pass-command';
 import { PlaceCmd } from '@app/classes/place-command';
-import { Player } from '@app/classes/player';
 import { BOARD_SIZE } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 import { ScrabbleMove } from '@app/classes/scrabble-move';
 import { ScrabbleWord } from '@app/classes/scrabble-word';
 import { SquareColor } from '@app/classes/square';
-import { Axis, isCoordInsideBoard } from '@app/classes/utilities';
+import { Axis, convertYAxisToLetterCoordinates, isCoordInsideBoard } from '@app/classes/utilities';
 import { Vec2 } from '@app/classes/vec2';
-import { Difficulty } from '@app/classes/virtual-player';
+import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { BonusService } from './bonus.service';
 import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
@@ -49,7 +48,7 @@ const MAX_ARRAY_SIZE = 4;
 export class VirtualPlayerService {
     rack: ScrabbleLetter[];
     orientation: Axis;
-    player: Player;
+    player: VirtualPlayer;
     type: Difficulty;
 
     constructor(
@@ -61,13 +60,13 @@ export class VirtualPlayerService {
         private validationService: ValidationService,
         private wordBuilderService: WordBuilderService,
     ) {
-        this.player = this.gameService.game.getOpponent();
+        this.player = this.gameService.game.getOpponent() as VirtualPlayer;
         this.rack = this.player.letters;
-        this.type = Difficulty.Difficult; // REMOVE THIS LATER AFTER TESTING
+        this.type = this.player.type;
     }
 
     playTurn(): void {
-        let moveMade = new ScrabbleMove();
+        let movesMade: ScrabbleMove[] = [];
         const defaultParams: DefaultCommandParams = {
             player: this.player,
             serviceCalled: this.gameService,
@@ -95,7 +94,7 @@ export class VirtualPlayerService {
                 }
                 const chosenTilesString = chosenTiles.map((tile) => tile.character).join('');
                 const command = new ExchangeCmd(defaultParams, chosenTilesString);
-                command.debugMessages.push('lettres échangées: ' + chosenTilesString);
+                command.debugMessages.push('Lettres échangées: ' + chosenTilesString);
                 this.commandInvoker.executeCommand(command);
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
@@ -109,14 +108,15 @@ export class VirtualPlayerService {
                     return;
                 }
                 // waits 3 second to try and find a word to place
-                moveMade = this.makeMoves(possiblePermutations, value)[0];
-                if (moveMade !== undefined) {
+                movesMade = this.makeMoves(possiblePermutations, value);
+                if (movesMade.length !== 0) {
                     const params: PlaceParams = {
-                        position: moveMade.position,
-                        orientation: moveMade.axis,
-                        word: moveMade.word.stringify(),
+                        position: movesMade[0].position,
+                        orientation: movesMade[0].axis,
+                        word: movesMade[0].word.stringify(),
                     };
                     const command = new PlaceCmd(defaultParams, params);
+                    command.debugMessages.push(this.debugMessageGenerator(movesMade));
                     this.commandInvoker.executeCommand(command);
                 } else {
                     const chosenTiles = this.chooseTilesFromRack(this.selectRandomValue());
@@ -124,7 +124,7 @@ export class VirtualPlayerService {
                     if (chosenTiles.length === 0) {
                         const emptyRackPass = new PassTurnCmd(defaultParams);
                         this.commandInvoker.executeCommand(emptyRackPass);
-                        emptyRackPass.debugMessages.push('no move was found. Calling pass command');
+                        emptyRackPass.debugMessages.push('No move was found. Calling Pass Command');
                         return;
                     }
                     const chosenTilesString = chosenTiles.map((tile) => tile.character).join('');
@@ -133,6 +133,56 @@ export class VirtualPlayerService {
                 }
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         }
+    }
+
+    debugMessageGenerator(moves: ScrabbleMove[]): string {
+        let message = '';
+        for (let i = 0; i < moves[0].word.content.length; i++) {
+            if (moves[0].word.content[i].tile.position.x === POSITION_ERROR || moves[0].word.content[i].tile.position.y === POSITION_ERROR) {
+                if (moves[0].axis === Axis.H) {
+                    const nextPos = moves[0].position.x + i;
+                    message +=
+                        convertYAxisToLetterCoordinates(moves[0].position.y).toUpperCase() +
+                        nextPos +
+                        ':' +
+                        moves[0].word.content[i].character.toUpperCase() +
+                        '  ';
+                } else {
+                    const nextPos = moves[0].position.y + i;
+                    message +=
+                        convertYAxisToLetterCoordinates(nextPos).toUpperCase() +
+                        moves[0].position.x +
+                        ':' +
+                        moves[0].word.content[i].character.toUpperCase() +
+                        '  ';
+                }
+            }
+        }
+        const sliceNumber = -1;
+        message.slice(0, sliceNumber);
+        // Only one space, as asked in the documentation
+        message += '(' + moves[0].value + ')' + '\n';
+
+        for (let i = 1; i < moves.length; i++) {
+            for (const letter of moves[i].word.content) {
+                message += letter.character.toUpperCase();
+            }
+            message += ' (' + moves[i].value + ')' + '\n';
+        }
+        const bingoRack = [];
+        for (const letter in this.rack) {
+            if (letter) {
+                bingoRack.push(this.rack[letter].character);
+                for (const moveLetter in moves[0].word.content) {
+                    if (bingoRack.includes(moveLetter)) {
+                        bingoRack.splice(bingoRack.indexOf(moveLetter), 1);
+                        break;
+                    }
+                }
+            }
+        }
+        if (bingoRack.length === 0) message += 'Bingo! (50)\n';
+        return message;
     }
 
     filterPermutations(permutations: ScrabbleWord[]): ScrabbleWord[] {
