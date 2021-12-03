@@ -3,7 +3,7 @@ import { ExchangeService } from '@app/services/exchange.service/exchange.service
 import { ManipulationRackService } from '@app/services/manipulation-rack.service/manipulation-rack.service';
 import { MAX_LETTER_COUNT, RackService } from '@app/services/rack.service/rack.service';
 import { RackComponent } from './rack.component';
-
+/* eslint-disable dot-notation */
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('RackComponent', () => {
     let component: RackComponent;
@@ -62,7 +62,7 @@ describe('RackComponent', () => {
 
         expect(spy).toHaveBeenCalled();
         expect(spyEvent).toHaveBeenCalled();
-        expect(manipulateRackServiceSpy.clearManipValues).toHaveBeenCalled();
+        expect(manipulateRackServiceSpy.clearManipulationValues).toHaveBeenCalled();
         expect(exchangeServiceSpy.handleSelection).toHaveBeenCalled();
     });
 
@@ -75,7 +75,7 @@ describe('RackComponent', () => {
         component.onFocusOut(mockEvent);
 
         expect(rackServiceSpy.deselectAll).not.toHaveBeenCalled();
-        expect(manipulateRackServiceSpy.clearManipValues).not.toHaveBeenCalled();
+        expect(manipulateRackServiceSpy.clearManipulationValues).not.toHaveBeenCalled();
     });
 
     it('onFocusOut should deselect all letters on rackComponent when focus is on anything but the exchange button', () => {
@@ -87,7 +87,7 @@ describe('RackComponent', () => {
         component.onFocusOut(mockEvent);
 
         expect(rackServiceSpy.deselectAll).toHaveBeenCalled();
-        expect(manipulateRackServiceSpy.clearManipValues).toHaveBeenCalled();
+        expect(manipulateRackServiceSpy.clearManipulationValues).toHaveBeenCalled();
     });
 
     it('onFocusOut should deselect all letters on rackComponent when focus is on anything but the exchange button', () => {
@@ -99,7 +99,7 @@ describe('RackComponent', () => {
         component.onFocusOut(mockEvent);
 
         expect(rackServiceSpy.deselectAll).toHaveBeenCalled();
-        expect(manipulateRackServiceSpy.clearManipValues).toHaveBeenCalled();
+        expect(manipulateRackServiceSpy.clearManipulationValues).toHaveBeenCalled();
     });
 
     it("onFocusOut shouldn't deselect all letters on rackComponent when focus is on exchange button", () => {
@@ -111,7 +111,7 @@ describe('RackComponent', () => {
         component.onFocusOut(mockEvent);
 
         expect(rackServiceSpy.deselectAll).not.toHaveBeenCalled();
-        expect(manipulateRackServiceSpy.clearManipValues).toHaveBeenCalled();
+        expect(manipulateRackServiceSpy.clearManipulationValues).toHaveBeenCalled();
     });
 
     it('onKeyDown should call just manipulationRackService switchLeft if we press on arrowleft button', () => {

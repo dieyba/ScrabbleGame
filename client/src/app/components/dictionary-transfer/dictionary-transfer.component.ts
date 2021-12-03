@@ -26,7 +26,6 @@ const DESCRIPTION_MIN_LENGTH = 10;
     styleUrls: ['./dictionary-transfer.component.scss'],
 })
 export class DictionaryTransferComponent implements AfterViewInit, OnDestroy {
-
     @ViewChild('inputFile', { static: false }) private inputFile!: ElementRef<HTMLInputElement>;
     selectedDictionary: DictionaryInterface;
     dictionaryList: DictionaryInterface[];
@@ -97,9 +96,11 @@ export class DictionaryTransferComponent implements AfterViewInit, OnDestroy {
     }
 
     onDownload() {
-        this.dictionarySubscription = this.dictionaryService.getDictionary(BASE_URL, this.selectedDictionary.title).subscribe(this.download, (error: HttpErrorResponse) => {
-            this.dictionaryService.handleErrorSnackBar(error);
-        });
+        this.dictionarySubscription = this.dictionaryService
+            .getDictionary(BASE_URL, this.selectedDictionary.title)
+            .subscribe(this.download, (error: HttpErrorResponse) => {
+                this.dictionaryService.handleErrorSnackBar(error);
+            });
     }
 
     download(dictionary: DictionaryInterface) {
@@ -140,17 +141,19 @@ export class DictionaryTransferComponent implements AfterViewInit, OnDestroy {
             return;
         }
 
-        this.dictionarySubscription = this.dictionaryService.update(BASE_URL, this.selectedDictionary.title, this.selectedDictionary._id, title, description).subscribe(
-            (dictionary) => {
-                this.dictionaryList[index].title = dictionary.title;
-                this.dictionaryList[index].description = dictionary.description;
-            },
-            (error: HttpErrorResponse) => {
-                if (error.error === 'Ce titre existe déjà') {
-                    this.snack.open(ErrorCaseDictionaryTransfer.TitleAlreadyThere, 'Fermer');
-                }
-            },
-        );
+        this.dictionarySubscription = this.dictionaryService
+            .update(BASE_URL, this.selectedDictionary.title, this.selectedDictionary._id, title, description)
+            .subscribe(
+                (dictionary) => {
+                    this.dictionaryList[index].title = dictionary.title;
+                    this.dictionaryList[index].description = dictionary.description;
+                },
+                (error: HttpErrorResponse) => {
+                    if (error.error === 'Ce titre existe déjà') {
+                        this.snack.open(ErrorCaseDictionaryTransfer.TitleAlreadyThere, 'Fermer');
+                    }
+                },
+            );
     }
 
     deleteDictionary(dictionaryToDelete: DictionaryInterface) {

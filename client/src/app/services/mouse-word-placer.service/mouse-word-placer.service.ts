@@ -172,90 +172,6 @@ export class MouseWordPlacerService {
         this.overlayContext.fillRect(position.x + 1, position.y + 1, SQUARE_SIZE, SQUARE_SIZE);
     }
 
-    private drawLetter(letterToDraw: ScrabbleLetter, pos: Vec2) {
-        if (
-            pos.x >= BOARD_SIZE ||
-            pos.y >= BOARD_SIZE ||
-            this.currentPosition.x > ABSOLUTE_BOARD_SIZE ||
-            this.currentPosition.y > ABSOLUTE_BOARD_SIZE
-        )
-            return;
-        letterToDraw.color = this.gridService.scrabbleBoard.squares[pos.x][pos.y].color;
-        const letter = letterToDraw.character.toUpperCase();
-        // Draw background
-        this.drawSquare(this.currentPosition, this.companionService.convertColorToString(letterToDraw.color));
-        // Draw letter
-        this.overlayContext.fillStyle = 'black';
-        this.overlayContext.font = this.gridService.currentLetterFont;
-        this.overlayContext.fillText(letter, this.currentPosition.x + 2, this.currentPosition.y + SQUARE_SIZE / 2 + BOARD_SIZE);
-
-        // Draw letter value
-        this.overlayContext.font = this.gridService.currentValueFont;
-        const DOUBLE_DIGIT = 10;
-        if (letterToDraw.value >= DOUBLE_DIGIT) {
-            const BIG_OFFSET_X = 15;
-            this.overlayContext.fillText(
-                String(letterToDraw.value),
-                this.currentPosition.x + SQUARE_SIZE - BIG_OFFSET_X,
-                this.currentPosition.y + SQUARE_SIZE - 2,
-            );
-        } else {
-            const SMALL_OFFSET_X = 6;
-            this.overlayContext.fillText(
-                String(letterToDraw.value),
-                this.currentPosition.x + SQUARE_SIZE - SMALL_OFFSET_X - 2,
-                this.currentPosition.y + SQUARE_SIZE - 2,
-            );
-        }
-    }
-
-    private placeLetter(letter: string) {
-        if (this.currentPosition.x === ABSOLUTE_BOARD_SIZE || this.currentPosition.y === ABSOLUTE_BOARD_SIZE)
-            this.deletePosition = this.currentPosition;
-        const indexes = this.companionService.convertPositionToGridIndex(this.currentPosition);
-        if (indexes[0] >= BOARD_SIZE || indexes[1] >= BOARD_SIZE) return;
-        let foundLetter: ScrabbleLetter = new ScrabbleLetter('', 0);
-        if (letter === letter.toUpperCase()) {
-            // Look for a blank piece on the rack
-            for (const rackLetter of this.rackService.rackLetters) {
-                if (rackLetter.character === '*') {
-                    foundLetter = rackLetter;
-                    this.currentWord.push(rackLetter);
-                    this.wordString += letter;
-                    this.rackService.rackLetters.splice(this.rackService.rackLetters.indexOf(rackLetter), 1);
-                    break;
-                }
-            }
-        } else {
-            // Check for the (non-blank) letter on the rack
-            for (const rackLetter of this.rackService.rackLetters) {
-                if (rackLetter.character === letter) {
-                    foundLetter = rackLetter;
-                    this.currentWord.push(rackLetter);
-                    this.wordString += rackLetter.character;
-                    this.rackService.rackLetters.splice(this.rackService.rackLetters.indexOf(rackLetter), 1);
-                    break;
-                }
-            }
-        }
-        if (foundLetter.character !== '') {
-            // Draw letters
-            this.drawCurrentWord();
-            // Update rack
-            this.updateRack();
-            // Prepare for next call
-            const nextSquare = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
-            this.currentPosition = nextSquare;
-            const pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
-            if (pos[0] >= BOARD_SIZE || pos[1] >= BOARD_SIZE) return;
-            let nextArrow = this.currentPosition;
-            if (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied)
-                nextArrow = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
-            this.drawArrow(nextArrow, this.currentAxis);
-            // Arrow display bug is here, need to fix before final commit. Works for 1st skip but not further ones.
-        } else return;
-    }
-
     updateRack() {
         this.rackService.gridContext.clearRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
         this.rackService.drawRack();
@@ -341,5 +257,89 @@ export class MouseWordPlacerService {
 
     clearOverlay() {
         this.overlayContext.clearRect(0, 0, this.overlayContext.canvas.width, this.overlayContext.canvas.height);
+    }
+
+    private placeLetter(letter: string) {
+        if (this.currentPosition.x === ABSOLUTE_BOARD_SIZE || this.currentPosition.y === ABSOLUTE_BOARD_SIZE)
+            this.deletePosition = this.currentPosition;
+        const indexes = this.companionService.convertPositionToGridIndex(this.currentPosition);
+        if (indexes[0] >= BOARD_SIZE || indexes[1] >= BOARD_SIZE) return;
+        let foundLetter: ScrabbleLetter = new ScrabbleLetter('', 0);
+        if (letter === letter.toUpperCase()) {
+            // Look for a blank piece on the rack
+            for (const rackLetter of this.rackService.rackLetters) {
+                if (rackLetter.character === '*') {
+                    foundLetter = rackLetter;
+                    this.currentWord.push(rackLetter);
+                    this.wordString += letter;
+                    this.rackService.rackLetters.splice(this.rackService.rackLetters.indexOf(rackLetter), 1);
+                    break;
+                }
+            }
+        } else {
+            // Check for the (non-blank) letter on the rack
+            for (const rackLetter of this.rackService.rackLetters) {
+                if (rackLetter.character === letter) {
+                    foundLetter = rackLetter;
+                    this.currentWord.push(rackLetter);
+                    this.wordString += rackLetter.character;
+                    this.rackService.rackLetters.splice(this.rackService.rackLetters.indexOf(rackLetter), 1);
+                    break;
+                }
+            }
+        }
+        if (foundLetter.character !== '') {
+            // Draw letters
+            this.drawCurrentWord();
+            // Update rack
+            this.updateRack();
+            // Prepare for next call
+            const nextSquare = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
+            this.currentPosition = nextSquare;
+            const pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
+            if (pos[0] >= BOARD_SIZE || pos[1] >= BOARD_SIZE) return;
+            let nextArrow = this.currentPosition;
+            if (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied)
+                nextArrow = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
+            this.drawArrow(nextArrow, this.currentAxis);
+            // Arrow display bug is here, need to fix before final commit. Works for 1st skip but not further ones.
+        } else return;
+    }
+
+    private drawLetter(letterToDraw: ScrabbleLetter, pos: Vec2) {
+        if (
+            pos.x >= BOARD_SIZE ||
+            pos.y >= BOARD_SIZE ||
+            this.currentPosition.x > ABSOLUTE_BOARD_SIZE ||
+            this.currentPosition.y > ABSOLUTE_BOARD_SIZE
+        )
+            return;
+        letterToDraw.color = this.gridService.scrabbleBoard.squares[pos.x][pos.y].color;
+        const letter = letterToDraw.character.toUpperCase();
+        // Draw background
+        this.drawSquare(this.currentPosition, this.companionService.convertColorToString(letterToDraw.color));
+        // Draw letter
+        this.overlayContext.fillStyle = 'black';
+        this.overlayContext.font = this.gridService.currentLetterFont;
+        this.overlayContext.fillText(letter, this.currentPosition.x + 2, this.currentPosition.y + SQUARE_SIZE / 2 + BOARD_SIZE);
+
+        // Draw letter value
+        this.overlayContext.font = this.gridService.currentValueFont;
+        const DOUBLE_DIGIT = 10;
+        if (letterToDraw.value >= DOUBLE_DIGIT) {
+            const BIG_OFFSET_X = 15;
+            this.overlayContext.fillText(
+                String(letterToDraw.value),
+                this.currentPosition.x + SQUARE_SIZE - BIG_OFFSET_X,
+                this.currentPosition.y + SQUARE_SIZE - 2,
+            );
+        } else {
+            const SMALL_OFFSET_X = 6;
+            this.overlayContext.fillText(
+                String(letterToDraw.value),
+                this.currentPosition.x + SQUARE_SIZE - SMALL_OFFSET_X - 2,
+                this.currentPosition.y + SQUARE_SIZE - 2,
+            );
+        }
     }
 }

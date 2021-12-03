@@ -1,3 +1,9 @@
+/* eslint-disable dot-notation */
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-vars */
+/* eslint-disable dot-notation */
+/* eslint-disable  @typescript-eslint/no-unused-expressions */
+/* eslint-disable  no-unused-expressions */
 import { TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { ChatEntryColor, ServerChatEntry } from '@app/classes/chat-display-entry/chat-display-entry';
@@ -7,9 +13,6 @@ import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player/virtual-p
 import * as io from 'socket.io-client';
 import { ACTIVE_DEBUG_MESSAGE, ChatDisplayService, INACTIVE_DEBUG_MESSAGE } from './chat-display.service';
 
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-/* eslint-disable no-unused-vars */
-/* eslint-disable dot-notation */
 class SocketMock {
     id: string = 'Socket mock';
     events: Map<string, CallableFunction> = new Map();
@@ -62,13 +65,13 @@ describe('ChatDisplayService', () => {
         expect(socketEmitMockSpy).toHaveBeenCalledWith('sendChatEntry', message, message2);
     });
     it('socketOnConnect should handle socket.on event addChatEntry', () => {
-        service.socketOnConnect();
+        service['socketOnConnect'];
         const serverChatEntry: ServerChatEntry = { senderName: 'dieyba', message: 'salut' };
         socketMock.triggerEvent('addChatEntry', serverChatEntry);
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event addSystemChatEntry', () => {
-        service.socketOnConnect();
+        service['socketOnConnect'];
         const systemEntry = 'system';
         socketMock.triggerEvent('addSystemChatEntry', systemEntry);
         expect(socketMockSpy).toHaveBeenCalled();

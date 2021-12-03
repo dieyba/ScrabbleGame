@@ -18,7 +18,7 @@ export enum GoalDescriptions {
     PlaceLetterWorthTenPts = 'Placer un mot contenant une lettre valant 10 points. (+20pts)',
     FormTwoLettersStarsOnly = 'Former un mot avec seulement deux lettres qui contient les deux étoiles (*). (+20pts)',
     FormWordWithLettersFromName = 'Former un mot avec au moins 3 lettres de ton nom.' +
-    " Chaque lettre peut être utilisé le nombre de fois qu'elle apparaît dans ton nom. (+30pts)",
+        " Chaque lettre peut être utilisé le nombre de fois qu'elle apparaît dans ton nom. (+30pts)",
     FormAnExistingWord = "Former un mot d'au moins 5 lettres qui a déjà été former auparavant. (+20pts)",
     FormThreeWords = 'Former 3 mots avec un seul placement. (+50pts)',
     PlaceLetterOnBoardCorner = 'Placer une lettre dans un des 4 coins du jeu. (+30pts)',

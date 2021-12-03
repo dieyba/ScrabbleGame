@@ -29,16 +29,6 @@ export class ChatDisplayService {
         this.socketOnConnect();
     }
 
-    private socketOnConnect() {
-        this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
-            const chatEntryColor = chatEntry.senderName === this.localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
-            this.addEntry({ color: chatEntryColor, message: chatEntry.message });
-        });
-        this.socket.on('addSystemChatEntry', (systemMessage: string) => {
-            this.addEntry({ color: ChatEntryColor.SystemColor, message: systemMessage });
-        });
-    }
-
     initialize(localPlayerName: string): void {
         this.entries = [];
         this.isActiveDebug = false;
@@ -92,5 +82,15 @@ export class ChatDisplayService {
     invertDebugState(): string {
         this.isActiveDebug = !this.isActiveDebug;
         return this.isActiveDebug ? ACTIVE_DEBUG_MESSAGE : INACTIVE_DEBUG_MESSAGE;
+    }
+
+    private socketOnConnect() {
+        this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
+            const chatEntryColor = chatEntry.senderName === this.localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
+            this.addEntry({ color: chatEntryColor, message: chatEntry.message });
+        });
+        this.socket.on('addSystemChatEntry', (systemMessage: string) => {
+            this.addEntry({ color: ChatEntryColor.SystemColor, message: systemMessage });
+        });
     }
 }

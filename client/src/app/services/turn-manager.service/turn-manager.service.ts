@@ -34,23 +34,6 @@ export class TurnManagerService {
         this.consecutivePassedTurns = 0;
     }
 
-    private socketOnConnect() {
-        this.socket.on('turn changed', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
-            this.gameService.isTurnPassed = isCurrentTurnedPassed;
-            this.consecutivePassedTurns = consecutivePassedTurns;
-            if (!this.gameService.game.isEndGame) {
-                const isLocalPlayerEndingGame = this.consecutivePassedTurns >= MAX_TURNS_PASSED && this.gameService.game.getLocalPlayer().isActive;
-                if (isLocalPlayerEndingGame) {
-                    this.endGameService.endGame();
-                }
-                this.displayPassTurnMessage();
-                this.updateActivePlayer();
-                this.gameService.resetTimer();
-                this.gameService.isTurnPassed = false;
-            }
-        });
-    }
-
     changeTurn() {
         if (this.gameService.game.isEndGame) {
             return;
@@ -110,5 +93,22 @@ export class TurnManagerService {
             const entryColor = this.gameService.game.getLocalPlayer().isActive ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
             this.chatDisplayService.addEntry({ color: entryColor, message: activePlayer.name + ' >> !passer' });
         }
+    }
+
+    private socketOnConnect() {
+        this.socket.on('turn changed', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
+            this.gameService.isTurnPassed = isCurrentTurnedPassed;
+            this.consecutivePassedTurns = consecutivePassedTurns;
+            if (!this.gameService.game.isEndGame) {
+                const isLocalPlayerEndingGame = this.consecutivePassedTurns >= MAX_TURNS_PASSED && this.gameService.game.getLocalPlayer().isActive;
+                if (isLocalPlayerEndingGame) {
+                    this.endGameService.endGame();
+                }
+                this.displayPassTurnMessage();
+                this.updateActivePlayer();
+                this.gameService.resetTimer();
+                this.gameService.isTurnPassed = false;
+            }
+        });
     }
 }

@@ -5,7 +5,6 @@ import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 const GOAL_LETTER_VALUE = 10;
 
 export class PlaceLetterWorthTenPts extends Goal {
-
     constructor() {
         super();
         this.type = GoalType.PlaceLetterWorthTenPts;

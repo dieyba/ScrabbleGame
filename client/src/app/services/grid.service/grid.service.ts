@@ -13,8 +13,9 @@ export enum Colors {
     None = 'white',
 }
 export interface Case {
-    type: Colors, colorType: string, valueType: string
-
+    type: Colors;
+    colorType: string;
+    valueType: string;
 }
 
 // TODO : Make a file for constants
@@ -101,31 +102,6 @@ export class GridService {
         return letter;
     }
 
-    private drawSingleSquareColor(i: number, j: number) {
-        const startX = (this.width * i) / BOARD_SIZE + 1 + BOARD_OFFSET;
-        const startY = (this.height * j) / BOARD_SIZE + 1 + BOARD_OFFSET;
-        this.gridContext.font = '10px system-ui';
-        // If colored square, hide text
-        switch (this.scrabbleBoard.squares[i][j].color) {
-            case SquareColor.DarkBlue:
-                this.fill({ type: Colors.DarkBlue, colorType: 'LETTRE', valueType: 'x3' }, i, j);
-                break;
-            case SquareColor.Teal:
-                this.fill({ type: Colors.Teal, colorType: 'LETTRE', valueType: 'x2' }, i, j);
-                break;
-            case SquareColor.Pink:
-                this.fill({ type: Colors.Pink, colorType: 'MOT', valueType: 'x2' }, i, j);
-                break;
-            case SquareColor.Red:
-                this.fill({ type: Colors.Red, colorType: 'MOT', valueType: 'x3' }, i, j);
-                break;
-            case SquareColor.None:
-                this.gridContext.fillStyle = Colors.None;
-                this.gridContext.fillRect(startX, startY, SQUARE_SIZE, SQUARE_SIZE);
-                break;
-        }
-    }
-
     fill(type: Case, i: number, j: number) {
         const startX = (this.width * i) / BOARD_SIZE + 1 + BOARD_OFFSET;
         const startY = (this.height * j) / BOARD_SIZE + 1 + BOARD_OFFSET;
@@ -138,7 +114,6 @@ export class GridService {
             this.gridContext.fillText(type.valueType, startX + BIG_OFFSET_X, startY + BIG_OFFSET_Y);
         }
     }
-
 
     // Draw single letters
     drawLetter(scrabbleLetter: ScrabbleLetter, i: number, j: number): void {
@@ -269,6 +244,31 @@ export class GridService {
             this.scrabbleBoard.squares[position.x][position.y].isBonusUsed = true;
             position.x += positionInc.x;
             position.y += positionInc.y;
+        }
+    }
+
+    private drawSingleSquareColor(i: number, j: number) {
+        const startX = (this.width * i) / BOARD_SIZE + 1 + BOARD_OFFSET;
+        const startY = (this.height * j) / BOARD_SIZE + 1 + BOARD_OFFSET;
+        this.gridContext.font = '10px system-ui';
+        // If colored square, hide text
+        switch (this.scrabbleBoard.squares[i][j].color) {
+            case SquareColor.DarkBlue:
+                this.fill({ type: Colors.DarkBlue, colorType: 'LETTRE', valueType: 'x3' }, i, j);
+                break;
+            case SquareColor.Teal:
+                this.fill({ type: Colors.Teal, colorType: 'LETTRE', valueType: 'x2' }, i, j);
+                break;
+            case SquareColor.Pink:
+                this.fill({ type: Colors.Pink, colorType: 'MOT', valueType: 'x2' }, i, j);
+                break;
+            case SquareColor.Red:
+                this.fill({ type: Colors.Red, colorType: 'MOT', valueType: 'x3' }, i, j);
+                break;
+            case SquareColor.None:
+                this.gridContext.fillStyle = Colors.None;
+                this.gridContext.fillRect(startX, startY, SQUARE_SIZE, SQUARE_SIZE);
+                break;
         }
     }
 }

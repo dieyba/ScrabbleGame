@@ -10,7 +10,6 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./best-scores.component.scss'],
 })
 export class BestScoresComponent implements OnInit, OnDestroy {
-
     classicModeBestScores: BestScores[];
     log2990ModeBestScores: BestScores[];
     classicBestScoresSubscription: Subscription;

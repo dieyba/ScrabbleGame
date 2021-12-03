@@ -7,7 +7,6 @@ import { ValidationService } from '@app/services/validation.service/validation.s
 import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
 import * as http from 'http';
 import * as io from 'socket.io';
-
 const DISCONNECT_TIME_INTERVAL = 5000;
 
 export class SocketManagerService {
@@ -25,9 +24,6 @@ export class SocketManagerService {
     }
     handleSockets(): void {
         this.sio.on('connection', (socket) => {
-            // eslint-disable-next-line no-console
-            console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
-
             socket.on('addPlayer', () => {
                 this.playerMan.addPlayer(socket.id);
             });
@@ -37,7 +33,6 @@ export class SocketManagerService {
                 this.getAllWaitingAreaGames(socket, gameParams.isLog2990);
             });
 
-            // This is only called when creating a game in play
             socket.on('deleteWaitingAreaRoom', () => {
                 this.deleteWaitingAreaRoom(socket);
                 this.getAllWaitingAreaGames(socket, this.getIsLog2990FromId(socket.id));
@@ -131,7 +126,6 @@ export class SocketManagerService {
             socket.on('change turn', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
                 this.changeTurn(socket, isCurrentTurnedPassed, consecutivePassedTurns);
             });
-
         });
     }
 
@@ -149,7 +143,6 @@ export class SocketManagerService {
         const newRoom = this.gameListMan.createWaitingAreaGame(gameParams, socket.id);
         const creatorPlayer = this.playerMan.getPlayerBySocketID(socket.id);
         if (creatorPlayer !== undefined) {
-            // update player info in the player manager
             creatorPlayer.name = newRoom.creatorName;
             creatorPlayer.roomId = newRoom.gameRoom.idGame;
             socket.join(newRoom.gameRoom.idGame.toString());
@@ -173,7 +166,6 @@ export class SocketManagerService {
         const waitingAreaRoom = this.gameListMan.getAWaitingAreaGame(leavingPlayerRoomId);
         const roomGame = this.gameListMan.getGameInPlay(leavingPlayerRoomId);
         if (roomGame !== undefined) {
-            // Disconnect is treated as abandoning a game in less than 5 seconds
             this.leaveGameInPlay(socket, roomGame);
         } else if (waitingAreaRoom !== undefined) {
             this.leaveWaitingAreaRoom(socket, waitingAreaRoom);
@@ -194,7 +186,6 @@ export class SocketManagerService {
                 this.gameListMan.deleteGameInPlay(roomGame.gameRoomId);
             })
             .catch(() => {
-                // If database is not available, provides a default name for the virtual player
                 const defaultVirtualPlayerName = 'Sara';
                 this.sio.to(roomGame.gameRoomId.toString()).emit('convert to solo', socket.id, defaultVirtualPlayerName);
                 this.gameListMan.deleteGameInPlay(roomGame.gameRoomId);
@@ -213,7 +204,6 @@ export class SocketManagerService {
         this.sio.to(waitingAreaRoom.gameRoom.idGame.toString()).emit('roomLeft', waitingAreaRoomUpdate);
     }
 
-    // Only removes the waiting area room from the waiting area rooms list in game manager service
     private deleteWaitingAreaRoom(socket: io.Socket): void {
         const player = this.playerMan.getPlayerBySocketID(socket.id);
         if (player === undefined) {
@@ -233,7 +223,6 @@ export class SocketManagerService {
     }
 
     private joinRoom(socket: io.Socket, joinerName: string, roomToJoinId: number, isLog2990: boolean) {
-        // TODO: make a verification to prevent creation if player already part of a room?
         const joiner = this.playerMan.getPlayerBySocketID(socket.id);
         if (joiner === undefined) {
             return;
@@ -243,7 +232,6 @@ export class SocketManagerService {
             return;
         }
         if (this.gameListMan.addJoinerPlayer(waitingAreaGame, joinerName, socket.id, isLog2990)) {
-            // update player info in the player manager
             joiner.name = joinerName;
             joiner.roomId = waitingAreaGame.gameRoom.idGame;
             socket.join(waitingAreaGame.gameRoom.idGame.toString());
@@ -265,7 +253,6 @@ export class SocketManagerService {
         this.sio.to(waitingAreaGame.gameRoom.idGame.toString()).emit('initClientGame', clientInitParams);
     }
 
-    // All chat display related methods are only used by multiplayer games
     private displayChatEntry(socket: io.Socket, message: string) {
         const sender = this.playerMan.getPlayerBySocketID(socket.id);
         if (sender === undefined) {
@@ -277,7 +264,6 @@ export class SocketManagerService {
         }
     }
 
-    // used when the messages to display are different depending on the client it is emitted to
     private displayDifferentChatEntry(socket: io.Socket, messageToSender: string, messageToOpponent: string) {
         const senderId = socket.id;
         const sender = this.playerMan.getPlayerBySocketID(senderId);

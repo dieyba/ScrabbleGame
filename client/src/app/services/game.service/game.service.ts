@@ -55,33 +55,6 @@ export class GameService {
         this.game = new GameParameters();
     }
 
-    private socketOnConnect() {
-        // Synchronization for multiplayer mode
-        this.socket.on('update board', (boardUpdate: BoardUpdate) => {
-            this.gridService.updateBoard(boardUpdate.word, boardUpdate.orientation, new Vec2(boardUpdate.positionX, boardUpdate.positionY));
-        });
-        this.socket.on('update letters', (update: LettersUpdate) => {
-            this.game.stock.letterStock = update.newStock;
-            this.game.getOpponent().letters = update.newLetters;
-            this.game.getOpponent().score = update.newScore;
-        });
-        this.socket.on('convert to solo', (previousPlayerSocketId: string, virtualPlayerName: string) => {
-            let newVirtualPlayer;
-            const playerArrayIndex = this.game.players.findIndex((p) => p.socketId === previousPlayerSocketId);
-            if (playerArrayIndex !== ERROR_NUMBER && !this.game.isEndGame) {
-                const previousPlayer = this.game.players[playerArrayIndex];
-                newVirtualPlayer = new VirtualPlayer(virtualPlayerName, Difficulty.Easy);
-                newVirtualPlayer.letters = previousPlayer.letters;
-                newVirtualPlayer.isActive = previousPlayer.isActive;
-                newVirtualPlayer.score = previousPlayer.score;
-                newVirtualPlayer.goal = previousPlayer.goal;
-                this.game.players[playerArrayIndex] = newVirtualPlayer;
-                this.game.gameMode = GameType.Solo;
-                this.chatDisplayService.addEntry(createSystemEntry('Conversion en mode solo'));
-            }
-        });
-    }
-
     initializeSoloGame(initInfo: WaitingAreaGameParameters, virtualPlayerDifficulty: Difficulty) {
         if (initInfo.gameMode === GameType.Solo) {
             this.game.scrabbleBoard = new ScrabbleBoard(initInfo.isRandomBonus);
@@ -336,5 +309,32 @@ export class GameService {
             }
         }
         return letters;
+    }
+
+    private socketOnConnect() {
+        // Synchronization for multiplayer mode
+        this.socket.on('update board', (boardUpdate: BoardUpdate) => {
+            this.gridService.updateBoard(boardUpdate.word, boardUpdate.orientation, new Vec2(boardUpdate.positionX, boardUpdate.positionY));
+        });
+        this.socket.on('update letters', (update: LettersUpdate) => {
+            this.game.stock.letterStock = update.newStock;
+            this.game.getOpponent().letters = update.newLetters;
+            this.game.getOpponent().score = update.newScore;
+        });
+        this.socket.on('convert to solo', (previousPlayerSocketId: string, virtualPlayerName: string) => {
+            let newVirtualPlayer;
+            const playerArrayIndex = this.game.players.findIndex((p) => p.socketId === previousPlayerSocketId);
+            if (playerArrayIndex !== ERROR_NUMBER && !this.game.isEndGame) {
+                const previousPlayer = this.game.players[playerArrayIndex];
+                newVirtualPlayer = new VirtualPlayer(virtualPlayerName, Difficulty.Easy);
+                newVirtualPlayer.letters = previousPlayer.letters;
+                newVirtualPlayer.isActive = previousPlayer.isActive;
+                newVirtualPlayer.score = previousPlayer.score;
+                newVirtualPlayer.goal = previousPlayer.goal;
+                this.game.players[playerArrayIndex] = newVirtualPlayer;
+                this.game.gameMode = GameType.Solo;
+                this.chatDisplayService.addEntry(createSystemEntry('Conversion en mode solo'));
+            }
+        });
     }
 }

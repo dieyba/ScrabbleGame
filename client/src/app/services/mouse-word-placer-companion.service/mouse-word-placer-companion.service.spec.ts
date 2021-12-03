@@ -1,10 +1,10 @@
 // import { TestBed } from '@angular/core/testing';
-// import { BOARD_SIZE, ScrabbleBoard } from '@app/classes/scrabble-board';
-// import { SquareColor } from '@app/classes/square';
-// import { Axis } from '@app/classes/utilities';
-// import { Vec2 } from '@app/classes/vec2';
+// import { BOARD_SIZE, ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
+// import { SquareColor } from '@app/classes/square/square';
+// import { Axis } from '@app/classes/utilities/utilities';
+// import { Vec2 } from '@app/classes/vec2/vec2';
+// import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE } from '@app/services/mouse-word-placer.service/mouse-word-placer.service';
 // import { MouseWordPlacerCompanionService } from './mouse-word-placer-companion.service';
-// import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE } from './mouse-word-placer.service';
 
 // describe('MouseWordPlacerCompanionService', () => {
 //     let service: MouseWordPlacerCompanionService;

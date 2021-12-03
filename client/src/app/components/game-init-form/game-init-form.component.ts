@@ -125,7 +125,6 @@ export class GameInitFormComponent implements OnInit, OnDestroy {
         this.beginnerNameSubscription.unsubscribe();
         this.expertNameSubscription.unsubscribe();
         this.dictionarySubscription.unsubscribe();
-
     }
 
     createFormControl() {

@@ -112,12 +112,6 @@ export class LetterStock {
         return this.letterStock.length === 0;
     }
 
-    private addLettersToStock(letter: ScrabbleLetter, number: number): void {
-        for (let i = 0; i < number; i++) {
-            this.letterStock.push(letter);
-        }
-    }
-
     takeLettersFromStock(number: number): ScrabbleLetter[] {
         const lettersRemovedFromStock: ScrabbleLetter[] = [];
         for (let i = 0; i < number; i++) {
@@ -139,5 +133,11 @@ export class LetterStock {
         }
 
         return randomLetters;
+    }
+
+    private addLettersToStock(letter: ScrabbleLetter, number: number): void {
+        for (let i = 0; i < number; i++) {
+            this.letterStock.push(letter);
+        }
     }
 }

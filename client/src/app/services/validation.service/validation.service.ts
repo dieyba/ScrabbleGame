@@ -41,15 +41,6 @@ export class ValidationService {
         this.socketOnConnect();
     }
 
-    private socketOnConnect() {
-        this.socket.on('areWordsValid', (result: boolean) => {
-            this.areWordsValid = result;
-        });
-        this.socket.on('newValidWords', (newWords: string[]) => {
-            this.validWordsFormed = this.validWordsFormed.concat(newWords);
-        });
-    }
-
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {
         const wordsValue = this.calculateScore(newWords);
         // remove letters on board
@@ -93,10 +84,7 @@ export class ValidationService {
         let newLetters = 0;
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
-                if (
-                    this.gridService.scrabbleBoard.squares[i][j].occupied &&
-                    !this.gridService.scrabbleBoard.squares[i][j].isValidated
-                ) {
+                if (this.gridService.scrabbleBoard.squares[i][j].occupied && !this.gridService.scrabbleBoard.squares[i][j].isValidated) {
                     newLetters++;
                 }
             }
@@ -164,5 +152,14 @@ export class ValidationService {
 
     isWordValid(word: string): boolean {
         return this.dictionaryTrie.find(word) && word.length >= MIN_WORD_LENGTH && !word.includes('-') && !word.includes("'") ? true : false;
+    }
+
+    private socketOnConnect() {
+        this.socket.on('areWordsValid', (result: boolean) => {
+            this.areWordsValid = result;
+        });
+        this.socket.on('newValidWords', (newWords: string[]) => {
+            this.validWordsFormed = this.validWordsFormed.concat(newWords);
+        });
     }
 }

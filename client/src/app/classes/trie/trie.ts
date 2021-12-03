@@ -2,7 +2,6 @@ import { Dictionary, DictionaryType } from '@app/classes/dictionary/dictionary';
 import { Node } from '@app/classes/node/node';
 // Implemented from www.codeguru.co.in/2021/10/implement-trie-data-structure-in.html
 export class Trie {
-
     root: Node;
 
     constructor() {
