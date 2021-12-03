@@ -488,7 +488,7 @@ export class VirtualPlayerService {
             }
             // Randomize length of word
             let index = this.getRandomIntInclusive(0, this.rack.length - 1);
-            while (lettersInArray[index] === true) {
+            while (lettersInArray[index]) {
                 // If we've already generated this number before
                 if (index !== lettersInArray.length - 1) {
                     index++;

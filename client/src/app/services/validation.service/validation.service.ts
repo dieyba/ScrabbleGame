@@ -92,8 +92,8 @@ export class ValidationService {
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
                 if (
-                    this.gridService.scrabbleBoard.squares[i][j].occupied === true &&
-                    this.gridService.scrabbleBoard.squares[i][j].isValidated === false
+                    this.gridService.scrabbleBoard.squares[i][j].occupied &&
+                    !this.gridService.scrabbleBoard.squares[i][j].isValidated
                 ) {
                     newLetters++;
                 }

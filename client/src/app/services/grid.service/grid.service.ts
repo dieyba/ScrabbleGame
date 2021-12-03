@@ -178,7 +178,7 @@ export class GridService {
     drawLetters(): void {
         for (let i = 0; i < BOARD_SIZE; i++) {
             for (let j = 0; j < BOARD_SIZE; j++) {
-                if (this.scrabbleBoard.squares[i][j].occupied === true) {
+                if (this.scrabbleBoard.squares[i][j].occupied) {
                     const positionX = (this.width * i) / BOARD_SIZE + BOARD_OFFSET;
                     const positionY = (this.height * j) / BOARD_SIZE + BOARD_OFFSET;
 

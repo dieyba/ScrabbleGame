@@ -30,9 +30,9 @@ export class AdminPageComponent {
             },
             (error: HttpErrorResponse) => {
                 if (error.status !== HttpStatusCode.Ok) {
-                    this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'close');
+                    this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'Fermer');
                 } else {
-                    this.snack.open(' La base de données a été réinitialisé avec succès!', 'close');
+                    this.snack.open(' La base de données a été réinitialisé avec succès!', 'Fermer');
                 }
             },
         );
@@ -43,9 +43,9 @@ export class AdminPageComponent {
             },
             (error: HttpErrorResponse) => {
                 if (error.status !== HttpStatusCode.Ok) {
-                    this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'close');
+                    this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'Fermer');
                 } else {
-                    this.snack.open(' La base de données a été réinitialisé avec succès!', 'close');
+                    this.snack.open(' La base de données a été réinitialisé avec succès!', 'Fermer');
                 }
             },
         );
@@ -56,9 +56,9 @@ export class AdminPageComponent {
             },
             (error: HttpErrorResponse) => {
                 if (error.status !== HttpStatusCode.Ok) {
-                    this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'close');
+                    this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'Fermer');
                 } else {
-                    this.snack.open(' La base de données a été réinitialisé avec succès!', 'close');
+                    this.snack.open(' La base de données a été réinitialisé avec succès!', 'Fermer');
                 }
             },
         );

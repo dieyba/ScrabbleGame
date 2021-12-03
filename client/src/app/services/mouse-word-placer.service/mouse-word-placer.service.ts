@@ -59,7 +59,7 @@ export class MouseWordPlacerService {
         const clickedSquare: Vec2 = new Vec2(xBaseOfSquare, yBaseOfSquare);
         const indexes = this.companionService.convertPositionToGridIndex(clickedSquare);
         if (indexes[0] >= BOARD_SIZE || indexes[1] >= BOARD_SIZE) return;
-        if (this.gridService.scrabbleBoard.squares[indexes[0]][indexes[1]].occupied === true) return;
+        if (this.gridService.scrabbleBoard.squares[indexes[0]][indexes[1]].occupied) return;
         this.currentPosition = clickedSquare;
         this.initialPosition = clickedSquare;
         if (!this.companionService.samePosition(clickedSquare, this.latestPosition)) {
@@ -123,7 +123,7 @@ export class MouseWordPlacerService {
         let pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
         let i = 0;
         if (pos[0] < 0 || pos[0] >= BOARD_SIZE || pos[1] < 0 || pos[1] >= BOARD_SIZE) return;
-        while (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied === true && pos[0] < BOARD_SIZE && pos[1] < BOARD_SIZE) {
+        while (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied && pos[0] < BOARD_SIZE && pos[1] < BOARD_SIZE) {
             this.wordString += this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].letter.character;
             if (pos[0] + i >= BOARD_SIZE || pos[1] + i >= BOARD_SIZE) return;
             if (this.currentAxis === Axis.H) {
@@ -241,7 +241,7 @@ export class MouseWordPlacerService {
             const pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
             if (pos[0] >= BOARD_SIZE || pos[1] >= BOARD_SIZE) return;
             let nextArrow = this.currentPosition;
-            if (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied === true)
+            if (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied)
                 nextArrow = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
             this.drawArrow(nextArrow, this.currentAxis);
             // Arrow display bug is here, need to fix before final commit. Works for 1st skip but not further ones.

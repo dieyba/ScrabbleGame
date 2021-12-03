@@ -16,7 +16,7 @@ export class ManipulationRackService {
 
     handleSelection(position: number) {
         if (this.rackService.handlingSelected[position - 1] === false) {
-            if (this.rackService.exchangeSelected[position - 1] === true) {
+            if (this.rackService.exchangeSelected[position - 1]) {
                 this.rackService.exchangeSelected[position - 1] = false;
             }
             this.rackService.select(position, this.rackService.gridContext, false);
@@ -54,7 +54,7 @@ export class ManipulationRackService {
 
         if (i !== ERROR_NUMBER) {
             if (this.rackService.handlingSelected[i] === false) {
-                if (this.rackService.exchangeSelected[i] === true) {
+                if (this.rackService.exchangeSelected[i]) {
                     this.rackService.exchangeSelected[i] = false;
                 }
             } else {
@@ -76,7 +76,7 @@ export class ManipulationRackService {
     }
 
     switchLeft() {
-        if (this.rackService.handlingSelected[this.letterSelectedPosition] === true) {
+        if (this.rackService.handlingSelected[this.letterSelectedPosition]) {
             const letterToSwitchLeft = this.rackService.rackLetters[this.letterSelectedPosition];
 
             if (this.letterSelectedPosition === 0) {
@@ -96,7 +96,7 @@ export class ManipulationRackService {
     }
 
     switchRight() {
-        if (this.rackService.handlingSelected[this.letterSelectedPosition] === true) {
+        if (this.rackService.handlingSelected[this.letterSelectedPosition]) {
             const letterToSwitchRight = this.rackService.rackLetters[this.letterSelectedPosition];
 
             if (this.letterSelectedPosition === this.rackService.rackLetters.length - 1) {

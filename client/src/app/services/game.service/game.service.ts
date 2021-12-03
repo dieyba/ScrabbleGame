@@ -187,7 +187,7 @@ export class GameService {
     exchangeLetters(player: Player, letters: string): ErrorType {
         if (player.isActive && this.game.stock.letterStock.length > DEFAULT_LETTER_COUNT) {
             const lettersToRemove: ScrabbleLetter[] = [];
-            if (removePlayerLetters(letters, player) === true) {
+            if (removePlayerLetters(letters, player)) {
                 for (let i = 0; i < letters.length; i++) {
                     lettersToRemove[i] = new ScrabbleLetter(letters[i]);
                 }
@@ -325,7 +325,7 @@ export class GameService {
     getLettersSelected(): string {
         let letters = '';
         for (let i = 0; i < this.rackService.exchangeSelected.length; i++) {
-            if (this.rackService.exchangeSelected[i] === true) {
+            if (this.rackService.exchangeSelected[i]) {
                 letters += this.rackService.rackLetters[i].character;
                 this.rackService.exchangeSelected[i] = false;
             }

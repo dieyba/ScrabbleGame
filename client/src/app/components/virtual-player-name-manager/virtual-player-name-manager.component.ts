@@ -54,7 +54,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
 
     addName(collection: VirtualPlayerName[], url: string) {
         if (!this.newName.valid) {
-            this.snack.open(ErrorCaseVirtualPlayerName.InvalidName, 'close');
+            this.snack.open(ErrorCaseVirtualPlayerName.InvalidName, 'Fermer');
             return;
         }
 
@@ -64,10 +64,10 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
-                    this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
+                    this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'Fermer');
                     return;
                 }
-                this.snack.open(ErrorCaseVirtualPlayerName.NameAlreadyThere, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.NameAlreadyThere, 'Fermer');
             },
         );
     }
@@ -145,17 +145,17 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
-                    this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
+                    this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'Fermer');
                     return;
                 }
-                this.snack.open(ErrorCaseVirtualPlayerName.DeleteAfterDeleteOrUpdate, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.DeleteAfterDeleteOrUpdate, 'Fermer');
             },
         );
     }
 
     private update(collection: VirtualPlayerName[], url: string) {
         if (!this.editName.valid) {
-            this.snack.open(ErrorCaseVirtualPlayerName.InvalidName, 'close');
+            this.snack.open(ErrorCaseVirtualPlayerName.InvalidName, 'Fermer');
             return;
         }
 
@@ -167,15 +167,15 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
-                    this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
+                    this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'Fermer');
                     return;
                 }
 
                 if (error.error === 'Ce nom existe déjà') {
-                    this.snack.open(ErrorCaseVirtualPlayerName.NameAlreadyThere, 'close');
+                    this.snack.open(ErrorCaseVirtualPlayerName.NameAlreadyThere, 'Fermer');
                     return;
                 }
-                this.snack.open(ErrorCaseVirtualPlayerName.UpdateAfterDelete, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.UpdateAfterDelete, 'Fermer');
             },
         );
     }

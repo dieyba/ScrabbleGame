@@ -84,7 +84,7 @@ export class GameInitFormComponent implements OnInit {
                 // TODO: make a default list of players name to use when cannot access database
                 // and pick a name different from the human player name
                 this.beginnerNameList = [{ _id: '', name: 'Sara' }];
-                this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'Fermer');
             },
         );
 
@@ -96,7 +96,7 @@ export class GameInitFormComponent implements OnInit {
                 // TODO: make a default list of players name to use when cannot access database
                 // and pick a name different from the human player name
                 this.expertNameList = [{ _id: '', name: 'Ariane' }];
-                this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'Fermer');
             },
         );
 

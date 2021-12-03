@@ -42,7 +42,7 @@ export class BestScoresService {
 
     handleErrorSnackBar(error: HttpErrorResponse): void {
         if (error.status !== HttpStatusCode.Ok) {
-            this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'close');
+            this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'Fermer');
         }
     }
 }
