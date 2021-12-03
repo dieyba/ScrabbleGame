@@ -126,7 +126,7 @@ export class VirtualPlayerService {
                 } else {
                     const chosenTiles = this.chooseTilesFromRack(this.selectRandomValue());
                     // Converts chosen word to string
-                    if (chosenTiles.length === 0) {
+                    if (chosenTiles.length === 0 || this.type === Difficulty.Easy) {
                         const emptyRackPass = new PassTurnCmd(defaultParams);
                         this.commandInvoker.executeCommand(emptyRackPass);
                         emptyRackPass.debugMessages.push(
@@ -459,7 +459,7 @@ export class VirtualPlayerService {
                 currentCoord.y += 1;
             }
             if (!currentSquare) return;
-            if (currentSquare.isValidated) continue;
+            if (currentSquare.isValidated || eachWord.tile.isValidated) continue;
             currentSquare.letter = word.content[index];
             currentSquare.occupied = true;
             currentSquare.isValidated = false;
@@ -479,10 +479,11 @@ export class VirtualPlayerService {
                 currentCoord.y += 1;
             }
             if (!currentSquare) return;
-            if (currentSquare.isValidated) continue;
+            if (currentSquare.isValidated && currentSquare.letter.character !== '') continue;
             currentSquare.letter = new ScrabbleLetter('', 0);
             currentSquare.occupied = false;
             letter.tile.position = new Vec2(POSITION_ERROR, POSITION_ERROR);
+            console.log('removed letter on ', currentSquare.position);
         }
     }
 
