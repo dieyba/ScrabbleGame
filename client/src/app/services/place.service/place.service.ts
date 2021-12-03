@@ -73,6 +73,20 @@ export class PlaceService {
         return ErrorType.NoError;
     }
 
+    canPlaceWord(placeParams: PlaceParams): boolean {
+        const isInsideBoard = this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, placeParams.position, placeParams.orientation);
+        const isValidStartWord = this.gridService.scrabbleBoard.isWordPassingInCenter(
+            placeParams.word,
+            placeParams.position,
+            placeParams.orientation,
+        );
+        const isValidNonStartWord =
+            this.gridService.scrabbleBoard.isWordPartOfAnotherWord(placeParams.word, placeParams.position, placeParams.orientation) ||
+            this.gridService.scrabbleBoard.isWordTouchingOtherWord(placeParams.word, placeParams.position, placeParams.orientation);
+
+        return isInsideBoard && (isValidStartWord || isValidNonStartWord);
+    }
+
     private placeLetter(player: Player, letter: string, position: Vec2) {
         // Position already occupied
         if (this.gridService.scrabbleBoard.squares[position.x][position.y].occupied) {
@@ -95,18 +109,5 @@ export class PlaceService {
             player.letters.splice(i, 1);
             break;
         }
-    }
-    private canPlaceWord(placeParams: PlaceParams): boolean {
-        const isInsideBoard = this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, placeParams.position, placeParams.orientation);
-        const isValidStartWord = this.gridService.scrabbleBoard.isWordPassingInCenter(
-            placeParams.word,
-            placeParams.position,
-            placeParams.orientation,
-        );
-        const isValidNonStartWord =
-            this.gridService.scrabbleBoard.isWordPartOfAnotherWord(placeParams.word, placeParams.position, placeParams.orientation) ||
-            this.gridService.scrabbleBoard.isWordTouchingOtherWord(placeParams.word, placeParams.position, placeParams.orientation);
-
-        return isInsideBoard && (isValidStartWord || isValidNonStartWord);
     }
 }

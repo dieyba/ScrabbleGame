@@ -27,7 +27,7 @@ enum LetterQuantity {
     X = 1,
     Y = 1,
     Z = 1,
-    Star = 40,
+    Star = 2,
 }
 
 export class LetterStock {

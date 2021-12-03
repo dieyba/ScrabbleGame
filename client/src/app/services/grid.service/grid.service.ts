@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
-import { ScrabbleLetter, UNPLACED } from '@app/classes/scrabble-letter/scrabble-letter';
+import { ScrabbleLetter, setLetter, UNPLACED } from '@app/classes/scrabble-letter/scrabble-letter';
 import { Square, SquareColor } from '@app/classes/square/square';
 import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
