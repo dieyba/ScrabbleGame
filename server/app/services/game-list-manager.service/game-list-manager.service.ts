@@ -1,12 +1,13 @@
 import { GameInitInfo, WaitingAreaGameParameters } from '@app/classes/game-parameters/game-parameters';
 import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
+import { DictionaryDBService } from '@app/services/dictionary-db.service/dictionary-db.service';
 import { Service } from 'typedi';
 @Service()
 export class GameListManager {
     private currentId: number;
     private waitingAreaGames: WaitingAreaGameParameters[];
     private gamesInPlay: GameInitInfo[];
-    constructor() {
+    constructor(private dictionaryDBService: DictionaryDBService) {
         this.waitingAreaGames = new Array<WaitingAreaGameParameters>();
         this.gamesInPlay = new Array<GameInitInfo>();
         this.currentId = 0;
@@ -32,13 +33,21 @@ export class GameListManager {
         return undefined;
     }
 
-    createWaitingAreaGame(game: WaitingAreaGameParameters, creatorSocketId: string): WaitingAreaGameParameters {
-        game.gameRoom.idGame = this.currentId;
-        game.gameRoom.creatorId = creatorSocketId;
-        game.gameRoom.playersName = [game.creatorName];
-        this.waitingAreaGames.push(game);
-        this.currentId++;
-        return game;
+    async createWaitingAreaGame(game: WaitingAreaGameParameters, creatorSocketId: string): Promise<WaitingAreaGameParameters> {
+        return this.dictionaryDBService
+            .getDictionary(game.dictionary.title)
+            .then((dictionary) => {
+                game.dictionary = dictionary;
+                game.gameRoom.idGame = this.currentId;
+                game.gameRoom.creatorId = creatorSocketId;
+                game.gameRoom.playersName = [game.creatorName];
+                this.waitingAreaGames.push(game);
+                this.currentId++;
+                return game;
+            })
+            .catch((e) => {
+                throw e;
+            });
     }
 
     addJoinerPlayer(game: WaitingAreaGameParameters, joinerName: string, joinerSocketId: string, isLog2990: boolean): boolean {
