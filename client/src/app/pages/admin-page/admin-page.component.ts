@@ -2,9 +2,9 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BestScoresService } from '@app/services/best-scores.service';
-import { DictionaryService } from '@app/services/dictionary.service';
-import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
+import { BestScoresService } from '@app/services/best-scores.service/best-scores.service';
+import { DictionaryService } from '@app/services/dictionary.service/dictionary.service';
+import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
 
 @Component({
     selector: 'app-admin-page',
