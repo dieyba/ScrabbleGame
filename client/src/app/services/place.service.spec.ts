@@ -76,12 +76,12 @@ describe('PlaceService', () => {
         const playerLetters: ScrabbleLetter[] = [];
         const letterA = new ScrabbleLetter('a', 1);
         const letterStar = new ScrabbleLetter('*', 0);
-        playerLetters.push(letterA);
-        playerLetters.push(letterStar);
+        playerMock.letters.push(letterA);
+        playerMock.letters.push(letterStar);
         const letterToPlace = 'a';
         const coord = new Vec2(Column.Eight, Row.H);
 
-        service.placeLetter(playerLetters, letterToPlace, coord);
+        service.placeLetter(playerMock, letterToPlace, coord);
 
         // Searching letter in playerLetter
         let playerLetter: ScrabbleLetter | undefined;
@@ -101,12 +101,12 @@ describe('PlaceService', () => {
         const playerLetters: ScrabbleLetter[] = [];
         const letterA = new ScrabbleLetter('a', 1);
         const letterStar = new ScrabbleLetter('*', 0);
-        playerLetters.push(letterA);
-        playerLetters.push(letterStar);
+        playerMock.letters.push(letterA);
+        playerMock.letters.push(letterStar);
         const letterToPlace = 'A';
         const coord = new Vec2(Column.Eight, Row.H);
 
-        service.placeLetter(playerLetters, letterToPlace, coord);
+        service.placeLetter(playerMock, letterToPlace, coord);
 
         // Searching letter in playerLetter
         let playerLetter: ScrabbleLetter | undefined;
@@ -126,14 +126,14 @@ describe('PlaceService', () => {
         const playerLetters: ScrabbleLetter[] = [];
         const letterA = new ScrabbleLetter('a', 1);
         const letterStar = new ScrabbleLetter('*', 0);
-        playerLetters.push(letterA);
-        playerLetters.push(letterStar);
+        playerMock.letters.push(letterA);
+        playerMock.letters.push(letterStar);
         const letterToPlace = 'a';
         const coord = new Vec2(Column.Eight, Row.H);
 
         // eslint-disable-next-line dot-notation
         service['gridService'].scrabbleBoard.squares[coord.x][coord.y].occupied = true; // No need to place a real letter
-        service.placeLetter(playerLetters, letterToPlace, coord);
+        service.placeLetter(playerMock, letterToPlace, coord);
 
         // Searching letter in playerLetter
         let playerLetter: ScrabbleLetter | undefined;

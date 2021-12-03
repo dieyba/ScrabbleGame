@@ -217,7 +217,7 @@ export class GameService {
         return ErrorType.ImpossibleCommand;
     }
     async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
-        // console.log(this.game.scrabbleBoard);
+        console.log(this.game.scrabbleBoard);
         console.log('start place:', this.game.stock);
         console.log(this.game.getLocalPlayer().letters);
         if (!player.isActive) {
@@ -270,7 +270,7 @@ export class GameService {
             this.isTurnEndSubject.next(this.isTurnPassed);
             this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
         });
-        // console.log('after place:', this.game.scrabbleBoard);
+        console.log('after place:', this.game.scrabbleBoard);
         console.log(this.game.stock);
         console.log(this.game.getLocalPlayer().letters);
         return errorResult;

@@ -53,7 +53,7 @@ describe('CommandInvokerService', () => {
         gameServiceSpy.passTurn = jasmine.createSpy('passTurnSpy').and.returnValue(ErrorType.NoError);
         const command = new PassTurnCmd(defaultParams);
         return service.executeCommand(command).then(() => {
-            expect(spy).toHaveBeenCalledWith(false, false, { isExecuted: true, executionMessages: [] });
+            expect(spy).toHaveBeenCalledWith(false, command, { isExecuted: true, executionMessages: [] });
         });
     });
 

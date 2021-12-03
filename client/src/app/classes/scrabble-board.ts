@@ -174,29 +174,21 @@ export class ScrabbleBoard {
         return (isWordInMiddleColumn && isVerticalWordOnCenter) || (isWordInMiddleRow && isHorizontalWordOnCenter);
     }
     isWordPartOfAnotherWord(word: string, coord: Vec2, orientation: string): boolean {
-        let result = false;
-        const isVertical = orientation === 'v';
-
-        // For each letter in "word", verifies if a Scrabble letter is already place and if it's the same letter
-        const tempCoord = new Vec2(coord.x, coord.y);
+        let isPartOfAnotherWord = false;
+        // For each letter in the word to place, verifies if a Scrabble letter is already placed and if it's the same letter
         for (let i = 0; i < word.length; i++) {
+            const tempCoord = orientation === 'v' ? new Vec2(coord.x, coord.y + i) : new Vec2(coord.x + i, coord.y);
+            if (!this.squares[tempCoord.x][tempCoord.y].occupied) {
+                continue;
+            }
+            const letterOnBoard = this.squares[tempCoord.x][tempCoord.y].letter;
             if (this.squares[tempCoord.x][tempCoord.y].occupied) {
-                // Checking if the letter corresponds with the string's character
-                // TODO: see if works for * too
-                if (this.squares[tempCoord.x][tempCoord.y].letter.character.toLowerCase() === word[i]) {
-                    result = true;
-                } else {
-                    return false;
-                }
+                isPartOfAnotherWord =
+                    letterOnBoard.character === '*' ? letterOnBoard.whiteLetterCharacter === word[i] : letterOnBoard.character === word[i];
             }
-            if (isVertical) {
-                tempCoord.y += i;
-            } else {
-                tempCoord.x += i;
-            }
+            if (!isPartOfAnotherWord) return isPartOfAnotherWord;
         }
-
-        return result;
+        return isPartOfAnotherWord;
     }
 
     // eslint-disable-next-line complexity
@@ -279,7 +271,10 @@ export class ScrabbleBoard {
         let tempString = '';
         for (let i = 0; i < length; i++) {
             if (this.squares[tempCoord.x][tempCoord.y].occupied) {
-                tempString += this.squares[tempCoord.x][tempCoord.y].letter.character;
+                tempString +=
+                    this.squares[tempCoord.x][tempCoord.y].letter.value === 0
+                        ? (tempString += this.squares[tempCoord.x][tempCoord.y].letter.whiteLetterCharacter)
+                        : (tempString += this.squares[tempCoord.x][tempCoord.y].letter.character);
             } else {
                 tempString += ' ';
             }
