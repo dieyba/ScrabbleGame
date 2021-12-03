@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChatDisplayEntry, ChatEntryColor } from 'src/app/classes/chat-display-entry';
+import { ChatDisplayEntry, ChatEntryColor } from 'src/app/classes/chat-display-entry/chat-display-entry';
 import { ChatDisplayComponent } from './chat-display.component';
 
 describe('ChatDisplayComponent', () => {

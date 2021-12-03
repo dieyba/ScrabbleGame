@@ -12,10 +12,15 @@ export class StartingPageComponent {
     constructor(private dialog: MatDialog, private router: Router) {}
 
     openDialog(): void {
-        this.dialog.open(BestScoresComponent, {
-            // height: '150%',
-            // width: '90%',
-        });
+        this.dialog.open(BestScoresComponent, {});
+    }
+
+    openPage(isLog2990: boolean) {
+        if (isLog2990) {
+            this.router.navigate(['/game-mode', { isLog2990: true }]);
+        } else {
+            this.router.navigate(['/game-mode', { isLog2990: false }]);
+        }
     }
 
     openPage(isLog2990: boolean) {
