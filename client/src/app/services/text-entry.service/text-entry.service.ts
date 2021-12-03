@@ -18,7 +18,7 @@ import {
     isValidLetter,
     removeAccents,
     scrabbleLettersToString,
-    trimSpaces,
+    trimSpaces
 } from '@app/classes/utilities/utilities';
 import { ChatDisplayService } from '@app/services/chat-display.service/chat-display.service';
 import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
@@ -36,8 +36,13 @@ type CommandCreationResult = Command | ErrorType.SyntaxError | ErrorType.Invalid
 
 // All eslint-disable-lines were disabled to allow calling the map's functions taking different arguments.
 export class TextEntryService {
+    // Since we want to map string keys to functions that create a specific command instance each,
+    // the functions require different specific parameters passed in
+    // to return different specific class instances that derived from an abstract command class
+    // Thus, we need to use Function
     private commandsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
     private paramsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
+    // isSolo: boolean;
 
     constructor(
         private chatDisplayService: ChatDisplayService,

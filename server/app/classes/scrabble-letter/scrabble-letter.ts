@@ -1,5 +1,5 @@
 import { Square, SquareColor } from '@app/classes/square/square';
-import { isAllLowerLetters, removeAccents } from '@app/classes/utilities/utilities';
+import { isAllLowerLetters, isValidLetter, removeAccents } from '@app/classes/utilities/utilities';
 
 export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;
@@ -16,20 +16,14 @@ export class ScrabbleLetter {
     constructor(letter: string, value?: number) {
         this.color = SquareColor.None;
         this.tile = new Square(UNPLACED, UNPLACED); // -1, -1 means it is not placed yet
-        this.setLetter(letter);
-        this.setDefaultValue(letter);
+        this.character = letter;
+        if (this.character === '*') {
+            this.whiteLetterCharacter = this.character;
+        }
+        this.setDefaultValue(this.character);
         if (value !== undefined) {
             this.value = value;
         }
-    }
-
-    setLetter(character: string): void {
-        // if a capital letter is passed in, represents a blank piece, meaning a '*'
-        this.character = isAllLowerLetters(character) ? removeAccents(character) : '*';
-        if (this.character === '*') {
-            this.whiteLetterCharacter = character;
-        }
-        this.setDefaultValue(this.character);
     }
 
     setDefaultValue(character: string) {
@@ -53,3 +47,17 @@ export class ScrabbleLetter {
         }
     }
 }
+
+export const setLetter = (character: string, scrabbleLetter: ScrabbleLetter): ScrabbleLetter => {
+    const result = scrabbleLetter;
+    if (character === '') {
+        result.character = '';
+        return result;
+    }
+    // if a captial letter is passed in, it represents a blank piece, meaning an asterisk
+    result.character = isAllLowerLetters(character) && isValidLetter(removeAccents(character)) ? removeAccents(character) : '*';
+    if (result.character === '*') {
+        result.whiteLetterCharacter = character;
+    }
+    return scrabbleLetter;
+};
