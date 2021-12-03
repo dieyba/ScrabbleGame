@@ -70,7 +70,7 @@ export class GameInitFormComponent implements OnInit {
         this.beginnerNameUrl = environment.serverUrl + '/VirtualPlayerName/beginners';
         this.expertNameUrl = environment.serverUrl + '/VirtualPlayerName/experts';
 
-        if (this.data.isSolo === true) {
+        if (this.data.isSolo) {
             this.level = new FormControl('', [Validators.required]);
         } else {
             this.level = new FormControl('');

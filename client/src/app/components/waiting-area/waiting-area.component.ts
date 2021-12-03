@@ -164,7 +164,7 @@ export class WaitingAreaComponent implements AfterViewInit {
         this.dialogRef.close();
     }
 
-    socketOnConnect() {
+    private socketOnConnect() {
         this.socket.on('initClientGame', (gameParams: GameInitInfo) => {
             clearTimeout(this.timer);
             this.dialogRef.close();

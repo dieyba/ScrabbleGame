@@ -33,7 +33,7 @@ export class TurnManagerService {
         this.consecutivePassedTurns = 0;
     }
 
-    socketOnConnect() {
+    private socketOnConnect() {
         this.socket.on('turn changed', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
             this.gameService.isTurnPassed = isCurrentTurnedPassed;
             this.consecutivePassedTurns = consecutivePassedTurns;

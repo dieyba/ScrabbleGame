@@ -88,7 +88,7 @@ export class RackService {
         }
     }
 
-    drawLetter(position: number) {
+    private drawLetter(position: number) {
         const positionX = (RACK_WIDTH * position) / MAX_LETTER_COUNT;
         const letter = this.rackLetters[position].character.toUpperCase();
         this.gridContext.beginPath();

@@ -98,7 +98,7 @@ export class GridService {
     }
 
     // To remove a square, set scrabbleBoard.squares[x][y].occupied to false, set scrabbleBoard.square[x][y].letter = new Scrabble
-    drawSingleSquareColor(i: number, j: number) {
+    private drawSingleSquareColor(i: number, j: number) {
         const startX = (this.width * i) / BOARD_SIZE + 1 + BOARD_OFFSET;
         const startY = (this.height * j) / BOARD_SIZE + 1 + BOARD_OFFSET;
         this.gridContext.font = '10px system-ui';

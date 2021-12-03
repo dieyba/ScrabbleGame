@@ -40,7 +40,7 @@ export class ValidationService {
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
     }
-    socketOnConnect() {
+    private socketOnConnect() {
         this.socket.on('areWordsValid', (result: boolean) => {
             this.areWordsValid = result;
         });

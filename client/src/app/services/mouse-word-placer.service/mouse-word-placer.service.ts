@@ -165,7 +165,7 @@ export class MouseWordPlacerService {
         this.companionService.changeFillStyleColor(this.overlayContext, color);
         this.overlayContext.fillRect(position.x + 1, position.y + 1, SQUARE_SIZE, SQUARE_SIZE);
     }
-    drawLetter(letterToDraw: ScrabbleLetter, pos: Vec2) {
+    private drawLetter(letterToDraw: ScrabbleLetter, pos: Vec2) {
         if (
             pos.x >= BOARD_SIZE ||
             pos.y >= BOARD_SIZE ||
@@ -201,7 +201,7 @@ export class MouseWordPlacerService {
             );
         }
     }
-    placeLetter(letter: string) {
+    private placeLetter(letter: string) {
         if (this.currentPosition.x === ABSOLUTE_BOARD_SIZE || this.currentPosition.y === ABSOLUTE_BOARD_SIZE)
             this.deletePosition = this.currentPosition;
         const indexes = this.companionService.convertPositionToGridIndex(this.currentPosition);

@@ -28,7 +28,7 @@ export class ChatDisplayService {
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
     }
-    socketOnConnect() {
+    private socketOnConnect() {
         this.socket.on('addChatEntry', (chatEntry: ServerChatEntry) => {
             const chatEntryColor = chatEntry.senderName === this.localPlayerName ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
             this.addEntry({ color: chatEntryColor, message: chatEntry.message });

@@ -36,9 +36,8 @@ type CommandCreationResult = Command | ErrorType.SyntaxError | ErrorType.Invalid
 
 // All eslint-disable-lines were disabled to allow calling the map's functions taking different arguments.
 export class TextEntryService {
-    commandsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
-    paramsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
-    isSolo: boolean;
+    private commandsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
+    private paramsMap: Map<string, Function>; // eslint-disable-line @typescript-eslint/ban-types
 
     constructor(
         private chatDisplayService: ChatDisplayService,

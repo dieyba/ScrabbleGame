@@ -54,7 +54,7 @@ export class GameService {
         this.socketOnConnect();
         this.game = new GameParameters();
     }
-    socketOnConnect() {
+    private socketOnConnect() {
         // Synchronization for multiplayer mode
         this.socket.on('update board', (boardUpdate: BoardUpdate) => {
             this.gridService.updateBoard(boardUpdate.word, boardUpdate.orientation, new Vec2(boardUpdate.positionX, boardUpdate.positionY));

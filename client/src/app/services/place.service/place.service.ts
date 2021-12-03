@@ -67,7 +67,7 @@ export class PlaceService {
         }
         return ErrorType.NoError;
     }
-    placeLetter(player: Player, letter: string, position: Vec2) {
+    private placeLetter(player: Player, letter: string, position: Vec2) {
         // Position already occupied
         if (this.gridService.scrabbleBoard.squares[position.x][position.y].occupied) {
             return;

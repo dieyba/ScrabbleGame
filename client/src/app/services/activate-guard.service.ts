@@ -10,8 +10,8 @@ export class ActivateGuard implements CanActivate {
     constructor(private gameService: GameService) {}
 
     canActivate(): // TODO: are those needed?
-    Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-        if (this.gameService.game.isEndGame === true) {
+        Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+        if (this.gameService.game.isEndGame) {
             return false;
         }
         return true;
