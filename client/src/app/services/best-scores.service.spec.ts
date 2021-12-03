@@ -4,6 +4,8 @@ import { TestBed } from '@angular/core/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BestScoresService } from './best-scores.service';
 
+/* eslint-disable dot-notation */
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('BestScoresService', () => {
     let service: BestScoresService;
 

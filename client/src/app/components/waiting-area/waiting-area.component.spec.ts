@@ -15,7 +15,7 @@ import { GameService } from '@app/services/game.service';
 import { Observable } from 'rxjs';
 import * as io from 'socket.io-client';
 import { WaitingAreaComponent } from './waiting-area.component';
-
+/* eslint-disable max-lines */
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 /* eslint-disable dot-notation */
