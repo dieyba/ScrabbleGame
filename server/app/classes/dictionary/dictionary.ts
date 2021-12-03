@@ -1,4 +1,4 @@
-import * as dict_path from '@app/assets/dictionnary.json';
+import * as dict_path from '@app/assets/dictionary.json';
 import { ObjectId } from 'bson';
 export enum DictionaryType {
     Default = 'Français',

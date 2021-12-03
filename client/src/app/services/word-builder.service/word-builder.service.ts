@@ -17,7 +17,7 @@ export class WordBuilderService {
     constructor(private gridService: GridService) {}
 
     // TODO: Handle -1 error coordinates
-    // TODO: make sure the scrabbleWords returned scrabbleLetters that have everything init properly (value, coord, color, isbonusUsed)
+    // TODO: make sure the scrabbleWords returned scrabbleLetters that have everything init properly (value, coord, color, isBonusUsed)
     buildWordsOnBoard(coord: Vec2, axis: Axis): ScrabbleWord[] {
         const result: ScrabbleWord[] = [];
 
@@ -85,7 +85,7 @@ export class WordBuilderService {
         return word;
     }
 
-    // out of range beginning coordinates or unoccupied beginning coordinates will return the begining coord
+    // out of range beginning coordinates or unoccupied beginning coordinates will return the beginning coord
     findWordEdge(coord: Vec2, axis: Axis, isTowardStart: boolean): Vec2 {
         if (!isCoordInsideBoard(coord)) {
             return coord;

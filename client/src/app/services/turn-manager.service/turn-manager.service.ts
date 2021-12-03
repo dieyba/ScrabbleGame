@@ -29,7 +29,7 @@ export class TurnManagerService {
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
     }
-    initalize() {
+    initialize() {
         this.consecutivePassedTurns = 0;
     }
 

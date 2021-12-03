@@ -14,10 +14,10 @@ export enum GoalType {
     PlaceLetterWorthTenPts = 0, // Place a word containing a letter with a 10 pts value
     FormTwoLettersStarsOnly = 1, // Form 2 letter word, both letters are *
     FormWordWithLettersFromName = 2 /* Form a word containing at least 3 letters from the player's name
-        (can be same letter, but different occurence)*/,
+        (can be same letter, but different occurrence)*/,
     FormAnExistingWord = 3, // Form a word already on the board
     FormThreeWords = 4, // Form three words at the same time
-    PlaceLetterOnBoardCorner = 5, // Place a letter on one of the 4 boaard corners
+    PlaceLetterOnBoardCorner = 5, // Place a letter on one of the 4 board corners
     ActivateTwoBonuses = 6, // Active 2 bonuses at the same time / place a word with 2 letters on a colour square
     PlaceLetterOnColorSquare = 7, // Place letter x on a square of color y. x and y are randomly chosen at start of game
 }

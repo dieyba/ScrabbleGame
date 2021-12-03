@@ -46,7 +46,7 @@ export class CommandInvokerService {
         if (isFromVirtualPlayer) {
             // TODO: see how exactly debug messages will be added in command invoker
             const commandMessage = commandResult.executionMessages[0].message;
-            this.chatDisplayService.addVirtalPlayerEntry(commandMessage, command.debugMessages);
+            this.chatDisplayService.addVirtualPlayerEntry(commandMessage, command.debugMessages);
         } else if (command instanceof ExchangeCmd) {
             // extract command returns both players message, but solo game only displays the local message
             this.chatDisplayService.addEntry(commandResult.executionMessages[0]);

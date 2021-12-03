@@ -1,4 +1,4 @@
-import dict_path from 'src/assets/dictionnary.json';
+import dict_path from 'src/assets/dictionary.json';
 
 export enum DictionaryType {
     Default = 'Français',

@@ -509,7 +509,7 @@ export class VirtualPlayerService {
                 index++;
             }
             if (this.isWordValid(charArray.join(''))) {
-                possibleMoves[movesFound] = this.wordify(j);
+                possibleMoves[movesFound] = this.wordsToLetters(j);
                 movesFound++;
             }
         }
@@ -637,7 +637,7 @@ export class VirtualPlayerService {
         } else return 'Erreur de placement';
     }
 
-    wordify(letters: ScrabbleLetter[]): ScrabbleWord {
+    wordsToLetters(letters: ScrabbleLetter[]): ScrabbleWord {
         const word = new ScrabbleWord();
         for (let i = 0; i < letters.length; i++) {
             word.content[i] = letters[i];

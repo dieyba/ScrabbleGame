@@ -3,7 +3,7 @@ import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 import { Service } from 'typedi';
 @Service()
 export class GameListManager {
-    private currentId: number; // TODO: refactor how we give an id number to avoid going to the inifite with the numbers?
+    private currentId: number;
     private waitingAreaGames: WaitingAreaGameParameters[];
     private gamesInPlay: GameInitInfo[];
     constructor() {

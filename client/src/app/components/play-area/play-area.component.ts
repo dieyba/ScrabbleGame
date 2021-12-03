@@ -73,7 +73,7 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
-        this.turnManagerService.initalize();
+        this.turnManagerService.initialize();
         this.chatDisplayService.initialize(this.gameService.game.getLocalPlayer().name);
 
         this.gameService.isTurnEndObservable.subscribe(() => {

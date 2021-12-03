@@ -24,7 +24,7 @@ export class ScrabbleLetter {
     }
 
     setLetter(character: string): void {
-        // if a captial letter is passed in, represents a blank piece, meaning a '*'
+        // if a capital letter is passed in, represents a blank piece, meaning a '*'
         this.character = isAllLowerLetters(character) ? removeAccents(character) : '*';
         if (this.character === '*') {
             this.whiteLetterCharacter = character;

@@ -7,11 +7,11 @@ import { RackService } from '@app/services/rack.service/rack.service';
 })
 export class ManipulationRackService {
     private letterSelectedPosition: number;
-    private firstOccurencePosition: number;
+    private firstOccurrencePosition: number;
 
     constructor(private readonly rackService: RackService) {
         this.letterSelectedPosition = ERROR_NUMBER;
-        this.firstOccurencePosition = ERROR_NUMBER;
+        this.firstOccurrencePosition = ERROR_NUMBER;
     }
 
     handleSelection(position: number) {
@@ -24,15 +24,15 @@ export class ManipulationRackService {
         }
     }
 
-    clearManipValues() {
+    clearManipulationValues() {
         this.letterSelectedPosition = ERROR_NUMBER;
-        this.firstOccurencePosition = ERROR_NUMBER;
+        this.firstOccurrencePosition = ERROR_NUMBER;
     }
 
-    findFisrtOccurence(letterToFind: string) {
+    findFirstOccurrence(letterToFind: string) {
         for (let i = 0; i < this.rackService.rackLetters.length; i++) {
             if (this.rackService.rackLetters[i].character === letterToFind) {
-                this.firstOccurencePosition = i;
+                this.firstOccurrencePosition = i;
                 break;
             }
         }
@@ -41,13 +41,13 @@ export class ManipulationRackService {
     selectByLetter(letterToSelect: string) {
         let i: number;
 
-        if (this.firstOccurencePosition === ERROR_NUMBER) {
-            this.findFisrtOccurence(letterToSelect);
-            i = this.firstOccurencePosition;
-        } else if (this.rackService.rackLetters[this.firstOccurencePosition].character !== letterToSelect) {
-            this.firstOccurencePosition = ERROR_NUMBER;
-            this.findFisrtOccurence(letterToSelect);
-            i = this.firstOccurencePosition;
+        if (this.firstOccurrencePosition === ERROR_NUMBER) {
+            this.findFirstOccurrence(letterToSelect);
+            i = this.firstOccurrencePosition;
+        } else if (this.rackService.rackLetters[this.firstOccurrencePosition].character !== letterToSelect) {
+            this.firstOccurrencePosition = ERROR_NUMBER;
+            this.findFirstOccurrence(letterToSelect);
+            i = this.firstOccurrencePosition;
         } else {
             i = this.letterSelectedPosition;
         }
@@ -64,7 +64,7 @@ export class ManipulationRackService {
                     }
                 }
                 if (i === this.rackService.rackLetters.length) {
-                    i = this.firstOccurencePosition;
+                    i = this.firstOccurrencePosition;
                 }
             }
             this.rackService.select(i + 1, this.rackService.gridContext, false);

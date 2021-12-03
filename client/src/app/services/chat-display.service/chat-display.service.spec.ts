@@ -92,7 +92,7 @@ describe('ChatDisplayService', () => {
         const commandInput = '!somecommand';
         const debugMessage = ['some debug message'];
         service.isActiveDebug = false;
-        service.addVirtalPlayerEntry(commandInput, debugMessage);
+        service.addVirtualPlayerEntry(commandInput, debugMessage);
         const expectedEntry = { color: ChatEntryColor.RemotePlayer, message: '!somecommand' };
         expect(service.entries.length).toEqual(1);
         expect(service.entries[0]).toEqual(expectedEntry);
@@ -102,7 +102,7 @@ describe('ChatDisplayService', () => {
         const commandInput = '!somecommand';
         const debugMessage = ['some debug message'];
         service.isActiveDebug = true;
-        service.addVirtalPlayerEntry(commandInput, debugMessage);
+        service.addVirtualPlayerEntry(commandInput, debugMessage);
         const expectedEntry = { color: ChatEntryColor.RemotePlayer, message: '!somecommand' };
         const expectedDebugEntry = { color: ChatEntryColor.SystemColor, message: '[Debug] some debug message' };
         expect(service.entries.length).toEqual(2);

@@ -12,8 +12,8 @@ import { GameService } from '@app/services/game.service/game.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
-const MAX_NAME_LENGHT = 12;
-const MIN_NAME_LENGHT = 3;
+const MAX_NAME_LENGTH = 12;
+const MIN_NAME_LENGTH = 3;
 const LIST_UPDATE_TIMEOUT = 500;
 
 @Component({
@@ -25,7 +25,7 @@ export class WaitingAreaComponent implements AfterViewInit {
     selectedGame: WaitingAreaGameParameters;
     playerName: FormControl;
     playerList: string[];
-    pendingGameslist: WaitingAreaGameParameters[];
+    pendingGamesList: WaitingAreaGameParameters[];
     roomDeletedId: number;
     nameErrorMessage: string;
     isStarting: boolean;
@@ -34,7 +34,7 @@ export class WaitingAreaComponent implements AfterViewInit {
     name: boolean;
     error: boolean;
     nameValid: boolean;
-    joindre: boolean;
+    join: boolean;
     full: boolean;
     gameCancelled: boolean;
 
@@ -54,7 +54,7 @@ export class WaitingAreaComponent implements AfterViewInit {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.playerList = [];
-        this.pendingGameslist = [];
+        this.pendingGamesList = [];
         this.name = false;
         this.isStarting = false;
         if (data.isGameSelected) {
@@ -62,15 +62,15 @@ export class WaitingAreaComponent implements AfterViewInit {
             this.playerName = new FormControl('', [
                 Validators.required,
                 Validators.pattern('[a-zA-ZÉé]*'),
-                Validators.maxLength(MAX_NAME_LENGHT),
-                Validators.minLength(MIN_NAME_LENGHT),
+                Validators.maxLength(MAX_NAME_LENGTH),
+                Validators.minLength(MIN_NAME_LENGTH),
             ]);
         }
         this.full = false;
         this.nameErrorMessage = '';
         this.nameValid = false;
         this.timer = setInterval(() => {
-            this.pendingGameslist = this.gameList.waitingAreaGames;
+            this.pendingGamesList = this.gameList.waitingAreaGames;
         }, LIST_UPDATE_TIMEOUT);
         this.socketOnConnect();
     }
@@ -88,11 +88,11 @@ export class WaitingAreaComponent implements AfterViewInit {
         this.gameList.getGames(this.data.isLog2990);
     }
 
-    // mettre la fonction randomNumber de form dans utilities et l'appeler ici
+    // TODO: put random number in utilities to use it here
     randomGame() {
-        let randomFloat = Math.random() * this.pendingGameslist.length;
+        let randomFloat = Math.random() * this.pendingGamesList.length;
         randomFloat = Math.floor(randomFloat);
-        this.selectedGame = this.pendingGameslist[randomFloat];
+        this.selectedGame = this.pendingGamesList[randomFloat];
         this.openName(true);
     }
 
@@ -140,7 +140,7 @@ export class WaitingAreaComponent implements AfterViewInit {
             this.nameErrorMessage = 'Vous ne pouvez pas avoir le meme nom que votre adversaire';
         } else {
             this.error = false;
-            this.joindre = true;
+            this.join = true;
             this.nameErrorMessage = 'Votre nom est valide ;) ';
         }
     }
@@ -173,7 +173,7 @@ export class WaitingAreaComponent implements AfterViewInit {
             this.socket.emit('deleteWaitingAreaRoom');
         });
         this.socket.on('waitingAreaRoomDeleted', (game: WaitingAreaGameParameters) => {
-            this.joindre = false;
+            this.join = false;
             this.nameValid = false;
             this.nameErrorMessage = '';
             this.gameCancelled = true;
@@ -192,7 +192,7 @@ export class WaitingAreaComponent implements AfterViewInit {
             if (game !== undefined) {
                 this.gameList.localPlayerRoomInfo = game;
                 this.playerList = this.gameList.localPlayerRoomInfo.gameRoom.playersName;
-                this.joindre = false;
+                this.join = false;
                 this.nameValid = false;
                 this.gameCancelled = true;
             }

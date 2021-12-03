@@ -63,7 +63,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
             return;
         }
 
-        // Updloading after reading
+        // Uploading after reading
         const fileReader = new FileReader();
         fileReader.onload = () => {
             this.upload(fileReader.result?.toString() as string);
@@ -124,12 +124,12 @@ export class DictionaryTransferComponent implements AfterViewInit {
     updateTitleAndDescription(title: string, description: string) {
         const index = this.dictionaryList.indexOf(this.selectedDictionary);
         if (index < 1) {
-            this.snack.open(ErrorCaseDictionaryTransfer.Untouchable, 'fermer');
+            this.snack.open(ErrorCaseDictionaryTransfer.Untouchable, 'Fermer');
             return;
         }
 
         if (!this.editTitle.valid || !this.editDescription.valid) {
-            this.snack.open(ErrorCaseDictionaryTransfer.TitleOrDescriptionInvalid, 'fermer');
+            this.snack.open(ErrorCaseDictionaryTransfer.TitleOrDescriptionInvalid, 'Fermer');
             return;
         }
 
@@ -140,7 +140,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
             },
             (error: HttpErrorResponse) => {
                 if (error.error === 'Ce titre existe déjà') {
-                    this.snack.open(ErrorCaseDictionaryTransfer.TitleAlreadyThere, 'fermer');
+                    this.snack.open(ErrorCaseDictionaryTransfer.TitleAlreadyThere, 'Fermer');
                 }
             },
         );
@@ -149,7 +149,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
     deleteDictionary(dictionaryToDelete: DictionaryInterface) {
         const index = this.dictionaryList.indexOf(this.selectedDictionary);
         if (index < 1) {
-            this.snack.open(ErrorCaseDictionaryTransfer.Untouchable, 'fermer');
+            this.snack.open(ErrorCaseDictionaryTransfer.Untouchable, 'Fermer');
             return;
         }
 
@@ -159,10 +159,10 @@ export class DictionaryTransferComponent implements AfterViewInit {
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
-                    this.snack.open(ErrorCaseDictionaryTransfer.DatabaseServerCrash, 'close');
+                    this.snack.open(ErrorCaseDictionaryTransfer.DatabaseServerCrash, 'Fermer');
                     return;
                 }
-                this.snack.open(ErrorCaseDictionaryTransfer.DictionaryDeleted, 'fermer');
+                this.snack.open(ErrorCaseDictionaryTransfer.DictionaryDeleted, 'Fermer');
             },
         );
     }
@@ -185,7 +185,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
             isJSON = true;
         } else {
             isJSON = false;
-            this.snack.open('Le fichier doit être un «.json»', 'fermer');
+            this.snack.open('Le fichier doit être un «.json»', 'Fermer');
         }
         return isJSON;
     }

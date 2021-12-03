@@ -158,7 +158,7 @@ export class SocketManagerService {
         const waitingAreaRoom = this.gameListMan.getAWaitingAreaGame(leavingPlayerRoomId);
         const roomGame = this.gameListMan.getGameInPlay(leavingPlayerRoomId);
         if (roomGame !== undefined) {
-            // Disconnect is treated as abandonning a game in less than 5 seconds
+            // Disconnect is treated as abandoning a game in less than 5 seconds
             this.leaveGameInPlay(socket, roomGame);
         } else if (waitingAreaRoom !== undefined) {
             this.leaveWaitingAreaRoom(socket, waitingAreaRoom);

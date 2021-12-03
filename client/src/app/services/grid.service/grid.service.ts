@@ -13,7 +13,7 @@ export enum Colors {
     None = 'white',
 }
 
-// TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
+// TODO : Make a file for constants
 export const DEFAULT_WIDTH = 540;
 export const DEFAULT_HEIGHT = 540;
 export const BOARD_SIZE = 15;

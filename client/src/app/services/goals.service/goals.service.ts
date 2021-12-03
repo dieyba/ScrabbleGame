@@ -77,16 +77,16 @@ export class GoalsService {
     }
 
     pickRandomLetterAndColor(lettersLeftInStock: ScrabbleLetter[]) {
-        let letterAndcolor = new ScrabbleLetter('');
+        let letterAndColor = new ScrabbleLetter('');
         // Set random letter and random color
         const randomLetterIndex = Math.floor(Math.random() * lettersLeftInStock.length);
-        letterAndcolor = lettersLeftInStock[randomLetterIndex];
+        letterAndColor = lettersLeftInStock[randomLetterIndex];
         let randomColorIndex = 0;
         do {
             randomColorIndex = Math.floor(Math.random() * TOTAL_COLORS);
         } while (randomColorIndex === 0);
-        letterAndcolor.color = randomColorIndex;
-        return letterAndcolor;
+        letterAndColor.color = randomColorIndex;
+        return letterAndColor;
     }
 
     addSharedGoal(goalType: GoalType) {

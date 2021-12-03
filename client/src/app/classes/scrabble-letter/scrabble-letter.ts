@@ -28,7 +28,7 @@ export class ScrabbleLetter {
             this.setDefaultValue(this.character);
             return;
         }
-        // if a captial letter is passed in, it represents a blank piece, meaning an asterisk
+        // if a capital letter is passed in, it represents a blank piece, meaning an asterisk
         this.character = isAllLowerLetters(character) && isValidLetter(removeAccents(character)) ? removeAccents(character) : '*';
         if (this.character === '*') {
             this.whiteLetterCharacter = character;

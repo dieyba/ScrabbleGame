@@ -56,7 +56,7 @@ export class ChatDisplayService {
         this.entries.push(entry);
     }
 
-    addVirtalPlayerEntry(commandInput: string, debugMessages?: string[]) {
+    addVirtualPlayerEntry(commandInput: string, debugMessages?: string[]) {
         this.addEntry({ color: ChatEntryColor.RemotePlayer, message: commandInput }); // display command entered
         if (this.isActiveDebug && debugMessages) {
             for (const message of debugMessages) {
