@@ -1,5 +1,5 @@
 import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
-import dict_path from 'src/assets/dictionnary.json';
+import dict_path from 'src/assets/dictionary.json';
 import { Trie } from './trie';
 
 describe('Trie', () => {
