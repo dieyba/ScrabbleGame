@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DictionaryInterface } from '@app/classes/dictionary';
@@ -25,7 +25,6 @@ const DESCRIPTION_MIN_LENGTH = 10;
     styleUrls: ['./dictionary-transfer.component.scss'],
 })
 export class DictionaryTransferComponent implements AfterViewInit {
-    @ViewChild('inputFile', { static: false }) private inputFile!: ElementRef<HTMLInputElement>;
     selectedDictionary: DictionaryInterface;
     dictionaryList: DictionaryInterface[];
     lastUploadedDictionary: DictionaryInterface;
@@ -46,7 +45,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.dictionaryService.getDictionaries(BASE_URL).subscribe(
             (dictionaries: DictionaryInterface[]) => {
-                this.updateDictionariesTitle(dictionaries);
+                this.updateDictionaryList(dictionaries);
             },
             (error: HttpErrorResponse) => {
                 this.dictionaryService.handleErrorSnackBar(error);
@@ -54,12 +53,20 @@ export class DictionaryTransferComponent implements AfterViewInit {
         );
     }
 
-    onUpload() {
-        if (!this.inputFileExist(this.inputFile)) {
+    onUpload(event: EventTarget | null) {
+        if (event === null) {
             return;
         }
 
-        if (!this.fileIsJSON((this.inputFile.nativeElement.files as FileList)[0].name)) {
+        const element = event as HTMLInputElement;
+        const fileList: FileList = element.files as FileList;
+
+        if (fileList === undefined) {
+            return;
+        }
+
+        if (!this.isFileJSON(fileList[0].name)) {
+            this.snack.open('Le fichier doit être un «.json»', 'fermer');
             return;
         }
 
@@ -68,7 +75,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
         fileReader.onload = () => {
             this.upload(fileReader.result?.toString() as string);
         };
-        fileReader.readAsText((this.inputFile.nativeElement.files as FileList)[0]);
+        fileReader.readAsText(fileList[0]);
     }
 
     upload(dictionary: string) {
@@ -109,7 +116,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
         }, 0);
     }
 
-    updateDictionariesTitle(dictionaries: DictionaryInterface[]) {
+    updateDictionaryList(dictionaries: DictionaryInterface[]) {
         this.dictionaryList = [];
         for (const dictionary of dictionaries) {
             const tempDictionary = { _id: '', title: '', description: '', words: [] } as DictionaryInterface;
@@ -167,26 +174,8 @@ export class DictionaryTransferComponent implements AfterViewInit {
         );
     }
 
-    inputFileExist(inputFile: ElementRef<HTMLInputElement>): boolean {
-        const isElementDefined = inputFile !== undefined;
-        const isFileListDefined = inputFile.nativeElement.files !== null;
-        let isFileDefined = false;
-        if (inputFile.nativeElement.files !== null) {
-            isFileDefined = inputFile.nativeElement.files[0] !== undefined;
-        }
-        return isElementDefined && isFileListDefined && isFileDefined;
-    }
-
-    fileIsJSON(fileName: string): boolean {
+    isFileJSON(fileName: string): boolean {
         const fileNameExtension = fileName.split('.', 2)[1];
-        let isJSON = false;
-
-        if (fileNameExtension === 'json') {
-            isJSON = true;
-        } else {
-            isJSON = false;
-            this.snack.open('Le fichier doit être un «.json»', 'fermer');
-        }
-        return isJSON;
+        return fileNameExtension === 'json';
     }
 }
