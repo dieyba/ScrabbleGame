@@ -35,10 +35,12 @@ export type CommandResult = { isExecuted: boolean; executionMessages: ChatDispla
 export abstract class Command {
     player: Player;
     isExecuted: boolean;
+    debugMessages: string[];
 
     constructor(player: Player) {
         this.player = player;
         this.isExecuted = false;
+        this.debugMessages = [];
     }
 
     abstract execute(): CommandResult | Promise<CommandResult>;

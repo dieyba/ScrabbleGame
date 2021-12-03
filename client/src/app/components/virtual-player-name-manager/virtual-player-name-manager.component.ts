@@ -3,17 +3,18 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
-import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
-const maxLength = 12;
-// export const BEGINNER_VIRTUAL_PLAYER_NAMES_URL = 'http://localhost:3000/api/VirtualPlayerName/beginners';
-// export const EXPERT_VIRTUAL_PLAYER_NAMES_URL = 'http://localhost:3000/api/VirtualPlayerName/experts';
+import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
+import { environment } from 'src/environments/environment';
 
-export enum ErrorCase {
+const maxLength = 12;
+
+export enum ErrorCaseVirtualPlayerName {
     InvalidName = 'Ce nom est invalide',
-    AlreadyThere = 'Ce nom existe déjà dans la base de données, actualisez votre page.',
+    NameAlreadyThere = 'Ce nom existe déjà dans la base de données, actualisez votre page.',
     DeleteAfterDeleteOrUpdate = 'Le nom que vous essayez de supprimer a déjà été modifié ou supprimé, actualisez votre page.',
     UpdateAfterDelete = 'Le nom que vous essayez de modifié a été supprimé, actualisez votre page.',
     DatabaseServerCrash = 'La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard.',
+    Untouchable = 'Vous ne pouvez pas modifier ou supprimer ce nom',
 }
 
 @Component({
@@ -22,8 +23,8 @@ export enum ErrorCase {
     styleUrls: ['./virtual-player-name-manager.component.scss'],
 })
 export class VirtualPlayerNameManagerComponent implements OnInit {
-    beginnerNameUrl = 'http://localhost:3000/api/VirtualPlayerName/beginners';
-    expertNameUrl = 'http://localhost:3000/api/VirtualPlayerName/experts';
+    beginnerNameUrl = environment.serverUrl + '/VirtualPlayerName/beginners';
+    expertNameUrl = environment.serverUrl + '/VirtualPlayerName/experts';
     beginnerNameList: VirtualPlayerName[];
     expertNameList: VirtualPlayerName[];
 
@@ -33,7 +34,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     isAddPlayerCardVisible: boolean = false;
     private index: number;
 
-    constructor(private virtualPlayerNameManagerService: VirtualPlayerNameManager, private snack: MatSnackBar) {
+    constructor(private virtualPlayerNameService: VirtualPlayerNameService, private snack: MatSnackBar) {
         this.beginnerNameList = [];
         this.expertNameList = [];
         this.selectedName = { _id: '', name: '' };
@@ -43,10 +44,8 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.virtualPlayerNameManagerService
-            .getVirtualPlayerNames(this.beginnerNameUrl)
-            .subscribe((beginnerList) => (this.beginnerNameList = beginnerList));
-        this.virtualPlayerNameManagerService.getVirtualPlayerNames(this.expertNameUrl).subscribe((expertList) => (this.expertNameList = expertList));
+        this.virtualPlayerNameService.getVirtualPlayerNames(this.beginnerNameUrl).subscribe((beginnerList) => (this.beginnerNameList = beginnerList));
+        this.virtualPlayerNameService.getVirtualPlayerNames(this.expertNameUrl).subscribe((expertList) => (this.expertNameList = expertList));
     }
 
     isUntouchable(): boolean {
@@ -54,21 +53,21 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     addName(collection: VirtualPlayerName[], url: string) {
-        if (!this.newName.valid || this.newName.value === '') {
-            this.snack.open(ErrorCase.InvalidName, 'close');
+        if (!this.newName.valid) {
+            this.snack.open(ErrorCaseVirtualPlayerName.InvalidName, 'close');
             return;
         }
 
-        this.virtualPlayerNameManagerService.postVirtualPlayerNames(url, this.newName.value).subscribe(
+        this.virtualPlayerNameService.postVirtualPlayerNames(url, this.newName.value).subscribe(
             (added) => {
                 collection.push(added);
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
-                    this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+                    this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
                     return;
                 }
-                this.snack.open(ErrorCase.AlreadyThere, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.NameAlreadyThere, 'close');
             },
         );
     }
@@ -83,6 +82,11 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     deleteName() {
+        if (this.isUntouchable()) {
+            this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
+            return;
+        }
+
         if (this.isBeginnerTab()) {
             this.delete(this.beginnerNameList, this.beginnerNameUrl);
         } else {
@@ -91,9 +95,15 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     updateName() {
+        if (this.isUntouchable()) {
+            this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
+            return;
+        }
+
         if (this.editName.value === '') {
             return;
         }
+
         if (this.isBeginnerTab()) {
             this.update(this.beginnerNameList, this.beginnerNameUrl);
         } else {
@@ -103,6 +113,11 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
 
     onSelect(name: VirtualPlayerName) {
         this.selectedName = name;
+        if (this.isUntouchable()) {
+            this.snack.open(ErrorCaseVirtualPlayerName.Untouchable, 'fermer');
+            return;
+        }
+
         this.isBeginnerTab();
         if (this.index > 2) {
             this.editName.setValue(this.selectedName.name);
@@ -123,38 +138,28 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     private delete(collection: VirtualPlayerName[], url: string) {
-        if (this.index <= 2) {
-            return;
-        }
-
-        this.virtualPlayerNameManagerService.delete(url, this.selectedName.name).subscribe(
-            (deleted) => {
-                if (!deleted) {
-                    collection.splice(this.index, 1);
-                    this.selectedName.name = '';
-                }
+        this.virtualPlayerNameService.delete(url, this.selectedName.name).subscribe(
+            () => {
+                collection.splice(this.index, 1);
+                this.selectedName.name = '';
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
-                    this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+                    this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
                     return;
                 }
-                this.snack.open(ErrorCase.DeleteAfterDeleteOrUpdate, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.DeleteAfterDeleteOrUpdate, 'close');
             },
         );
     }
 
     private update(collection: VirtualPlayerName[], url: string) {
-        if (this.index <= 2) {
-            return;
-        }
-
         if (!this.editName.valid) {
-            this.snack.open(ErrorCase.InvalidName, 'close');
+            this.snack.open(ErrorCaseVirtualPlayerName.InvalidName, 'close');
             return;
         }
 
-        this.virtualPlayerNameManagerService.update(url, this.selectedName._id, this.editName.value).subscribe(
+        this.virtualPlayerNameService.update(url, this.selectedName._id, this.editName.value).subscribe(
             () => {
                 collection[this.index] = { _id: this.selectedName._id, name: this.editName.value };
                 this.selectedName.name = '';
@@ -162,30 +167,16 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
-                    this.snack.open(ErrorCase.DatabaseServerCrash, 'close');
+                    this.snack.open(ErrorCaseVirtualPlayerName.DatabaseServerCrash, 'close');
                     return;
                 }
 
                 if (error.error === 'Ce nom existe déjà') {
-                    this.snack.open(ErrorCase.AlreadyThere, 'close');
+                    this.snack.open(ErrorCaseVirtualPlayerName.NameAlreadyThere, 'close');
                     return;
                 }
-                this.snack.open(ErrorCase.UpdateAfterDelete, 'close');
+                this.snack.open(ErrorCaseVirtualPlayerName.UpdateAfterDelete, 'close');
             },
         );
     }
-
-    // confirmName(tab: VirtualPlayerName[], nameToCompare: string): boolean {
-    //     this.nameAlreadyExist = false;
-    //     if (nameToCompare === '') {
-    //         return false;
-    //     }
-    //     for (const name of tab) {
-    //         if (name.name === nameToCompare) {
-    //             this.nameAlreadyExist = true;
-    //             return false;
-    //         }
-    //     }
-    //     return true;
-    // }
 }

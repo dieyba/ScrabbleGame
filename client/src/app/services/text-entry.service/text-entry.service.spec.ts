@@ -1,19 +1,17 @@
 // import { TestBed } from '@angular/core/testing';
-// import { createErrorEntry } from '@app/classes/chat-display-entry/chat-display-entry';
+// import { createErrorEntry } from '@app/classes/chat-display-entry';
 // import { ErrorType } from '@app/classes/errors';
-// import { GameParameters } from '@app/classes/game-parameters';
-// import { Player } from "@app/classes/player";
+// import { GameParameters, GameType } from '@app/classes/game-parameters';
+// import { LetterStock } from '@app/classes/letter-stock';
+// import { Player } from '@app/classes/player';
 // import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 // import { ChatDisplayService } from './chat-display.service';
 // import { CommandInvokerService } from './command-invoker.service';
 // import { GameService } from './game.service';
-// import { SoloGameService } from './solo-game.service';
 // import { TextEntryService } from './text-entry.service';
 
 // const LOCAL_PLAYER_NAME = 'Local Player';
 // const VIRTUAL_PLAYER_NAME = 'Virtual Player';
-
-// TODO: finish text entry tests
 
 // /* eslint-disable  @typescript-eslint/no-magic-numbers */
 // describe('TextEntryService', () => {
@@ -21,34 +19,32 @@
 //     let chatDisplayServiceSpy: jasmine.SpyObj<ChatDisplayService>;
 //     let commandInvokerServiceSpy: jasmine.SpyObj<CommandInvokerService>;
 //     let gameServiceSpy: jasmine.SpyObj<GameService>;
-//     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
-//     const localPlayer = new LocalPlayer(LOCAL_PLAYER_NAME);
+//     const localPlayer = new Player(LOCAL_PLAYER_NAME);
 
 //     beforeEach(() => {
 //         chatDisplayServiceSpy = jasmine.createSpyObj('ChatDisplayService', [
-//             'addPlayerEntry',
+//             'addEntry',
 //             'addErrorMessage',
 //             'createExchangeMessage',
 //             'invertDebugState',
+//             'sendMessageToServer',
 //         ]);
-//         soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['place']);
-//         gameServiceSpy = jasmine.createSpyObj('GameService', ['passTurn']);
-//         commandInvokerServiceSpy = jasmine.createSpyObj('GameService', ['executeCommand']);
+//         gameServiceSpy = jasmine.createSpyObj('GameService', ['place', 'passTurn']);
+//         commandInvokerServiceSpy = jasmine.createSpyObj('CommandInvokerService', ['executeCommand']);
 //         TestBed.configureTestingModule({
 //             providers: [
 //                 { provide: CommandInvokerService, useValue: commandInvokerServiceSpy },
 //                 { provide: ChatDisplayService, useValue: chatDisplayServiceSpy },
-//                 { provide: SoloGameService, useValue: soloGameServiceSpy },
 //                 { provide: GameService, useValue: gameServiceSpy },
 //             ],
 //         });
 //         service = TestBed.inject(TextEntryService);
-//         gameServiceSpy.currentGameService = soloGameServiceSpy;
-//         gameServiceSpy.currentGameService.game = new GameParameters(LOCAL_PLAYER_NAME, 60, false);
-//         gameServiceSpy.isMultiplayerGame = false;
-//         gameServiceSpy.currentGameService.game.isEndGame = false;
-//         gameServiceSpy.currentGameService.game.localPlayer = localPlayer;
-//         gameServiceSpy.currentGameService.game.opponentPlayer = new VirtualPlayer(VIRTUAL_PLAYER_NAME, Difficulty.Easy);
+//         gameServiceSpy.game = new GameParameters();
+//         gameServiceSpy.game.gameMode = GameType.Solo;
+//         gameServiceSpy.game.stock = new LetterStock();
+//         gameServiceSpy.game.isEndGame = false;
+//         gameServiceSpy.game.setLocalPlayer(localPlayer);
+//         gameServiceSpy.game.setOpponent(new VirtualPlayer(VIRTUAL_PLAYER_NAME, Difficulty.Easy));
 //     });
 
 //     it('should be created', () => {
@@ -60,6 +56,12 @@
 //         const fakeCommand = '!fake command name';
 //         service.handleInput(fakeCommand);
 //         expect(spy).toHaveBeenCalledWith(fakeCommand, localPlayer);
+//     });
+
+//     it('handleInput should not send empty input', () => {
+//         const chatMessage = '    ';
+//         service.handleInput(chatMessage);
+//         expect(chatDisplayServiceSpy.addEntry).toHaveBeenCalledTimes(0);
 //     });
 
 //     it('handleInput should send input as normal chat message', () => {
@@ -76,7 +78,7 @@
 
 //     it('should send invalid command error message when needed', () => {
 //         // Having spaces before the ! or after the command input should not be an error of any type
-//         const validNameCmds = [' !debug ', '!debug', '!passer', '!échanger z', '!placer b5v mot'];
+//         const validNameCmds = [' !debug ', '!réserve', '!aide', '!passer', '!échanger z', '!placer b5v mot'];
 //         // empty string is already prevented by checking if the string is empty beforehand
 //         const invalidCmds = ['!', '! debug', '!random name', '!echanger', '!123'];
 
@@ -87,7 +89,7 @@
 
 //         for (const input of invalidCmds) {
 //             service.handleInput(input);
-//             expect(createErrorEntry).toHaveBeenCalledWith(ErrorType.InvalidCommand, input);
+//             expect(chatDisplayServiceSpy.addEntry).toHaveBeenCalledWith(createErrorEntry(ErrorType.InvalidCommand, input));
 //         }
 //     });
 
@@ -115,6 +117,8 @@
 //             '!placer i10h 123',
 //             '!placer a31416h something',
 //             '!placer a5V nothing',
+//             '!réserve de lettres',
+//             '!aide help',
 //         ];
 
 //         for (const input of validSyntaxCmds) {
@@ -124,21 +128,23 @@
 
 //         for (const input of syntaxErrorCmds) {
 //             service.handleInput(input);
-//             expect(createErrorEntry).toHaveBeenCalledWith(ErrorType.SyntaxError, input);
+//             expect(chatDisplayServiceSpy.addEntry).toHaveBeenCalledWith(createErrorEntry(ErrorType.SyntaxError, input));
 //         }
 //     });
 
-//     it('should send impossible command error message when execution returns it', () => {
-//         const cmd = '!échanger aaa';
-//         service.handleInput(cmd);
-//         expect(createErrorEntry).toHaveBeenCalledWith(ErrorType.ImpossibleCommand, cmd);
-//     });
-
-//     // // the rest of the this method is tested when being called in createCommand method
+//     // the rest of the this method is tested when being called in createCommand method
 //     it('should split an input only if it starts with !', () => {
 //         const emptyString = service.splitCommandInput('');
 //         expect(emptyString).toEqual([]);
 //         const notACommand = service.splitCommandInput('not a command');
 //         expect(notACommand).toEqual([]);
+//     });
+
+//     // the rest of the this method is tested when being called in createCommand method
+//     it('should emit to server when multiplayer mode', () => {
+//         gameServiceSpy.game.gameMode = GameType.MultiPlayer;
+//         const chatMessage = 'some input';
+//         service.handleInput(chatMessage);
+//         expect(chatDisplayServiceSpy.sendMessageToServer).toHaveBeenCalledWith(LOCAL_PLAYER_NAME + ' >> ' + chatMessage);
 //     });
 // });

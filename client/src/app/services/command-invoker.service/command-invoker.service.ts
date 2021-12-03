@@ -5,6 +5,7 @@ import { ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
 import { GameType } from '@app/classes/game-parameters/game-parameters';
 import { PassTurnCmd } from '@app/classes/pass-command/pass-command';
 import { PlaceCmd } from '@app/classes/place-command/place-command';
+import { VirtualPlayer } from '@app/classes/virtual-player/virtual-player';
 import { ChatDisplayService } from '@app/services/chat-display.service/chat-display.service';
 import { GameService } from '@app/services/game.service/game.service';
 
@@ -14,20 +15,19 @@ import { GameService } from '@app/services/game.service/game.service';
 export class CommandInvokerService {
     constructor(private chatDisplayService: ChatDisplayService, private gameService: GameService) {}
 
-    async executeCommand(command: Command): Promise<void> {
+    async executeCommand(command: Command) {
+        const commandResult = await command.execute();
         const isExchangeCmd = command instanceof ExchangeCmd;
         const isToDisplayRemotely = isExchangeCmd || command instanceof PassTurnCmd || command instanceof PlaceCmd;
-        const executionResult = await command.execute();
-        this.displayExecutionResultMessages(executionResult, isExchangeCmd, isToDisplayRemotely);
-    }
-    displayExecutionResultMessages(commandResult: CommandResult, isExchangeCmd: boolean, isToDisplayRemotely: boolean) {
         const isSendToServer = this.gameService.game.gameMode === GameType.MultiPlayer && isToDisplayRemotely && commandResult.isExecuted;
         const isFromVirtualPlayer =
-            this.gameService.game.gameMode === GameType.Solo && commandResult.executionMessages[0]?.color === ChatEntryColor.RemotePlayer;
+            this.gameService.game.gameMode === GameType.Solo &&
+            this.gameService.game.getOpponent() instanceof VirtualPlayer &&
+            commandResult.executionMessages[0]?.color === ChatEntryColor.RemotePlayer;
         if (isSendToServer) {
             this.displayExecutionWithServer(isExchangeCmd, commandResult);
         } else {
-            this.displayExecutionLocally(isFromVirtualPlayer, isExchangeCmd, commandResult);
+            this.displayExecutionLocally(isFromVirtualPlayer, command, commandResult);
         }
     }
     displayExecutionWithServer(isExchangeCmd: boolean, commandResult: CommandResult) {
@@ -42,13 +42,12 @@ export class CommandInvokerService {
             });
         }
     }
-    displayExecutionLocally(isFromVirtualPlayer: boolean, isExchangeCmd: boolean, commandResult: CommandResult) {
+    displayExecutionLocally(isFromVirtualPlayer: boolean, command: Command, commandResult: CommandResult) {
         if (isFromVirtualPlayer) {
             // TODO: see how exactly debug messages will be added in command invoker
             const commandMessage = commandResult.executionMessages[0].message;
-            const debugMessages = ['some debug message', 'some other debug message'];
-            this.chatDisplayService.addVirtalPlayerEntry(commandMessage, debugMessages);
-        } else if (isExchangeCmd) {
+            this.chatDisplayService.addVirtalPlayerEntry(commandMessage, command.debugMessages);
+        } else if (command instanceof ExchangeCmd) {
             // extract command returns both players message, but solo game only displays the local message
             this.chatDisplayService.addEntry(commandResult.executionMessages[0]);
         } else {

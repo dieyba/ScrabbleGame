@@ -4,18 +4,20 @@ import { Service } from 'typedi';
 // import { DatabaseService } from "./database.service";
 const DATABASE_URL = 'mongodb+srv://Scrabble304:Scrabble304@cluster0.bvwkn.mongodb.net/database?retryWrites=true&w=majority';
 const DATABASE_NAME = 'BestScore';
-const DATABASE_COLLECTION = ['ClassicMode', 'Log2990Mode'];
+export const DATABASE_COLLECTION = ['ClassicMode', 'Log2990Mode'];
 
 const MAX_SCORE = 100000000000;
 @Service()
 export class BestScoresService {
-    client: MongoClient;
     defaultClassicBestScoresValue: BestScores[];
     defaultLog2990BestScoresValue: BestScores[];
     classicCollection: Collection<BestScores>;
     log2990Collection: Collection<BestScores>;
+    dbUrl: string;
+    private client: MongoClient;
 
-    constructor(url = DATABASE_URL) {
+    constructor(url: string = DATABASE_URL) {
+        this.dbUrl = url;
         this.defaultClassicBestScoresValue = [
             {
                 playerName: 'Erika',
@@ -61,97 +63,63 @@ export class BestScoresService {
                 score: 3,
             },
         ];
-        MongoClient.connect(url)
-            .then((client: MongoClient) => {
+    }
+
+    async connectClient(): Promise<void> {
+        return MongoClient.connect(this.dbUrl)
+            .then(async (client: MongoClient) => {
                 this.client = client;
                 this.classicCollection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]);
                 this.log2990Collection = client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[1]);
-                this.populateDB(this.defaultClassicBestScoresValue, DATABASE_COLLECTION[0]);
-                this.populateDB(this.defaultLog2990BestScoresValue, DATABASE_COLLECTION[1]);
+                await this.populateDB(this.defaultClassicBestScoresValue, DATABASE_COLLECTION[0]);
+                await this.populateDB(this.defaultLog2990BestScoresValue, DATABASE_COLLECTION[1]);
             })
-            .catch((error) => {
-                throw error;
+            .catch(() => {
+                throw new Error('Connection with database fail');
             });
     }
+
     async getBestScores(collectionType: Collection<BestScores>): Promise<BestScores[]> {
         return collectionType
             .find({})
             .sort({ score: -1 })
             .toArray()
-            .then((log2990BestScores: BestScores[]) => {
-                return log2990BestScores;
-            })
-            .catch((error: Error) => {
-                throw error;
+            .then((bestScores: BestScores[]) => {
+                return bestScores;
             });
     }
 
     async postBestScore(collectionType: Collection<BestScores>, bestScore: BestScores): Promise<void> {
         if (await this.canSetInDb(collectionType, bestScore)) {
-            collectionType
-                .insertOne(bestScore)
-                .then(() => {
-                    /* do nothing */
-                })
-                .catch((error: Error) => {
-                    throw error;
-                });
+            collectionType.insertOne(bestScore);
         }
     }
 
-    async checkingIfAlreadyInDb(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
+    async canSetInDb(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
+        const arrayScore = await tabScore.find({}).sort({ score: -1 }).toArray();
+        const deleteMinScore = await this.minimumScore(tabScore);
         let haveToChange = false;
-        await tabScore.find({}).forEach((score) => {
-            if (score.score < newScore.score && score.playerName === newScore.playerName) {
-                tabScore.findOneAndDelete(score);
+        for (const dbScore of arrayScore) {
+            if (newScore.score < deleteMinScore.score) {
+                return haveToChange;
+            }
+            if (dbScore.score === newScore.score && dbScore.playerName === newScore.playerName) {
+                return haveToChange;
+            }
+            if (dbScore.score === newScore.score && dbScore.playerName !== newScore.playerName) {
+                return (haveToChange = true);
+            }
+            if (dbScore.score < newScore.score) {
+                await tabScore.findOneAndDelete(deleteMinScore);
                 haveToChange = true;
             }
-        });
+        }
         return haveToChange;
     }
 
-    async isTwoSameBestScores(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
-        let twoSameBestScore = false;
-        const sameNameSameScore = await this.checkingIfAlreadyInDb(tabScore, newScore);
-        if (!sameNameSameScore) {
-            await tabScore.find({}).forEach((score) => {
-                if (score.score === newScore.score) {
-                    twoSameBestScore = true;
-                }
-            });
-        }
-        return twoSameBestScore;
-    }
-
-    async isScoreHigh(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
-        let valid = false;
-        const deleteMinScore: BestScores = { playerName: '', score: MAX_SCORE };
-        const sameNameSameScore = await this.checkingIfAlreadyInDb(tabScore, newScore);
-        const twoBestScores = await this.isTwoSameBestScores(tabScore, newScore);
-        if (!sameNameSameScore && !twoBestScores) {
-            await tabScore.find({}).forEach((score) => {
-                if (score.score < deleteMinScore.score) {
-                    deleteMinScore.playerName = score.playerName;
-                    deleteMinScore.score = score.score;
-                }
-            });
-            if (deleteMinScore.score < newScore.score) {
-                tabScore.findOneAndDelete(deleteMinScore);
-                valid = true;
-            }
-        }
-
-        return valid;
-    }
-    async canSetInDb(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
-        const sameNameDifferentScore = await this.checkingIfAlreadyInDb(tabScore, newScore);
-        const scoreIsHigh = await this.isScoreHigh(tabScore, newScore);
-        const twoSameScores = await this.isTwoSameBestScores(tabScore, newScore);
-        return scoreIsHigh || twoSameScores || sameNameDifferentScore;
-    }
-
     async populateDB(typeScores: BestScores[], dbCollection: string): Promise<void> {
-        if ((await this.client.db(DATABASE_NAME).collection(dbCollection).countDocuments()) === 0) {
+        const docCount = await this.client.db(DATABASE_NAME).collection(dbCollection).countDocuments();
+        if (docCount === 0) {
             for (const score of typeScores) {
                 await this.client.db(DATABASE_NAME).collection(dbCollection).insertOne(score);
             }
@@ -159,18 +127,24 @@ export class BestScoresService {
     }
 
     async resetCollectionInDb(tabScore: Collection<BestScores>, typeScores: BestScores[], dbCollection: string): Promise<void> {
-        tabScore
-            .deleteMany({})
-            .then(() => {
-                this.populateDB(typeScores, dbCollection);
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
+        await tabScore.deleteMany({});
+        await this.populateDB(typeScores, dbCollection);
     }
 
     async resetDataBase() {
         await this.resetCollectionInDb(this.classicCollection, this.defaultClassicBestScoresValue, DATABASE_COLLECTION[0]);
         await this.resetCollectionInDb(this.log2990Collection, this.defaultLog2990BestScoresValue, DATABASE_COLLECTION[1]);
+    }
+
+    private async minimumScore(tabScore: Collection<BestScores>): Promise<BestScores> {
+        const arrayScore = await tabScore.find({}).toArray();
+        const deleteMinScore: BestScores = { playerName: '', score: MAX_SCORE };
+        for (const score of arrayScore) {
+            if (score.score < deleteMinScore.score) {
+                deleteMinScore.playerName = score.playerName;
+                deleteMinScore.score = score.score;
+            }
+        }
+        return deleteMinScore;
     }
 }

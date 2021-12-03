@@ -8,6 +8,8 @@ import { GameListManager } from './game-list-manager.service';
 import { PlayerManagerService } from './player-manager.service';
 import { ValidationService } from './validation.service';
 
+const DISCONNECT_TIME_INTERVAL = 5000;
+
 export class SocketManagerService {
     private sio: io.Server;
     private gameListMan: GameListManager;
@@ -142,8 +144,10 @@ export class SocketManagerService {
         }
     }
     private disconnect(socket: io.Socket) {
-        this.leaveRoom(socket);
-        this.playerMan.removePlayer(socket.id);
+        setTimeout(() => {
+            this.leaveRoom(socket);
+            this.playerMan.removePlayer(socket.id);
+        }, DISCONNECT_TIME_INTERVAL);
     }
     private leaveRoom(socket: io.Socket) {
         const leavingPlayer = this.playerMan.getPlayerBySocketID(socket.id);

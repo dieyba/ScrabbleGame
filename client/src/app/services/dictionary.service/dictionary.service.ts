@@ -3,8 +3,9 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
-export const BASE_URL = 'http://localhost:3000/api/dictionary';
+export const BASE_URL = environment.serverUrl + '/dictionary';
 @Injectable({
     providedIn: 'root',
 })
@@ -28,9 +29,21 @@ export class DictionaryService {
         return this.http.post<DictionaryInterface>(url, dictionary);
     }
 
-    // resetDbBestScores() {
-    //     return this.http.delete<BestScores>(BASE_URL);
-    // }
+    reset(): Observable<DictionaryInterface> {
+        return this.http.delete<DictionaryInterface>(BASE_URL);
+    }
+
+    update(url: string, dictionaryName: string, dictionaryId: unknown, updatedTitle: string, updatedDescription: string) {
+        return this.http.patch<DictionaryInterface>(url + '/' + dictionaryName, {
+            id: dictionaryId,
+            newTitle: updatedTitle,
+            newDescription: updatedDescription,
+        });
+    }
+
+    delete(dictionaryId: unknown): Observable<DictionaryInterface> {
+        return this.http.delete<DictionaryInterface>(BASE_URL + '/' + dictionaryId);
+    }
 
     handleErrorSnackBar(error: HttpErrorResponse): void {
         switch (error.status) {

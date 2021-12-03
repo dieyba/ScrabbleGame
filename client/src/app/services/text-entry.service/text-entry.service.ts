@@ -65,7 +65,7 @@ export class TextEntryService {
 
     /**
      * @description This function verifies if the input is a valid command or
-     * just text. It doesn't check the command's arguments of the command.
+     * just text. It doesn't check the command's arguments.
      *
      * @param text Text input from user
      */

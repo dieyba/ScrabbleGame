@@ -181,4 +181,17 @@ describe('RackService', () => {
         expect(drawExistingLetters).toHaveBeenCalled();
         expect(ctxStubSpy).toHaveBeenCalled();
     });
+
+    it('clear rack should remove all rack letters and clear the ui', () => {
+        const drawRackSpy = spyOn(service, 'drawRack');
+        const ctxStubSpy = spyOn(ctxStub, 'clearRect');
+        const letter1 = new ScrabbleLetter('a', 1);
+        service.addLetter(letter1);
+
+        service.clearRack();
+
+        expect(ctxStubSpy).toHaveBeenCalled();
+        expect(drawRackSpy).toHaveBeenCalled();
+        expect(service.rackLetters).toEqual([]);
+    });
 });

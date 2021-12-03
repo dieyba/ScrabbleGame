@@ -15,8 +15,17 @@ export class ScrabbleWord {
     stringify(): string {
         let string = '';
         for (const i of this.content) {
-            string += i.character;
+            if (i) {
+                string += i.character;
+            }
         }
         return string;
+    }
+    calculateValue(): number {
+        let value = 0;
+        for (const i of this.content) {
+            value += i.value;
+        }
+        return value;
     }
 }

@@ -8,6 +8,7 @@ export const UNPLACED = -1;
 
 export class ScrabbleLetter {
     character: string; // One word string, depending on which letter it is
+    whiteLetterCharacter: string; // the desired letter value if the character is an asterisk
     value: number; // How many points the letter is worth before blue bonuses
     color: SquareColor;
     tile: Square;
@@ -25,10 +26,16 @@ export class ScrabbleLetter {
     setLetter(character: string): void {
         // if a captial letter is passed in, represents a blank piece, meaning a '*'
         this.character = isAllLowerLetters(character) ? removeAccents(character) : '*';
+        if (this.character === '*') {
+            this.whiteLetterCharacter = character;
+        }
+        this.setDefaultValue(this.character);
     }
     setDefaultValue(character: string) {
         // set the letter's default value
-        if ('aeilnorstu'.includes(character)) {
+        if (character === '') {
+            this.value = 0;
+        } else if ('aeilnorstu'.includes(character)) {
             this.value = 1;
         } else if ('dgm'.includes(character)) {
             this.value = 2;
@@ -41,7 +48,7 @@ export class ScrabbleLetter {
         } else if ('kwxyz'.includes(character)) {
             this.value = 10;
         } else {
-            this.value = 0; // case where it is a * or capital letter
+            this.value = 0; // default value for *
         }
     }
 }
