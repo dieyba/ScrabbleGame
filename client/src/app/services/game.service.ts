@@ -15,16 +15,16 @@ import { Vec2 } from '@app/classes/vec2';
 import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
 import { SocketHandler } from '@app/modules/socket-handler';
+import { ChatDisplayService } from '@app/services/chat-display.service';
+import { GoalsService } from '@app/services/goals.service';
+import { GridService } from '@app/services/grid.service';
+import { PlaceService } from '@app/services/place.service';
+import { RackService } from '@app/services/rack.service';
+import { ValidationService } from '@app/services/validation.service';
+import { WordBuilderService } from '@app/services/word-builder.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { ChatDisplayService } from './chat-display.service';
-import { GoalsService } from './goals.service';
-import { GridService } from './grid.service';
-import { PlaceService } from './place.service';
-import { RackService } from './rack.service';
-import { ValidationService } from './validation.service';
-import { WordBuilderService } from './word-builder.service';
 
 export const DEFAULT_LETTER_COUNT = 7;
 const TIMER_INTERVAL = 1000;
@@ -231,17 +231,8 @@ export class GameService {
         if (errorResult !== ErrorType.NoError) {
             return errorResult;
         }
-        // Generate all words created
-        const scrabbleWordsH: ScrabbleWord[] = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
-        const scrabbleWordsV: ScrabbleWord[] = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
-        const tempScrabbleWords = placeParams.orientation === Axis.H ? scrabbleWordsH : scrabbleWordsV;
-        // TODO: remove
-        // let tempScrabbleWords: ScrabbleWord[];
-        // if (placeParams.orientation === Axis.H) {
-        //     tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.H);
-        // } else {
-        //     tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, Axis.V);
-        // }
+
+        const tempScrabbleWords = this.wordBuilder.buildWordsOnBoard(placeParams.word, placeParams.position, placeParams.orientation);
         const strWords: string[] = [];
         const newlyPlacedLetters: ScrabbleLetter[] = [];
         tempScrabbleWords[0].content.forEach((newWordLetter) => {

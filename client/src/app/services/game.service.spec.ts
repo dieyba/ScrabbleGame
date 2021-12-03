@@ -1,27 +1,61 @@
+/* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { TestBed } from '@angular/core/testing';
+import { PlaceParams } from '@app/classes/commands';
 import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { ErrorType } from '@app/classes/errors';
 import { FormAnExistingWord } from '@app/classes/form-an-existing-word';
 import { GameInitInfo, GameParameters, GameType } from '@app/classes/game-parameters';
 import { GameTimer } from '@app/classes/game-timer';
 import { GoalType } from '@app/classes/goal';
+import { LetterStock } from '@app/classes/letter-stock';
 import { PlaceLetterWorthTenPts } from '@app/classes/place-letter-worth-ten-pts';
 import { Player } from '@app/classes/player';
+import { ScrabbleBoard } from '@app/classes/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleWord } from '@app/classes/scrabble-word';
+import { BoardUpdate, LettersUpdate } from '@app/classes/server-message';
 import { SquareColor } from '@app/classes/square';
+import { Axis } from '@app/classes/utilities';
+import { Vec2 } from '@app/classes/vec2';
 import { Difficulty } from '@app/classes/virtual-player';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
+import { ChatDisplayService } from '@app/services/chat-display.service';
+import { GameService } from '@app/services/game.service';
+import { GoalsService } from '@app/services/goals.service';
+import { GridService } from '@app/services/grid.service';
+import { PlaceService } from '@app/services/place.service';
+import { RackService } from '@app/services/rack.service';
+import { ValidationService } from '@app/services/validation.service';
+import { WordBuilderService } from '@app/services/word-builder.service';
 import { BehaviorSubject } from 'rxjs';
-import { ChatDisplayService } from './chat-display.service';
-import { GameService } from './game.service';
-import { GoalsService } from './goals.service';
-import { GridService } from './grid.service';
-import { PlaceService } from './place.service';
-import { RackService } from './rack.service';
-import { ValidationService } from './validation.service';
-import { WordBuilderService } from './word-builder.service';
+import * as io from 'socket.io-client';
+
+class SocketMock {
+    id: string = 'Socket mock';
+    events: Map<string, CallableFunction> = new Map();
+    on(eventName: string, cb: CallableFunction) {
+        this.events.set(eventName, cb);
+    }
+
+    triggerEvent(eventName: string, ...args: any[]) {
+        const arrowFunction = this.events.get(eventName) as CallableFunction;
+        arrowFunction(...args);
+    }
+
+    join() {
+        return;
+    }
+    emit() {
+        return;
+    }
+
+    disconnect() {
+        return;
+    }
+}
 
 describe('GameService', () => {
     let service: GameService;
@@ -35,9 +69,12 @@ describe('GameService', () => {
 
     let initInfoSolo: WaitingAreaGameParameters;
     let initInfoMulti: GameInitInfo;
+    let socketMock: SocketMock;
+    let socketOnMockSpy: jasmine.SpyObj<any>;
+    let socketEmitMockSpy: jasmine.SpyObj<any>;
 
     beforeEach(() => {
-        gridServiceSpy = jasmine.createSpyObj('GridService', ['sendMessageToServer', 'createEndGameMessages']);
+        gridServiceSpy = jasmine.createSpyObj('GridService', ['sendMessageToServer', 'createEndGameMessages', 'updateBoard']);
         rackServiceSpy = jasmine.createSpyObj('RackService', ['gridContext', 'drawLetter', 'removeLetter', 'addLetter', 'rackLetters'], {
             rackLetters: [] as ScrabbleLetter[],
         });
@@ -83,13 +120,70 @@ describe('GameService', () => {
         };
         service.game = new GameParameters();
         service.game.gameTimer = new GameTimer();
+        service.game.stock = new LetterStock();
         validationServiceSpy.dictionary = new Dictionary(DictionaryType.Default);
+        socketMock = new SocketMock();
+        service['socket'] = socketMock as unknown as io.Socket;
+        socketOnMockSpy = spyOn(socketMock, 'on').and.callThrough();
+        socketEmitMockSpy = spyOn(socketMock, 'emit').and.callThrough();
         clearInterval(service.game.gameTimer.intervalValue);
     });
 
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
+
+    // socketOnConnect tests
+    it('socketOnConnect call socket on event update board', () => {
+        const boardUpdate: BoardUpdate = { word: 'test', orientation: Axis.V, positionX: 4, positionY: 8 };
+        service.socketOnConnect();
+        socketMock.triggerEvent('update board', boardUpdate);
+        expect(socketOnMockSpy).toHaveBeenCalled();
+    });
+
+    it('socketOnConnect call socket on event update letters', () => {
+        const creator: Player = new Player('Riri');
+        const joiner: Player = new Player('Lulu');
+        service.game.players[0] = creator;
+        service.game.players[1] = joiner;
+
+        const stock: ScrabbleLetter[] = service.game.stock.letterStock;
+        const letters: ScrabbleLetter[] = [new ScrabbleLetter('k'), new ScrabbleLetter('r')];
+        const lettersUpdate: LettersUpdate = { newStock: stock, newLetters: letters, newScore: 48 };
+        service.socketOnConnect();
+        socketMock.triggerEvent('update letters', lettersUpdate);
+        expect(socketOnMockSpy).toHaveBeenCalled();
+    });
+
+    it('socketOnConnect call socket on event convert to solo', () => {
+        const creator: Player = new Player('Riri');
+        creator.socketId = '0';
+        const joiner: Player = new Player('Lulu');
+        joiner.socketId = '1';
+        service.game.players[0] = creator;
+        service.game.players[1] = joiner;
+        service['socket'].id = '1';
+        service.socketOnConnect();
+        socketMock.triggerEvent('convert to solo', { previousPlayerSocketId: '1', virtualPlayerName: 'Riri' });
+        expect(socketOnMockSpy).toHaveBeenCalled();
+    });
+
+    // TODO: entrer dans le if
+    // it('socketOnConnect call chatDisplayService addEntry if it is not endGame and if the player exists', () => {
+    //     const creator: Player = new Player('Riri');
+    //     creator.socketId = '0';
+    //     const joiner: Player = new Player('Lulu');
+    //     joiner.socketId = '1';
+    //     service.game.players[0] = creator;
+    //     service.game.players[1] = joiner;
+    //     service['socket'].id = '1';
+    //     service.game.isEndGame = true;
+    //     service.socketOnConnect();
+    //     // console.log(service.game.players.findIndex((p) => p.socketId === '1'));
+    //     socketMock.triggerEvent('convert to solo', { previousPlayerSocketId: '1', virtualPlayerName: 'Riri' });
+    //     expect(socketOnMockSpy).toHaveBeenCalled();
+    //     // expect(chatDisplayServiceSpy.addEntry).toHaveBeenCalled();
+    // });
 
     // initializeSoloGame tests
     it('initializeSoloGame should call game setLocalPlayer, setOpponent, getLocalPlayer and getOpponent if it is solo mode', () => {
@@ -218,13 +312,12 @@ describe('GameService', () => {
         expect(secondsToMinutesSpy).not.toHaveBeenCalled();
 
         service.game.isEndGame = false;
-        // service.startCountdown();
+        service.startCountdown();
         jasmine.clock().tick(1000);
         expect(secondsToMinutesSpy).toHaveBeenCalled();
         jasmine.clock().uninstall();
     });
 
-    // TODO: isTurnPassedTurn ne st pas mis à jour alors que la ligne est couverte
     it('startCountdown should set isTurnPassed to true if the timer is over', () => {
         jasmine.clock().install();
         service.game.gameTimer.timerMs = 0;
@@ -233,18 +326,19 @@ describe('GameService', () => {
         service.isTurnEndSubject = new BehaviorSubject<boolean>(true);
         service.startCountdown();
         jasmine.clock().tick(1000);
-        // console.log(service.game.gameTimer.timerMs);
 
         expect(service.isTurnPassed).toBeTrue();
         jasmine.clock().uninstall();
     });
 
+    // resetTimer tests
     it('resetTimer should call startCountdown', () => {
         const startCountDownSpy: jasmine.Spy<jasmine.Func> = spyOn(service, 'startCountdown');
         service.resetTimer();
         expect(startCountDownSpy).toHaveBeenCalled();
     });
 
+    // passTurn tests
     it('passTurn should call return NoError if the player is active', () => {
         const player: Player = new Player('Riri');
         service.isTurnEndSubject = new BehaviorSubject<boolean>(true);
@@ -252,5 +346,176 @@ describe('GameService', () => {
 
         player.isActive = true;
         expect(service.passTurn(player)).toEqual(ErrorType.NoError);
+    });
+
+    // exchangeLetters tests
+    it('exchangeLetters should return ImpossibleCommand if the player is not active or if there is not enough letters in stock', () => {
+        const player: Player = new Player('Riri');
+        player.isActive = true;
+        service.game.stock.letterStock = [];
+
+        expect(service.exchangeLetters(player, 'sd')).toEqual(ErrorType.ImpossibleCommand);
+
+        player.isActive = false;
+        const randomLetters: ScrabbleLetter[] = [
+            new ScrabbleLetter('k'),
+            new ScrabbleLetter('d'),
+            new ScrabbleLetter('v'),
+            new ScrabbleLetter('h'),
+            new ScrabbleLetter('r'),
+            new ScrabbleLetter('a'),
+            new ScrabbleLetter('l'),
+            new ScrabbleLetter('e'),
+        ];
+        service.game.stock.letterStock = randomLetters;
+        expect(service.exchangeLetters(player, 'aks')).toEqual(ErrorType.ImpossibleCommand);
+    });
+
+    it('exchangeLetters should return ImpossibleCommand if the player has not the letters he want to delete', () => {
+        const randomLetters: ScrabbleLetter[] = [
+            new ScrabbleLetter('k'),
+            new ScrabbleLetter('d'),
+            new ScrabbleLetter('v'),
+            new ScrabbleLetter('h'),
+            new ScrabbleLetter('r'),
+            new ScrabbleLetter('a'),
+            new ScrabbleLetter('l'),
+            new ScrabbleLetter('e'),
+        ];
+        const player: Player = new Player('Riri');
+        player.isActive = true;
+        player.letters = randomLetters;
+
+        expect(service.exchangeLetters(player, 'x')).toEqual(ErrorType.ImpossibleCommand);
+    });
+
+    it('exchangeLetters should return NoError and set isTurnPassed to false', () => {
+        const randomLetters: ScrabbleLetter[] = [
+            new ScrabbleLetter('k'),
+            new ScrabbleLetter('d'),
+            new ScrabbleLetter('v'),
+            new ScrabbleLetter('h'),
+            new ScrabbleLetter('r'),
+            new ScrabbleLetter('a'),
+            new ScrabbleLetter('l'),
+            new ScrabbleLetter('e'),
+        ];
+        const player: Player = new Player('Riri');
+        player.isActive = true;
+        player.letters = randomLetters;
+        service.isTurnEndSubject = new BehaviorSubject<boolean>(false);
+
+        expect(service.exchangeLetters(player, 'dv')).toEqual(ErrorType.NoError);
+        expect(service.isTurnPassed).toBeFalse();
+    });
+
+    it('exchangeLetters should call socket emit if it is multiplayer mode', () => {
+        const randomLetters: ScrabbleLetter[] = [
+            new ScrabbleLetter('k'),
+            new ScrabbleLetter('d'),
+            new ScrabbleLetter('v'),
+            new ScrabbleLetter('h'),
+            new ScrabbleLetter('r'),
+            new ScrabbleLetter('a'),
+            new ScrabbleLetter('l'),
+            new ScrabbleLetter('e'),
+        ];
+        const player: Player = new Player('Riri');
+        player.isActive = true;
+        player.letters = randomLetters;
+        service.isTurnEndSubject = new BehaviorSubject<boolean>(false);
+        service.game.gameMode = GameType.MultiPlayer;
+        service.exchangeLetters(player, 'dv');
+
+        expect(socketEmitMockSpy).toHaveBeenCalled();
+    });
+
+    // place tests
+    it('place should return ImpossibleCommand if the player is not active', async () => {
+        const placeParams: PlaceParams = { position: new Vec2(1, 1), orientation: Axis.H, word: 'test' };
+        const player: Player = new Player('Riri');
+
+        expect(await service.place(player, placeParams)).toEqual(ErrorType.ImpossibleCommand);
+    });
+
+    it('place should call placeService place and just return the error result if the result is not NoError', async () => {
+        const placeParams: PlaceParams = { position: new Vec2(1, 1), orientation: Axis.H, word: 'test' };
+        const player: Player = new Player('Riri');
+        player.isActive = true;
+
+        placeServiceSpy.place.and.returnValue(ErrorType.SyntaxError);
+        expect(await service.place(player, placeParams)).toEqual(ErrorType.SyntaxError);
+
+        placeServiceSpy.place.and.returnValue(ErrorType.InvalidCommand);
+        expect(await service.place(player, placeParams)).toEqual(ErrorType.InvalidCommand);
+    });
+
+    // synchronizeAfterPlaceCommand
+    it('synchronizeAfterPlaceCommand should call socket emit if it is multiplayer mode and if there is no error', () => {
+        const placeParams: PlaceParams = { position: new Vec2(1, 1), orientation: Axis.H, word: 'test' };
+        const player: Player = new Player('Riri');
+        player.letters = [new ScrabbleLetter('r'), new ScrabbleLetter('a'), new ScrabbleLetter('l'), new ScrabbleLetter('e')];
+        player.score = 193;
+        service.game.gameMode = GameType.Solo;
+
+        service.synchronizeAfterPlaceCommand(ErrorType.ImpossibleCommand, placeParams, player);
+        expect(socketEmitMockSpy).not.toHaveBeenCalled();
+
+        service.synchronizeAfterPlaceCommand(ErrorType.NoError, placeParams, player);
+        expect(socketEmitMockSpy).not.toHaveBeenCalled();
+
+        service.game.gameMode = GameType.MultiPlayer;
+        service.synchronizeAfterPlaceCommand(ErrorType.NoError, placeParams, player);
+        expect(socketEmitMockSpy).toHaveBeenCalledTimes(2);
+    });
+
+    // addRackLetter tests
+    it('addRackLetter should call rackService addLetter', () => {
+        const randomLetters: ScrabbleLetter[] = [new ScrabbleLetter('r'), new ScrabbleLetter('a'), new ScrabbleLetter('l'), new ScrabbleLetter('e')];
+        rackServiceSpy.rackLetters = randomLetters;
+        const creator: Player = new Player('Riri');
+        service.game.players[0] = creator;
+        service.addRackLetters([new ScrabbleLetter('e')]);
+
+        expect(rackServiceSpy.addLetter).toHaveBeenCalled();
+    });
+
+    // removeRackLetter tests
+    it('removeRackLetter should call rackService removeLetter', () => {
+        const randomLetters: ScrabbleLetter[] = [
+            new ScrabbleLetter('k'),
+            new ScrabbleLetter('d'),
+            new ScrabbleLetter('v'),
+            new ScrabbleLetter('h'),
+            new ScrabbleLetter('r'),
+            new ScrabbleLetter('a'),
+            new ScrabbleLetter('l'),
+            new ScrabbleLetter('e'),
+        ];
+        rackServiceSpy.rackLetters = randomLetters;
+        const creator: Player = new Player('Riri');
+        service.game.players[0] = creator;
+        service.removeRackLetter(new ScrabbleLetter('e'));
+
+        expect(rackServiceSpy.removeLetter).toHaveBeenCalled();
+    });
+
+    // drawRack tests
+    it('drawRack should call rackService addLetter', () => {
+        gridServiceSpy.scrabbleBoard = new ScrabbleBoard(false);
+        gridServiceSpy.scrabbleBoard.squares[0][0].isValidated = true;
+        const word1: ScrabbleLetter[] = [new ScrabbleLetter('t'), new ScrabbleLetter('e'), new ScrabbleLetter('s'), new ScrabbleLetter('t')];
+        const word2: ScrabbleLetter[] = [new ScrabbleLetter('f'), new ScrabbleLetter('i'), new ScrabbleLetter('n')];
+
+        const scrabbleWord1: ScrabbleWord = new ScrabbleWord();
+        const scrabbleWord2: ScrabbleWord = new ScrabbleWord();
+        scrabbleWord1.content = word1;
+        scrabbleWord2.content = word2;
+        scrabbleWord1.orientation = Axis.H;
+        scrabbleWord2.orientation = Axis.V;
+
+        const newWords: ScrabbleWord[] = [scrabbleWord1, scrabbleWord2];
+        service.drawRack(newWords);
+        expect(rackServiceSpy.addLetter).toHaveBeenCalled();
     });
 });

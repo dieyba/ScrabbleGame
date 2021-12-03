@@ -168,15 +168,23 @@ export class SocketManagerService {
         this.virtualPlayerNameService
             .getVirtualPlayerNames(this.virtualPlayerNameService.beginnersCollection)
             .then((virtualPlayerNames: VirtualPlayerName[]) => {
-                const randomNewNameIndex = Math.floor(Math.random() * virtualPlayerNames.length);
-                const newVirtualPlayerName = virtualPlayerNames[randomNewNameIndex].name;
+                let newVirtualPlayerName: string;
+                do {
+                    const randomNewNameIndex = Math.floor(Math.random() * virtualPlayerNames.length);
+                    newVirtualPlayerName = virtualPlayerNames[randomNewNameIndex].name;
+                } while (roomGame.players[0].name === newVirtualPlayerName);
                 this.sio.to(roomGame.gameRoomId.toString()).emit('convert to solo', socket.id, newVirtualPlayerName);
                 this.gameListMan.deleteGameInPlay(roomGame.gameRoomId);
             })
             .catch(() => {
                 // If database is not available, provides a default name for the virtual player
-                const defaultVirtualPlayerName = 'Sara';
-                this.sio.to(roomGame.gameRoomId.toString()).emit('convert to solo', socket.id, defaultVirtualPlayerName);
+                const defaultVirtualPlayerName = ['Erika', 'Étienne', 'Sara'];
+                let opponentPlayerName: string;
+                do {
+                    const randomPlayerId: number = Math.floor(Math.random() * defaultVirtualPlayerName.length);
+                    opponentPlayerName = defaultVirtualPlayerName[randomPlayerId];
+                } while (roomGame.players[0].name === opponentPlayerName);
+                this.sio.to(roomGame.gameRoomId.toString()).emit('convert to solo', socket.id, opponentPlayerName);
                 this.gameListMan.deleteGameInPlay(roomGame.gameRoomId);
             });
     }

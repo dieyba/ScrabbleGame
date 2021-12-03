@@ -29,7 +29,8 @@ export class TurnManagerService {
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
     }
-    initalize() {
+
+    initialize() {
         this.consecutivePassedTurns = 0;
     }
 
@@ -37,46 +38,52 @@ export class TurnManagerService {
         this.socket.on('turn changed', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
             this.gameService.isTurnPassed = isCurrentTurnedPassed;
             this.consecutivePassedTurns = consecutivePassedTurns;
-            if (!this.gameService.game.isEndGame) {
-                const isLocalPlayerEndingGame = this.consecutivePassedTurns >= MAX_TURNS_PASSED && this.gameService.game.getLocalPlayer().isActive;
-                if (isLocalPlayerEndingGame) {
-                    this.endGameService.endGame();
-                }
-                this.displayPassTurnMessage();
-                this.updateActivePlayer();
-                this.gameService.resetTimer();
-                this.gameService.isTurnPassed = false;
+            if (this.gameService.game.isEndGame) {
+                return;
             }
+
+            const isLocalPlayerEndingGame = this.consecutivePassedTurns >= MAX_TURNS_PASSED && this.gameService.game.getLocalPlayer().isActive;
+            if (isLocalPlayerEndingGame) {
+                this.endGameService.endGame();
+            }
+            this.displayPassTurnMessage();
+            this.updateActivePlayer();
+            this.gameService.resetTimer();
+            this.gameService.isTurnPassed = false;
         });
     }
+
     changeTurn() {
         if (this.gameService.game.isEndGame) {
             return;
         }
-        if (this.gameService.game.gameMode === GameType.Solo) {
-            // Display "!passer" message for automatic pass turn or player pass turn command
-            this.displayPassTurnMessage();
-            this.updateConsecutivePassedTurns();
-            this.updateActivePlayer();
-            this.gameService.resetTimer();
-            const isVirtualPlayerCanPlay =
-                this.gameService.game.getOpponent() instanceof VirtualPlayer && this.gameService.game.getOpponent().isActive;
-            if (isVirtualPlayerCanPlay) {
-                this.virtualPlayerService.playTurn();
-            }
-            this.gameService.isTurnPassed = false; // reset isTurnedPassed when new human turn starts
-        } else {
+
+        if (this.gameService.game.gameMode === GameType.MultiPlayer) {
             this.socket.emit('change turn', this.gameService.isTurnPassed, this.consecutivePassedTurns);
+            return;
         }
+
+        // Display "!passer" message for automatic pass turn or player pass turn command
+        this.displayPassTurnMessage();
+        this.updateConsecutivePassedTurns();
+        this.updateActivePlayer();
+        this.gameService.resetTimer();
+        const isVirtualPlayerCanPlay = this.gameService.game.getOpponent() instanceof VirtualPlayer && this.gameService.game.getOpponent().isActive;
+        if (isVirtualPlayerCanPlay) {
+            this.virtualPlayerService.playTurn();
+        }
+        this.gameService.isTurnPassed = false; // reset isTurnedPassed when new human turn starts
     }
-    updateConsecutivePassedTurns() {
+
+    private updateConsecutivePassedTurns() {
         // Check if last 5 turns have been passed (by the command or the timer running out)
         this.consecutivePassedTurns = this.gameService.isTurnPassed ? this.consecutivePassedTurns + 1 : 0;
         if (this.consecutivePassedTurns >= MAX_TURNS_PASSED) {
             this.endGameService.endGame();
         }
     }
-    updateActivePlayer() {
+
+    private updateActivePlayer() {
         if (this.gameService.game.isEndGame) {
             this.gameService.game.getLocalPlayer().isActive = false;
             this.gameService.game.getOpponent().isActive = false;
@@ -97,7 +104,8 @@ export class TurnManagerService {
         activePlayer.isActive = false;
         inactivePlayer.isActive = true;
     }
-    displayPassTurnMessage() {
+
+    private displayPassTurnMessage() {
         if (this.gameService.isTurnPassed) {
             const activePlayer = this.gameService.game.getLocalPlayer().isActive
                 ? this.gameService.game.getLocalPlayer()

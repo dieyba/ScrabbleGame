@@ -1,96 +1,108 @@
-// import { TestBed } from '@angular/core/testing';
-// import { GameParameters } from '@app/classes/game-parameters';
-// import * as io from 'socket.io-client';
-// import { GameListService } from './game-list.service';
+import { TestBed } from '@angular/core/testing';
+import { DictionaryType } from '@app/classes/dictionary';
+import { GameType } from '@app/classes/game-parameters';
+import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
+import * as io from 'socket.io-client';
+import { GameListService } from './game-list.service';
 
-// /* eslint-disable  @typescript-eslint/no-explicit-any */
-// /* eslint-disable  @typescript-eslint/no-magic-numbers */
-// /* eslint-disable no-unused-vars */
-// /* eslint-disable dot-notation */
-// class SocketMock {
-//     id: string = 'Socket mock';
-//     events: Map<string, CallableFunction> = new Map();
-//     on(eventName: string, cb: CallableFunction) {
-//         this.events.set(eventName, cb);
-//     }
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable no-unused-vars */
+/* eslint-disable dot-notation */
+class SocketMock {
+    id: string = 'Socket mock';
+    events: Map<string, CallableFunction> = new Map();
+    on(eventName: string, cb: CallableFunction) {
+        this.events.set(eventName, cb);
+    }
 
-//     triggerEvent(eventName: string, ...args: any[]) {
-//         const arrowFunction = this.events.get(eventName) as CallableFunction;
-//         arrowFunction(...args);
-//     }
+    triggerEvent(eventName: string, ...args: any[]) {
+        const arrowFunction = this.events.get(eventName) as CallableFunction;
+        arrowFunction(...args);
+    }
 
-//     join(...args: any[]) {
-//         return;
-//     }
-//     emit(...args: any[]) {
-//         return;
-//     }
+    join() {
+        return;
+    }
+    emit() {
+        return;
+    }
 
-//     disconnect() {
-//         return;
-//     }
-// }
-// describe('GameListService', () => {
-//     let service: GameListService;
-//     let socketMock: SocketMock;
-//     let socketMockSpy: jasmine.SpyObj<any>;
-//     beforeEach(() => {
-//         TestBed.configureTestingModule({});
-//         service = TestBed.inject(GameListService);
-//         socketMock = new SocketMock();
-//         service['socket'] = socketMock as unknown as io.Socket;
-//         socketMockSpy = spyOn(socketMock, 'emit');
-//     });
+    disconnect() {
+        return;
+    }
+}
 
-//     it('should be created', () => {
-//         expect(service).toBeTruthy();
-//     });
-//     it('should createRoom ', () => {
-//         const game = new GameParameters('dieyba', 60, false);
-//         service.createRoom(game);
-//         expect(socketMockSpy).toHaveBeenCalledWith('createRoom', {
-//             name: 'dieyba',
-//             timer: 60,
-//             board: false,
-//             creatorLetters: [],
-//             opponentLetters: [],
-//             stock: [],
-//         });
-//     });
-//     it('should deleteRoom ', () => {
-//         service.deleteRoom();
-//         expect(socketMockSpy).toHaveBeenCalledWith('deleteRoom');
-//     });
-//     it('should start ', () => {
-//         const game = new GameParameters('dieyba', 60, false);
-//         game.gameRoom.idGame = 2;
-//         const joinerName = 'erika';
-//         service.start(game, joinerName);
-//         expect(socketMockSpy).toHaveBeenCalledWith('joinRoom', {
-//             gameId: game.gameRoom.idGame,
-//             joinerName,
-//         });
-//     });
-//     it('should call someoneLeftRoom ', () => {
-//         service.someoneLeftRoom();
-//         expect(socketMockSpy).toHaveBeenCalledWith('leaveRoom');
-//     });
-//     it('should call initializeGame ', () => {
-//         const roomId = 2;
-//         service.initializeGame(roomId);
-//         expect(socketMockSpy).toHaveBeenCalledWith('initializeGame', roomId);
-//     });
-//     it('should getList ', () => {
-//         const game = new GameParameters('dieyba', 60, false);
-//         service.existingRooms.push(game);
-//         service.getList();
-//         expect(service.existingRooms.length).toEqual(1);
-//     });
-//     // it('should catch event getAllGames ', () => {
-//     //     let socketMockSpyOn = spyOn(socketMock, 'on');
+describe('GameListService', () => {
+    let service: GameListService;
+    let socketMock: SocketMock;
+    // let socketOnMockSpy: jasmine.SpyObj<any>;
+    let socketEmitMockSpy: jasmine.SpyObj<any>;
 
-//     //     expect(socketMockSpyOn).toHaveBeenCalledWith('initializeGame', (game: any) => {
-//     //         service.existingRooms = game;
-//     //     })
-//     // });
-// });
+    // eslint-disable-next-line max-len
+    const game: WaitingAreaGameParameters = new WaitingAreaGameParameters(GameType.Solo, 2, DictionaryType.Default, 60, false, false, 'Riri', 'Lulu');
+    // const game2: WaitingAreaGameParameters = new WaitingAreaGameParameters(
+    //     GameType.MultiPlayer,
+    //     2,
+    //     DictionaryType.English,
+    //     60,
+    //     true,
+    //     true,
+    //     'Didi',
+    //     'Kevin',
+    // );
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({});
+        service = TestBed.inject(GameListService);
+        socketMock = new SocketMock();
+        service['socket'] = socketMock as unknown as io.Socket;
+        // socketOnMockSpy = spyOn(socketMock, 'on').and.callThrough();
+        socketEmitMockSpy = spyOn(socketMock, 'emit').and.callThrough();
+    });
+
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
+
+    // TODO: fix 'arrowFunction is not a function' error
+    // it('should catch socket updateWaitingAreaGames event', () => {
+    //     const allGames: WaitingAreaGameParameters[] = [game, game2];
+    //     socketMock.triggerEvent('updateWaitingAreaGames', allGames);
+
+    //     // expect(socketOnMockSpy).toHaveBeenCalledWith('updateWaitingAreaGames', (games: WaitingAreaGameParameters[]) => {
+    //     //     service.waitingAreaGames = games;
+    //     // });
+    //     expect(socketOnMockSpy).toHaveBeenCalled();
+    // });
+
+    it('getGames should call socket emit with the right parameters', () => {
+        service.getGames(true);
+        expect(socketEmitMockSpy).toHaveBeenCalledWith('getAllWaitingAreaGames', true);
+    });
+
+    it('createRoom should call socket emit with the right parameters', () => {
+        service.createRoom(game);
+        expect(socketEmitMockSpy).toHaveBeenCalledWith('createWaitingAreaRoom', game);
+    });
+
+    it('deleteRoom should call socket emit with the right parameters', () => {
+        service.deleteRoom();
+        expect(socketEmitMockSpy).toHaveBeenCalledWith('deleteWaitingAreaRoom');
+    });
+
+    it('start should call socket emit with the right parameters', () => {
+        service.start(game, 'Riri');
+        expect(socketEmitMockSpy).toHaveBeenCalledWith('joinWaitingAreaRoom', 'Riri', game.gameRoom.idGame, game.isLog2990);
+    });
+
+    it('initializeMultiplayerGame should call socket emit with the right parameters', () => {
+        service.initializeMultiplayerGame();
+        expect(socketEmitMockSpy).toHaveBeenCalledWith('initializeMultiPlayerGame');
+    });
+
+    it('someoneLeftRoom should call socket emit with the right parameters', () => {
+        service.someoneLeftRoom();
+        expect(socketEmitMockSpy).toHaveBeenCalledWith('leaveRoom');
+    });
+});

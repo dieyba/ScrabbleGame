@@ -72,4 +72,12 @@ describe('ScrabbleWord', () => {
         expect(isCoordInsideBoard(new Vec2(Column.Fifteen + 1, Row.O))).toBeFalse();
         expect(isCoordInsideBoard(new Vec2(Column.Fifteen, Row.O + 1))).toBeFalse();
     });
+
+    it('randomNumber should return a value between the minimum and the maximum', () => {
+        const minimum = 3;
+        const maximum = 10;
+
+        expect(utilities.randomNumber(minimum, maximum)).toBeLessThan(maximum);
+        expect(utilities.randomNumber(minimum, maximum)).toBeGreaterThanOrEqual(minimum);
+    });
 });

@@ -24,6 +24,10 @@ export class EndGameService {
     ) {
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
+        this.socketOnConnect();
+    }
+
+    socketOnConnect() {
         this.socket.on('gameEnded', () => {
             this.chatDisplayService.displayEndGameMessage(
                 this.gameService.game.stock.letterStock,
@@ -34,19 +38,22 @@ export class EndGameService {
             this.gameService.resetTimer(); // to stop the timer
         });
     }
+
     endGame() {
-        if (this.gameService.game.gameMode === GameType.Solo) {
-            this.chatDisplayService.displayEndGameMessage(
-                this.gameService.game.stock.letterStock,
-                this.gameService.game.getLocalPlayer(),
-                this.gameService.game.getOpponent(),
-            );
-            this.endLocalGame();
-            this.gameService.resetTimer();
-        } else if (this.gameService.game.gameMode === GameType.MultiPlayer) {
+        if (this.gameService.game.gameMode === GameType.MultiPlayer) {
             this.socket.emit('endGame');
+            return;
         }
+
+        this.chatDisplayService.displayEndGameMessage(
+            this.gameService.game.stock.letterStock,
+            this.gameService.game.getLocalPlayer(),
+            this.gameService.game.getOpponent(),
+        );
+        this.endLocalGame();
+        this.gameService.resetTimer();
     }
+
     private endLocalGame() {
         const isEmptyPlayerRack =
             this.gameService.game.getLocalPlayer().letters.length === 0 || this.gameService.game.getOpponent().letters.length === 0;
@@ -67,8 +74,8 @@ export class EndGameService {
                     // if (error.status !== HttpStatusCode.Ok) {
                     this.snack.open(
                         'Désolé votre score ne pourra pas être éligible au tableau' +
-                            'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
-                            'Veuillez réessayer plus tard!',
+                        'des meilleurs scores, la base de données et/ou le serveur est momentanément indisponible.' +
+                        'Veuillez réessayer plus tard!',
                         'close',
                     );
                     // }
@@ -79,6 +86,7 @@ export class EndGameService {
         this.gameService.game.gameTimer.secondsToMinutes();
         this.gameService.game.isEndGame = true;
     }
+
     private endGameAfterPlace() {
         const winnerPlayer =
             this.gameService.game.getLocalPlayer().letters.length === 0
@@ -94,6 +102,7 @@ export class EndGameService {
         winnerPlayer.isWinner = true;
         loserPlayer.isWinner = false;
     }
+
     private endGameAfterPassedTurns() {
         let maxScore = this.gameService.game.players[0].score - calculateRackPoints(this.gameService.game.players[0]);
         this.gameService.game.players.forEach((player) => {

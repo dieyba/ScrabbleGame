@@ -107,3 +107,8 @@ export const isCoordInsideBoard = (coord: Vec2) => {
     const isValidRow = coord.y >= Row.A && coord.y <= Row.O;
     return isValidColumn && isValidRow;
 };
+
+export const randomNumber = (minimum: number, maximum: number): number => {
+    const randomFloat = Math.random() * (maximum - minimum);
+    return Math.floor(randomFloat) + minimum;
+};

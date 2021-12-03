@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { DictionaryInterface } from '@app/classes/dictionary';
 import { GameType } from '@app/classes/game-parameters';
+import { randomNumber } from '@app/classes/utilities';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters';
 import { ErrorCase } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
@@ -139,19 +140,14 @@ export class FormComponent implements OnInit {
         this.dialogRef.close();
     }
 
-    randomNumber(minimum: number, maximum: number): number {
-        const randomFloat = Math.random() * (maximum - minimum);
-        return Math.floor(randomFloat) + minimum;
-    }
-
     randomPlayer(list: VirtualPlayerName[]): void {
         const showOpponents = document.getElementById('opponents');
         if (showOpponents instanceof HTMLElement) {
             showOpponents.style.visibility = 'visible';
         }
-        this.randomPlayerId = this.randomNumber(0, list.length);
+        this.randomPlayerId = randomNumber(0, list.length);
         do {
-            this.randomPlayerId = this.randomNumber(0, list.length);
+            this.randomPlayerId = randomNumber(0, list.length);
             this.selectedPlayer = list[this.randomPlayerId].name;
         } while (this.name.value === this.selectedPlayer);
 

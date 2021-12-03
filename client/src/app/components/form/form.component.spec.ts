@@ -83,20 +83,6 @@
 //     //     expect(spy).not.toHaveBeenCalled();
 //     // });
 
-//     it('should return a value between the minimum and the maxmimum', () => {
-//         const minimum = 3;
-//         const maximum = 10;
-
-//         expect(component.randomNumber(minimum, maximum)).toBeLessThan(maximum);
-//         expect(component.randomNumber(minimum, maximum)).toBeGreaterThanOrEqual(minimum);
-//     });
-
-//     // it('should call randomNumber() method', () => {
-//     //     const spy = spyOn(component, 'randomNumber');
-//     //     component.randomPlayer(list);
-//     //     expect(spy).toHaveBeenCalled();
-//     // });
-
 //     it('form invalid when empty', () => {
 //         component.submit();
 //         expect(component.myForm.valid).toBeFalsy();
