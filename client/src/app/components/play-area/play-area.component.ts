@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { DefaultCommandParams } from '@app/classes/commands/commands';
 import { PassTurnCmd } from '@app/classes/pass-command/pass-command';
 import { Vec2 } from '@app/classes/vec2/vec2';
@@ -10,6 +10,7 @@ import { GridService } from '@app/services/grid.service/grid.service';
 import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service/mouse-word-placer.service';
 import { RackService } from '@app/services/rack.service/rack.service';
 import { TurnManagerService } from '@app/services/turn-manager.service/turn-manager.service';
+import { Subscription } from 'rxjs';
 
 // TODO : See if needed elsewhere, else no need to move these constants
 export const DEFAULT_WIDTH = 580;
@@ -28,13 +29,14 @@ export enum MouseButton {
     templateUrl: './play-area.component.html',
     styleUrls: ['./play-area.component.scss'],
 })
-export class PlayAreaComponent implements AfterViewInit {
+export class PlayAreaComponent implements AfterViewInit, OnDestroy {
     @ViewChild('gridCanvas', { static: false }) private gridCanvas!: ElementRef<HTMLCanvasElement>;
     @ViewChild('overlayCanvas', { static: false }) private overlayCanvas!: ElementRef<HTMLCanvasElement>;
 
     mousePosition: Vec2;
     private canvasSize: Vec2;
     private rackSize: Vec2;
+    private turnSubscription: Subscription;
 
     constructor(
         private readonly gridService: GridService,
@@ -50,10 +52,12 @@ export class PlayAreaComponent implements AfterViewInit {
         this.canvasSize = new Vec2(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         this.rackSize = new Vec2(RACK_WIDTH, RACK_HEIGHT);
     }
+
     @HostListener('keydown', ['$event'])
     onKeyDown(event: KeyboardEvent) {
         this.mouseWordPlacerService.onKeyDown(event);
     }
+
     @HostListener('focusout', ['$event'])
     onBlur(evt: FocusEvent) {
         if (document.hasFocus()) {
@@ -66,6 +70,7 @@ export class PlayAreaComponent implements AfterViewInit {
             }
         }
     }
+
     ngAfterViewInit(): void {
         this.gridService.gridContext = this.gridCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.mouseWordPlacerService.overlayContext = this.overlayCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
@@ -73,14 +78,18 @@ export class PlayAreaComponent implements AfterViewInit {
         this.gridService.drawGrid();
         this.gridService.drawColors();
         this.rackService.drawRack();
-        this.turnManagerService.initalize();
+        this.turnManagerService.initialize();
         this.chatDisplayService.initialize(this.gameService.game.getLocalPlayer().name);
 
-        this.gameService.isTurnEndObservable.subscribe(() => {
+        this.turnSubscription = this.gameService.isTurnEndObservable.subscribe(() => {
             // put back the letters from the board to the rack if they weren't placed
             this.mouseWordPlacerService.onBlur();
             this.turnManagerService.changeTurn();
         });
+    }
+
+    ngOnDestroy() {
+        this.turnSubscription.unsubscribe();
     }
 
     passTurn() {
@@ -123,12 +132,15 @@ export class PlayAreaComponent implements AfterViewInit {
     sizeDownLetters(): void {
         this.gridService.sizeDownLetters();
     }
+
     onMouseDown(event: MouseEvent) {
         this.mouseWordPlacerService.onMouseClick(event);
     }
+
     confirmWord() {
         this.mouseWordPlacerService.confirmWord();
     }
+
     atLeastOneLetterSelected(): boolean {
         return this.exchangeService.atLeastOneLetterSelected();
     }

@@ -45,6 +45,7 @@ export abstract class Goal {
         this.description = '';
         this.isAchieved = false;
     }
+
     initialize?(goalParameters: ScrabbleLetter | ValidationService | Player[]): void;
     abstract achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters?: ScrabbleLetter[], activePlayerName?: string): number;
 }

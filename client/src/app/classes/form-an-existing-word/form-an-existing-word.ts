@@ -12,16 +12,18 @@ export class FormAnExistingWord extends Goal {
         this.type = GoalType.FormAnExistingWord;
         this.description = GoalDescriptions.FormAnExistingWord;
     }
+
     initialize(validationService: ValidationService) {
         this.validationService = validationService;
     }
+
     achieve(wordsFormed: ScrabbleWord[]) {
         if (this.isAchieved) {
             return 0;
         }
         const previousValidWordsFormed = this.validationService.validWordsFormed.slice(0, -wordsFormed.length);
         for (const newWordFormed of wordsFormed) {
-            // TODO: Voir pour les étoiles si les lettres si il faut toLower() dans validWordsFormed et newWordFormed
+            // TODO: see if star letters should be in toLower() in validWordsFormed and newWordFormed
             if (
                 previousValidWordsFormed.includes(scrabbleLettersToString(newWordFormed.content)) &&
                 newWordFormed.content.length >= MIN_WORD_LENGTH

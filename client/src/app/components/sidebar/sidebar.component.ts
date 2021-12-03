@@ -32,6 +32,7 @@ export class SidebarComponent implements AfterViewInit {
         this.localPlayer = gameService.game.getLocalPlayer();
         this.opponentPlayer = gameService.game.getOpponent();
     }
+
     ngAfterViewInit(): void {
         clearTimeout(this.gameService.game.gameTimer.intervalValue);
     }
@@ -97,6 +98,7 @@ export class SidebarComponent implements AfterViewInit {
         }
         return false;
     }
+
     getTimer(): string {
         return this.gameService.game.gameTimer.timer;
     }

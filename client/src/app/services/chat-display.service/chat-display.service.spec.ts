@@ -1,3 +1,9 @@
+/* eslint-disable dot-notation */
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-vars */
+/* eslint-disable dot-notation */
+/* eslint-disable  @typescript-eslint/no-unused-expressions */
+/* eslint-disable  no-unused-expressions */
 import { TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { ChatEntryColor, ServerChatEntry } from '@app/classes/chat-display-entry/chat-display-entry';
@@ -7,9 +13,6 @@ import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player/virtual-p
 import * as io from 'socket.io-client';
 import { ACTIVE_DEBUG_MESSAGE, ChatDisplayService, INACTIVE_DEBUG_MESSAGE } from './chat-display.service';
 
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-/* eslint-disable no-unused-vars */
-/* eslint-disable dot-notation */
 class SocketMock {
     id: string = 'Socket mock';
     events: Map<string, CallableFunction> = new Map();
@@ -62,13 +65,13 @@ describe('ChatDisplayService', () => {
         expect(socketEmitMockSpy).toHaveBeenCalledWith('sendChatEntry', message, message2);
     });
     it('socketOnConnect should handle socket.on event addChatEntry', () => {
-        service.socketOnConnect();
+        service['socketOnConnect'];
         const serverChatEntry: ServerChatEntry = { senderName: 'dieyba', message: 'salut' };
         socketMock.triggerEvent('addChatEntry', serverChatEntry);
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event addSystemChatEntry', () => {
-        service.socketOnConnect();
+        service['socketOnConnect'];
         const systemEntry = 'system';
         socketMock.triggerEvent('addSystemChatEntry', systemEntry);
         expect(socketMockSpy).toHaveBeenCalled();
@@ -92,7 +95,7 @@ describe('ChatDisplayService', () => {
         const commandInput = '!somecommand';
         const debugMessage = ['some debug message'];
         service.isActiveDebug = false;
-        service.addVirtalPlayerEntry(commandInput, debugMessage);
+        service.addVirtualPlayerEntry(commandInput, debugMessage);
         const expectedEntry = { color: ChatEntryColor.RemotePlayer, message: '!somecommand' };
         expect(service.entries.length).toEqual(1);
         expect(service.entries[0]).toEqual(expectedEntry);
@@ -102,7 +105,7 @@ describe('ChatDisplayService', () => {
         const commandInput = '!somecommand';
         const debugMessage = ['some debug message'];
         service.isActiveDebug = true;
-        service.addVirtalPlayerEntry(commandInput, debugMessage);
+        service.addVirtualPlayerEntry(commandInput, debugMessage);
         const expectedEntry = { color: ChatEntryColor.RemotePlayer, message: '!somecommand' };
         const expectedDebugEntry = { color: ChatEntryColor.SystemColor, message: '[Debug] some debug message' };
         expect(service.entries.length).toEqual(2);

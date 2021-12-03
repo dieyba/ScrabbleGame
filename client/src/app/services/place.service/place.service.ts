@@ -67,7 +67,20 @@ export class PlaceService {
         }
         return ErrorType.NoError;
     }
-    placeLetter(player: Player, letter: string, position: Vec2) {
+
+    canPlaceWord(placeParams: PlaceParams): boolean {
+        if (
+            !this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, placeParams.position, placeParams.orientation) ||
+            (!this.gridService.scrabbleBoard.isWordPassingInCenter(placeParams.word, placeParams.position, placeParams.orientation) &&
+                !this.gridService.scrabbleBoard.isWordPartOfAnotherWord(placeParams.word, placeParams.position, placeParams.orientation) &&
+                !this.gridService.scrabbleBoard.isWordTouchingOtherWord(placeParams.word, placeParams.position, placeParams.orientation))
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    private placeLetter(player: Player, letter: string, position: Vec2) {
         // Position already occupied
         if (this.gridService.scrabbleBoard.squares[position.x][position.y].occupied) {
             return;
@@ -92,16 +105,5 @@ export class PlaceService {
                 break;
             }
         }
-    }
-    canPlaceWord(placeParams: PlaceParams): boolean {
-        if (
-            !this.gridService.scrabbleBoard.isWordInsideBoard(placeParams.word, placeParams.position, placeParams.orientation) ||
-            (!this.gridService.scrabbleBoard.isWordPassingInCenter(placeParams.word, placeParams.position, placeParams.orientation) &&
-                !this.gridService.scrabbleBoard.isWordPartOfAnotherWord(placeParams.word, placeParams.position, placeParams.orientation) &&
-                !this.gridService.scrabbleBoard.isWordTouchingOtherWord(placeParams.word, placeParams.position, placeParams.orientation))
-        ) {
-            return false;
-        }
-        return true;
     }
 }

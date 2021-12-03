@@ -2,16 +2,16 @@
 // import { TestBed } from '@angular/core/testing';
 // import { CanvasTestHelper } from '@app/classes/canvas-test-helper/canvas-test-helper';
 // import { GameParameters } from '@app/classes/game-parameters/game-parameters';
-// import { ScrabbleBoard } from '@app/classes/scrabble-board';
-// import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-// import { Axis } from '@app/classes/utilities';
-// import { Vec2 } from '@app/classes/vec2';
-// import { CommandInvokerService } from './command-invoker.service';
-// import { GameService } from './game.service';
-// import { BOARD_OFFSET, BOARD_SIZE, DEFAULT_HEIGHT, DEFAULT_WIDTH, GridService } from './grid.service';
-// import { MouseWordPlacerCompanionService } from './mouse-word-placer-companion.service';
+// import { ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
+// import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+// import { Axis } from '@app/classes/utilities/utilities';
+// import { Vec2 } from '@app/classes/vec2/vec2';
+// import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
+// import { GameService } from '@app/services/game.service/game.service';
+// import { BOARD_OFFSET, BOARD_SIZE, DEFAULT_HEIGHT, DEFAULT_WIDTH, GridService } from '@app/services/grid.service/grid.service';
+// import { MouseWordPlacerCompanionService } from '@app/services/mouse-word-placer-companion.service/mouse-word-placer-companion.service';
+// import { RackService, RACK_HEIGHT, RACK_WIDTH } from '@app/services/rack.service/rack.service';
 // import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE, MouseWordPlacerService } from './mouse-word-placer.service';
-// import { RackService, RACK_HEIGHT, RACK_WIDTH } from './rack.service';
 
 // describe('MouseWordPlacerService', () => {
 //     let service: MouseWordPlacerService;
@@ -326,11 +326,11 @@
 //     });
 //     it('removeLetter should redraw the rack when it is called', () => {
 //         rackServiceSpy.rackLetters = [
-//     new ScrabbleLetter('t', 1),
-//     new ScrabbleLetter('e', 1),
-//     new ScrabbleLetter('s', 1),
-//     new ScrabbleLetter('t', 1)
-// ];
+//             new ScrabbleLetter('t', 1),
+//             new ScrabbleLetter('e', 1),
+//             new ScrabbleLetter('s', 1),
+//             new ScrabbleLetter('t', 1)
+//         ];
 //         service.removeLetter();
 //         expect(rackServiceSpy.drawExistingLetters).toHaveBeenCalled();
 //     });
