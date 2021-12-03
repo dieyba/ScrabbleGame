@@ -20,7 +20,6 @@ export class WordBuilderService {
     // TODO: make sure the scrabbleWords returned scrabbleLetters that have everything init properly (value, coord, color, isbonusUsed)
     buildWordsOnBoard(coord: Vec2, axis: Axis): ScrabbleWord[] {
         const result: ScrabbleWord[] = [];
-
         // get full word that can be read on the placed word's row/column
         let wordBuilt = this.buildScrabbleWord(coord, axis);
         wordBuilt.orientation = axis;

@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { GameType } from '@app/classes/game-parameters/game-parameters';
+import { Difficulty } from '@app/classes/virtual-player/virtual-player';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters/waiting-area-game-parameters';
 import { ErrorCaseVirtualPlayerName } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
@@ -186,9 +187,10 @@ export class GameInitFormComponent implements OnInit {
             if (gameMode === GameType.Solo) {
                 this.closeDialog();
                 gameParams.joinerName = this.opponent.value;
+                const difficulty: Difficulty = this.level.value === 'easy' ? Difficulty.Easy : Difficulty.Difficult;
                 this.dialogRef.close();
                 this.router.navigate(['/game']);
-                this.gameService.initializeSoloGame(gameParams, this.level.value);
+                this.gameService.initializeSoloGame(gameParams, difficulty);
             } else {
                 this.closeDialog();
                 this.gameList.createRoom(gameParams);
