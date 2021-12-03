@@ -383,11 +383,8 @@ export class VirtualPlayerService {
             } else if (axis === Axis.V && currentCoord.y + 1 < BOARD_SIZE) {
                 currentCoord.y += 1;
             }
-            console.log('hello');
-            if (!currentSquare || !currentSquare.letter) return;
-            console.log('there');
+            if (!currentSquare) return;
             if (currentSquare.isValidated) continue;
-            console.log('placed letter: ' + word.content[i].character);
             currentSquare.letter = word.content[i];
             currentSquare.occupied = true;
             currentSquare.isValidated = false;
@@ -407,14 +404,11 @@ export class VirtualPlayerService {
             if (axis === Axis.V && currentCoord.y + 1 < BOARD_SIZE) {
                 currentCoord.y += 1;
             }
+            if (!currentSquare) return;
             if (currentSquare.isValidated) continue;
-            if (currentSquare) {
-                if (!currentSquare.isValidated) {
-                    currentSquare.letter = new ScrabbleLetter('', 0);
-                    currentSquare.occupied = false;
-                    word.content[i].tile.position = new Vec2(POSITION_ERROR, POSITION_ERROR);
-                }
-            }
+            currentSquare.letter = new ScrabbleLetter('', 0);
+            currentSquare.occupied = false;
+            word.content[i].tile.position = new Vec2(POSITION_ERROR, POSITION_ERROR);
         }
     }
 
