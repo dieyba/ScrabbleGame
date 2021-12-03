@@ -65,7 +65,7 @@ describe('ExchangeCmd', () => {
         gameServiceSpy.exchangeLetters.and.returnValue(ErrorType.ImpossibleCommand);
         const errorLetters = 'AAAAAAAA';
         const errorMessage = createErrorEntry(ErrorType.ImpossibleCommand, '!échanger ' + errorLetters);
-        exchange.letters = errorLetters;
+        exchange['letters'] = errorLetters;
         exchange.player.isActive = false;
         expect(exchange.execute()).toEqual({ isExecuted: false, executionMessages: [errorMessage] });
     });

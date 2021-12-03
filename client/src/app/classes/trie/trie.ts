@@ -13,10 +13,7 @@ export class Trie {
             this.insert(word);
         }
     }
-    insert(word: string): void {
-        if (word === null) {
-            return;
-        }
+    insert(word: string): boolean {
         word = word.toLowerCase();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let current = this.root;
@@ -26,7 +23,7 @@ export class Trie {
             }
             current = current.children.get(character) as Node;
         }
-        current.isWord = true;
+        return current.isWord = true;
     }
     find(word: string): boolean {
         let current = this.root;

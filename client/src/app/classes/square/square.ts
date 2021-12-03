@@ -3,8 +3,6 @@ import { Vec2 } from '@app/classes/vec2/vec2';
 
 export const TOTAL_COLORS = 5;
 
-export const TOTAL_COLORS = 5;
-
 export enum SquareColor {
     None = 0,
     Teal = 1,

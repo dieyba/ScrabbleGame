@@ -18,12 +18,13 @@ import { environment } from 'src/environments/environment';
 
 const PUBLIC_GOALS_COUNT = 2;
 const TOTAL_GOALS_COUNT = 8;
+type GoalCreationFunction = () => InstanceType<typeof Goal>;
 
 @Injectable({
     providedIn: 'root',
 })
 export class GoalsService {
-    goalsCreationMap: Map<GoalType, Function>; // eslint-disable-line @typescript-eslint/ban-types
+    goalsCreationMap: Map<GoalType, GoalCreationFunction>;
     sharedGoals: Goal[];
     privateGoals: Goal[];
     private socket: io.Socket;
@@ -56,7 +57,7 @@ export class GoalsService {
         const newSharedGoals: GoalType[] = [];
         for (let i = 0; newSharedGoals.length < PUBLIC_GOALS_COUNT; i++) {
             const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
-            if (!newSharedGoals.includes(randomGoal)) {
+            if (!usedGoals.includes(randomGoal)) {
                 newSharedGoals.push(randomGoal);
                 usedGoals.push(randomGoal);
             }
@@ -131,9 +132,6 @@ export class GoalsService {
 
     getGoalOfAPlayer(activePlayer: Player): Goal {
         const activePlayerGoalId = this.privateGoals.findIndex((goal: Goal) => {
-            if (activePlayer.goal === undefined || goal.type === undefined) {
-                return false;
-            }
             return goal.type === activePlayer.goal;
         });
         return this.privateGoals[activePlayerGoalId];
@@ -142,9 +140,6 @@ export class GoalsService {
     getGoalByType(goalType: GoalType) {
         const allGoals = this.sharedGoals.concat(this.privateGoals);
         const goalId = allGoals.findIndex((goal: Goal) => {
-            if (goal.type === undefined) {
-                return false;
-            }
             return goal.type === goalType;
         });
         return allGoals[goalId];

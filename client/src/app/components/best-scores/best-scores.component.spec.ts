@@ -26,7 +26,7 @@ describe('BestScoresComponent', () => {
         },
     ] as BestScores[];
     beforeEach(async () => {
-        bestScoresServiceSpy = jasmine.createSpyObj('BestScoresService', ['getBestScores', 'handleErrorSnackBar']);
+        bestScoresServiceSpy = jasmine.createSpyObj('BestScoresService', ['getBestScores', 'handleErrorSnackBar', 'playerName']);
         bestScoresServiceSpy.getBestScores.and.callFake(() => {
             return of(defaultClassicBestScoresValue);
         });

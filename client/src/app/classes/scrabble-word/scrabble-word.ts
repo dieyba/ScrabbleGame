@@ -15,9 +15,7 @@ export class ScrabbleWord {
     stringify(): string {
         let string = '';
         for (const i of this.content) {
-            if (i) {
-                string += i.character;
-            }
+            string += i.character;
         }
         return string;
     }
