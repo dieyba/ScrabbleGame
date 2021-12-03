@@ -1,4 +1,4 @@
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 
 enum LetterQuantity {
     A = 9,

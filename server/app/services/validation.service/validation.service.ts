@@ -1,4 +1,4 @@
-import { Dictionary, DictionaryType } from '@app/classes/dictionary';
+import { Dictionary, DictionaryType } from '@app/classes/dictionary/dictionary';
 import { Service } from 'typedi';
 
 @Service()

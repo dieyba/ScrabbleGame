@@ -1,6 +1,6 @@
 import { Application } from '@app/app';
 import { BestScores } from '@app/classes/best-scores';
-import { BestScoresService } from '@app/services/best-scores.service';
+import { BestScoresService } from '@app/services/best-scores.service/best-scores.service';
 import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';

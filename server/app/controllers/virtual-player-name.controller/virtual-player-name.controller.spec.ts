@@ -1,5 +1,5 @@
 import { VirtualPlayerName } from '@app/classes/virtual-player-name';
-import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
+import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
 import { ObjectId } from 'bson';
 import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
@@ -9,7 +9,7 @@ import * as supertest from 'supertest';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
 // eslint-disable-next-line no-restricted-imports
-import { Application } from '../app';
+import { Application } from '../../app';
 
 describe('VirtualPlayerNameController', () => {
     const names: VirtualPlayerName[] = [

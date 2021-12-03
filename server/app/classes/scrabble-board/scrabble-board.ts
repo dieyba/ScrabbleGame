@@ -1,4 +1,4 @@
-import { ColorQuantity, Square, SquareColor } from './square';
+import { ColorQuantity, Square, SquareColor } from '../square/square';
 
 export const BOARD_SIZE = 15;
 

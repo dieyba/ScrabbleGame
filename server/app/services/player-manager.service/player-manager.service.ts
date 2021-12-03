@@ -1,5 +1,5 @@
-import { Player } from '@app/classes/player';
-import { ERROR_NUMBER } from '@app/classes/utilities';
+import { Player } from '@app/classes/player/player';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 import { Service } from 'typedi';
 
 @Service()

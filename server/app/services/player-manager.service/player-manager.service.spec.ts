@@ -1,4 +1,4 @@
-import { Player } from '@app/classes/player';
+import { Player } from '@app/classes/player/player';
 import { expect } from 'chai';
 import { PlayerManagerService } from './player-manager.service';
 

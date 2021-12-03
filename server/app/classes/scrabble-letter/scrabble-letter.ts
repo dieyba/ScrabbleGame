@@ -1,5 +1,5 @@
-import { Square, SquareColor } from './square';
-import { isAllLowerLetters, removeAccents } from './utilities';
+import { Square, SquareColor } from '../square/square';
+import { isAllLowerLetters, removeAccents } from '../utilities/utilities';
 
 export const DARK_BLUE_FACTOR = 3;
 export const PALE_BLUE_FACTOR = 2;

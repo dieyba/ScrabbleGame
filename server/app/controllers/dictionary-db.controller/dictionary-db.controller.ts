@@ -1,5 +1,5 @@
-import { DictionaryInterface } from '@app/classes/dictionary';
-import { DictionaryDBService } from '@app/services/dictionary-db.service';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
+import { DictionaryDBService } from '@app/services/dictionary-db.service/dictionary-db.service';
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';

@@ -1,5 +1,5 @@
 import { VirtualPlayerName } from '@app/classes/virtual-player-name';
-import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service';
+import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';

@@ -1,6 +1,6 @@
-import { GoalType } from './game-parameters';
-import { ScrabbleLetter } from './scrabble-letter';
-import { ERROR_NUMBER } from './utilities';
+import { GoalType } from '../game-parameters/game-parameters';
+import { ScrabbleLetter } from '../scrabble-letter/scrabble-letter';
+import { ERROR_NUMBER } from '../utilities/utilities';
 
 export class Player {
     socketId: string;

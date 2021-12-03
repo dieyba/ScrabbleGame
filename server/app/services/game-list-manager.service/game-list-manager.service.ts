@@ -1,5 +1,5 @@
-import { GameInitInfo, WaitingAreaGameParameters } from '@app/classes/game-parameters';
-import { ERROR_NUMBER } from '@app/classes/utilities';
+import { GameInitInfo, WaitingAreaGameParameters } from '@app/classes/game-parameters/game-parameters';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 import { Service } from 'typedi';
 @Service()
 export class GameListManager {

@@ -1,6 +1,6 @@
 /* eslint no-underscore-dangle: 0 */
 import * as dict_path from '@app/assets/dictionnary.json';
-import { Dictionary, DictionaryInterface } from '@app/classes/dictionary';
+import { Dictionary, DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { Collection, Filter, FindOneAndUpdateOptions, FindOptions, MongoClient, ObjectId } from 'mongodb';
 import { Service } from 'typedi';
 

@@ -143,8 +143,8 @@ describe('WordBuilderService', () => {
                 gridServiceSpy.scrabbleBoard.squares[x][y].letter.tile.occupied = true;
             }
         }
-        expect(service.buildWordsOnBoard('eleve', startCoord, Axis.H).length).toEqual(1);
-        expect(service.buildWordsOnBoard('eleve', startCoord, Axis.H)[0].content).toEqual(letters);
+        expect(service.buildWordsOnBoard(startCoord, Axis.H).length).toEqual(1);
+        expect(service.buildWordsOnBoard(startCoord, Axis.H)[0].content).toEqual(letters);
     });
 
     it('should not build word if cannot find its edges', () => {

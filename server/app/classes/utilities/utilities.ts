@@ -1,4 +1,4 @@
-import { ScrabbleLetter } from './scrabble-letter';
+import { ScrabbleLetter } from '../scrabble-letter/scrabble-letter';
 
 export const ERROR_NUMBER = -1;
 

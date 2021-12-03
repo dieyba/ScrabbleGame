@@ -1,5 +1,5 @@
 import { BestScores } from '@app/classes/best-scores';
-import { BestScoresService } from '@app/services/best-scores.service';
+import { BestScoresService } from '@app/services/best-scores.service/best-scores.service';
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';

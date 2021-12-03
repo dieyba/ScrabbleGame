@@ -1,9 +1,9 @@
-import { DictionaryType } from './dictionary';
-import { LetterStock } from './letter-stock';
-import { Player } from './player';
-import { ScrabbleBoard } from './scrabble-board';
-import { ScrabbleLetter } from './scrabble-letter';
-import { Square, TOTAL_COLORS } from './square';
+import { DictionaryType } from '../dictionary/dictionary';
+import { LetterStock } from '../letter-stock/letter-stock';
+import { Player } from '../player/player';
+import { ScrabbleBoard } from '../scrabble-board/scrabble-board';
+import { ScrabbleLetter } from '../scrabble-letter/scrabble-letter';
+import { Square, TOTAL_COLORS } from '../square/square';
 
 export const GAME_CAPACITY = 2;
 const DEFAULT_LETTER_COUNT = 7;
