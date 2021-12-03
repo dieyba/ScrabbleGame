@@ -4,7 +4,7 @@ import { DefaultCommandParams, PlaceParams } from '@app/classes/commands/command
 import { ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
 import { PassTurnCmd } from '@app/classes/pass-command/pass-command';
 import { PlaceCmd } from '@app/classes/place-command/place-command';
-import { VirtualPlayer } from '@app/classes/virtual-player/virtual-player';
+import { VirtualPlayer, Difficulty } from '@app/classes/virtual-player/virtual-player';
 import { BOARD_SIZE } from '@app/classes/scrabble-board/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleMove } from '@app/classes/scrabble-move/scrabble-move';
@@ -12,7 +12,6 @@ import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { SquareColor } from '@app/classes/square/square';
 import { Axis, convertYAxisToLetterCoordinates, isCoordInsideBoard } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { Difficulty } from '@app/classes/virtual-player/virtual-player';
 import { BonusService } from '@app/services/bonus.service/bonus.service';
 import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
 import { GameService } from '@app/services/game.service/game.service';
