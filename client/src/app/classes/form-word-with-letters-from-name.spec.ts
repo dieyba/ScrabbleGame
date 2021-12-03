@@ -37,10 +37,9 @@ describe('FormWordWithLettersFromName', () => {
         const letter1 = new ScrabbleLetter('a', 1);
         const letter2 = new ScrabbleLetter('i', 1);
         const letter3 = new ScrabbleLetter('m', 1);
-        const letter4 = new ScrabbleLetter('t', 1);
         const newWord1 = new ScrabbleWord();
-        newWord1.content = [letter1, letter2, letter3, letter1, letter2, letter4]; // aimait 
-        const newlyPlacedLetters = [letter1, letter2, letter4];
+        newWord1.content = [letter1, letter3, letter2]; // ami
+        const newlyPlacedLetters = [letter1, letter2, letter3];
         expect(formWordWithLettersFromName.achieve([newWord1], newlyPlacedLetters, name)).toEqual(0);
     });
 

@@ -57,7 +57,7 @@ export class GoalsService {
         const newSharedGoals: GoalType[] = [];
         for (let i = 0; newSharedGoals.length < PUBLIC_GOALS_COUNT; i++) {
             const randomGoal = Math.floor(Math.random() * TOTAL_GOALS_COUNT);
-            if (!newSharedGoals.includes(randomGoal)) {
+            if (!usedGoals.includes(randomGoal)) {
                 newSharedGoals.push(randomGoal);
                 usedGoals.push(randomGoal);
             }
@@ -143,7 +143,7 @@ export class GoalsService {
     getGoalByType(goalType: GoalType) {
         const allGoals = this.sharedGoals.concat(this.privateGoals);
         const goalId = allGoals.findIndex((goal: Goal) => {
-            if (goal.type === undefined) {
+            if (goal.type === undefined || goalType === undefined) {
                 return false;
             }
             return goal.type === goalType;
