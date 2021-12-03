@@ -4,12 +4,13 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { BASE_URL, BestScores, BestScoresService } from '@app/services/best-scores.service';
 import { of, throwError } from 'rxjs';
 import { BestScoresComponent } from './best-scores.component';
-
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable dot-notation */
 describe('BestScoresComponent', () => {
     let component: BestScoresComponent;
     let fixture: ComponentFixture<BestScoresComponent>;
     let bestScoresServiceSpy: jasmine.SpyObj<BestScoresService>;
-    let defaultClassicBestScoresValue = [
+    const defaultClassicBestScoresValue = [
         {
             playerName: 'Erika',
             score: 1,
@@ -26,8 +27,8 @@ describe('BestScoresComponent', () => {
     beforeEach(async () => {
         bestScoresServiceSpy = jasmine.createSpyObj('BestScoresService', ['getBestScores', 'handleErrorSnackBar']);
         bestScoresServiceSpy.getBestScores.and.callFake(() => {
-            return of(defaultClassicBestScoresValue)
-        })
+            return of(defaultClassicBestScoresValue);
+        });
         await TestBed.configureTestingModule({
             declarations: [BestScoresComponent],
             providers: [

@@ -82,7 +82,7 @@ export class WaitingAreaComponent {
         this.gameList.someoneLeftRoom();
     }
 
-    // mettre la fonction randomNumber de form dans utilities et l'appeler ici 
+    // mettre la fonction randomNumber de form dans utilities et l'appeler ici
     randomGame() {
         let randomFloat = Math.random() * this.pendingGameslist.length;
         randomFloat = Math.floor(randomFloat);

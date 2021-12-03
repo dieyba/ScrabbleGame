@@ -3,7 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BestScoresService } from './best-scores.service';
 
-
+/* eslint-disable dot-notation */
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('BestScoresService', () => {
     let service: BestScoresService;
 
@@ -35,7 +36,10 @@ describe('BestScoresService', () => {
                 status: HttpStatusCode.NotFound,
             }),
         );
-        expect(spy).toHaveBeenCalledWith('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'close');
+        expect(spy).toHaveBeenCalledWith(
+            'La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!',
+            'close',
+        );
     });
 
     it('getBestScores should get', () => {
@@ -49,7 +53,6 @@ describe('BestScoresService', () => {
         service.postBestScore('Dieyba', 80, 'url');
         expect(spy).toHaveBeenCalled();
     });
-
 
     it('resetDbBestScores should post', () => {
         const spy = spyOn(service['http'], 'delete');

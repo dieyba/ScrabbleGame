@@ -15,7 +15,7 @@ import { GameService } from '@app/services/game.service';
 import { Observable } from 'rxjs';
 import * as io from 'socket.io-client';
 import { WaitingAreaComponent } from './waiting-area.component';
-
+/* eslint-disable max-lines */
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 /* eslint-disable dot-notation */
@@ -54,7 +54,13 @@ describe('WaitingAreaComponent', () => {
     // let gameTest: GameParameters
 
     beforeEach(async () => {
-        gameListServiceSpy = jasmine.createSpyObj('GameListService', ['initializeMultiplayerGame', 'getList', 'start', 'deleteRoom', 'someoneLeftRoom']);
+        gameListServiceSpy = jasmine.createSpyObj('GameListService', [
+            'initializeMultiplayerGame',
+            'getList',
+            'start',
+            'deleteRoom',
+            'someoneLeftRoom',
+        ]);
         multiplayerMode = jasmine.createSpyObj('GameService', ['initializeMultiplayerGame']);
         await TestBed.configureTestingModule({
             declarations: [WaitingAreaComponent],
@@ -85,7 +91,16 @@ describe('WaitingAreaComponent', () => {
 
     it('onSelect should set selectedGame if gameSelected is true', () => {
         component.isGameSelected = true;
-        const gameSelected = { gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' }, creatorName: 'Dieyba', joinerName: 'Erika', dictionaryType: DictionaryType.Default, totalCountDown: 60, isRandomBonus: false, gameMode: 1, isLOG2990: false }
+        const gameSelected = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 1,
+            isLOG2990: false,
+        };
         // const game = new GameParameters('Ari', 60, false);
         component.onSelect(gameSelected);
         expect(component.selectedGame.creatorName).toEqual('Dieyba');
@@ -95,7 +110,16 @@ describe('WaitingAreaComponent', () => {
         component.isGameSelected = false;
         // const selectedGame = new GameParameters('', 0, false);
         // const game = new GameParameters('Ari', 60, false);
-        const gameSelected = { gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' }, creatorName: 'Dieyba', joinerName: 'Erika', dictionaryType: DictionaryType.Default, totalCountDown: 60, isRandomBonus: false, gameMode: 1, isLOG2990: false }
+        const gameSelected = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 1,
+            isLOG2990: false,
+        };
         component.onSelect(gameSelected);
         expect(component.selectedGame.creatorName).toEqual('');
     });
@@ -112,7 +136,16 @@ describe('WaitingAreaComponent', () => {
 
     it('startIfFull should initializeGame if two players have joined', () => {
         component.playerList = ['Ari', 'Sara'];
-        component.gameList.localPlayerRoomInfo = { gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' }, creatorName: 'Dieyba', joinerName: 'Erika', dictionaryType: DictionaryType.Default, totalCountDown: 60, isRandomBonus: false, gameMode: 1, isLOG2990: false };
+        component.gameList.localPlayerRoomInfo = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 1,
+            isLOG2990: false,
+        };
         component.startIfFull();
         expect(component.isStarting).toEqual(true);
         expect(gameListServiceSpy.initializeMultiplayerGame).toHaveBeenCalled();
@@ -126,7 +159,16 @@ describe('WaitingAreaComponent', () => {
     });
 
     it('start should set nameValid to true and call gameList start when only one player', () => {
-        component.selectedGame = { gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' }, creatorName: 'Dieyba', joinerName: 'Erika', dictionaryType: DictionaryType.Default, totalCountDown: 60, isRandomBonus: false, gameMode: 1, isLOG2990: false }
+        component.selectedGame = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 1,
+            isLOG2990: false,
+        };
         component.selectedGame.gameRoom.playersName = ['Ari'];
         component.playerName = new FormControl('Ari');
         component.start();
@@ -135,7 +177,16 @@ describe('WaitingAreaComponent', () => {
     });
 
     it('start should set full to true when two players', () => {
-        component.selectedGame = { gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' }, creatorName: 'Dieyba', joinerName: 'Erika', dictionaryType: DictionaryType.Default, totalCountDown: 60, isRandomBonus: false, gameMode: 1, isLOG2990: false }
+        component.selectedGame = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 1,
+            isLOG2990: false,
+        };
         component.selectedGame.gameRoom.playersName = ['Ari', 'Sara'];
         component.playerName = new FormControl('Ari');
         component.start();
@@ -144,7 +195,16 @@ describe('WaitingAreaComponent', () => {
     });
 
     it('confirmName should set error to true when playerName and creatorPlayer name are the same', () => {
-        const game = { gameRoom: { idGame: 1, capacity: 2, playersName: ['Ari', 'Erika'], creatorId: '', joinerId: '' }, creatorName: 'Ari', joinerName: 'Erika', dictionaryType: DictionaryType.Default, totalCountDown: 60, isRandomBonus: false, gameMode: 1, isLOG2990: false }
+        const game = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Ari', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Ari',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 1,
+            isLOG2990: false,
+        };
         // game.creatorPlayer = game.localPlayer;
         component.playerName = new FormControl('Ari');
         component.confirmName(game);
@@ -152,7 +212,16 @@ describe('WaitingAreaComponent', () => {
     });
 
     it('confirmName should set error to false when playerName and creatorPlayer name are not the same', () => {
-        const game = { gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' }, creatorName: 'Dieyba', joinerName: 'Erika', dictionaryType: DictionaryType.Default, totalCountDown: 60, isRandomBonus: false, gameMode: 1, isLOG2990: false }
+        const game = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 1,
+            isLOG2990: false,
+        };
         // game.creatorPlayer = game.localPlayer;
         component.playerName = new FormControl('Sara');
         component.confirmName(game);
@@ -199,25 +268,61 @@ describe('WaitingAreaComponent', () => {
     });
     it('socketOnConnect should handle socket.on event roomdeleted', () => {
         component.socketOnConnect();
-        const game = { gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' }, creatorName: 'Dieyba', joinerName: 'Erika', dictionaryType: DictionaryType.Default, totalCountDown: 60, isRandomBonus: false, gameMode: 1, isLOG2990: false }
+        const game = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 1,
+            isLOG2990: false,
+        };
         socketMock.triggerEvent('waitingAreaRoomDeleted', game);
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomcreated', () => {
         component.socketOnConnect();
-        const game = { gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' }, creatorName: 'Dieyba', joinerName: 'Erika', dictionaryType: DictionaryType.Default, totalCountDown: 60, isRandomBonus: false, gameMode: 1, isLOG2990: false }
+        const game = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 1,
+            isLOG2990: false,
+        };
         socketMock.triggerEvent('waitingAreaRoomCreated', game);
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomJoined', () => {
         component.socketOnConnect();
-        const game = { gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' }, creatorName: 'Dieyba', joinerName: 'Erika', dictionaryType: DictionaryType.Default, totalCountDown: 60, isRandomBonus: false, gameMode: 1, isLOG2990: false }
+        const game = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 1,
+            isLOG2990: false,
+        };
         socketMock.triggerEvent('roomJoined', game);
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomLeft', () => {
         component.socketOnConnect();
-        const game = { gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' }, creatorName: 'Dieyba', joinerName: 'Erika', dictionaryType: DictionaryType.Default, totalCountDown: 60, isRandomBonus: false, gameMode: 1, isLOG2990: false }
+        const game = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 1,
+            isLOG2990: false,
+        };
         socketMock.triggerEvent('roomLeft', game);
         expect(socketMockSpy).toHaveBeenCalled();
     });

@@ -9,7 +9,7 @@ import { BestScoresComponent } from '@app/components/best-scores/best-scores.com
 })
 export class StartingPageComponent {
     playerName: string;
-    playerScore: number
+    playerScore: number;
     constructor(private dialog: MatDialog) {
         this.playerName = '';
         this.playerScore = 0;

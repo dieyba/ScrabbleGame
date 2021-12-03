@@ -95,32 +95,21 @@ export class BestScoresService {
         }
     }
 
-
     async canSetInDb(tabScore: Collection<BestScores>, newScore: BestScores): Promise<boolean> {
-        const arrayScore = (await tabScore.find({}).sort({ score: -1 }).toArray());
+        const arrayScore = await tabScore.find({}).sort({ score: -1 }).toArray();
         const deleteMinScore = await this.minimumScore(tabScore);
         let haveToChange = false;
-        // console.log(arrayScore)
-        console.log(deleteMinScore.score)
-        for (let dbScore of arrayScore) {
-            console.log('dbScore.score', dbScore.score)
-            console.log('dbScore.playerName', dbScore.playerName)
-            console.log('newScore', newScore)
-            console.log(dbScore.score === newScore.score, ' ', dbScore.playerName === newScore.playerName)
+        for (const dbScore of arrayScore) {
             if (newScore.score < deleteMinScore.score) {
-                console.log('score trop petit')
                 return haveToChange;
             }
             if (dbScore.score === newScore.score && dbScore.playerName === newScore.playerName) {
-                console.log('same nom and same score no changes')
                 return haveToChange;
             }
             if (dbScore.score === newScore.score && dbScore.playerName !== newScore.playerName) {
-                console.log('different nom but same score')
-                return haveToChange = true;
+                return (haveToChange = true);
             }
             if (dbScore.score < newScore.score) {
-                console.log('score elevé')
                 await tabScore.findOneAndDelete(deleteMinScore);
                 haveToChange = true;
             }
@@ -148,14 +137,14 @@ export class BestScoresService {
     }
 
     private async minimumScore(tabScore: Collection<BestScores>): Promise<BestScores> {
-        const arrayScore = (await tabScore.find({}).toArray());
+        const arrayScore = await tabScore.find({}).toArray();
         const deleteMinScore: BestScores = { playerName: '', score: MAX_SCORE };
-        for (let score of arrayScore) {
+        for (const score of arrayScore) {
             if (score.score < deleteMinScore.score) {
                 deleteMinScore.playerName = score.playerName;
                 deleteMinScore.score = score.score;
             }
         }
-        return deleteMinScore
+        return deleteMinScore;
     }
 }

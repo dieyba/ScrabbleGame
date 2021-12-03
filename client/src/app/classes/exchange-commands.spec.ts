@@ -19,9 +19,7 @@ describe('ExchangeCmd', () => {
         gameServiceSpy = jasmine.createSpyObj('GameService', ['exchangeLetters']);
 
         TestBed.configureTestingModule({
-            providers: [
-                { provide: GameService, useValue: gameServiceSpy },
-            ],
+            providers: [{ provide: GameService, useValue: gameServiceSpy }],
         });
     });
 
@@ -30,7 +28,6 @@ describe('ExchangeCmd', () => {
         const exchange = new ExchangeCmd(defaultParams, LETTERS);
         expect(exchange).toBeTruthy();
     });
-
 
     // it('createExchangeCmd should create an instance', () => {
     //     const defaultParams: DefaultCommandParams = { player: localPlayer, serviceCalled: gameServiceSpy };

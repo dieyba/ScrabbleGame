@@ -28,7 +28,7 @@ export class BestScoresComponent implements OnInit, OnDestroy {
     }
 
     samePosition(tab: BestScores[]) {
-        for (let score of tab) {
+        for (const score of tab) {
             let nextScore = tab.indexOf(score) + 1;
             if (nextScore === tab.length) {
                 nextScore -= 1;
@@ -45,7 +45,7 @@ export class BestScoresComponent implements OnInit, OnDestroy {
         this.classicBestScoresSubsciption = this.bestScoresService.getBestScores(url).subscribe(
             (receiveBestScore) => {
                 this.classicModeBestScores = receiveBestScore;
-                this.samePosition(this.classicModeBestScores)
+                this.samePosition(this.classicModeBestScores);
             },
             (error: HttpErrorResponse) => {
                 this.bestScoresService.handleErrorSnackBar(error);
