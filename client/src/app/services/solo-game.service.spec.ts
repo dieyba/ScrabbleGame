@@ -3,7 +3,7 @@
 // /* eslint-disable max-lines */
 // import { discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
 // import { FormControl, FormGroup, Validators } from '@angular/forms';
-// import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
+// import { CanvasTestHelper } from '@app/classes/canvas-test-helper/canvas-test-helper';
 // import { ErrorType } from '@app/classes/errors';
 // import { GameParameters } from '@app/classes/game-parameters';
 // import { Player } from "@app/classes/player";

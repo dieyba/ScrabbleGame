@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { TextEntryService } from '@app/services/text-entry.service';
+import { TextEntryService } from '@app/services/text-entry.service/text-entry.service';
 @Component({
     selector: 'app-text-entry',
     templateUrl: './text-entry.component.html',

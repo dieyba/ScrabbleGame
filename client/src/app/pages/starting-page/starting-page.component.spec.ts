@@ -6,6 +6,7 @@ import { BestScoresComponent } from '@app/components/best-scores/best-scores.com
 import { Observable } from 'rxjs';
 import { StartingPageComponent } from './starting-page.component';
 
+/* eslint-disable dot-notation */
 describe('StartingPageComponent', () => {
     let component: StartingPageComponent;
     let fixture: ComponentFixture<StartingPageComponent>;
@@ -40,7 +41,6 @@ describe('StartingPageComponent', () => {
         // matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
         // component.openDialog();
         // expect(matdialog).toHaveBeenCalled();
-        // eslint-disable-next-line dot-notation
         const spy = spyOn(component['dialog'], 'open');
         component.openDialog();
         expect(spy).toHaveBeenCalledTimes(1);

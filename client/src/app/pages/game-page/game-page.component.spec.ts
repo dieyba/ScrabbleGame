@@ -1,7 +1,7 @@
 // import { ComponentFixture, TestBed } from '@angular/core/testing';
 // import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 // import { Router, RouterModule } from '@angular/router';
-// import { GameParameters, GameType } from '@app/classes/game-parameters';
+// import { GameParameters, GameType } from '@app/classes/game-parameters/game-parameters';
 // import { ScrabbleLetter } from '@app/classes/scrabble-letter';
 // import { ChatDisplayComponent } from '@app/components/chat-display/chat-display.component';
 // import { PlayAreaComponent } from '@app/components/play-area/play-area.component';

@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { Vec2 } from '@app/classes/vec2';
-import { ExchangeService } from '@app/services/exchange.service';
-import { ManipulationRackService } from '@app/services/manipulation-rack.service';
-import { RackService } from '@app/services/rack.service';
+import { Vec2 } from '@app/classes/vec2/vec2';
+import { ExchangeService } from '@app/services/exchange.service/exchange.service';
+import { ManipulationRackService } from '@app/services/manipulation-rack.service/manipulation-rack.service';
+import { RackService } from '@app/services/rack.service/rack.service';
 
 export const RACK_WIDTH = 440;
 export const RACK_HEIGHT = 50;
@@ -41,7 +41,7 @@ export class RackComponent implements AfterViewInit {
     onRightClick(event: Event) {
         event.preventDefault();
         const position = this.selectedLetterPosition(event as MouseEvent);
-        this.manipulationRackService.clearManipValues();
+        this.manipulationRackService.clearManipulationValues();
         this.exchangeService.handleSelection(position);
     }
 
@@ -59,7 +59,7 @@ export class RackComponent implements AfterViewInit {
             } else {
                 this.rackService.deselectAll(this.rackContext);
             }
-            this.manipulationRackService.clearManipValues();
+            this.manipulationRackService.clearManipulationValues();
         }
     }
 
