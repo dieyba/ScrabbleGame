@@ -49,7 +49,8 @@ describe('CommandInvokerService', () => {
     });
 
     it('command should call displayExecutionLocally', async () => {
-        const spy = spyOn<unknown>(service, 'displayExecutionLocally');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(service, 'displayExecutionLocally' as any);
         gameServiceSpy.passTurn = jasmine.createSpy('passTurnSpy').and.returnValue(ErrorType.NoError);
         const command = new PassTurnCmd(defaultParams);
         return service.executeCommand(command).then(() => {
@@ -58,7 +59,8 @@ describe('CommandInvokerService', () => {
     });
 
     it('exchangeCommand should call displayExecutionWithServer with the 2 different messages', async () => {
-        const spy = spyOn<unknown>(service, 'displayExecutionWithServer');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(service, 'displayExecutionWithServer' as any);
         gameServiceSpy.exchangeLetters = jasmine.createSpy('exchangeLettersSpy').and.returnValue(ErrorType.NoError);
         gameServiceSpy.game.gameMode = GameType.MultiPlayer;
         const command = new ExchangeCmd(defaultParams, 'letter');
@@ -71,8 +73,10 @@ describe('CommandInvokerService', () => {
     });
 
     it('should not display message with server if solo game mode', async () => {
-        const spyServerDisplayChat = spyOn<unknown>(service, 'displayExecutionWithServer').and.callThrough();
-        const spyLocalDisplayChat = spyOn<unknown>(service, 'displayExecutionLocally').and.callThrough();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyServerDisplayChat = spyOn<any>(service, 'displayExecutionWithServer' as any).and.callThrough();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyLocalDisplayChat = spyOn<any>(service, 'displayExecutionLocally' as any).and.callThrough();
         gameServiceSpy.place = jasmine.createSpy('place').and.returnValue(ErrorType.NoError);
         const placeParams = { position: new Vec2(), orientation: Axis.H, word: '' };
         const placeCmd = new PlaceCmd(defaultParams, placeParams);
@@ -82,8 +86,10 @@ describe('CommandInvokerService', () => {
     });
 
     it('should not display message on both clients if the command execution failed', async () => {
-        const spyServerDisplayChat = spyOn<unknown>(service, 'displayExecutionWithServer').and.callThrough();
-        const spyLocalDisplayChat = spyOn<unknown>(service, 'displayExecutionLocally').and.callThrough();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyServerDisplayChat = spyOn<any>(service, 'displayExecutionWithServer' as any).and.callThrough();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyLocalDisplayChat = spyOn<any>(service, 'displayExecutionLocally' as any).and.callThrough();
         gameServiceSpy.place = jasmine.createSpy('place').and.returnValue(ErrorType.ImpossibleCommand);
         gameServiceSpy.game.gameMode = GameType.MultiPlayer;
         const placeParams = { position: new Vec2(), orientation: Axis.H, word: '' };
@@ -94,8 +100,10 @@ describe('CommandInvokerService', () => {
     });
 
     it('should  only display message on both clients for place, pass and exchange commands', async () => {
-        const spyServerDisplayChat = spyOn<unknown>(service, 'displayExecutionWithServer').and.callThrough();
-        const spyLocalDisplayChat = spyOn<unknown>(service, 'displayExecutionLocally').and.callThrough();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyServerDisplayChat = spyOn<any>(service, 'displayExecutionWithServer' as any).and.callThrough();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyLocalDisplayChat = spyOn<any>(service, 'displayExecutionLocally' as any).and.callThrough();
         gameServiceSpy.place = jasmine.createSpy('place').and.returnValue(ErrorType.NoError);
         gameServiceSpy.exchangeLetters = jasmine.createSpy('place').and.returnValue(ErrorType.NoError);
         gameServiceSpy.passTurn = jasmine.createSpy('passTurnSpy').and.returnValue(ErrorType.NoError);

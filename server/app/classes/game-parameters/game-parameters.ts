@@ -1,4 +1,4 @@
-import { DictionaryType } from '@app/classes/dictionary/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { LetterStock } from '@app/classes/letter-stock/letter-stock';
 import { Player } from '@app/classes/player/player';
 import { ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
@@ -39,7 +39,7 @@ export interface WaitingAreaGameParameters {
     gameRoom: GameRoom;
     creatorName: string;
     joinerName: string;
-    dictionaryType: DictionaryType;
+    dictionary: DictionaryInterface;
     totalCountDown: number;
     isRandomBonus: boolean;
     isLog2990: boolean;
@@ -56,6 +56,7 @@ export class GameInitInfo {
     gameMode: GameType;
     sharedGoals: GoalType[];
     randomLetterAndColor: ScrabbleLetter;
+    dictionary: DictionaryInterface;
 
     constructor(clientParametersChosen: WaitingAreaGameParameters) {
         this.gameRoomId = clientParametersChosen.gameRoom.idGame;
@@ -63,6 +64,7 @@ export class GameInitInfo {
         this.isLog2990 = clientParametersChosen.isLog2990;
         this.totalCountDown = clientParametersChosen.totalCountDown;
         this.scrabbleBoard = new ScrabbleBoard(clientParametersChosen.isRandomBonus).squares;
+        this.dictionary = clientParametersChosen.dictionary;
 
         // Initializing the players and the stock
         const stock = new LetterStock();
