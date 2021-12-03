@@ -1,5 +1,5 @@
 import { ColorQuantity, Square, SquareColor } from '@app/classes/square/square';
-import { isCoordInsideBoard } from '@app/classes/utilities/utilities';
+import { Axis, isCoordInsideBoard } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
 
 export const BOARD_SIZE = 15;
@@ -162,10 +162,10 @@ export class ScrabbleBoard {
             return false;
         }
         // Verifying if word is too long to stay inside board
-        if (orientation === 'h' && coord.x + word.length > Row.Length) {
+        if (orientation === Axis.H && coord.x + word.length > Row.Length) {
             return false;
         }
-        if (orientation === 'v' && coord.y + word.length > Column.Length) {
+        if (orientation === Axis.V && coord.y + word.length > Column.Length) {
             return false;
         }
 
@@ -175,7 +175,7 @@ export class ScrabbleBoard {
     isWordPassingInCenter(word: string, coord: Vec2, orientation: string): boolean {
         const tempCoord = new Vec2(coord.x, coord.y);
         // Checking if word passing middle vertically
-        const isWordInMiddleColumn = tempCoord.x === Column.Eight && orientation === 'v';
+        const isWordInMiddleColumn = tempCoord.x === Column.Eight && orientation === Axis.V;
         const isVerticalWordOnCenter = tempCoord.y < Row.I && tempCoord.y + word.length - 1 >= Row.H;
         if (isWordInMiddleColumn) {
             if (isVerticalWordOnCenter) {
@@ -195,7 +195,7 @@ export class ScrabbleBoard {
     }
     isWordPartOfAnotherWord(word: string, coord: Vec2, orientation: string): boolean {
         let result = false;
-        const isVertical = orientation === 'v';
+        const isVertical = orientation === Axis.V;
 
         // For each letter in "word", verifies if a Scrabble letter is already place and if it's the same letter
         for (let i = 0; i < word.length; i++) {
@@ -225,7 +225,7 @@ export class ScrabbleBoard {
         const coordBeforeWord = new Vec2();
         const coordAfterWord = new Vec2();
         // EL: I modified all lines with comments, maybe tests fail now because of this.
-        if (orientation === 'v') {
+        if (orientation === Axis.V) {
             coordBeforeWord.x = coordAfterWord.x = coord.x;
             if (coord.y === 0) coordBeforeWord.y = coord.y;
             // Modification 1 above and below.
@@ -256,7 +256,7 @@ export class ScrabbleBoard {
         // Checking if touching word lengthwise (down if horizontal, right if vertical)
         const tempCoord = new Vec2();
         for (let i = 0; i < word.length; i++) {
-            if (orientation === 'v') {
+            if (orientation === Axis.V) {
                 tempCoord.x = coord.x + 1;
                 tempCoord.y = coord.y + i;
             } else {
@@ -270,7 +270,7 @@ export class ScrabbleBoard {
 
         // Checking if touching word lengthwise (up if horizontal, left if vertical)
         for (let i = 0; i < word.length; i++) {
-            if (orientation === 'v') {
+            if (orientation === Axis.V) {
                 tempCoord.x = coord.x - 1;
                 tempCoord.y = coord.y + i;
             } else {

@@ -1,10 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { BASE_URL, DictionaryService } from '@app/services/dictionary.service/dictionary.service';
+import { Subscription } from 'rxjs';
 
 export enum ErrorCaseDictionaryTransfer {
     TitleAlreadyThere = 'Un dictionnaire de la base de donnée possède déjà ce titre.',
@@ -24,13 +25,14 @@ const DESCRIPTION_MIN_LENGTH = 10;
     templateUrl: './dictionary-transfer.component.html',
     styleUrls: ['./dictionary-transfer.component.scss'],
 })
-export class DictionaryTransferComponent implements AfterViewInit {
+export class DictionaryTransferComponent implements AfterViewInit, OnDestroy {
     @ViewChild('inputFile', { static: false }) private inputFile!: ElementRef<HTMLInputElement>;
     selectedDictionary: DictionaryInterface;
     dictionaryList: DictionaryInterface[];
     lastUploadedDictionary: DictionaryInterface;
     editTitle: FormControl;
     editDescription: FormControl;
+    dictionarySubscription: Subscription;
 
     constructor(private dictionaryService: DictionaryService, private snack: MatSnackBar) {
         this.selectedDictionary = { _id: '', title: '', description: '', words: [] };
@@ -44,7 +46,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.dictionaryService.getDictionaries(BASE_URL).subscribe(
+        this.dictionarySubscription = this.dictionaryService.getDictionaries(BASE_URL).subscribe(
             (dictionaries: DictionaryInterface[]) => {
                 this.updateDictionariesTitle(dictionaries);
             },
@@ -52,6 +54,9 @@ export class DictionaryTransferComponent implements AfterViewInit {
                 this.dictionaryService.handleErrorSnackBar(error);
             },
         );
+    }
+    ngOnDestroy() {
+        this.dictionarySubscription.unsubscribe();
     }
 
     onUpload() {
@@ -72,7 +77,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
     }
 
     upload(dictionary: string) {
-        this.dictionaryService.uploadFromString(dictionary).subscribe(
+        this.dictionarySubscription = this.dictionaryService.uploadFromString(dictionary).subscribe(
             (dictionaryDescription) => {
                 this.lastUploadedDictionary = dictionaryDescription;
                 this.snack.open('Téléversement réussi!', 'Fermer');
@@ -90,7 +95,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
     }
 
     onDownload() {
-        this.dictionaryService.getDictionary(BASE_URL, this.selectedDictionary.title).subscribe(this.download, (error: HttpErrorResponse) => {
+        this.dictionarySubscription = this.dictionaryService.getDictionary(BASE_URL, this.selectedDictionary.title).subscribe(this.download, (error: HttpErrorResponse) => {
             this.dictionaryService.handleErrorSnackBar(error);
         });
     }
@@ -133,7 +138,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
             return;
         }
 
-        this.dictionaryService.update(BASE_URL, this.selectedDictionary.title, this.selectedDictionary._id, title, description).subscribe(
+        this.dictionarySubscription = this.dictionaryService.update(BASE_URL, this.selectedDictionary.title, this.selectedDictionary._id, title, description).subscribe(
             (dictionary) => {
                 this.dictionaryList[index].title = dictionary.title;
                 this.dictionaryList[index].description = dictionary.description;
@@ -153,7 +158,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
             return;
         }
 
-        this.dictionaryService.delete(dictionaryToDelete._id).subscribe(
+        this.dictionarySubscription = this.dictionaryService.delete(dictionaryToDelete._id).subscribe(
             () => {
                 this.dictionaryList.splice(index, 1);
             },

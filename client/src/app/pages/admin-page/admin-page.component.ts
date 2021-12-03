@@ -1,18 +1,22 @@
 // import { Component, OnInit } from '@angular/core';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BestScoresService } from '@app/services/best-scores.service/best-scores.service';
 import { DictionaryService } from '@app/services/dictionary.service/dictionary.service';
 import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
 })
-export class AdminPageComponent {
+export class AdminPageComponent implements OnDestroy {
     privateName: boolean;
+    private virtualPlayerNameSubscription: Subscription;
+    private bestScoresSubscription: Subscription;
+    private dictionarySubscription: Subscription;
 
     constructor(
         public virtualPlayerNameService: VirtualPlayerNameService,
@@ -22,9 +26,14 @@ export class AdminPageComponent {
     ) {
         this.privateName = false;
     }
+    ngOnDestroy() {
+        this.dictionarySubscription.unsubscribe();
+        this.virtualPlayerNameSubscription.unsubscribe();
+        this.bestScoresSubscription.unsubscribe();
+    }
 
     resetDataBase() {
-        this.bestScoreService.resetDbBestScores().subscribe(
+        this.bestScoresSubscription = this.bestScoreService.resetDbBestScores().subscribe(
             () => {
                 /* Do nothing */
             },
@@ -37,7 +46,7 @@ export class AdminPageComponent {
             },
         );
 
-        this.virtualPlayerNameService.reset().subscribe(
+        this.virtualPlayerNameSubscription = this.virtualPlayerNameService.reset().subscribe(
             () => {
                 /* Do nothing */
             },
@@ -50,7 +59,7 @@ export class AdminPageComponent {
             },
         );
 
-        this.dictionaryService.reset().subscribe(
+        this.dictionarySubscription = this.dictionaryService.reset().subscribe(
             () => {
                 /* Do nothing */
             },

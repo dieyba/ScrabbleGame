@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -13,6 +13,7 @@ import { BASE_URL, DictionaryService } from '@app/services/dictionary.service/di
 import { GameListService } from '@app/services/game-list.service/game-list.service';
 import { GameService } from '@app/services/game.service/game.service';
 import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
+import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 export const GAME_CAPACITY = 2;
@@ -26,7 +27,7 @@ export interface DialogData {
     templateUrl: './game-init-form.component.html',
     styleUrls: ['./game-init-form.component.scss'],
 })
-export class GameInitFormComponent implements OnInit {
+export class GameInitFormComponent implements OnInit, OnDestroy {
     myForm: FormGroup;
     name: FormControl;
     timer: FormControl;
@@ -47,6 +48,9 @@ export class GameInitFormComponent implements OnInit {
 
     private beginnerNameUrl: string;
     private expertNameUrl: string;
+    private beginnerNameSubscription: Subscription;
+    private expertNameSubscription: Subscription;
+    private dictionarySubscription: Subscription;
 
     constructor(
         private gameService: GameService,
@@ -76,7 +80,7 @@ export class GameInitFormComponent implements OnInit {
             this.level = new FormControl('');
         }
 
-        this.virtualPlayerNameService.getVirtualPlayerNames(this.beginnerNameUrl).subscribe(
+        this.beginnerNameSubscription = this.virtualPlayerNameService.getVirtualPlayerNames(this.beginnerNameUrl).subscribe(
             (list) => {
                 this.beginnerNameList = list;
             },
@@ -88,7 +92,7 @@ export class GameInitFormComponent implements OnInit {
             },
         );
 
-        this.virtualPlayerNameService.getVirtualPlayerNames(this.expertNameUrl).subscribe(
+        this.expertNameSubscription = this.virtualPlayerNameService.getVirtualPlayerNames(this.expertNameUrl).subscribe(
             (list) => {
                 this.expertNameList = list;
             },
@@ -100,7 +104,7 @@ export class GameInitFormComponent implements OnInit {
             },
         );
 
-        this.dictionaryService.getDictionaries(BASE_URL).subscribe(
+        this.dictionarySubscription = this.dictionaryService.getDictionaries(BASE_URL).subscribe(
             (dictionaries: DictionaryInterface[]) => {
                 for (const dictionary of dictionaries) {
                     this.dictionaryList.push(dictionary.title);
@@ -116,7 +120,12 @@ export class GameInitFormComponent implements OnInit {
         this.createFormControl();
         this.createForm();
     }
+    ngOnDestroy() {
+        this.beginnerNameSubscription.unsubscribe();
+        this.expertNameSubscription.unsubscribe();
+        this.dictionarySubscription.unsubscribe();
 
+    }
     createFormControl() {
         this.name = new FormControl('', [Validators.required, Validators.pattern('[a-zA-ZÉé]*')]);
         this.timer = new FormControl('', [Validators.required]);

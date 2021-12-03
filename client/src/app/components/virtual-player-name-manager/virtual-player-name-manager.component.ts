@@ -1,9 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 import { VirtualPlayerName, VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
+import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 const maxLength = 12;
@@ -22,7 +23,7 @@ export enum ErrorCaseVirtualPlayerName {
     templateUrl: './virtual-player-name-manager.component.html',
     styleUrls: ['./virtual-player-name-manager.component.scss'],
 })
-export class VirtualPlayerNameManagerComponent implements OnInit {
+export class VirtualPlayerNameManagerComponent implements OnInit, OnDestroy {
     beginnerNameUrl = environment.serverUrl + '/VirtualPlayerName/beginners';
     expertNameUrl = environment.serverUrl + '/VirtualPlayerName/experts';
     beginnerNameList: VirtualPlayerName[];
@@ -33,6 +34,9 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     editName: FormControl;
     isAddPlayerCardVisible: boolean = false;
     private index: number;
+    private expertNameSubscription: Subscription;
+    private beginnerNameSubscription: Subscription;
+    private vpNameSubscription: Subscription;
 
     constructor(private virtualPlayerNameService: VirtualPlayerNameService, private snack: MatSnackBar) {
         this.beginnerNameList = [];
@@ -44,8 +48,13 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.virtualPlayerNameService.getVirtualPlayerNames(this.beginnerNameUrl).subscribe((beginnerList) => (this.beginnerNameList = beginnerList));
-        this.virtualPlayerNameService.getVirtualPlayerNames(this.expertNameUrl).subscribe((expertList) => (this.expertNameList = expertList));
+        this.beginnerNameSubscription = this.virtualPlayerNameService.getVirtualPlayerNames(this.beginnerNameUrl).subscribe((beginnerList) => (this.beginnerNameList = beginnerList));
+        this.expertNameSubscription = this.virtualPlayerNameService.getVirtualPlayerNames(this.expertNameUrl).subscribe((expertList) => (this.expertNameList = expertList));
+    }
+    ngOnDestroy() {
+        this.beginnerNameSubscription.unsubscribe();
+        this.expertNameSubscription.unsubscribe();
+        this.vpNameSubscription.unsubscribe();
     }
 
     isUntouchable(): boolean {
@@ -58,7 +67,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             return;
         }
 
-        this.virtualPlayerNameService.postVirtualPlayerNames(url, this.newName.value).subscribe(
+        this.vpNameSubscription = this.virtualPlayerNameService.postVirtualPlayerNames(url, this.newName.value).subscribe(
             (added) => {
                 collection.push(added);
             },
@@ -138,7 +147,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
     }
 
     private delete(collection: VirtualPlayerName[], url: string) {
-        this.virtualPlayerNameService.delete(url, this.selectedName.name).subscribe(
+        this.vpNameSubscription = this.virtualPlayerNameService.delete(url, this.selectedName.name).subscribe(
             () => {
                 collection.splice(this.index, 1);
                 this.selectedName.name = '';
@@ -159,7 +168,7 @@ export class VirtualPlayerNameManagerComponent implements OnInit {
             return;
         }
 
-        this.virtualPlayerNameService.update(url, this.selectedName._id, this.editName.value).subscribe(
+        this.vpNameSubscription = this.virtualPlayerNameService.update(url, this.selectedName._id, this.editName.value).subscribe(
             () => {
                 collection[this.index] = { _id: this.selectedName._id, name: this.editName.value };
                 this.selectedName.name = '';
