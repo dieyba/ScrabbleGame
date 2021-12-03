@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
-import { Axis, ERROR_NUMBER, invertAxis, isCoordInsideBoard } from '@app/classes/utilities/utilities';
+import { Axis, ERROR_NUMBER, invertAxis, isCoordInsideBoard, MIN_WORD_LENGTH } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
 import { GridService } from '@app/services/grid.service/grid.service';
 
@@ -8,7 +8,6 @@ const TOWARD_START = true;
 const TOWARD_END = false;
 const BACKWARD_STEP = -1;
 const FORWARD_STEP = 1;
-const MIN_WORD_LENGTH = 2;
 
 @Injectable({
     providedIn: 'root',
@@ -17,10 +16,9 @@ export class WordBuilderService {
     constructor(private gridService: GridService) {}
 
     // TODO: Handle -1 error coordinates
-    // TODO: make sure the scrabbleWords returned scrabbleLetters that have everything init properly (value, coord, color, isbonusUsed)
+    // TODO: make sure the scrabbleWords returned scrabbleLetters that have everything init properly (value, coord, color, isBonusUsed)
     buildWordsOnBoard(coord: Vec2, axis: Axis): ScrabbleWord[] {
         const result: ScrabbleWord[] = [];
-
         // get full word that can be read on the placed word's row/column
         let wordBuilt = this.buildScrabbleWord(coord, axis);
         wordBuilt.orientation = axis;
@@ -85,7 +83,7 @@ export class WordBuilderService {
         return word;
     }
 
-    // out of range beginning coordinates or unoccupied beginning coordinates will return the begining coord
+    // out of range beginning coordinates or unoccupied beginning coordinates will return the beginning coord
     findWordEdge(coord: Vec2, axis: Axis, isTowardStart: boolean): Vec2 {
         if (!isCoordInsideBoard(coord)) {
             return coord;

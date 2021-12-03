@@ -16,16 +16,16 @@ export class ExchangeService {
     ) {}
 
     handleSelection(position: number) {
-        if (this.rackService.handlingSelected[position - 1] === true) {
+        if (this.rackService.handlingSelected[position - 1]) {
             this.rackService.handlingSelected[position - 1] = false;
         }
         for (let i = 0; i < this.rackService.handlingSelected.length; i++) {
-            if (this.rackService.handlingSelected[i] === true) {
+            if (this.rackService.handlingSelected[i]) {
                 this.rackService.deselect(i + 1, this.rackService.gridContext, false);
             }
         }
 
-        if (this.rackService.exchangeSelected[position - 1] === true) {
+        if (this.rackService.exchangeSelected[position - 1]) {
             this.rackService.deselect(position, this.rackService.gridContext, true);
         } else {
             this.rackService.select(position, this.rackService.gridContext, true);
@@ -47,7 +47,7 @@ export class ExchangeService {
 
     atLeastOneLetterSelected(): boolean {
         for (const selected of this.rackService.exchangeSelected) {
-            if (selected === true) {
+            if (selected) {
                 return true;
             }
         }

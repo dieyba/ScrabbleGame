@@ -6,7 +6,7 @@ import { SquareColor } from '@app/classes/square/square';
 import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
 import { GridService } from '@app/services/grid.service/grid.service';
-
+/* eslint-disable dot-notation */
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('GridService', () => {
     let service: GridService;
@@ -103,12 +103,13 @@ describe('GridService', () => {
 
     it('drawSingleSquareColor should change fillStyle to white', () => {
         service.scrabbleBoard.squares[6][6].color = SquareColor.None;
-        service.drawSingleSquareColor(6, 6);
+        service['drawSingleSquareColor'](6, 6);
         expect(service.gridContext.fillStyle).toEqual('#ffffff');
     });
 
     it('removeSquare should call drawSingleSquareColor', () => {
-        const spy = spyOn(service, 'drawSingleSquareColor');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(service, 'drawSingleSquareColor' as any);
         service.scrabbleBoard.squares[5][7].letter = new ScrabbleLetter('', 0);
         service.removeSquare(5, 7);
         expect(spy).toHaveBeenCalled();
@@ -126,7 +127,7 @@ describe('GridService', () => {
         const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
         service.scrabbleBoard.squares[5][5].color = SquareColor.DarkBlue;
         service.scrabbleBoard.squares[5][5].occupied = false;
-        service.drawSingleSquareColor(5, 5);
+        service['drawSingleSquareColor'](5, 5);
         expect(fillTextSpy).toHaveBeenCalled();
         expect(fillRectSpy).toHaveBeenCalled();
     });
@@ -136,7 +137,7 @@ describe('GridService', () => {
         const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
         service.scrabbleBoard.squares[5][5].color = SquareColor.DarkBlue;
         service.scrabbleBoard.squares[5][5].occupied = true;
-        service.drawSingleSquareColor(5, 5);
+        service['drawSingleSquareColor'](5, 5);
         expect(fillTextSpy).not.toHaveBeenCalled();
         expect(fillRectSpy).toHaveBeenCalled();
     });
@@ -146,7 +147,7 @@ describe('GridService', () => {
         const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
         service.scrabbleBoard.squares[0][0].color = SquareColor.Red;
         service.scrabbleBoard.squares[0][0].occupied = false;
-        service.drawSingleSquareColor(0, 0);
+        service['drawSingleSquareColor'](0, 0);
         expect(fillTextSpy).toHaveBeenCalled();
         expect(fillRectSpy).toHaveBeenCalled();
     });
@@ -156,7 +157,7 @@ describe('GridService', () => {
         const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
         service.scrabbleBoard.squares[0][0].color = SquareColor.Red;
         service.scrabbleBoard.squares[0][0].occupied = true;
-        service.drawSingleSquareColor(0, 0);
+        service['drawSingleSquareColor'](0, 0);
         expect(fillTextSpy).not.toHaveBeenCalled();
         expect(fillRectSpy).toHaveBeenCalled();
     });
@@ -166,7 +167,7 @@ describe('GridService', () => {
         const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
         service.scrabbleBoard.squares[6][6].color = SquareColor.Teal;
         service.scrabbleBoard.squares[6][6].occupied = false;
-        service.drawSingleSquareColor(6, 6);
+        service['drawSingleSquareColor'](6, 6);
         expect(fillTextSpy).toHaveBeenCalled();
         expect(fillRectSpy).toHaveBeenCalled();
     });
@@ -176,7 +177,7 @@ describe('GridService', () => {
         const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
         service.scrabbleBoard.squares[6][6].color = SquareColor.Teal;
         service.scrabbleBoard.squares[6][6].occupied = true;
-        service.drawSingleSquareColor(6, 6);
+        service['drawSingleSquareColor'](6, 6);
         expect(fillTextSpy).not.toHaveBeenCalled();
         expect(fillRectSpy).toHaveBeenCalled();
     });
@@ -186,7 +187,7 @@ describe('GridService', () => {
         const fillRectSpy = spyOn(service.gridContext, 'fillRect').and.callThrough();
         service.scrabbleBoard.squares[1][1].color = SquareColor.Pink;
         service.scrabbleBoard.squares[1][1].occupied = true;
-        service.drawSingleSquareColor(1, 1);
+        service['drawSingleSquareColor'](1, 1);
         expect(fillTextSpy).not.toHaveBeenCalled();
         expect(fillRectSpy).toHaveBeenCalled();
     });

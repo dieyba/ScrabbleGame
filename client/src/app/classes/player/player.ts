@@ -23,6 +23,7 @@ export class Player {
         }
     }
 }
+
 export const removePlayerLetters = (lettersToRemove: string, player: Player): boolean => {
     const oldRack: ScrabbleLetter[] = player.letters;
 
@@ -37,6 +38,7 @@ export const removePlayerLetters = (lettersToRemove: string, player: Player): bo
     }
     return true;
 };
+
 export const calculateRackPoints = (player: Player): number => {
     let totalValue = 0;
     player.letters.forEach((letter) => {

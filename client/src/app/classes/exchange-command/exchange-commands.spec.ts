@@ -10,7 +10,7 @@ import { GameService } from '@app/services/game.service/game.service';
 const PLAYER_NAME = 'Sara';
 const OPPONENT_NAME = 'Not Sara';
 const LETTERS = 'abcd';
-
+/* eslint-disable dot-notation */
 describe('ExchangeCmd', () => {
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let exchange: ExchangeCmd;
@@ -66,6 +66,7 @@ describe('ExchangeCmd', () => {
         gameServiceSpy.exchangeLetters.and.returnValue(ErrorType.ImpossibleCommand);
         const errorLetters = 'AAAAAAAA';
         const errorMessage = createErrorEntry(ErrorType.ImpossibleCommand, '!échanger ' + errorLetters);
+        // eslint-disable-next-line dot-notation
         exchange['letters'] = errorLetters;
         exchange.player.isActive = false;
         expect(exchange.execute()).toEqual({ isExecuted: false, executionMessages: [errorMessage] });

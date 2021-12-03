@@ -1,10 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { BASE_URL, DictionaryService } from '@app/services/dictionary.service/dictionary.service';
+import { Subscription } from 'rxjs';
 
 export enum ErrorCaseDictionaryTransfer {
     TitleAlreadyThere = 'Un dictionnaire de la base de donnée possède déjà ce titre.',
@@ -24,12 +25,13 @@ const DESCRIPTION_MIN_LENGTH = 10;
     templateUrl: './dictionary-transfer.component.html',
     styleUrls: ['./dictionary-transfer.component.scss'],
 })
-export class DictionaryTransferComponent implements AfterViewInit {
+export class DictionaryTransferComponent implements AfterViewInit, OnDestroy {
     selectedDictionary: DictionaryInterface;
     dictionaryList: DictionaryInterface[];
     lastUploadedDictionary: DictionaryInterface;
     editTitle: FormControl;
     editDescription: FormControl;
+    dictionarySubscription: Subscription;
 
     constructor(private dictionaryService: DictionaryService, private snack: MatSnackBar) {
         this.selectedDictionary = { _id: '', title: '', description: '', words: [] };
@@ -43,7 +45,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.dictionaryService.getDictionaries(BASE_URL).subscribe(
+        this.dictionarySubscription = this.dictionaryService.getDictionaries(BASE_URL).subscribe(
             (dictionaries: DictionaryInterface[]) => {
                 this.updateDictionaryList(dictionaries);
             },
@@ -51,6 +53,10 @@ export class DictionaryTransferComponent implements AfterViewInit {
                 this.dictionaryService.handleErrorSnackBar(error);
             },
         );
+    }
+
+    ngOnDestroy() {
+        this.dictionarySubscription.unsubscribe();
     }
 
     onUpload(event: EventTarget | null) {
@@ -66,11 +72,11 @@ export class DictionaryTransferComponent implements AfterViewInit {
         }
 
         if (!this.isFileJSON(fileList[0].name)) {
-            this.snack.open('Le fichier doit être un «.json»', 'fermer');
+            this.snack.open('Le fichier doit être un «.json»', 'Fermer');
             return;
         }
 
-        // Updloading after reading
+        // Uploading after reading
         const fileReader = new FileReader();
         fileReader.onload = () => {
             this.upload(fileReader.result?.toString() as string);
@@ -79,7 +85,7 @@ export class DictionaryTransferComponent implements AfterViewInit {
     }
 
     upload(dictionary: string) {
-        this.dictionaryService.uploadFromString(dictionary).subscribe(
+        this.dictionarySubscription = this.dictionaryService.uploadFromString(dictionary).subscribe(
             (dictionaryDescription) => {
                 this.lastUploadedDictionary = dictionaryDescription;
                 this.snack.open('Téléversement réussi!', 'Fermer');
@@ -97,9 +103,11 @@ export class DictionaryTransferComponent implements AfterViewInit {
     }
 
     onDownload() {
-        this.dictionaryService.getDictionary(BASE_URL, this.selectedDictionary.title).subscribe(this.download, (error: HttpErrorResponse) => {
-            this.dictionaryService.handleErrorSnackBar(error);
-        });
+        this.dictionarySubscription = this.dictionaryService
+            .getDictionary(BASE_URL, this.selectedDictionary.title)
+            .subscribe(this.download, (error: HttpErrorResponse) => {
+                this.dictionaryService.handleErrorSnackBar(error);
+            });
     }
 
     download(dictionary: DictionaryInterface) {
@@ -131,45 +139,47 @@ export class DictionaryTransferComponent implements AfterViewInit {
     updateTitleAndDescription(title: string, description: string) {
         const index = this.dictionaryList.indexOf(this.selectedDictionary);
         if (index < 1) {
-            this.snack.open(ErrorCaseDictionaryTransfer.Untouchable, 'fermer');
+            this.snack.open(ErrorCaseDictionaryTransfer.Untouchable, 'Fermer');
             return;
         }
 
         if (!this.editTitle.valid || !this.editDescription.valid) {
-            this.snack.open(ErrorCaseDictionaryTransfer.TitleOrDescriptionInvalid, 'fermer');
+            this.snack.open(ErrorCaseDictionaryTransfer.TitleOrDescriptionInvalid, 'Fermer');
             return;
         }
 
-        this.dictionaryService.update(BASE_URL, this.selectedDictionary.title, this.selectedDictionary._id, title, description).subscribe(
-            (dictionary) => {
-                this.dictionaryList[index].title = dictionary.title;
-                this.dictionaryList[index].description = dictionary.description;
-            },
-            (error: HttpErrorResponse) => {
-                if (error.error === 'Ce titre existe déjà') {
-                    this.snack.open(ErrorCaseDictionaryTransfer.TitleAlreadyThere, 'fermer');
-                }
-            },
-        );
+        this.dictionarySubscription = this.dictionaryService
+            .update(BASE_URL, this.selectedDictionary.title, this.selectedDictionary._id, title, description)
+            .subscribe(
+                (dictionary) => {
+                    this.dictionaryList[index].title = dictionary.title;
+                    this.dictionaryList[index].description = dictionary.description;
+                },
+                (error: HttpErrorResponse) => {
+                    if (error.error === 'Ce titre existe déjà') {
+                        this.snack.open(ErrorCaseDictionaryTransfer.TitleAlreadyThere, 'Fermer');
+                    }
+                },
+            );
     }
 
     deleteDictionary(dictionaryToDelete: DictionaryInterface) {
         const index = this.dictionaryList.indexOf(this.selectedDictionary);
         if (index < 1) {
-            this.snack.open(ErrorCaseDictionaryTransfer.Untouchable, 'fermer');
+            this.snack.open(ErrorCaseDictionaryTransfer.Untouchable, 'Fermer');
             return;
         }
 
-        this.dictionaryService.delete(dictionaryToDelete._id).subscribe(
+        this.dictionarySubscription = this.dictionaryService.delete(dictionaryToDelete._id).subscribe(
             () => {
                 this.dictionaryList.splice(index, 1);
             },
             (error: HttpErrorResponse) => {
                 if (error.statusText === 'Unknown Error') {
-                    this.snack.open(ErrorCaseDictionaryTransfer.DatabaseServerCrash, 'close');
+                    this.snack.open(ErrorCaseDictionaryTransfer.DatabaseServerCrash, 'Fermer');
                     return;
                 }
-                this.snack.open(ErrorCaseDictionaryTransfer.DictionaryDeleted, 'fermer');
+                this.snack.open(ErrorCaseDictionaryTransfer.DictionaryDeleted, 'Fermer');
             },
         );
     }

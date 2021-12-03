@@ -52,17 +52,21 @@ export class GameParameters {
         this.localPlayerIndex = localPlayerIndex;
         this.opponentPlayerIndex = opponentPlayerIndex;
     }
+
     getLocalPlayer(): Player {
         return this.players[this.localPlayerIndex];
     }
+
     getOpponent(): Player {
         return this.players[this.opponentPlayerIndex];
     }
+
     setLocalPlayer(localPlayer: Player) {
         if (this.localPlayerIndex >= 0 && this.localPlayerIndex < GAME_CAPACITY) {
             this.players[this.localPlayerIndex] = localPlayer;
         }
     }
+
     setOpponent(opponent: Player) {
         if (this.opponentPlayerIndex >= 0 && this.opponentPlayerIndex < GAME_CAPACITY) {
             this.players[this.opponentPlayerIndex] = opponent;

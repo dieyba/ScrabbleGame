@@ -10,6 +10,7 @@ export class FormWordWithLettersFromName extends Goal {
         this.type = GoalType.FormWordWithLettersFromName;
         this.description = GoalDescriptions.FormWordWithLettersFromName;
     }
+
     achieve(wordsFormed: ScrabbleWord[], newlyPlacedLetters: ScrabbleLetter[], activePlayerName: string) {
         if (this.isAchieved) {
             return 0;

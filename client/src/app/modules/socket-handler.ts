@@ -7,8 +7,3 @@ export const requestSocket = (server: string): io.Socket => {
     }
     return activeSocket;
 };
-
-// export function disconnectSocket(): any {
-//     activeSocket.disconnect();
-//     return activeSocket === undefined;
-// }
