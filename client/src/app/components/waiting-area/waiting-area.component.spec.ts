@@ -258,7 +258,7 @@ describe('WaitingAreaComponent', () => {
         expect(gameListServiceSpy.someoneLeftRoom).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event updateInfo', () => {
-        component['socketOnConnect'];
+        component['socketOnConnect']();
         const game = new GameParameters();
         game.players[0] = new Player('dieyba');
         game.players[1] = new Player('sara');
@@ -271,7 +271,7 @@ describe('WaitingAreaComponent', () => {
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomdeleted', () => {
-        component['socketOnConnect'];
+        component['socketOnConnect']();
         const game = {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
@@ -286,7 +286,7 @@ describe('WaitingAreaComponent', () => {
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomcreated', () => {
-        component['socketOnConnect'];
+        component['socketOnConnect']();
         const game = {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
@@ -301,7 +301,7 @@ describe('WaitingAreaComponent', () => {
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomJoined', () => {
-        component['socketOnConnect'];
+        component['socketOnConnect']();
         const game = {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
@@ -316,7 +316,7 @@ describe('WaitingAreaComponent', () => {
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomLeft', () => {
-        component['socketOnConnect'];
+        component['socketOnConnect']();
         const game = {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
@@ -332,7 +332,7 @@ describe('WaitingAreaComponent', () => {
     });
 
     it('socketOnConnect should handle socket.on event roomLeft', () => {
-        component['socketOnConnect'];
+        component['socketOnConnect']();
         const game = undefined;
         socketMock.triggerEvent('roomLeft', game);
         expect(socketMockSpy).toHaveBeenCalled();

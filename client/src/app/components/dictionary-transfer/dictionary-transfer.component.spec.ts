@@ -122,11 +122,11 @@ describe('DictionaryTransferComponent', () => {
         expect(dictionaryServiceSpy.update).toHaveBeenCalledTimes(2);
     });
 
-    it('deleteDictionary should call snackBar open when the dictionary isnt in the tab or if it is the default dictionary', () => {
+    it('deleteDictionary should call snackBar open when the dictionary is not in the tab or if it is the default dictionary', () => {
         component.selectedDictionary = component.dictionaryList[0];
         const spy = spyOn(component['snack'], 'open');
         component.deleteDictionary(component.selectedDictionary);
-        expect(spy).toHaveBeenCalledWith(ErrorCaseDictionaryTransfer.Untouchable, 'fermer');
+        expect(spy).toHaveBeenCalledWith(ErrorCaseDictionaryTransfer.Untouchable, 'Fermer');
     });
 
     it('deleteDictionary should call dictionaryService delete', () => {

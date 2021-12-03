@@ -18,10 +18,10 @@ describe('RackComponent', () => {
         });
         manipulateRackServiceSpy = jasmine.createSpyObj('ManipulationRackService', [
             'handleSelection',
-            'clearManipValues',
             'selectByLetter',
             'switchLeft',
             'switchRight',
+            'clearManipulationValues',
         ]);
         exchangeServiceSpy = jasmine.createSpyObj('ExchangeService', ['handleSelection', 'exchange', 'cancelExchange', 'atLeastOneLetterSelected']);
 
@@ -54,7 +54,7 @@ describe('RackComponent', () => {
         expect(manipulateRackServiceSpy.handleSelection).toHaveBeenCalled();
     });
 
-    it('onRightClick should call selectedLetterPosition, manipulationRackService clearManipValues and exchangeService handleSelection', () => {
+    it('onRightClick should call selectedLetterPosition, manipulationRackService clearManipulationValues and exchangeService handleSelection', () => {
         const testEvent = new MouseEvent('click');
         const spy = spyOn(component, 'selectedLetterPosition');
         const spyEvent = spyOn(testEvent, 'preventDefault');

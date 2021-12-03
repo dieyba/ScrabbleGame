@@ -17,7 +17,7 @@ import { ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { BoardUpdate, LettersUpdate } from '@app/classes/server-message';
-import { SquareColor } from '@app/classes/square/square';
+import { Square, SquareColor } from '@app/classes/square/square';
 import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
 import { Difficulty } from '@app/classes/virtual-player/virtual-player';
@@ -121,6 +121,7 @@ describe('GameService', () => {
         service.game = new GameParameters();
         service.game.gameTimer = new GameTimer();
         service.game.stock = new LetterStock();
+        service.game.scrabbleBoard = new ScrabbleBoard(false);
         validationServiceSpy.dictionary = new Dictionary(DictionaryType.Default);
         socketMock = new SocketMock();
         service['socket'] = socketMock as unknown as io.Socket;
@@ -452,7 +453,20 @@ describe('GameService', () => {
 
     // synchronizeAfterPlaceCommand
     it('synchronizeAfterPlaceCommand should call socket emit if it is multiplayer mode and if there is no error', () => {
-        const placeParams: PlaceParams = { position: new Vec2(1, 1), orientation: Axis.H, word: 'test' };
+        const placeParams: PlaceParams = { position: new Vec2(0, 0), orientation: Axis.H, word: 'tes*' };
+        const square1 = new Square(0, 0);
+        const square2 = new Square(1, 0);
+        const square3 = new Square(2, 0);
+        const square4 = new Square(3, 0);
+        square1.letter = new ScrabbleLetter('t');
+        square2.letter = new ScrabbleLetter('e');
+        square3.letter = new ScrabbleLetter('s');
+        square4.letter = new ScrabbleLetter('*');
+        service.game.scrabbleBoard.squares[0][0] = square1;
+        service.game.scrabbleBoard.squares[1][0] = square2;
+        service.game.scrabbleBoard.squares[2][0] = square3;
+        service.game.scrabbleBoard.squares[3][0] = square4;
+
         const player: Player = new Player('Riri');
         player.letters = [new ScrabbleLetter('r'), new ScrabbleLetter('a'), new ScrabbleLetter('l'), new ScrabbleLetter('e')];
         player.score = 193;
@@ -467,6 +481,13 @@ describe('GameService', () => {
         service.game.gameMode = GameType.MultiPlayer;
         service.synchronizeAfterPlaceCommand(ErrorType.NoError, placeParams, player);
         expect(socketEmitMockSpy).toHaveBeenCalledTimes(2);
+
+        const placeParams2: PlaceParams = { position: new Vec2(0, 0), orientation: Axis.V, word: 'ta' };
+        const square5 = new Square(0, 1);
+        square5.letter = new ScrabbleLetter('a');
+        service.game.scrabbleBoard.squares[0][1] = square5;
+        service.synchronizeAfterPlaceCommand(ErrorType.NoError, placeParams2, player);
+        expect(socketEmitMockSpy).toHaveBeenCalled();
     });
 
     // addRackLetter tests

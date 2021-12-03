@@ -36,7 +36,7 @@ export class ScrabbleLetter {
         this.setDefaultValue(this.character);
     }
 
-    setDefaultValue(character: string) {
+    private setDefaultValue(character: string) {
         // set the letter's default value
         if (character === '') {
             this.value = 0;
