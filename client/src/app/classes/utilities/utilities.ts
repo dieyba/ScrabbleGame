@@ -107,3 +107,7 @@ export const isCoordInsideBoard = (coord: Vec2) => {
     const isValidRow = coord.y >= Row.A && coord.y <= Row.O;
     return isValidColumn && isValidRow;
 };
+
+export const convertYAxisToLetterCoordinates = (y: number): string => {
+    return String.fromCharCode('a'.charCodeAt(0) + y);
+};

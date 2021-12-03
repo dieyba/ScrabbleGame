@@ -6,15 +6,15 @@ import { DefaultCommandParams, PlaceParams } from '@app/classes/commands/command
 import { ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
 import { PassTurnCmd } from '@app/classes/pass-command/pass-command';
 import { PlaceCmd } from '@app/classes/place-command/place-command';
-import { Player } from '@app/classes/player/player';
 import { BOARD_SIZE } from '@app/classes/scrabble-board/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleMove } from '@app/classes/scrabble-move/scrabble-move';
+import { RACK_SIZE } from '@app/classes/scrabble-rack/scrabble-rack';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { SquareColor } from '@app/classes/square/square';
-import { Axis, isCoordInsideBoard } from '@app/classes/utilities/utilities';
+import { Axis, convertYAxisToLetterCoordinates, isCoordInsideBoard } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { Difficulty } from '@app/classes/virtual-player/virtual-player';
+import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player/virtual-player';
 import { BonusService } from '@app/services/bonus.service/bonus.service';
 import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
 import { GameService } from '@app/services/game.service/game.service';
@@ -43,6 +43,7 @@ const NO_MOVE_TOTAL_WAIT_TIME = 20000;
 const POINTS_INTERVAL = 5;
 const PERCENTAGE = 100;
 const POSITION_ERROR = -1;
+const MAX_ARRAY_SIZE = 4;
 
 @Injectable({
     providedIn: 'root',
@@ -50,7 +51,7 @@ const POSITION_ERROR = -1;
 export class VirtualPlayerService {
     rack: ScrabbleLetter[];
     orientation: Axis;
-    player: Player;
+    player: VirtualPlayer;
     type: Difficulty;
 
     constructor(
@@ -62,13 +63,13 @@ export class VirtualPlayerService {
         private validationService: ValidationService,
         private wordBuilderService: WordBuilderService,
     ) {
-        this.player = this.gameService.game.getOpponent();
+        this.player = this.gameService.game.getOpponent() as VirtualPlayer;
         this.rack = this.player.letters;
-        this.type = Difficulty.Difficult; // REMOVE THIS LATER AFTER TESTING
+        this.type = this.player.type;
     }
 
     playTurn(): void {
-        let moveMade = new ScrabbleMove();
+        let movesMade: ScrabbleMove[] = [];
         const defaultParams: DefaultCommandParams = {
             player: this.player,
             serviceCalled: this.gameService,
@@ -82,6 +83,7 @@ export class VirtualPlayerService {
             setTimeout(() => {
                 // 10% chance to end turn on easy mode
                 const command = new PassTurnCmd(defaultParams);
+                command.debugMessages.push('Le joueur virtuel a choisi de passer son tour.');
                 this.commandInvoker.executeCommand(command);
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile) {
@@ -91,12 +93,13 @@ export class VirtualPlayerService {
                 // Converts chosen word to string
                 if (chosenTiles.length === 0) {
                     const emptyRackPass = new PassTurnCmd(defaultParams);
+                    emptyRackPass.debugMessages.push("Le joueur virtuel a choisi d'échanger ses lettres.");
                     this.commandInvoker.executeCommand(emptyRackPass);
                     return;
                 }
-                const chosenTilesString = chosenTiles.map((tile) => tile.character).join(''); // TEST THIS, may not work.
+                const chosenTilesString = chosenTiles.map((tile) => tile.character).join('');
                 const command = new ExchangeCmd(defaultParams, chosenTilesString);
-                command.debugMessages.push('lettres échangées: ' + chosenTilesString);
+                command.debugMessages.push('Lettres échangées: ' + chosenTilesString);
                 this.commandInvoker.executeCommand(command);
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         } else if (currentMove <= Probability.EndTurn + Probability.ExchangeTile + Probability.MakeAMove) {
@@ -110,33 +113,140 @@ export class VirtualPlayerService {
                     return;
                 }
                 // waits 3 second to try and find a word to place
-                moveMade = this.makeMoves(possiblePermutations, value);
-                const params: PlaceParams = {
-                    position: moveMade.position,
-                    orientation: moveMade.axis,
-                    word: moveMade.word.stringify(),
-                };
-                if (moveMade.word.content.length > 1) {
+                movesMade = this.makeMoves(possiblePermutations, value);
+                if (movesMade.length !== 0) {
+                    const params: PlaceParams = {
+                        position: movesMade[0].position,
+                        orientation: movesMade[0].axis,
+                        word: movesMade[0].word.stringify(),
+                    };
                     const command = new PlaceCmd(defaultParams, params);
+                    command.debugMessages.push(this.debugMessageGenerator(movesMade));
                     this.commandInvoker.executeCommand(command);
                 } else {
-                    const command = new PassTurnCmd(defaultParams);
-                    command.debugMessages.push('no move was found. Calling pass command');
+                    const chosenTiles = this.chooseTilesFromRack(this.selectRandomValue());
+                    // Converts chosen word to string
+                    if (chosenTiles.length === 0) {
+                        const emptyRackPass = new PassTurnCmd(defaultParams);
+                        this.commandInvoker.executeCommand(emptyRackPass);
+                        emptyRackPass.debugMessages.push(
+                            "Aucun placement dans la plage de points sélectionnée n'a été trouvé. Le joueur virtuel passe son tour.",
+                        );
+                        return;
+                    }
+                    const chosenTilesString = chosenTiles.map((tile) => tile.character).join('');
+                    const command = new ExchangeCmd(defaultParams, chosenTilesString);
+                    command.debugMessages.push("Aucun placement n'a été trouvé pour le joueur virtuel. Il échange ses lettres.");
                     this.commandInvoker.executeCommand(command);
                 }
             }, DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
         }
     }
 
+    debugMessageGenerator(moves: ScrabbleMove[]): string {
+        let message = '';
+        for (let i = 0; i < moves[0].word.content.length; i++) {
+            if (moves[0].word.content[i].tile.position.x === POSITION_ERROR || moves[0].word.content[i].tile.position.y === POSITION_ERROR) {
+                if (moves[0].axis === Axis.H) {
+                    const nextPos = moves[0].position.x + i + 1;
+                    message +=
+                        convertYAxisToLetterCoordinates(moves[0].position.y).toUpperCase() +
+                        nextPos +
+                        ':' +
+                        moves[0].word.content[i].character.toUpperCase() +
+                        '  ';
+                } else {
+                    const nextPos = moves[0].position.y + i;
+                    message +=
+                        convertYAxisToLetterCoordinates(nextPos).toUpperCase() +
+                        (moves[0].position.x + 1) +
+                        ':' +
+                        moves[0].word.content[i].character.toUpperCase() +
+                        '  ';
+                }
+            }
+        }
+        const sliceNumber = -1;
+        message.slice(0, sliceNumber);
+        // Only one space, as asked in the documentation
+        message += '(' + moves[0].value + ')' + '\n\n';
+
+        if (moves.length === 1) {
+            message += "Aucun placement alternatif n'a été trouvé.";
+        }
+
+        for (let i = 1; i < moves.length; i++) {
+            for (const letter of moves[i].word.content) {
+                message += letter.character.toUpperCase();
+            }
+            message += ' (' + moves[i].value + ')' + '\n\n';
+        }
+        const bingoRack = [];
+        for (const letter in this.rack) {
+            if (letter) {
+                bingoRack.push(this.rack[letter].character);
+                for (const moveLetter in moves[0].word.content) {
+                    if (bingoRack.includes(moveLetter)) {
+                        bingoRack.splice(bingoRack.indexOf(moveLetter), 1);
+                        break;
+                    }
+                }
+            }
+        }
+        if (bingoRack.length === 0) message += 'Bingo! (50)\n';
+        return message;
+    }
+
     filterPermutations(permutations: ScrabbleWord[]): ScrabbleWord[] {
         const filteredPermutations: ScrabbleWord[] = [];
         for (const permutation of permutations) {
+            // Let's check if the permutation is just a word that is already on the board and skip it if it is the case
+            let notOnBoardFound = true;
+            for (const letter of permutation.content) {
+                if (letter.tile.position.x === POSITION_ERROR && letter.tile.position.y === POSITION_ERROR) {
+                    notOnBoardFound = true;
+                }
+            }
+            if (!notOnBoardFound) continue;
             const permutationString = permutation.stringify();
-            if (this.isWordValid(permutationString)) {
+            if (
+                this.isWordValid(permutationString) &&
+                (this.isPossiblePermutation(permutation, Axis.H) || this.isPossiblePermutation(permutation, Axis.V))
+            ) {
                 filteredPermutations.push(permutation);
             }
         }
         return filteredPermutations;
+    }
+
+    isPossiblePermutation(word: ScrabbleWord, axis: Axis): boolean {
+        let variablePos = POSITION_ERROR;
+        let constantPos = POSITION_ERROR;
+        let posDifference = 0;
+        let letterCounter = 0;
+        for (const letter of word.content) {
+            if (letter.tile.isValidated) {
+                if (axis === Axis.H) {
+                    if (variablePos === POSITION_ERROR) {
+                        variablePos = letter.tile.position.x;
+                        constantPos = letter.tile.position.y;
+                    }
+                    if (constantPos !== letter.tile.position.y) return false;
+                    posDifference = letter.tile.position.x - variablePos;
+                }
+                if (axis === Axis.V) {
+                    if (variablePos === POSITION_ERROR) {
+                        variablePos = letter.tile.position.y;
+                        constantPos = letter.tile.position.x;
+                    }
+                    if (constantPos !== letter.tile.position.x) return false;
+                    posDifference = letter.tile.position.y - variablePos;
+                }
+                if (posDifference !== letterCounter && variablePos !== POSITION_ERROR) return false;
+            }
+            letterCounter++;
+        }
+        return true;
     }
 
     playFirstTurn(permutations: ScrabbleWord[], value: number): void {
@@ -145,22 +255,34 @@ export class VirtualPlayerService {
             serviceCalled: this.gameService,
         };
         const moveFound = this.findFirstValidMoves(permutations, value, true);
-        if (moveFound.position.x === POSITION_ERROR || moveFound.position.y === POSITION_ERROR || moveFound.word.content.length === 0) {
-            // Pass turn
+        if (moveFound.length === 0) {
             setTimeout(() => {
-                const passTurn = new PassTurnCmd(defaultParams);
-                this.commandInvoker.executeCommand(passTurn);
+                const chosenTiles = this.chooseTilesFromRack(this.selectRandomValue());
+                const chosenTilesString = chosenTiles.map((tile) => tile.character).join('');
+                if (this.type === Difficulty.Difficult || chosenTilesString === '') {
+                    const emptyRackPass = new PassTurnCmd(defaultParams);
+                    emptyRackPass.debugMessages.push(
+                        "Aucun placement n'a été trouvé dane la plage de points pour le joueur virtuel. Il passe son tour.",
+                    );
+                    this.commandInvoker.executeCommand(emptyRackPass);
+                    return;
+                }
+                const exchange = new ExchangeCmd(defaultParams, chosenTilesString);
+                exchange.debugMessages.push("Aucun placement n'a été trouvé pour le joueur virtuel. Il échange ses lettres.");
+                this.commandInvoker.executeCommand(exchange);
             }, NO_MOVE_TOTAL_WAIT_TIME - DEFAULT_VIRTUAL_PLAYER_WAIT_TIME);
+            // Pass turn
             return;
         }
         // Play the word
         // Find the best position for the move for the points if VP is expert
         const params: PlaceParams = {
-            position: moveFound.position,
-            orientation: this.orientation,
-            word: moveFound.word.stringify(),
+            position: moveFound[0].position,
+            orientation: moveFound[0].axis,
+            word: moveFound[0].word.stringify(),
         };
         const command = new PlaceCmd(defaultParams, params);
+        command.debugMessages.push(this.debugMessageGenerator(moveFound));
         this.commandInvoker.executeCommand(command);
     }
 
@@ -182,39 +304,41 @@ export class VirtualPlayerService {
         return value;
     }
 
-    // TODO: Modify this class to store three words instead of only one.
-    findFirstValidMoves(permutations: ScrabbleWord[], value: number, isFirstTurn: boolean): ScrabbleMove {
+    findFirstValidMoves(permutations: ScrabbleWord[], value: number, isFirstTurn: boolean): ScrabbleMove[] {
         const filteredPermutations = this.filterPermutations(permutations);
-        let currentMaxValue = 0;
-        let currentBestWord: ScrabbleWord = new ScrabbleWord();
-        let axis;
+        const resultArray: ScrabbleMove[] = [];
+        let currentMinValue = 0;
         let position = new Vec2(POSITION_ERROR, POSITION_ERROR);
         if (value === Points.MaxValue4) {
             for (const permutation of filteredPermutations) {
-                position = this.findPositionForWord(permutation, value, isFirstTurn, currentMaxValue);
+                position = this.findPositionForWord(permutation, value, isFirstTurn, currentMinValue);
                 if (position.x !== POSITION_ERROR && position.y !== POSITION_ERROR) {
-                    const axisChosen = this.getRandomIntInclusive(0, 1);
-                    if (axisChosen === 0) axis = Axis.H;
-                    else axis = Axis.V;
-                    const valueOfWord = this.valueOnPosition(permutation, position, axis);
-                    if (valueOfWord > currentMaxValue) {
-                        currentMaxValue = permutation.value;
-                        currentBestWord = permutation;
+                    const valueOfWord = this.valueOnPosition(permutation, position, this.orientation);
+                    if (valueOfWord > currentMinValue) {
+                        resultArray.push(new ScrabbleMove(permutation, position, this.orientation, valueOfWord));
+                        if (resultArray.length > MAX_ARRAY_SIZE) {
+                            resultArray.sort((a, b) => b.value - a.value);
+                            currentMinValue = resultArray[MAX_ARRAY_SIZE].value;
+                            resultArray.pop();
+                        }
                     }
                 }
             }
-            return new ScrabbleMove(currentBestWord, position, axis);
+            resultArray.sort((a, b) => {
+                return b.value - a.value;
+            });
+            return resultArray;
         }
         for (const permutation of filteredPermutations) {
             position = this.findPositionForWord(permutation, value, isFirstTurn);
             if (position.x !== POSITION_ERROR || position.y !== POSITION_ERROR) {
                 const valueOfWord = this.valueOnPosition(permutation, position, this.orientation);
                 if ((valueOfWord <= value && value >= value - POINTS_INTERVAL) || (value === Points.MaxValue1 && permutation.value === 0)) {
-                    return new ScrabbleMove(permutation, position);
+                    resultArray.push(new ScrabbleMove(permutation, position, this.orientation, valueOfWord));
                 }
             }
         }
-        return new ScrabbleMove();
+        return resultArray;
     }
 
     findPositionForWord(word: ScrabbleWord, value: Points, isFirstTurn: boolean, currentMaxValue?: Points): Vec2 {
@@ -268,17 +392,21 @@ export class VirtualPlayerService {
         return returnPosition;
     }
 
-    valueOnPosition(word: ScrabbleWord, position: Vec2, axis: Axis): number {
+    // eslint-disable-next-line complexity
+    valueOnPosition(word: ScrabbleWord, position: Vec2, axis: Axis, isFirstTurn?: boolean): number {
         let totalValue = 0;
         let i = 0;
         let doubleScore = false;
         let tripleScore = false;
+        let firstTurnFactor = 0;
+        if (isFirstTurn) firstTurnFactor = 1;
         for (const letter of word.content) {
             let squareColor;
             switch (axis) {
                 case Axis.H:
                     if (this.gridService.scrabbleBoard.squares[position.x + i] === undefined) return 0;
                     squareColor = this.gridService.scrabbleBoard.squares[position.x + i][position.y].color;
+                    if (this.gridService.scrabbleBoard.squares[position.x + i][position.y].isBonusUsed === true) squareColor = SquareColor.None;
                     break;
                 case Axis.V:
                     if (
@@ -287,6 +415,7 @@ export class VirtualPlayerService {
                     )
                         return 0;
                     squareColor = this.gridService.scrabbleBoard.squares[position.x][position.y + i].color;
+                    if (this.gridService.scrabbleBoard.squares[position.x][position.y + i].isBonusUsed === true) squareColor = SquareColor.None;
                     break;
             }
             switch (squareColor) {
@@ -313,8 +442,8 @@ export class VirtualPlayerService {
         } else if (doubleScore) {
             totalValue *= 2;
         }
-        const allLettersPlaced = 8;
-        if (word.content.length === allLettersPlaced) return totalValue * 2;
+        const allLettersPlaced = RACK_SIZE + 1 - firstTurnFactor;
+        if (word.content.length >= allLettersPlaced) return totalValue * 2; // > 8 is an estimation for bingo
         return totalValue;
     }
 
@@ -329,24 +458,19 @@ export class VirtualPlayerService {
             } else if (axis === Axis.V && currentCoord.y + 1 < BOARD_SIZE) {
                 currentCoord.y += 1;
             }
-            if (!currentSquare || !currentSquare.letter) return;
-            if (
-                currentSquare.isValidated ||
-                (currentSquare.position.x === word.content[index].tile.position.x && currentSquare.position.y === word.content[index].tile.position.y)
-            )
-                continue;
+            if (!currentSquare) return;
+            if (currentSquare.isValidated) continue;
             currentSquare.letter = word.content[index];
             currentSquare.occupied = true;
             currentSquare.isValidated = false;
+            word.content[index].tile.position = currentSquare.position;
         }
     }
 
     removalAfterTempPlacement(word: ScrabbleWord, startPos: Vec2, axis: Axis) {
         if (!isCoordInsideBoard(startPos)) return;
         const currentCoord = new Vec2(startPos.x, startPos.y);
-        /* eslint-disable  @typescript-eslint/no-unused-expressions */
-        for (const eachWord of word.content) {
-            eachWord;
+        for (const letter of word.content) {
             const currentSquare = this.gridService.scrabbleBoard.squares[currentCoord.x][currentCoord.y];
             if (axis === Axis.H && currentCoord.x + 1 < BOARD_SIZE) {
                 currentCoord.x += 1;
@@ -354,13 +478,11 @@ export class VirtualPlayerService {
             if (axis === Axis.V && currentCoord.y + 1 < BOARD_SIZE) {
                 currentCoord.y += 1;
             }
+            if (!currentSquare) return;
             if (currentSquare.isValidated) continue;
-            if (currentSquare) {
-                if (!currentSquare.isValidated) {
-                    currentSquare.letter = new ScrabbleLetter('', 0);
-                    currentSquare.occupied = false;
-                }
-            }
+            currentSquare.letter = new ScrabbleLetter('', 0);
+            currentSquare.occupied = false;
+            letter.tile.position = new Vec2(POSITION_ERROR, POSITION_ERROR);
         }
     }
 
@@ -417,14 +539,12 @@ export class VirtualPlayerService {
                         // Verify if the letters can be found in the rack.
                         this.tempPlacement(word, realPos, axis);
                         const wordsBuilt = this.wordBuilderService.buildWordsOnBoard(realPos, axis);
-                        this.removalAfterTempPlacement(word, realPos, axis);
                         let isErrorInWordsBuilt = wordsBuilt.length >= 1 ? false : true;
-                        // if (!this.canBuildWordWithRack(word, realPos, axis)) isErrorInWordsBuilt = true;
-                        // Function above is not working properly but should check if the current letter is the right one for the word.
                         for (const wordBuilt of wordsBuilt) {
                             if (!this.isWordValid(wordBuilt.stringify())) isErrorInWordsBuilt = true;
                         }
                         if (!this.wordHasBeenPlaced(word, wordsBuilt)) isErrorInWordsBuilt = true;
+                        this.removalAfterTempPlacement(word, realPos, axis);
                         if (isErrorInWordsBuilt) continue;
                         returnPos = realPos;
                     }
@@ -437,7 +557,7 @@ export class VirtualPlayerService {
     canBuildWordWithRack(word: ScrabbleWord, startPos: Vec2, axis: Axis): boolean {
         const nextPosition = new Vec2(startPos.x, startPos.y);
         for (const letter of word.content) {
-            if (letter.tile.occupied) {
+            if (letter.tile.isValidated) {
                 const tilePosition = letter.tile.position;
                 if (tilePosition.x !== nextPosition.x || tilePosition.y !== nextPosition.x) return false;
             }
@@ -493,7 +613,7 @@ export class VirtualPlayerService {
                 if (newWords) {
                     for (const newWord of newWords) {
                         if (newWord) {
-                            if (!possibleMoves.includes(newWord) && (newWord.value < points || newWord.value > 0)) {
+                            if (newWord.value < points || newWord.value > 0) {
                                 if ((newWord.value < points || newWord.value > 0) && this.lettersInRack(newWord)) {
                                     possibleMoves.push(newWord);
                                 }
@@ -519,17 +639,13 @@ export class VirtualPlayerService {
         return true;
     }
 
-    makeMoves(permutations: ScrabbleWord[], value: number): ScrabbleMove {
-        // TODO: Modify this to show alternate placements
-        let currentMaxValue;
-        let currentBestWord;
-        let currentBestMoveAxis;
-        let movePosition = new Vec2(POSITION_ERROR, POSITION_ERROR);
+    makeMoves(permutations: ScrabbleWord[], value: number): ScrabbleMove[] {
+        const returnArray: ScrabbleMove[] = [];
+        let currentMinValue;
         const filteredPermutations = this.filterPermutations(permutations);
         if (value === Points.MaxValue4) {
             // Expert algorithm
-            currentMaxValue = 0;
-            currentBestWord = new ScrabbleWord();
+            currentMinValue = 0;
             for (const word of filteredPermutations) {
                 for (const axis in Axis) {
                     // Try with both axises for each permutation.
@@ -538,16 +654,17 @@ export class VirtualPlayerService {
                         this.orientation = myAxis;
                         const position = this.findPosition(word, myAxis);
                         const wordValue = this.valueOnPosition(word, position, myAxis);
-                        if (wordValue > currentMaxValue) {
-                            currentMaxValue = wordValue;
-                            currentBestWord = word;
-                            movePosition = position;
-                            currentBestMoveAxis = this.orientation;
+                        if (wordValue > currentMinValue) {
+                            returnArray.push(new ScrabbleMove(word, position, myAxis, wordValue));
+                            if (returnArray.length > MAX_ARRAY_SIZE) {
+                                returnArray.sort((a, b) => b.value - a.value);
+                                currentMinValue = returnArray[MAX_ARRAY_SIZE].value;
+                            }
                         }
                     }
                 }
             }
-            return new ScrabbleMove(currentBestWord, movePosition, currentBestMoveAxis);
+            return returnArray;
         }
         // Easy algorithm
         for (const word of filteredPermutations) {
@@ -559,12 +676,12 @@ export class VirtualPlayerService {
                     const position = this.findPosition(word, myAxis);
                     const wordValue = this.valueOnPosition(word, position, myAxis);
                     if ((wordValue > value - POINTS_INTERVAL && wordValue <= value) || (wordValue === Points.MaxValue1 && wordValue === 0)) {
-                        return new ScrabbleMove(word, position, this.orientation);
+                        returnArray.push(new ScrabbleMove(word, position, myAxis, wordValue));
                     }
                 }
             }
         }
-        return new ScrabbleMove();
+        return returnArray;
     }
 
     displayMoves(moves: ScrabbleWord[]): string {
@@ -641,6 +758,7 @@ export class VirtualPlayerService {
 
     permutationsWithBoard(): ScrabbleWord[] {
         const returnPermutations: ScrabbleWord[] = [];
+        const rackString = this.rack.map((letter) => letter.character).join('');
         for (const row of this.gridService.scrabbleBoard.squares) {
             for (const square of row) {
                 if (square.letter) {
@@ -652,7 +770,7 @@ export class VirtualPlayerService {
                                     if (word) {
                                         let boardTileCounter = 0;
                                         for (const letter of word.content) {
-                                            if (letter.tile.occupied) {
+                                            if (letter.tile.occupied && !rackString.includes(letter.character)) {
                                                 boardTileCounter++;
                                             }
                                         }
