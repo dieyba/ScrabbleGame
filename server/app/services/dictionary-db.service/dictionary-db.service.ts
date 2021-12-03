@@ -122,20 +122,9 @@ export class DictionaryDBService {
 
     async populateDictionaryDB(): Promise<void> {
         if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments()) === 0) {
-<<<<<<< HEAD
             const dictionary = dict_path as DictionaryInterface;
             dictionary._id = new ObjectId();
             await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(dictionary);
-=======
-            const dico = dict_path as Dictionary;
-            const dictionaries: DictionaryInterface = {
-                _id: new ObjectId(),
-                title: dico.title,
-                description: dico.description,
-                words: dico.words,
-            };
-            await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(dictionaries);
->>>>>>> dev
         }
     }
 
