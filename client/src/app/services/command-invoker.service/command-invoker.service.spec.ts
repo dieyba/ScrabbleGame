@@ -15,7 +15,7 @@ import { VirtualPlayer } from '@app/classes/virtual-player/virtual-player';
 import { ChatDisplayService } from '@app/services/chat-display.service/chat-display.service';
 import { GameService } from '@app/services/game.service/game.service';
 import { CommandInvokerService } from './command-invoker.service';
-
+/* eslint-disable dot-notation */
 describe('CommandInvokerService', () => {
     let service: CommandInvokerService;
     let chatDisplayServiceSpy: ChatDisplayService;
@@ -49,7 +49,7 @@ describe('CommandInvokerService', () => {
     });
 
     it('command should call displayExecutionLocally', async () => {
-        const spy = spyOn(service, 'displayExecutionLocally');
+        const spy = spyOn<any>(service, 'displayExecutionLocally');
         gameServiceSpy.passTurn = jasmine.createSpy('passTurnSpy').and.returnValue(ErrorType.NoError);
         const command = new PassTurnCmd(defaultParams);
         return service.executeCommand(command).then(() => {
@@ -58,7 +58,7 @@ describe('CommandInvokerService', () => {
     });
 
     it('exchangeCommand should call displayExecutionWithServer with the 2 different messages', async () => {
-        const spy = spyOn(service, 'displayExecutionWithServer');
+        const spy = spyOn<any>(service, 'displayExecutionWithServer');
         gameServiceSpy.exchangeLetters = jasmine.createSpy('exchangeLettersSpy').and.returnValue(ErrorType.NoError);
         gameServiceSpy.game.gameMode = GameType.MultiPlayer;
         const command = new ExchangeCmd(defaultParams, 'letter');
@@ -71,8 +71,8 @@ describe('CommandInvokerService', () => {
     });
 
     it('should not display message with server if solo game mode', async () => {
-        const spyServerDisplayChat = spyOn(service, 'displayExecutionWithServer').and.callThrough();
-        const spyLocalDisplayChat = spyOn(service, 'displayExecutionLocally').and.callThrough();
+        const spyServerDisplayChat = spyOn<any>(service, 'displayExecutionWithServer').and.callThrough();
+        const spyLocalDisplayChat = spyOn<any>(service, 'displayExecutionLocally').and.callThrough();
         gameServiceSpy.place = jasmine.createSpy('place').and.returnValue(ErrorType.NoError);
         const placeParams = { position: new Vec2(), orientation: Axis.H, word: '' };
         const placeCmd = new PlaceCmd(defaultParams, placeParams);
@@ -82,8 +82,8 @@ describe('CommandInvokerService', () => {
     });
 
     it('should not display message on both clients if the command execution failed', async () => {
-        const spyServerDisplayChat = spyOn(service, 'displayExecutionWithServer').and.callThrough();
-        const spyLocalDisplayChat = spyOn(service, 'displayExecutionLocally').and.callThrough();
+        const spyServerDisplayChat = spyOn<any>(service, 'displayExecutionWithServer').and.callThrough();
+        const spyLocalDisplayChat = spyOn<any>(service, 'displayExecutionLocally').and.callThrough();
         gameServiceSpy.place = jasmine.createSpy('place').and.returnValue(ErrorType.ImpossibleCommand);
         gameServiceSpy.game.gameMode = GameType.MultiPlayer;
         const placeParams = { position: new Vec2(), orientation: Axis.H, word: '' };
@@ -94,8 +94,8 @@ describe('CommandInvokerService', () => {
     });
 
     it('should  only display message on both clients for place, pass and exchange commands', async () => {
-        const spyServerDisplayChat = spyOn(service, 'displayExecutionWithServer').and.callThrough();
-        const spyLocalDisplayChat = spyOn(service, 'displayExecutionLocally').and.callThrough();
+        const spyServerDisplayChat = spyOn<any>(service, 'displayExecutionWithServer').and.callThrough();
+        const spyLocalDisplayChat = spyOn<any>(service, 'displayExecutionLocally').and.callThrough();
         gameServiceSpy.place = jasmine.createSpy('place').and.returnValue(ErrorType.NoError);
         gameServiceSpy.exchangeLetters = jasmine.createSpy('place').and.returnValue(ErrorType.NoError);
         gameServiceSpy.passTurn = jasmine.createSpy('passTurnSpy').and.returnValue(ErrorType.NoError);

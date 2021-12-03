@@ -9,6 +9,7 @@ export class FormThreeWords extends Goal {
         this.type = GoalType.FormThreeWords;
         this.description = GoalDescriptions.FormThreeWords;
     }
+
     achieve(wordsFormed: ScrabbleWord[]) {
         if (this.isAchieved) {
             return 0;

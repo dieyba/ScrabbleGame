@@ -29,26 +29,11 @@ export class TurnManagerService {
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
     }
-    initalize() {
+
+    initialize() {
         this.consecutivePassedTurns = 0;
     }
 
-    socketOnConnect() {
-        this.socket.on('turn changed', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
-            this.gameService.isTurnPassed = isCurrentTurnedPassed;
-            this.consecutivePassedTurns = consecutivePassedTurns;
-            if (!this.gameService.game.isEndGame) {
-                const isLocalPlayerEndingGame = this.consecutivePassedTurns >= MAX_TURNS_PASSED && this.gameService.game.getLocalPlayer().isActive;
-                if (isLocalPlayerEndingGame) {
-                    this.endGameService.endGame();
-                }
-                this.displayPassTurnMessage();
-                this.updateActivePlayer();
-                this.gameService.resetTimer();
-                this.gameService.isTurnPassed = false;
-            }
-        });
-    }
     changeTurn() {
         if (this.gameService.game.isEndGame) {
             return;
@@ -69,6 +54,7 @@ export class TurnManagerService {
             this.socket.emit('change turn', this.gameService.isTurnPassed, this.consecutivePassedTurns);
         }
     }
+
     updateConsecutivePassedTurns() {
         // Check if last 5 turns have been passed (by the command or the timer running out)
         this.consecutivePassedTurns = this.gameService.isTurnPassed ? this.consecutivePassedTurns + 1 : 0;
@@ -76,6 +62,7 @@ export class TurnManagerService {
             this.endGameService.endGame();
         }
     }
+
     updateActivePlayer() {
         if (this.gameService.game.isEndGame) {
             this.gameService.game.getLocalPlayer().isActive = false;
@@ -97,6 +84,7 @@ export class TurnManagerService {
         activePlayer.isActive = false;
         inactivePlayer.isActive = true;
     }
+
     displayPassTurnMessage() {
         if (this.gameService.isTurnPassed) {
             const activePlayer = this.gameService.game.getLocalPlayer().isActive
@@ -105,5 +93,22 @@ export class TurnManagerService {
             const entryColor = this.gameService.game.getLocalPlayer().isActive ? ChatEntryColor.LocalPlayer : ChatEntryColor.RemotePlayer;
             this.chatDisplayService.addEntry({ color: entryColor, message: activePlayer.name + ' >> !passer' });
         }
+    }
+
+    private socketOnConnect() {
+        this.socket.on('turn changed', (isCurrentTurnedPassed: boolean, consecutivePassedTurns: number) => {
+            this.gameService.isTurnPassed = isCurrentTurnedPassed;
+            this.consecutivePassedTurns = consecutivePassedTurns;
+            if (!this.gameService.game.isEndGame) {
+                const isLocalPlayerEndingGame = this.consecutivePassedTurns >= MAX_TURNS_PASSED && this.gameService.game.getLocalPlayer().isActive;
+                if (isLocalPlayerEndingGame) {
+                    this.endGameService.endGame();
+                }
+                this.displayPassTurnMessage();
+                this.updateActivePlayer();
+                this.gameService.resetTimer();
+                this.gameService.isTurnPassed = false;
+            }
+        });
     }
 }

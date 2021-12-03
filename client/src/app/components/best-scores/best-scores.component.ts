@@ -12,14 +12,17 @@ import { Subscription } from 'rxjs';
 export class BestScoresComponent implements OnInit, OnDestroy {
     classicModeBestScores: BestScores[];
     log2990ModeBestScores: BestScores[];
-    classicBestScoresSubsciption: Subscription;
+    classicBestScoresSubscription: Subscription;
+    log2990BestScoresSubscription: Subscription;
 
     constructor(private bestScoresService: BestScoresService, private dialogRef: MatDialogRef<BestScoresComponent>) {
         this.classicModeBestScores = [];
         this.log2990ModeBestScores = [];
     }
+
     ngOnDestroy(): void {
-        this.classicBestScoresSubsciption.unsubscribe();
+        this.classicBestScoresSubscription.unsubscribe();
+        this.log2990BestScoresSubscription.unsubscribe();
     }
 
     ngOnInit() {
@@ -42,7 +45,7 @@ export class BestScoresComponent implements OnInit, OnDestroy {
     // }
 
     getClassicBestScores(url: string) {
-        this.classicBestScoresSubsciption = this.bestScoresService.getBestScores(url).subscribe(
+        this.classicBestScoresSubscription = this.bestScoresService.getBestScores(url).subscribe(
             (receiveBestScore) => {
                 this.classicModeBestScores = receiveBestScore;
                 // this.samePosition(this.classicModeBestScores);
@@ -54,7 +57,7 @@ export class BestScoresComponent implements OnInit, OnDestroy {
     }
 
     getLog2990BestScores(url: string) {
-        this.bestScoresService.getBestScores(url).subscribe(
+        this.log2990BestScoresSubscription = this.bestScoresService.getBestScores(url).subscribe(
             (receiveBestScore) => {
                 this.log2990ModeBestScores = receiveBestScore;
             },

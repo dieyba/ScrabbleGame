@@ -53,16 +53,12 @@ export class DictionaryDBController {
         });
 
         this.router.patch('/:title', async (req: Request, res: Response) => {
-            // console.log('collection in controller : ', this.dictionaryDBService.dictionaryCollection);
             this.dictionaryDBService
                 .updateDictionary(req.body.id, req.body.newTitle, req.body.newDescription)
                 .then(() => {
-                    // console.log('then');
                     res.status(StatusCodes.OK).send();
                 })
                 .catch((error: Error) => {
-                    // console.log('catch');
-                    // console.log(error);
                     if (error.message === 'Cannot remove headers after they are sent to the client') {
                         // do nothing
                     } else {
@@ -72,7 +68,6 @@ export class DictionaryDBController {
         });
 
         this.router.delete('/:id', async (req: Request, res: Response) => {
-            // console.log('req : ', req.params);
             this.dictionaryDBService
                 .delete(req.params.id)
                 .then(() => {

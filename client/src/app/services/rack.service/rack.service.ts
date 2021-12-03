@@ -88,21 +88,6 @@ export class RackService {
         }
     }
 
-    drawLetter(position: number) {
-        const positionX = (RACK_WIDTH * position) / MAX_LETTER_COUNT;
-        const letter = this.rackLetters[position].character.toUpperCase();
-        this.gridContext.beginPath();
-        this.gridContext.fillStyle = 'black';
-        this.gridContext.font = '50px system-ui';
-        this.gridContext.fillText(letter, positionX + OFFSET, 0 + RACK_HEIGHT - OFFSET);
-        this.gridContext.font = '15px system-ui';
-        if (this.rackLetters[position].value >= DOUBLE_DIGIT) {
-            this.gridContext.fillText(String(this.rackLetters[position].value), positionX + RACK_HEIGHT - SMALL_OFFSET * 2, 0 + RACK_HEIGHT - OFFSET);
-        } else {
-            this.gridContext.fillText(String(this.rackLetters[position].value), positionX + RACK_HEIGHT - SMALL_OFFSET, 0 + RACK_HEIGHT - OFFSET);
-        }
-    }
-
     findSquareOrigin(position: number): number {
         return (RACK_WIDTH * (position - 1)) / MAX_LETTER_COUNT;
     }
@@ -147,11 +132,22 @@ export class RackService {
 
     drawSelection(position: number, ctx: CanvasRenderingContext2D) {
         const squareOrigin = this.findSquareOrigin(position);
-        // Les lettres sont réecrites en gras, on peut le régler en redessiant le rack mais ce n'est pas important.
-        // il faudrait remettre la couleur en blanc avant de la changer.
-        // ctx.fillRect(0, 0, RACK_WIDTH, RACK_HEIGHT);
-        // this.drawRack();
         ctx.fillRect(squareOrigin, 0, SQUARE_WIDTH, RACK_HEIGHT);
         this.drawExistingLetters();
+    }
+
+    private drawLetter(position: number) {
+        const positionX = (RACK_WIDTH * position) / MAX_LETTER_COUNT;
+        const letter = this.rackLetters[position].character.toUpperCase();
+        this.gridContext.beginPath();
+        this.gridContext.fillStyle = 'black';
+        this.gridContext.font = '50px system-ui';
+        this.gridContext.fillText(letter, positionX + OFFSET, 0 + RACK_HEIGHT - OFFSET);
+        this.gridContext.font = '15px system-ui';
+        if (this.rackLetters[position].value >= DOUBLE_DIGIT) {
+            this.gridContext.fillText(String(this.rackLetters[position].value), positionX + RACK_HEIGHT - SMALL_OFFSET * 2, 0 + RACK_HEIGHT - OFFSET);
+        } else {
+            this.gridContext.fillText(String(this.rackLetters[position].value), positionX + RACK_HEIGHT - SMALL_OFFSET, 0 + RACK_HEIGHT - OFFSET);
+        }
     }
 }
