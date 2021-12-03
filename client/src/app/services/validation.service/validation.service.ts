@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Dictionary, DictionaryType } from '@app/classes/dictionary/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { GameType } from '@app/classes/game-parameters/game-parameters';
 import { Player } from '@app/classes/player/player';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { Trie } from '@app/classes/trie/trie';
-import { ERROR_NUMBER, MIN_WORD_LENGTH as MIN_WORD_LENGTH } from '@app/classes/utilities/utilities';
+import { ERROR_NUMBER, MIN_WORD_LENGTH } from '@app/classes/utilities/utilities';
 import * as SocketHandler from '@app/modules/socket-handler';
 import { BonusService } from '@app/services/bonus.service/bonus.service';
 import { BOARD_SIZE, GridService } from '@app/services/grid.service/grid.service';
 import * as io from 'socket.io-client';
+import dict_path from 'src/assets/dictionary.json';
 import { environment } from 'src/environments/environment';
 
 const BONUS_LETTER_COUNT = 7;
@@ -20,7 +21,7 @@ export const WAIT_TIME = 3000;
 })
 export class ValidationService {
     validWordsFormed: string[];
-    dictionary: Dictionary;
+    dictionary: DictionaryInterface;
     dictionaryTrie: Trie;
     words: string[];
     isTimerElapsed: boolean;
@@ -30,15 +31,19 @@ export class ValidationService {
 
     constructor(private readonly gridService: GridService, private bonusService: BonusService) {
         this.validWordsFormed = [];
-        this.dictionary = new Dictionary(DictionaryType.Default);
-        this.dictionaryTrie = new Trie();
-        this.dictionaryTrie.initializeDictionary();
+        this.dictionary = dict_path as DictionaryInterface;
+        this.dictionaryTrie = new Trie(this.dictionary);
         this.words = [];
         this.isTimerElapsed = false;
         this.areWordsValid = false;
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         this.socketOnConnect();
+    }
+
+    setDictionary(dictionary: DictionaryInterface) {
+        this.dictionary = dictionary;
+        this.dictionaryTrie = new Trie(dictionary);
     }
 
     updatePlayerScore(newWords: ScrabbleWord[], player: Player): void {

@@ -56,7 +56,7 @@ export class DictionaryService {
                 break;
             }
             default: {
-                this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!', 'Fermer');
+                this.snack.open('La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard.', 'Fermer');
                 break;
             }
         }

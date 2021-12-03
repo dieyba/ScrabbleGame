@@ -11,7 +11,7 @@
         </div>
         <div class="games" *ngFor="let game of pendingGamesList">
             <button class="game-btn" (click)="openName(true); onSelect(game)">
-                Partie #{{ game.gameRoom.idGame }} - Créateur: {{ game.creatorName }} - Dictionnaire: {{ game.dictionaryType }} - Temps:
+                Partie #{{ game.gameRoom.idGame }} - Créateur: {{ game.creatorName }} - Dictionnaire: {{ game.dictionary.title }} - Temps:
                 {{ game.totalCountDown }} secondes
             </button>
         </div>
@@ -23,7 +23,7 @@
         <mat-card class="games">
             <li *ngFor="let game of pendingGamesList" [class.selected]="game === selectedGame">
                 <option selected (click)="openName(true); onSelect(game)">
-                    Partie #{{ game.gameRoom.idGame }} - Créateur: {{ game.creatorName }} - Dictionnaire: {{ game.dictionaryType }} - Temps:
+                    Partie #{{ game.gameRoom.idGame }} - Créateur: {{ game.creatorName }} - Dictionnaire: {{ game.dictionary.title }} - Temps:
                     {{ game.totalCountDown }} sec.
                 </option>
             </li>

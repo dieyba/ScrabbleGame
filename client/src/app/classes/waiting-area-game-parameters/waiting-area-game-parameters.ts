@@ -1,4 +1,4 @@
-import { DictionaryType } from '@app/classes/dictionary/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { GameType, UNDEFINE_ID } from '@app/classes/game-parameters/game-parameters';
 import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
 
@@ -14,7 +14,7 @@ export class WaitingAreaGameParameters {
     gameRoom: GameRoom;
     creatorName: string;
     joinerName: string;
-    dictionaryType: DictionaryType;
+    dictionary: DictionaryInterface;
     totalCountDown: number;
     isRandomBonus: boolean;
     gameMode: GameType;
@@ -23,7 +23,7 @@ export class WaitingAreaGameParameters {
     constructor(
         gameMode: GameType,
         capacity: number,
-        dictionaryType: DictionaryType,
+        dictionary: DictionaryInterface,
         totalCountDown: number,
         isRandomBonus: boolean,
         isLog2990: boolean,
@@ -38,7 +38,7 @@ export class WaitingAreaGameParameters {
             creatorId: UNDEFINE_ID,
             joinerId: UNDEFINE_ID,
         };
-        this.dictionaryType = dictionaryType;
+        this.dictionary = dictionary;
         this.totalCountDown = totalCountDown;
         this.isRandomBonus = isRandomBonus;
         this.isLog2990 = isLog2990;

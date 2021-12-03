@@ -2,7 +2,7 @@ import { AfterViewInit, Component, HostListener, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { DictionaryType } from '@app/classes/dictionary/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { GameInitInfo, GameType } from '@app/classes/game-parameters/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters/waiting-area-game-parameters';
 import { DialogData, GameInitFormComponent, GAME_CAPACITY } from '@app/components/game-init-form/game-init-form.component';
@@ -10,6 +10,7 @@ import * as SocketHandler from '@app/modules/socket-handler';
 import { GameListService } from '@app/services/game-list.service/game-list.service';
 import { GameService } from '@app/services/game.service/game.service';
 import * as io from 'socket.io-client';
+import dict_path from 'src/assets/dictionary.json';
 import { environment } from 'src/environments/environment';
 
 const MAX_NAME_LENGTH = 12;
@@ -57,7 +58,15 @@ export class WaitingAreaComponent implements AfterViewInit {
         this.name = false;
         this.isStarting = false;
         if (data.isGameSelected) {
-            this.selectedGame = new WaitingAreaGameParameters(GameType.MultiPlayer, GAME_CAPACITY, DictionaryType.Default, 0, false, false, '');
+            this.selectedGame = new WaitingAreaGameParameters(
+                GameType.MultiPlayer,
+                GAME_CAPACITY,
+                dict_path as DictionaryInterface,
+                0,
+                false,
+                false,
+                '',
+            );
             this.playerName = new FormControl('', [
                 Validators.required,
                 Validators.pattern('[a-zA-ZÉé]*'),
