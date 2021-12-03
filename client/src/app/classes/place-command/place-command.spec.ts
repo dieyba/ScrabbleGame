@@ -6,7 +6,7 @@ import { createPlaceCmd, PlaceCmd } from '@app/classes/place-command/place-comma
 import { Player } from '@app/classes/player/player';
 import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/game.service/game.service';
 
 const PLAYER_NAME = 'Sara';
 const OPPONENT_NAME = 'Not Sara';

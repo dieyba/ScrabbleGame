@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
-import { BASE_URL, DictionaryService } from '@app/services/dictionary.service';
+import { BASE_URL, DictionaryService } from '@app/services/dictionary.service/dictionary.service';
 
 @Component({
     selector: 'app-dictionary-transfer',

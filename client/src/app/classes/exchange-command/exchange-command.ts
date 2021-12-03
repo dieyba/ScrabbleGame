@@ -1,7 +1,7 @@
 import { ChatDisplayEntry, ChatEntryColor, createErrorEntry } from '@app/classes/chat-display-entry/chat-display-entry';
 import { Command, CommandName, CommandResult, DefaultCommandParams } from '@app/classes/commands/commands';
 import { ErrorType } from '@app/classes/errors';
-import { GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/game.service/game.service';
 
 export class ExchangeCmd extends Command {
     private gameService: GameService;

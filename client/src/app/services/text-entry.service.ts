@@ -18,11 +18,11 @@ import {
     isValidLetter,
     removeAccents,
     scrabbleLettersToString,
-    trimSpaces,
+    trimSpaces
 } from '@app/classes/utilities/utilities';
 import { ChatDisplayService } from './chat-display.service';
 import { CommandInvokerService } from './command-invoker.service';
-import { GameService } from './game.service';
+import { GameService } from './game.service/game.service';
 
 const MIN_EXCHANGE_LETTERS = 1;
 const MAX_EXCHANGE_LETTERS = 7;

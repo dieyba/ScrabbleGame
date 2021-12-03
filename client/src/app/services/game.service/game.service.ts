@@ -18,12 +18,12 @@ import * as SocketHandler from '@app/modules/socket-handler';
 import { BehaviorSubject, Observable } from 'rxjs';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import { GoalsService } from '../goals.service';
+import { GridService } from '../grid.service/grid.service';
+import { PlaceService } from '../place.service/place.service';
+import { ValidationService } from '../validation.service';
 import { ChatDisplayService } from './chat-display.service';
-import { GoalsService } from './goals.service';
-import { GridService } from './grid.service';
-import { PlaceService } from './place.service';
-import { RackService } from './rack.service';
-import { ValidationService } from './validation.service';
+import { RackService } from "./rack../word-builder.service/word-builder.service";
 import { WordBuilderService } from './word-builder.service';
 
 export const DEFAULT_LETTER_COUNT = 7;

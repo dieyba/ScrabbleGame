@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ExchangeService } from '@app/services/exchange.service';
-import { ManipulationRackService } from '@app/services/manipulation-rack.service';
+import { ExchangeService } from '@app/services/exchange.service/exchange.service';
+import { ManipulationRackService } from '@app/services/manipulation-rack.service/manipulation-rack.service';
 import { MAX_LETTER_COUNT, RackService } from '@app/services/rack.service';
 import { RackComponent } from './rack.component';
 

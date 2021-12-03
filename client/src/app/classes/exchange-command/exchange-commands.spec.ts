@@ -4,7 +4,7 @@ import { ErrorType } from '@app/classes/errors';
 import { createExchangeCmd, ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
 import { GameParameters } from '@app/classes/game-parameters/game-parameters';
 import { Player } from '@app/classes/player/player';
-import { GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/game.service/game.service';
 
 const PLAYER_NAME = 'Sara';
 const OPPONENT_NAME = 'Not Sara';

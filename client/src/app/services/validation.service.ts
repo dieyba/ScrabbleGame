@@ -8,7 +8,7 @@ import * as SocketHandler from '@app/modules/socket-handler';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { BonusService } from './bonus.service';
-import { BOARD_SIZE, GridService } from './grid.service';
+import { BOARD_SIZE, GridService } from './grid.service/grid.service';
 
 const BONUS_LETTER_COUNT = 7;
 const BONUS_POINTS = 50;

@@ -11,12 +11,12 @@ import { ScrabbleRack } from '@app/classes/scrabble-rack/scrabble-rack';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { Axis, ERROR_NUMBER } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
+import { GameService } from '../game.service/game.service';
+import { GridService } from '../grid.service/grid.service';
+import { PlaceService } from '../place.service/place.service';
+import { WordBuilderService } from '../word-builder.service/word-builder.service';
 import { BonusService } from './bonus.service';
 import { CommandInvokerService } from './command-invoker.service';
-import { GameService } from './game.service';
-import { GridService } from './grid.service';
-import { PlaceService } from './place.service';
-import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
     EndTurn = 100, // TODO: put the right probability settings after testing

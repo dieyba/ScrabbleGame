@@ -5,11 +5,11 @@ import { BOARD_SIZE } from '@app/classes/scrabble-board/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { Axis, isValidLetter, removeAccents } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
+import { GameService } from '../game.service/game.service';
+import { BOARD_OFFSET, GridService, SQUARE_SIZE } from '../grid.service/grid.service';
+import { MouseWordPlacerCompanionService } from '../mouse-word-placer-companion.service/mouse-word-placer-companion.service';
+import { RackService, RACK_HEIGHT, RACK_WIDTH } from '../rack.service';
 import { CommandInvokerService } from './command-invoker.service';
-import { GameService } from './game.service';
-import { BOARD_OFFSET, GridService, SQUARE_SIZE } from './grid.service';
-import { MouseWordPlacerCompanionService } from './mouse-word-placer-companion.service';
-import { RackService, RACK_HEIGHT, RACK_WIDTH } from './rack.service';
 export const ABSOLUTE_BOARD_SIZE = 580;
 export const ACTUAL_SQUARE_SIZE = SQUARE_SIZE + 2;
 @Injectable({

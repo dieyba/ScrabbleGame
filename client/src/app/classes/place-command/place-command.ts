@@ -3,7 +3,7 @@ import { Command, CommandName, CommandResult, DefaultCommandParams, PlaceParams 
 import { ErrorType } from '@app/classes/errors';
 import { Axis, convertCoordToString } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/game.service/game.service';
 
 export class PlaceCmd extends Command {
     private gameService: GameService;

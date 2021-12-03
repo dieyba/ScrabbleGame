@@ -5,7 +5,7 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { SquareColor } from '@app/classes/square/square';
 import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { GridService } from '@app/services/grid.service';
+import { GridService } from '@app/services/grid.service/grid.service';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('GridService', () => {

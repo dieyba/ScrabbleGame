@@ -4,10 +4,10 @@ import { PassTurnCmd } from '@app/classes/pass-command/pass-command';
 import { Vec2 } from '@app/classes/vec2/vec2';
 import { ChatDisplayService } from '@app/services/chat-display.service';
 import { CommandInvokerService } from '@app/services/command-invoker.service';
-import { ExchangeService } from '@app/services/exchange.service';
-import { DEFAULT_LETTER_COUNT, GameService } from '@app/services/game.service';
-import { GridService } from '@app/services/grid.service';
-import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service';
+import { ExchangeService } from '@app/services/exchange.service/exchange.service';
+import { DEFAULT_LETTER_COUNT, GameService } from '@app/services/game.service/game.service';
+import { GridService } from '@app/services/grid.service/grid.service';
+import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service/mouse-word-placer.service';
 import { RackService } from '@app/services/rack.service';
 import { TurnManagerService } from '@app/services/turn-manager.service';
 

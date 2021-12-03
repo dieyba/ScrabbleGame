@@ -6,7 +6,7 @@ import { SquareColor } from '@app/classes/square/square';
 import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
 import { BonusService } from '@app/services/bonus.service';
-import { GridService } from '@app/services/grid.service';
+import { GridService } from '@app/services/grid.service/grid.service';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
