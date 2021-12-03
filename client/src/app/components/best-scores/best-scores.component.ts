@@ -27,10 +27,25 @@ export class BestScoresComponent implements OnInit, OnDestroy {
         this.getLog2990BestScores(BASE_URL + '/log2990Mode');
     }
 
+    samePosition(tab: BestScores[]) {
+        for (const score of tab) {
+            let nextScore = tab.indexOf(score) + 1;
+            if (nextScore === tab.length) {
+                nextScore -= 1;
+            }
+            if (score.score === tab[nextScore].score) {
+                tab[nextScore - 1].playerName += ' - ';
+                tab[nextScore - 1].playerName += tab[nextScore].playerName;
+                tab.splice(nextScore, 1);
+            }
+        }
+    }
+
     getClassicBestScores(url: string) {
         this.classicBestScoresSubsciption = this.bestScoresService.getBestScores(url).subscribe(
             (receiveBestScore) => {
                 this.classicModeBestScores = receiveBestScore;
+                this.samePosition(this.classicModeBestScores);
             },
             (error: HttpErrorResponse) => {
                 this.bestScoresService.handleErrorSnackBar(error);
