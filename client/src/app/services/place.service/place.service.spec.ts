@@ -6,9 +6,9 @@ import { Column, Row, ScrabbleBoard } from '@app/classes/scrabble-board/scrabble
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { GridService } from './grid.service/grid.service';
+import { GridService } from '@app/services/grid.service/grid.service';
+import { RackService } from '@app/services/rack.service/rack.service';
 import { PlaceService } from './place.service';
-import { RackService } from './rack.service';
 
 describe('PlaceService', () => {
     let service: PlaceService;

@@ -5,10 +5,10 @@ import { Player } from '@app/classes/player/player';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { ERROR_NUMBER, MIN_WORD_LENGHT } from '@app/classes/utilities/utilities';
 import * as SocketHandler from '@app/modules/socket-handler';
+import { BonusService } from '@app/services/bonus.service/bonus.service';
+import { BOARD_SIZE, GridService } from '@app/services/grid.service/grid.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { BonusService } from './bonus.service';
-import { BOARD_SIZE, GridService } from './grid.service/grid.service';
 
 const BONUS_LETTER_COUNT = 7;
 const BONUS_POINTS = 50;

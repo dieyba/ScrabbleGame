@@ -7,7 +7,7 @@ import { GameInitInfo, GameType } from '@app/classes/game-parameters/game-parame
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters/waiting-area-game-parameters';
 import { GameInitFormComponent, GAME_CAPACITY } from '@app/components/game-init-form/game-init-form.component';
 import * as SocketHandler from '@app/modules/socket-handler';
-import { GameListService } from '@app/services/game-list.service';
+import { GameListService } from '@app/services/game-list.service/game-list.service';
 import { GameService } from '@app/services/game.service/game.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';

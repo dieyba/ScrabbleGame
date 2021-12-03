@@ -5,8 +5,8 @@ import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { Square } from '@app/classes/square/square';
 import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { GridService } from './grid.service';
-import { WordBuilderService } from './word-builder.service';
+import { GridService } from '@app/services/grid.service/grid.service';
+import { WordBuilderService } from '@app/services/word-builder.service/word-builder.service';
 
 const TOWARD_START = true;
 
@@ -123,7 +123,7 @@ describe('WordBuilderService', () => {
 
     it('should not build from coordinates out of range', () => {
         const outOfBoundCoord = new Vec2(Column.Seven, Row.C);
-        expect(service.buildWordsOnBoard('somerandomword', outOfBoundCoord, Axis.H)).toEqual([]);
+        expect(service.buildWordsOnBoard(outOfBoundCoord, Axis.H)).toEqual([]);
     });
 
     it('should only build the new words formed by the new letters placed', () => {
@@ -175,7 +175,7 @@ describe('WordBuilderService', () => {
                 }
             }
         }
-        const wordsBuilt = service.buildWordsOnBoard('aaa', startCoord, Axis.H);
+        const wordsBuilt = service.buildWordsOnBoard(startCoord, Axis.H);
         expect(wordsBuilt.length).toEqual(expectedWords.length);
         for (let i = 0; i < wordsBuilt.length; i++) {
             expect(wordsBuilt[i].content).toEqual(expectedWords[i].content);

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { DefaultCommandParams } from '@app/classes/commands/commands';
 import { ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
+import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
+import { RackService } from '@app/services/rack.service/rack.service';
 import { GameService } from '../game.service/game.service';
-import { RackService } from '../rack.service';
-import { CommandInvokerService } from './command-invoker.service';
 
 @Injectable({
     providedIn: 'root',

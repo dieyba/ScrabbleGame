@@ -10,7 +10,7 @@ import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parame
 import { ErrorCase } from '@app/components/virtual-player-name-manager/virtual-player-name-manager.component';
 import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
 import { BASE_URL, DictionaryService } from '@app/services/dictionary.service/dictionary.service';
-import { GameListService } from '@app/services/game-list.service';
+import { GameListService } from '@app/services/game-list.service/game-list.service';
 import { GameService } from '@app/services/game.service/game.service';
 import { VirtualPlayerName, VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
 

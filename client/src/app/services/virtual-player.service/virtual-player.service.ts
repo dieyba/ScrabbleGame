@@ -11,12 +11,12 @@ import { ScrabbleRack } from '@app/classes/scrabble-rack/scrabble-rack';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { Axis, ERROR_NUMBER } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { GameService } from '../game.service/game.service';
-import { GridService } from '../grid.service/grid.service';
-import { PlaceService } from '../place.service/place.service';
-import { WordBuilderService } from '../word-builder.service/word-builder.service';
-import { BonusService } from './bonus.service';
-import { CommandInvokerService } from './command-invoker.service';
+import { BonusService } from '@app/services/bonus.service/bonus.service';
+import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
+import { GameService } from '@app/services/game.service/game.service';
+import { GridService } from '@app/services/grid.service/grid.service';
+import { PlaceService } from '@app/services/place.service/place.service';
+import { WordBuilderService } from '@app/services/word-builder.service/word-builder.service';
 
 export enum Probability {
     EndTurn = 100, // TODO: put the right probability settings after testing
@@ -227,7 +227,6 @@ export class VirtualPlayerService {
                             if (this.bonusService.totalValue(list[l]) > points || this.bonusService.totalValue(list[l]) < points - POINTS_INTERVAL) {
                                 list.splice(l);
                             } else {
-                                const currentWord = list[l].stringify();
                                 const position = this.findPosition(list[l], axis);
                                 const otherWords: ScrabbleWord[] = this.wordBuilderService.buildWordsOnBoard(position, axis);
                                 let sum = 0;

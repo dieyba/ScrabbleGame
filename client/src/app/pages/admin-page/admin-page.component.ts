@@ -2,7 +2,7 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BestScoresService } from '@app/services/best-scores.service';
+import { BestScoresService } from '@app/services/best-scores.service/best-scores.service';
 import { VirtualPlayerNameManager } from '@app/services/virtual-player-name-manager';
 
 @Component({

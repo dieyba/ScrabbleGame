@@ -5,8 +5,8 @@ import { ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
 import { GameType } from '@app/classes/game-parameters/game-parameters';
 import { PassTurnCmd } from '@app/classes/pass-command/pass-command';
 import { PlaceCmd } from '@app/classes/place-command/place-command';
-import { ChatDisplayService } from './chat-display.service';
-import { GameService } from './game.service';
+import { ChatDisplayService } from '@app/services/chat-display.service/chat-display.service';
+import { GameService } from '@app/services/game.service/game.service';
 
 @Injectable({
     providedIn: 'root',

@@ -1,6 +1,6 @@
 import { ChatDisplayEntry, ChatEntryColor, createPlayerEntry } from '@app/classes/chat-display-entry/chat-display-entry';
 import { Command, CommandName, CommandResult, DefaultCommandParams } from '@app/classes/commands/commands';
-import { ChatDisplayService } from '@app/services/chat-display.service';
+import { ChatDisplayService } from '@app/services/chat-display.service/chat-display.service';
 
 const HELP_INTRO_MESSAGE = 'Il y a 6 commandes:';
 const HELP_MESSAGE = '!aide : affiche une explication des commandes';

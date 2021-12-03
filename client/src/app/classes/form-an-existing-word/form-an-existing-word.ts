@@ -1,7 +1,7 @@
 import { Goal, GoalDescriptions, GoalPoints, GoalType } from '@app/classes/goal/goal';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { scrabbleLettersToString } from '@app/classes/utilities/utilities';
-import { ValidationService } from '@app/services/validation.service';
+import { ValidationService } from '@app/services/validation.service/validation.service';
 
 const MIN_WORD_LENGTH = 5;
 

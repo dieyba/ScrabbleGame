@@ -4,8 +4,8 @@ import { ErrorType } from '@app/classes/errors';
 import { Player } from '@app/classes/player/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { GridService } from '../grid.service/grid.service';
-import { RackService } from '../rack.service';
+import { GridService } from '@app/services/grid.service/grid.service';
+import { RackService } from '@app/services/rack.service/rack.service';
 
 @Injectable({
     providedIn: 'root',

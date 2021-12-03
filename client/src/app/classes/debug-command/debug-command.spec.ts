@@ -3,7 +3,7 @@ import { ChatEntryColor } from '@app/classes/chat-display-entry/chat-display-ent
 import { DefaultCommandParams } from '@app/classes/commands/commands';
 import { createDebugCmd, DebugCmd } from '@app/classes/debug-command/debug-command';
 import { Player } from '@app/classes/player/player';
-import { ACTIVE_DEBUG_MESSAGE, ChatDisplayService, INACTIVE_DEBUG_MESSAGE } from '@app/services/chat-display.service';
+import { ACTIVE_DEBUG_MESSAGE, ChatDisplayService, INACTIVE_DEBUG_MESSAGE } from '@app/services/chat-display.service/chat-display.service';
 const PLAYER_NAME = 'Sara';
 
 describe('DebugCmd', () => {

@@ -4,11 +4,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { GameType } from '@app/classes/game-parameters/game-parameters';
 import { calculateRackPoints } from '@app/classes/player/player';
 import * as SocketHandler from '@app/modules/socket-handler';
+import { BASE_URL, BestScoresService } from '@app/services/best-scores.service/best-scores.service';
+import { ChatDisplayService } from '@app/services/chat-display.service/chat-display.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { GameService } from '../game.service/game.service';
-import { BASE_URL, BestScoresService } from './best-scores.service';
-import { ChatDisplayService } from './chat-display.service';
 
 @Injectable({
     providedIn: 'root',

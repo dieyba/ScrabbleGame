@@ -3,7 +3,7 @@ import { DARK_BLUE_FACTOR, PALE_BLUE_FACTOR, ScrabbleLetter } from '@app/classes
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { SquareColor } from '@app/classes/square/square';
 import { Axis, ERROR_NUMBER } from '@app/classes/utilities/utilities';
-import { GridService } from './grid.service';
+import { GridService } from '@app/services/grid.service/grid.service';
 
 const PINK_FACTOR = 2;
 const RED_FACTOR = 3;
