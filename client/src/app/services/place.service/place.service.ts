@@ -27,9 +27,6 @@ export class PlaceService {
             placeParams.word.length,
             placeParams.orientation,
         );
-        // lettersToPlace: rEPere, rEpere
-        // lettersOnBoard = Pere
-        // rack:r**pere
         for (const letter of lettersOnBoard.toLowerCase()) {
             lettersToPlace = lettersToPlace.replace(letter, '');
         }

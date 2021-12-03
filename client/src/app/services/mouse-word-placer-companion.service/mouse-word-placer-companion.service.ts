@@ -24,9 +24,9 @@ export class MouseWordPlacerCompanionService {
     findNextSquare(axis: Axis, position: Vec2, board: ScrabbleBoard): Vec2 {
         let newPosition =
             axis === Axis.H ? new Vec2(position.x + ACTUAL_SQUARE_SIZE, position.y) : new Vec2(position.x, position.y + ACTUAL_SQUARE_SIZE);
-        // Next position is out of bound
         const newPositionIndexes = this.convertPositionToGridIndex(newPosition);
-        if (!isCoordInsideBoard(newPositionIndexes)) return position;
+        // Next position is out of bound
+        if (!isCoordInsideBoard(newPositionIndexes)) return newPosition;
         // Find the next square position
         if (board.squares[newPositionIndexes.x][newPositionIndexes.y].occupied) {
             newPosition = this.findNextSquare(axis, newPosition, board);

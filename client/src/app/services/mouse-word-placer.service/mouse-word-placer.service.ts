@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { DefaultCommandParams, PlaceParams } from '@app/classes/commands/commands';
 import { PlaceCmd } from '@app/classes/place-command/place-command';
-import { BOARD_SIZE } from '@app/classes/scrabble-board/scrabble-board';
+import { BOARD_SIZE, Column, Row } from '@app/classes/scrabble-board/scrabble-board';
 import { ScrabbleLetter, setLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { Axis, isCoordInsideBoard, isValidLetter, removeAccents } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
@@ -101,17 +101,7 @@ export class MouseWordPlacerService {
                 this.onBlur();
                 break;
             default:
-                console.log(
-                    'on key down cur pos:',
-                    this.currentPosition,
-                    ' = ',
-                    this.companionService.convertPositionToGridIndex(this.currentPosition),
-                );
-                if (
-                    isValidLetter(removeAccents(keyPressed)) &&
-                    this.currentPosition.x < ABSOLUTE_BOARD_SIZE &&
-                    this.currentPosition.y < ABSOLUTE_BOARD_SIZE
-                ) {
+                if (isValidLetter(removeAccents(keyPressed))) {
                     this.findPlaceForLetter(keyPressed);
                 }
                 break;
@@ -130,6 +120,7 @@ export class MouseWordPlacerService {
 
     findPlaceForLetter(keyPressed: string) {
         let pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
+        if (!isCoordInsideBoard(pos)) return;
         while (this.gridService.scrabbleBoard.squares[pos.x][pos.y].occupied && isCoordInsideBoard(pos)) {
             const boardLetter = this.gridService.scrabbleBoard.squares[pos.x][pos.y].letter;
             this.wordString += boardLetter.character === '*' ? boardLetter.whiteLetterCharacter : boardLetter.character;
@@ -148,7 +139,7 @@ export class MouseWordPlacerService {
     // Draws an arrow on the canvas in the square specified by the position
     drawArrow(position: Vec2, axis: Axis) {
         const indexes = this.companionService.convertPositionToGridIndex(position);
-        if (indexes.x < 0 || indexes.x >= BOARD_SIZE || indexes.y < 0 || indexes.y >= BOARD_SIZE) return;
+        if (indexes.x < 0 || indexes.x > Column.Fifteen || indexes.y < 0 || indexes.y > Row.O) return;
         this.drawSquare(position, this.companionService.convertColorToString(this.gridService.scrabbleBoard.squares[indexes.x][indexes.y].color));
         if (indexes.x >= BOARD_SIZE || indexes.y >= BOARD_SIZE) return;
         this.overlayContext.textAlign = 'center';
@@ -314,7 +305,7 @@ export class MouseWordPlacerService {
         if (this.currentPosition.x === ABSOLUTE_BOARD_SIZE || this.currentPosition.y === ABSOLUTE_BOARD_SIZE)
             this.deletePosition = this.currentPosition;
         const indexes = this.companionService.convertPositionToGridIndex(this.currentPosition);
-        if (indexes.x >= BOARD_SIZE || indexes.y >= BOARD_SIZE) return;
+        if (!isCoordInsideBoard(indexes)) return;
         let foundLetter: ScrabbleLetter = new ScrabbleLetter('', 0);
         if (letter === letter.toUpperCase()) {
             // Look for a blank piece on the rack
@@ -349,12 +340,9 @@ export class MouseWordPlacerService {
             const nextSquare = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
             this.currentPosition = nextSquare;
             const pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
-            if (pos.x >= BOARD_SIZE || pos.y >= BOARD_SIZE) return;
-            // let nextArrow = this.currentPosition;
-            // if (this.gridService.scrabbleBoard.squares[pos[0]][pos[1]].occupied === true)
-            //     nextArrow = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
+            // Display arrow if next call is not on the complete right or bottom edge position
+            if (pos.x >= Column.Fifteen || pos.y >= Row.O) return;
             this.drawArrow(this.currentPosition, this.currentAxis);
-            // Arrow display bug is here, need to fix before final commit. Works for 1st skip but not further ones.
             console.log('current word:', this.currentWord);
             console.log('word string:', this.wordString);
         }
