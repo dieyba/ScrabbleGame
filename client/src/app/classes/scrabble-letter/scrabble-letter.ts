@@ -16,24 +16,14 @@ export class ScrabbleLetter {
     constructor(letter: string, value?: number) {
         this.color = SquareColor.None;
         this.tile = new Square(UNPLACED, UNPLACED); // -1, -1 means it is not placed yet
-        this.setLetter(letter);
+        this.character = letter;
+        if (this.character === '*') {
+            this.whiteLetterCharacter = this.character;
+        }
+        this.setDefaultValue(this.character);
         if (value !== undefined) {
             this.value = value;
         }
-    }
-
-    setLetter(character: string): void {
-        if (character === '') {
-            this.character = '';
-            this.setDefaultValue(this.character);
-            return;
-        }
-        // if a capital letter is passed in, it represents a blank piece, meaning an asterisk
-        this.character = isAllLowerLetters(character) && isValidLetter(removeAccents(character)) ? removeAccents(character) : '*';
-        if (this.character === '*') {
-            this.whiteLetterCharacter = character;
-        }
-        this.setDefaultValue(this.character);
     }
 
     setDefaultValue(character: string) {
@@ -57,3 +47,19 @@ export class ScrabbleLetter {
         }
     }
 }
+
+export const setLetter = (character: string, scrabbleLetter: ScrabbleLetter): ScrabbleLetter => {
+    const result = scrabbleLetter;
+    if (character === '') {
+        result.character = '';
+        result.value = 0;
+        return result;
+    }
+    // if a capital letter is passed in, it represents a blank piece, meaning an asterisk
+    result.character = isAllLowerLetters(character) && isValidLetter(removeAccents(character)) ? removeAccents(character) : '*';
+    if (result.character === '*') {
+        result.whiteLetterCharacter = character;
+        result.value = 0;
+    }
+    return scrabbleLetter;
+};

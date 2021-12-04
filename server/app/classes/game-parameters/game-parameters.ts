@@ -80,7 +80,8 @@ export class GameInitInfo {
             player.letters = stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
         });
         // Set the private and public goals
-        if (String(clientParametersChosen.isLog2990) === 'true') {
+        
+        if (clientParametersChosen.isLog2990) {
             const usedGoals: GoalType[] = [];
             this.pickSharedGoals(usedGoals);
             this.pickPrivateGoals(usedGoals);

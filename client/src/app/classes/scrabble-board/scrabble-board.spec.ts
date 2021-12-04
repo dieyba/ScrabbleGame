@@ -1,8 +1,8 @@
+import { Column, Row, ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { Square } from '@app/classes/square/square';
 import { isCoordInsideBoard } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { ScrabbleBoard } from './scrabble-board';
 
 describe('ScrabbleBoard', () => {
     let board: ScrabbleBoard;
@@ -52,8 +52,8 @@ describe('ScrabbleBoard', () => {
     });
 
     it('isWordInsideBoard should return false if the word is not completely inside the board', () => {
-        position.x = 10;
-        position.y = 10;
+        position.x = Column.Fifteen - motAPlacer.length + 2;
+        position.y = Row.O - motAPlacer.length + 2;
         expect(board.isWordInsideBoard(motAPlacer, position, orientation)).toBeFalse();
 
         orientation = 'v';
@@ -61,6 +61,8 @@ describe('ScrabbleBoard', () => {
     });
 
     it('isWordInsideBoard should return true if the word inside the board', () => {
+        position.x = Column.Fifteen - motAPlacer.length + 1;
+        position.y = Row.O - motAPlacer.length + 1;
         expect(board.isWordInsideBoard(motAPlacer, position, orientation)).toBeTrue();
     });
 
@@ -176,6 +178,24 @@ describe('ScrabbleBoard', () => {
         expect(board.isWordTouchingOtherWord(motAPlacer, position, orientation)).toBeFalse();
     });
 
+    it('isWordTouchingOtherWord should return false if the word goes out of bounds (word horizontal)', () => {
+        const letterAlreadyPlaced = new ScrabbleLetter('a', 1);
+        board.squares[13][2].letter = letterAlreadyPlaced;
+        board.squares[13][2].occupied = true;
+        orientation = 'h';
+        position.x = 13;
+        expect(board.isWordTouchingOtherWord(motAPlacer, position, orientation)).toBeFalse();
+    });
+
+    it('isWordTouchingOtherWord should return false if the word goes out of bounds (word vertical)', () => {
+        const letterAlreadyPlaced = new ScrabbleLetter('a', 1);
+        board.squares[2][13].letter = letterAlreadyPlaced;
+        board.squares[2][13].occupied = true;
+        orientation = 'v';
+        position.y = 13;
+        expect(board.isWordTouchingOtherWord(motAPlacer, position, orientation)).toBeFalse();
+    });
+
     it('getStringFromCoord should return the correct string (maison )', () => {
         const centerColomnRow = 8;
 
@@ -192,8 +212,8 @@ describe('ScrabbleBoard', () => {
         }
 
         // Checking all squares of the new word plus one horizontally. The last squares isn't occupied.
-        expect(board.getStringFromCoord(new Vec2(centerColomnRow, centerColomnRow), motAPlacer.length + 1, 'h')).toEqual('maison ');
+        expect(board.getStringFromCoord(new Vec2(centerColomnRow, centerColomnRow), motAPlacer.length + 1, 'h')).toEqual('maison');
         // Same vertically
-        expect(board.getStringFromCoord(new Vec2(centerColomnRow, centerColomnRow), motAPlacer.length + 1, 'v')).toEqual('m      ');
+        expect(board.getStringFromCoord(new Vec2(centerColomnRow, centerColomnRow), motAPlacer.length + 1, 'v')).toEqual('m');
     });
 });

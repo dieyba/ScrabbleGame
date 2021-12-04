@@ -46,6 +46,7 @@ export class GameInitFormComponent implements OnInit, OnDestroy {
     defaultTimer: string;
     defaultDictionary: string;
     defaultBonus: boolean;
+    isGameStarted: boolean = false;
 
     private beginnerNameUrl: string;
     private expertNameUrl: string;
@@ -183,34 +184,36 @@ export class GameInitFormComponent implements OnInit, OnDestroy {
     }
 
     async submit(): Promise<void> {
-        // Trying to get dictionary
-        const dictionary = await this.dictionaryService
-            .getDictionary(BASE_URL, this.dictionaryForm.value)
-            .toPromise()
-            .catch(() => {
-                return null;
-            });
-        if (dictionary === null) {
-            this.snack.open(
-                'Il y a eu un problème avec la base de donnée des dictionnaires. Veuillez choisi un autre dictionnaire ou réessayer plus tard',
-                'Fermer',
-            );
-            return;
-        }
-
         if (this.myForm.valid) {
+            this.isGameStarted = true;
             const gameMode = this.data.isSolo ? GameType.Solo : GameType.MultiPlayer;
             const gameParams = new WaitingAreaGameParameters(
                 gameMode,
                 GAME_CAPACITY,
-                dictionary,
+                { _id: 0, title: this.dictionaryForm.value, description: 'no description', words: ['words'] },
                 this.timer.value,
                 this.bonus.value,
                 this.data.isLog2990,
                 this.name.value, // game creator name
             );
             if (gameMode === GameType.Solo) {
+                // Trying to get dictionary
+                const dictionary = await this.dictionaryService
+                    .getDictionary(BASE_URL, this.dictionaryForm.value)
+                    .toPromise()
+                    .catch(() => {
+                        return null;
+                    });
+                if (dictionary === null) {
+                    this.snack.open(
+                        'Il y a eu un problème avec la base de donnée des dictionnaires.' +
+                            'Veuillez choisir un autre dictionnaire ou réessayer plus tard',
+                        'Fermer',
+                    );
+                    return;
+                }
                 this.closeDialog();
+                gameParams.dictionary = dictionary;
                 gameParams.joinerName = this.opponent.value;
                 const difficulty: Difficulty = this.level.value === 'easy' ? Difficulty.Easy : Difficulty.Difficult;
                 this.dialogRef.close();

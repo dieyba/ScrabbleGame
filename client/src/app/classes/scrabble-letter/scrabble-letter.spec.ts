@@ -1,4 +1,4 @@
-import { ScrabbleLetter } from './scrabble-letter';
+import { ScrabbleLetter, setLetter } from './scrabble-letter';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('ScrabbleLetter', () => {
@@ -12,29 +12,29 @@ describe('ScrabbleLetter', () => {
     });
 
     it('setLetter should remove the accents', () => {
-        const letter = new ScrabbleLetter('a', 1);
-        letter.setLetter('à');
+        let letter = new ScrabbleLetter('a', 1);
+        letter = setLetter('à', letter);
         expect(letter.character).toEqual('a');
     });
 
     it('setLetter should set empty char', () => {
-        const letter = new ScrabbleLetter('z');
-        letter.setLetter('');
+        let letter = new ScrabbleLetter('z');
+        letter = setLetter('', letter);
         expect(letter.character).toEqual('');
         expect(letter.value).toEqual(0);
     });
 
     it('setLetter should set * char', () => {
-        const letter = new ScrabbleLetter('z');
-        letter.setLetter('*');
+        let letter = new ScrabbleLetter('z');
+        letter = setLetter('*', letter);
         expect(letter.character).toEqual('*');
         expect(letter.whiteLetterCharacter).toEqual('*');
         expect(letter.value).toEqual(0);
     });
 
     it('setLetter should set * char and its letter value', () => {
-        const letter = new ScrabbleLetter('z');
-        letter.setLetter('E');
+        let letter = new ScrabbleLetter('z');
+        letter = setLetter('E', letter);
         expect(letter.character).toEqual('*');
         expect(letter.whiteLetterCharacter).toEqual('E');
         expect(letter.value).toEqual(0);

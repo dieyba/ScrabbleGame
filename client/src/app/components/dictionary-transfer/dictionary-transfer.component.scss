@@ -1,57 +1,39 @@
-// .papy {
-//     width: 100%;
-// }
-/* Dropdown Button */
-.dropbtn {
-    background-color: #04aa6d;
-    color: white;
-    padding: 16px;
-    font-size: 16px;
-    border: none;
+hr {
+    border: 0.5px solid #6aa0e0;
+    background-color: #6aa0e0;
+    margin: 0px 0px 10px 0px;
 }
 
-/* The container <div> - needed to position the dropdown content */
-.dropdown {
+input {
+    height: 30px;
+    width:  400px;
+}
+
+.custom-file-input::-webkit-file-upload-button {
+    visibility: hidden;
+  }
+
+.custom-file-input::before {
+    content: 'Sélectionner un fichier';
+    white-space: nowrap;
     position: relative;
-    display: inline-block;
-}
-
-/* Dropdown Content (Hidden by Default) */
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-}
-
-/* Links inside the dropdown */
-.dropdown-content span {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-}
-
-/* Change color of dropdown links on hover */
-.dropdown-content span:hover {
-    background-color: #ddd;
-}
-
-/* Show the dropdown menu on hover */
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
-/* Change the background color of the dropdown button when the dropdown content is shown */
-.dropdown:hover .dropbtn {
-    background-color: #3e8e41;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 15px;
+    border-radius: 5px;
+    background-color: #6aa0e0;
+    border: 1px solid #6aa0e0;
+    cursor: pointer;
 }
 
 .input {
     display: flex;
     flex-direction: column;
+}
+
+.description {
+    font-size: 14px;
 }
 
 .btn {
@@ -72,4 +54,162 @@
 }
 .tab {
     margin-left: 40px;
+}
+
+.form-group {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.mat-card {
+    background-color: #dcecff;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.add-dict {
+    margin-top: 90px;
+}
+
+.dict-btn {
+    white-space: nowrap;
+    position: relative;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 18px;
+    border-radius: 5px;
+    background-color: #e4e4e4;
+    border: 1px solid #e4e4e4;
+    padding: 5px 10px;
+}
+
+.dictionary-list {
+    background-color: white;
+    border-radius: 10px;
+    height: 130px;
+    overflow-y: scroll;
+}
+
+.close-btn {
+    float: right;
+    background-color: #dcecff;
+    border-color: #dcecff;
+    border-style: none;
+}
+
+.plus {
+    margin-top: -12px;
+}
+
+.trash {
+    margin-top: -10px;
+}
+
+.edit {
+    margin-top: -8px;
+}
+
+.download {
+    margin-top: -5px;
+}
+
+.plus-btn {
+    background-color: #6aa0e0;
+    margin: 5px 10px 15px 0px;
+    float: right;
+}
+
+.plus-btn .toolTipAdd {
+    visibility: hidden;
+    background-color: gray;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    margin-left: -100px;
+    margin-top: -55px;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.plus-btn:hover .toolTipAdd {
+    visibility: visible;
+}
+
+.delete-btn {
+    background-color: #6aa0e0;
+    margin: 5px 10px 15px 0px;
+    float: right;
+}
+
+.delete-btn .toolTipDelete {
+    visibility: hidden;
+    background-color: gray;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    margin-left: -100px;
+    margin-top: -55px;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.delete-btn:hover .toolTipDelete {
+    visibility: visible;
+}
+
+.edit-btn {
+    background-color: #6aa0e0;
+    margin: 5px 10px 15px 0px;
+    float: right;
+}
+
+.edit-btn .toolTipEdit {
+    visibility: hidden;
+    background-color: gray;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    margin-left: -100px;
+    margin-top: -55px;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.edit-btn:hover .toolTipEdit {
+    visibility: visible;
+}
+
+.download-btn {
+    background-color: #6aa0e0;
+    margin: 5px 10px 15px 0px;
+    float: right;
+}
+
+.download-btn .toolTipDownload {
+    visibility: hidden;
+    background-color: gray;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    margin-left: -100px;
+    margin-top: -55px;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.download-btn:hover .toolTipADownload {
+    visibility: visible;
 }

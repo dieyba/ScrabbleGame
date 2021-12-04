@@ -37,8 +37,8 @@ export class SidebarComponent implements AfterViewInit {
         clearTimeout(this.gameService.game.gameTimer.intervalValue);
     }
 
-    isLog2990(): string {
-        return String(this.gameService.game.isLog2990);
+    isLog2990(): boolean {
+        return this.gameService.game.isLog2990;
     }
 
     getPlayer1Name(): string {

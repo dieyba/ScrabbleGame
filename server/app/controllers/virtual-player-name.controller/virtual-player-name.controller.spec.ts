@@ -258,7 +258,6 @@ describe('VirtualPlayerNameController', () => {
     //     return supertest(expressApp)
     //         .delete('/api/VirtualPlayerName')
     //         .then((response) => {
-    //             console.log('response : ', response);
     //             expect(response.statusCode).to.equal(StatusCodes.BAD_REQUEST);
     //         });
     // });

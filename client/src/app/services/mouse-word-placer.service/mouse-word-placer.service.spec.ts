@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+// /* eslint-disable max-lines */
 // import { TestBed } from '@angular/core/testing';
 // import { CanvasTestHelper } from '@app/classes/canvas-test-helper/canvas-test-helper';
 // import { GameParameters } from '@app/classes/game-parameters/game-parameters';
@@ -8,10 +9,18 @@
 // import { Vec2 } from '@app/classes/vec2/vec2';
 // import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
 // import { GameService } from '@app/services/game.service/game.service';
-// import { BOARD_OFFSET, BOARD_SIZE, DEFAULT_HEIGHT, DEFAULT_WIDTH, GridService } from '@app/services/grid.service/grid.service';
+// import {
+//     ABSOLUTE_BOARD_SIZE,
+//     ACTUAL_SQUARE_SIZE,
+//     BOARD_OFFSET,
+//     BOARD_SIZE,
+//     DEFAULT_HEIGHT,
+//     DEFAULT_WIDTH,
+//     GridService,
+// } from '@app/services/grid.service/grid.service';
 // import { MouseWordPlacerCompanionService } from '@app/services/mouse-word-placer-companion.service/mouse-word-placer-companion.service';
+// import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service/mouse-word-placer.service';
 // import { RackService, RACK_HEIGHT, RACK_WIDTH } from '@app/services/rack.service/rack.service';
-// import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE, MouseWordPlacerService } from './mouse-word-placer.service';
 
 // describe('MouseWordPlacerService', () => {
 //     let service: MouseWordPlacerService;
@@ -23,8 +32,8 @@
 //     let companionServiceSpy: jasmine.SpyObj<MouseWordPlacerCompanionService>;
 //     const SEVEN_INDEX = 6;
 //     const H_INDEX = 7;
-//     const SEVEN_POS = 260;
-//     const H_POS = 300;
+//     const SEVEN_POS = 236;
+//     const H_POS = 272;
 //     beforeEach(() => {
 //         const gridSpy = jasmine.createSpyObj('GridService', ['drawLetter', 'drawLetters', 'drawSingleSquareColor']); // Every method I need
 //         const rackSpy = jasmine.createSpyObj('RackService', ['addLetter', 'drawExistingLetters', 'drawRack']);
@@ -66,10 +75,10 @@
 //         rackServiceSpy.rackLetters = [new ScrabbleLetter('t', 1)];
 //         rackServiceSpy.gridContext = CanvasTestHelper.createCanvas(RACK_WIDTH, RACK_HEIGHT).getContext('2d') as CanvasRenderingContext2D;
 //         gridServiceSpy.scrabbleBoard = new ScrabbleBoard(false);
-//         const gameTimer = 100;
-//         gameServiceSpy.currentGameService.game = new GameParameters('Étienne', gameTimer, false);
-//         gameServiceSpy.currentGameService.game.localPlayer = new LocalPlayer('Étienne');
-//         gameServiceSpy.currentGameService.game.localPlayer.isActive = true;
+//         gameServiceSpy.game = new GameParameters();
+//         gameServiceSpy.game.setLocalAndOpponentId(0, 1);
+//         gameServiceSpy.game.setLocalPlayer(new Player('Étienne'));
+//         gameServiceSpy.game.getLocalPlayer().isActive = true;
 //         // Set service attributes
 //         service.wordString = 'test';
 //         service.currentWord = [new ScrabbleLetter('t', 1), new ScrabbleLetter('e', 1), new ScrabbleLetter('s', 1), new ScrabbleLetter('t', 1)];
@@ -87,7 +96,7 @@
 //     it('onMouseClick should not do anything if player is it is not the turn of the player', () => {
 //         const clearSpy = spyOn(service, 'clearOverlay');
 //         service.currentWord = [];
-//         gameServiceSpy.currentGameService.game.localPlayer.isActive = false;
+//         gameServiceSpy.game.getLocalPlayer().isActive = false;
 //         const mouseEvent = new MouseEvent('click', {
 //             clientX: SEVEN_POS,
 //             clientY: H_POS,
@@ -110,7 +119,7 @@
 //     it('onMouseClick should not do anything if the game is over', () => {
 //         const clearSpy = spyOn(service, 'clearOverlay');
 //         service.currentWord = [];
-//         gameServiceSpy.currentGameService.game.isEndGame = true;
+//         gameServiceSpy.game.isEndGame = true;
 //         const mouseEvent = new MouseEvent('click', {
 //             clientX: SEVEN_POS,
 //             clientY: H_POS,
@@ -192,7 +201,7 @@
 //         expect(service.currentAxis).toEqual(Axis.H);
 //     });
 //     it('onKeyDown should consider Backspace, Enter, Escape, or a letter on the keyboard', () => {
-//         gameServiceSpy.currentGameService.game.localPlayer.letters = [
+//         gameServiceSpy.game.getLocalPlayer().letters = [
 //             new ScrabbleLetter('t', 1),
 //             new ScrabbleLetter('e', 1),
 //             new ScrabbleLetter('s', 1),
@@ -229,7 +238,7 @@
 //     });
 //     it('onKeyDown should not do anything if player is not active', () => {
 //         const keyEvent = new KeyboardEvent('keydown', { key: 'a' });
-//         gameServiceSpy.currentGameService.game.localPlayer.isActive = false;
+//         gameServiceSpy.game.getLocalPlayer().isActive = false;
 //         const removeSpy = spyOn(service, 'removeLetter');
 //         const confirmSpy = spyOn(service, 'confirmWord');
 //         const blurSpy = spyOn(service, 'onBlur');
@@ -325,12 +334,8 @@
 //         expect(drawArrowSpy).toHaveBeenCalled();
 //     });
 //     it('removeLetter should redraw the rack when it is called', () => {
-//         rackServiceSpy.rackLetters = [
-//             new ScrabbleLetter('t', 1),
-//             new ScrabbleLetter('e', 1),
-//             new ScrabbleLetter('s', 1),
-//             new ScrabbleLetter('t', 1)
-//         ];
+// eslint-disable-next-line max-len
+//         rackServiceSpy.rackLetters = [new ScrabbleLetter('t', 1), new ScrabbleLetter('e', 1), new ScrabbleLetter('s', 1), new ScrabbleLetter('t', 1)];
 //         service.removeLetter();
 //         expect(rackServiceSpy.drawExistingLetters).toHaveBeenCalled();
 //     });
@@ -389,45 +394,37 @@
 //         rackServiceSpy.rackLetters.push(new ScrabbleLetter('s', 1));
 //         const drawLetterSpy = spyOn(service, 'drawLetter');
 //         companionServiceSpy.convertPositionToGridIndex.and.returnValue([SEVEN_INDEX, H_INDEX]);
-//         const H = 260;
-//         const SEVEN = 300;
-//         companionServiceSpy.findNextSquare.and.returnValue(new Vec2(SEVEN + ACTUAL_SQUARE_SIZE * service.currentWord.length, H));
+//         companionServiceSpy.findNextSquare.and.returnValue(new Vec2(SEVEN_POS + ACTUAL_SQUARE_SIZE * service.currentWord.length, H_POS));
 //         service.placeLetter('s');
 //         expect(drawLetterSpy).toHaveBeenCalled();
 //     });
 //     it('placeLetter should draw a letter on the overlay if it is inside the board (vertical)', () => {
 //         rackServiceSpy.rackLetters.push(new ScrabbleLetter('s', 1));
 //         const drawLetterSpy = spyOn(service, 'drawLetter');
-//         const H = 260;
-//         const SEVEN = 300;
 //         service.currentAxis = Axis.V;
 //         service.currentPosition = new Vec2(SEVEN_POS, H_POS + service.currentWord.length * ACTUAL_SQUARE_SIZE);
 //         companionServiceSpy.convertPositionToGridIndex.and.returnValue([SEVEN_INDEX, H_INDEX]);
-//         companionServiceSpy.findNextSquare.and.returnValue(new Vec2(SEVEN, H + ACTUAL_SQUARE_SIZE * service.currentWord.length));
+//         companionServiceSpy.findNextSquare.and.returnValue(new Vec2(SEVEN_POS, H_POS + ACTUAL_SQUARE_SIZE * service.currentWord.length));
 //         service.placeLetter('s');
 //         expect(drawLetterSpy).toHaveBeenCalled();
 //     });
 //     it('placeLetter should be able to place a blank letter', () => {
 //         rackServiceSpy.rackLetters.push(new ScrabbleLetter('*', 0));
 //         const drawLetterSpy = spyOn(service, 'drawLetter');
-//         const H = 260;
-//         const SEVEN = 300;
 //         service.currentAxis = Axis.V;
 //         service.currentPosition = new Vec2(SEVEN_POS, H_POS + service.currentWord.length * ACTUAL_SQUARE_SIZE);
 //         companionServiceSpy.convertPositionToGridIndex.and.returnValue([SEVEN_INDEX, H_INDEX]);
-//         companionServiceSpy.findNextSquare.and.returnValue(new Vec2(SEVEN, H + ACTUAL_SQUARE_SIZE * service.currentWord.length));
+//         companionServiceSpy.findNextSquare.and.returnValue(new Vec2(SEVEN_POS, H_POS + ACTUAL_SQUARE_SIZE * service.currentWord.length));
 //         service.placeLetter('S');
 //         expect(drawLetterSpy).toHaveBeenCalled();
 //     });
 //     it('placeLetter should not place letters when an unsupported key is pressed', () => {
 //         rackServiceSpy.rackLetters.push(new ScrabbleLetter('s', 1));
 //         const drawLetterSpy = spyOn(service, 'drawLetter');
-//         const H = 260;
-//         const SEVEN = 300;
 //         service.currentAxis = Axis.V;
 //         service.currentPosition = new Vec2(SEVEN_POS, H_POS + service.currentWord.length * ACTUAL_SQUARE_SIZE);
 //         companionServiceSpy.convertPositionToGridIndex.and.returnValue([SEVEN_INDEX, H_INDEX]);
-//         companionServiceSpy.findNextSquare.and.returnValue(new Vec2(SEVEN, H + ACTUAL_SQUARE_SIZE * service.currentWord.length));
+//         companionServiceSpy.findNextSquare.and.returnValue(new Vec2(SEVEN_POS, H_POS + ACTUAL_SQUARE_SIZE * service.currentWord.length));
 //         service.placeLetter('#');
 //         expect(drawLetterSpy).not.toHaveBeenCalled();
 //     });

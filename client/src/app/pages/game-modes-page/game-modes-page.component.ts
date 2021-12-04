@@ -10,17 +10,24 @@ import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.
     styleUrls: ['./game-modes-page.component.scss'],
 })
 export class GameModesComponent {
-    constructor(private dialog: MatDialog, private route: ActivatedRoute) {}
+    isLog2990: boolean;
+    constructor(private dialog: MatDialog, private route: ActivatedRoute) {
+        if (String(this.route.snapshot.params.isLog2990) === 'true') {
+            this.isLog2990 = true;
+        } else {
+            this.isLog2990 = false;
+        }
+    }
 
     openDialog(isSolo: boolean): void {
-        this.dialog.open(GameInitFormComponent, { data: { isSolo, isLog2990: this.route.snapshot.params.isLog2990 } });
+        this.dialog.open(GameInitFormComponent, { data: { isSolo, isLog2990: this.isLog2990 } });
     }
 
     openJoinRoom(isGameSelected: boolean) {
         this.dialog.open(WaitingAreaComponent, {
             data: {
                 isGameSelected,
-                isLog2990: this.route.snapshot.params.isLog2990,
+                isLog2990: this.isLog2990,
             },
             disableClose: true,
         });

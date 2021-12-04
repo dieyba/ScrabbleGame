@@ -13,12 +13,10 @@ const DISCONNECT_TIME_INTERVAL = 5000;
 
 export class SocketManagerService {
     private sio: io.Server;
-    private gameListMan: GameListManager;
     private validationService: ValidationService;
     private virtualPlayerNameService: VirtualPlayerNameService;
     private playerMan: PlayerManagerService;
-    constructor(server: http.Server) {
-        this.gameListMan = new GameListManager();
+    constructor(server: http.Server, private gameListMan: GameListManager) {
         this.playerMan = new PlayerManagerService();
         this.validationService = new ValidationService();
         this.virtualPlayerNameService = new VirtualPlayerNameService();
@@ -30,8 +28,8 @@ export class SocketManagerService {
                 this.playerMan.addPlayer(socket.id);
             });
 
-            socket.on('createWaitingAreaRoom', (gameParams: WaitingAreaGameParameters) => {
-                this.createWaitingAreaRoom(socket, gameParams);
+            socket.on('createWaitingAreaRoom', async (gameParams: WaitingAreaGameParameters) => {
+                await this.createWaitingAreaRoom(socket, gameParams);
                 this.getAllWaitingAreaGames(socket, gameParams.isLog2990);
             });
 
@@ -148,14 +146,18 @@ export class SocketManagerService {
         return false;
     }
 
-    private createWaitingAreaRoom(socket: io.Socket, gameParams: WaitingAreaGameParameters): void {
-        const newRoom = this.gameListMan.createWaitingAreaGame(gameParams, socket.id);
-        const creatorPlayer = this.playerMan.getPlayerBySocketID(socket.id);
-        if (creatorPlayer !== undefined) {
-            creatorPlayer.name = newRoom.creatorName;
-            creatorPlayer.roomId = newRoom.gameRoom.idGame;
-            socket.join(newRoom.gameRoom.idGame.toString());
-            this.sio.emit('waitingAreaRoomCreated', newRoom);
+    private async createWaitingAreaRoom(socket: io.Socket, gameParams: WaitingAreaGameParameters): Promise<void> {
+        try {
+            const newRoom = await this.gameListMan.createWaitingAreaGame(gameParams, socket.id);
+            const creatorPlayer = this.playerMan.getPlayerBySocketID(socket.id);
+            if (creatorPlayer !== undefined) {
+                creatorPlayer.name = newRoom.creatorName;
+                creatorPlayer.roomId = newRoom.gameRoom.idGame;
+                socket.join(newRoom.gameRoom.idGame.toString());
+                this.sio.emit('waitingAreaRoomCreated', newRoom);
+            }
+        } catch (e) {
+            this.sio.emit('failToGetDictionary', e);
         }
     }
 
@@ -228,7 +230,7 @@ export class SocketManagerService {
 
     private getAllWaitingAreaGames(socket: io.Socket, isLog2990: boolean) {
         const senderId = socket.id;
-        this.sio.to(senderId).emit('updateWaitingAreaGames', this.gameListMan.getAllWaitingAreaGames(String(isLog2990)));
+        this.sio.to(senderId).emit('updateWaitingAreaGames', this.gameListMan.getAllWaitingAreaGames(isLog2990));
     }
 
     private joinRoom(socket: io.Socket, joinerName: string, roomToJoinId: number, isLog2990: boolean) {

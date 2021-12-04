@@ -2,6 +2,7 @@ import { Application } from '@app/app';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
+import { GameListManager } from './services/game-list-manager.service/game-list-manager.service';
 import { SocketManagerService } from './services/socket-manager.service/socket-manager.service';
 
 @Service()
@@ -11,7 +12,7 @@ export class Server {
     private static readonly baseDix: number = 10;
     private server: http.Server;
 
-    constructor(private readonly application: Application) {}
+    constructor(private readonly application: Application, private gameListMan: GameListManager) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
         const port: number = typeof val === 'string' ? parseInt(val, this.baseDix) : val;
@@ -32,7 +33,7 @@ export class Server {
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
         this.server.on('listening', () => this.onListening());
-        const socketManager = new SocketManagerService(this.server);
+        const socketManager = new SocketManagerService(this.server, this.gameListMan);
         socketManager.handleSockets();
     }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
-import { ScrabbleLetter, UNPLACED } from '@app/classes/scrabble-letter/scrabble-letter';
+import { ScrabbleLetter, setLetter, UNPLACED } from '@app/classes/scrabble-letter/scrabble-letter';
 import { Square, SquareColor } from '@app/classes/square/square';
 import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
@@ -32,6 +32,9 @@ const DOUBLE_DIGIT = 10;
 const DEFAULT_LETTER_FONT_INDEX = 2;
 const DEFAULT_VALUE_FONT_INDEX = 2;
 const ROW_MAIN_LETTERS = 'ABCDEFGHIJKLMNO';
+
+export const ABSOLUTE_BOARD_SIZE = 580;
+export const ACTUAL_SQUARE_SIZE = SQUARE_SIZE + 2;
 
 @Injectable({
     providedIn: 'root',
@@ -93,7 +96,11 @@ export class GridService {
     removeSquare(i: number, j: number): ScrabbleLetter {
         // Saving information about square
         const color = this.scrabbleBoard.squares[i][j].color;
-        const letter = this.scrabbleBoard.squares[i][j].letter;
+        let letter = this.scrabbleBoard.squares[i][j].letter;
+        // Reset white letters
+        if (letter?.value === 0) {
+            letter = setLetter('*', letter);
+        }
         // Unassign the letter and the letter coordinates (tile)
         letter.tile = new Square(UNPLACED, UNPLACED);
         this.scrabbleBoard.squares[i][j] = new Square(i, j);
@@ -218,15 +225,9 @@ export class GridService {
     removeInvalidLetters(coord: Vec2, length: number, orientation: Axis): ScrabbleLetter[] {
         const removedScrabbleLetters: ScrabbleLetter[] = [];
         for (let i = 0; i < length; i++) {
-            if (orientation === Axis.V) {
-                if (this.scrabbleBoard.squares[coord.x][coord.y + i].isValidated === false) {
-                    removedScrabbleLetters.push(this.removeSquare(coord.x, coord.y + i));
-                }
-            }
-            if (orientation === Axis.H) {
-                if (this.scrabbleBoard.squares[coord.x + i][coord.y].isValidated === false) {
-                    removedScrabbleLetters.push(this.removeSquare(coord.x + i, coord.y));
-                }
+            const tempCoord = orientation === Axis.V ? new Vec2(coord.x, coord.y + i) : new Vec2(coord.x + i, coord.y);
+            if (!this.scrabbleBoard.squares[tempCoord.x][tempCoord.y].isValidated && this.scrabbleBoard.squares[tempCoord.x][tempCoord.y].occupied) {
+                removedScrabbleLetters.push(this.removeSquare(tempCoord.x, tempCoord.y));
             }
         }
         return removedScrabbleLetters;
@@ -235,8 +236,8 @@ export class GridService {
     updateBoard(word: string, orientation: string, position: Vec2) {
         const positionInc = orientation === 'h' ? new Vec2(1, 0) : new Vec2(0, 1);
         for (const letter of word) {
-            const scrabbleLetter = new ScrabbleLetter(letter);
-            scrabbleLetter.setLetter(letter);
+            let scrabbleLetter = new ScrabbleLetter(letter);
+            scrabbleLetter = setLetter(letter, scrabbleLetter);
             scrabbleLetter.tile.position.x = position.x;
             scrabbleLetter.tile.position.y = position.y;
             this.drawLetter(scrabbleLetter, position.x, position.y);
@@ -260,10 +261,10 @@ export class GridService {
                 this.fill({ type: Colors.Teal, colorType: 'LETTRE', valueType: 'x2' }, i, j);
                 break;
             case SquareColor.Pink:
-                this.fill({ type: Colors.Pink, colorType: 'MOT', valueType: 'x2' }, i, j);
+                this.fill({ type: Colors.Pink, colorType: ' MOT', valueType: 'x2' }, i, j);
                 break;
             case SquareColor.Red:
-                this.fill({ type: Colors.Red, colorType: 'MOT', valueType: 'x3' }, i, j);
+                this.fill({ type: Colors.Red, colorType: ' MOT', valueType: 'x3' }, i, j);
                 break;
             case SquareColor.None:
                 this.gridContext.fillStyle = Colors.None;

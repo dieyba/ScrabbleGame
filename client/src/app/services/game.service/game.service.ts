@@ -71,7 +71,7 @@ export class GameService {
             const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
             this.game.players[starterPlayerIndex].isActive = true;
             this.validationService.setDictionary(initInfo.dictionary);
-            if (String(this.game.isLog2990) === 'true') {
+            if (this.game.isLog2990) {
                 const usedGoals: GoalType[] = [];
                 const sharedGoals = this.goalsService.pickSharedGoals(usedGoals);
                 this.goalsService.pickPrivateGoals(usedGoals, this.game.players);
@@ -209,7 +209,7 @@ export class GameService {
         }
         const strWords: string[] = [];
         const newlyPlacedLetters: ScrabbleLetter[] = [];
-        tempScrabbleWords[0].content.forEach((newWordLetter) => {
+        tempScrabbleWords[0]?.content.forEach((newWordLetter) => {
             if (!newWordLetter.tile.isValidated) {
                 newlyPlacedLetters.push(newWordLetter);
             }
@@ -227,7 +227,7 @@ export class GameService {
             } else {
                 // Take new letters
                 this.validationService.updatePlayerScore(tempScrabbleWords, player);
-                if (String(this.game.isLog2990) === 'true') {
+                if (this.game.isLog2990) {
                     // TODO: make sure that scrabbleLetter.tile is updated properly every turn because it is needed in goal validation
                     player.score += this.goalsService.achieveGoals(player, tempScrabbleWords, newlyPlacedLetters);
                 }

@@ -21,9 +21,9 @@ export const invertAxis = {
 export const scrabbleLettersToString = (letters: ScrabbleLetter[]): string => {
     let stringLetters = '';
     for (const letter of letters) {
-        stringLetters += letter.character;
+        stringLetters += letter.character === '*' ? letter.whiteLetterCharacter : letter.character;
     }
-    return stringLetters;
+    return stringLetters.toLowerCase();
 };
 
 /**
