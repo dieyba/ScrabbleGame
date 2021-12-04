@@ -77,10 +77,8 @@ export class VirtualPlayerService {
             // Always tries to make a move
             currentMove = PERCENTAGE;
         }
-        console.log(currentMove);
         if (currentMove <= Probability.EndTurn) {
             setTimeout(() => {
-                console.log('bonjour');
                 // 10% chance to end turn on easy mode
                 const command = new PassTurnCmd(defaultParams);
                 command.debugMessages.push('Le joueur virtuel a choisi de passer son tour.');
@@ -146,7 +144,7 @@ export class VirtualPlayerService {
     debugMessageGenerator(moves: ScrabbleMove[]): string {
         let message = '';
         for (let i = 0; i < moves[0].word.content.length; i++) {
-            if (moves[0].word.content[i].tile.position.x === POSITION_ERROR) { 
+            if (moves[0].word.content[i].tile.position.x === POSITION_ERROR) {
                 // only need to check x because y is always the same
                 if (moves[0].axis === Axis.H) {
                     const nextPos = moves[0].position.x + i + 1;
