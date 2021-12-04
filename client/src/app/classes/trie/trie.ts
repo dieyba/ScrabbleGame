@@ -13,11 +13,7 @@ export class Trie {
             this.insert(word);
         }
     }
-
-    insert(word: string): void {
-        if (word === null) {
-            return;
-        }
+    insert(word: string): boolean {
         word = word.toLowerCase();
         let current = this.root;
         for (const character of word) {
@@ -26,7 +22,7 @@ export class Trie {
             }
             current = current.children.get(character) as Node;
         }
-        current.isWord = true;
+        return current.isWord = true;
     }
 
     find(word: string): boolean {

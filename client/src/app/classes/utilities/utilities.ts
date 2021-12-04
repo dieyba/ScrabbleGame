@@ -23,7 +23,7 @@ export const scrabbleLettersToString = (letters: ScrabbleLetter[]): string => {
     for (const letter of letters) {
         stringLetters += letter.character === '*' ? letter.whiteLetterCharacter : letter.character;
     }
-    return stringLetters;
+    return stringLetters.toLowerCase();
 };
 
 /**

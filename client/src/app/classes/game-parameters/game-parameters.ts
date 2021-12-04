@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { GameTimer } from '@app/classes/game-timer/game-timer';
 import { GoalType } from '@app/classes/goal/goal';
 import { LetterStock } from '@app/classes/letter-stock/letter-stock';
