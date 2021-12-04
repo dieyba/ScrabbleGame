@@ -6,9 +6,10 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-unused-vars */
 /* eslint-disable dot-notation */
-import { DictionaryType } from '@app/classes/dictionary/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { GameInitInfo, GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters/game-parameters';
 import { Player } from '@app/classes/player/player';
+import { ObjectId } from 'bson';
 import { assert, expect } from 'chai';
 import * as http from 'http';
 import * as sinon from 'sinon';
@@ -72,11 +73,12 @@ describe('SocketManager service', () => {
     let validationServiceStub: sinon.SinonStubbedInstance<ValidationService>;
     let httpServer: http.Server;
     let serverMock: ServerMock;
-
+    const dictionary: DictionaryInterface = { _id: new ObjectId(), title: 'title', description: 'description', words: ['word'] };
     beforeEach(() => {
+        const gameListManagerStubContruct = sinon.createStubInstance(GameListManager);
         validationServiceStub = sinon.createStubInstance(ValidationService);
         httpServer = http.createServer();
-        socketManagerService = new SocketManagerService(httpServer);
+        socketManagerService = new SocketManagerService(httpServer, gameListManagerStubContruct as unknown as GameListManager);
 
         // Mocking the server
         serverMock = new ServerMock();
@@ -536,12 +538,12 @@ describe('SocketManager service', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 2,
             isLog2990: false,
-        };
+        } as unknown as Promise<WaitingAreaGameParameters>
         const gameListManagerStub = sinon.createStubInstance(GameListManager);
         gameListManagerStub.createWaitingAreaGame.returns(gameMock);
         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
@@ -682,7 +684,7 @@ describe('SocketManager service', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 2,
@@ -725,7 +727,7 @@ describe('SocketManager service', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 2,
@@ -829,7 +831,7 @@ describe('SocketManager service', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 2,
@@ -863,7 +865,7 @@ describe('SocketManager service', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 2,
@@ -920,7 +922,7 @@ describe('SocketManager service', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 2,
@@ -1066,7 +1068,7 @@ describe('SocketManager service', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 2,
@@ -1106,7 +1108,7 @@ describe('SocketManager service', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 2,
@@ -1280,7 +1282,7 @@ describe('SocketManager service', () => {
             },
             creatorName: '',
             joinerName: '',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 0,
             isRandomBonus: false,
             isLog2990: false,
@@ -1298,7 +1300,7 @@ describe('SocketManager service', () => {
         assert(gameListManagerStub.getGameInPlay.called);
     });
 
-    it('"createWaitingAreaRoom" do nothing if gameInPlay doesn`t exist', () => {
+    it('"createWaitingAreaRoom" do nothing if gameInPlay doesn`t exist', async () => {
         // This should register the "connection" event and connect a false client
         socketManagerService.handleSockets();
         serverMock.triggerEvent('connection');
@@ -1307,7 +1309,7 @@ describe('SocketManager service', () => {
         const socketMockJoinSpy = sinon.spy(socketMock, 'join');
 
         // stub spy and mock
-        const waitingAreaGameParametersMock: WaitingAreaGameParameters = {
+        const waitingAreaGameParametersMock = {
             gameRoom: {
                 idGame: 0,
                 capacity: 0,
@@ -1317,12 +1319,12 @@ describe('SocketManager service', () => {
             },
             creatorName: '',
             joinerName: '',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 0,
             isRandomBonus: false,
             isLog2990: false,
             gameMode: GameType.Solo,
-        };
+        } as unknown as Promise<WaitingAreaGameParameters>;
 
         const gameListManagerStub = sinon.createStubInstance(GameListManager);
         gameListManagerStub.createWaitingAreaGame.returns(waitingAreaGameParametersMock);
@@ -1333,14 +1335,14 @@ describe('SocketManager service', () => {
         socketManagerService['playerMan'] = playerManagerServiceStub;
 
         // calling "getIsLog2990FromId"
-        socketManagerService['createWaitingAreaRoom'](socketMock as unknown as io.Socket, waitingAreaGameParametersMock);
+        socketManagerService['createWaitingAreaRoom'](socketMock as unknown as io.Socket, await waitingAreaGameParametersMock);
 
         assert(playerManagerServiceStub.getPlayerBySocketID.called);
         assert(gameListManagerStub.getGameInPlay.called);
         assert(socketMockJoinSpy.notCalled);
     });
 
-    it('"createWaitingAreaRoom" do nothing if gameInPlay doesn`t exist', () => {
+    it('"createWaitingAreaRoom" do nothing if gameInPlay doesn`t exist', async () => {
         // This should register the "connection" event and connect a false client
         socketManagerService.handleSockets();
         serverMock.triggerEvent('connection');
@@ -1351,7 +1353,7 @@ describe('SocketManager service', () => {
         const serverMockSpy = sinon.spy(serverMock, 'emit');
 
         // stub spy and mock
-        const waitingAreaGameParametersMock: WaitingAreaGameParameters = {
+        const waitingAreaGameParametersMock = {
             gameRoom: {
                 idGame: 0,
                 capacity: 0,
@@ -1361,12 +1363,12 @@ describe('SocketManager service', () => {
             },
             creatorName: '',
             joinerName: '',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 0,
             isRandomBonus: false,
             isLog2990: false,
             gameMode: GameType.Solo,
-        };
+        } as unknown as Promise<WaitingAreaGameParameters>;
 
         const gameListManagerStub = sinon.createStubInstance(GameListManager);
         gameListManagerStub.createWaitingAreaGame.returns(waitingAreaGameParametersMock);
@@ -1378,7 +1380,7 @@ describe('SocketManager service', () => {
         socketManagerService['playerMan'] = playerManagerServiceStub;
 
         // calling "getIsLog2990FromId"
-        socketManagerService['createWaitingAreaRoom'](socketMock as unknown as io.Socket, waitingAreaGameParametersMock);
+        socketManagerService['createWaitingAreaRoom'](socketMock as unknown as io.Socket, await waitingAreaGameParametersMock);
 
         assert(playerManagerServiceStub.getPlayerBySocketID.called);
         assert(gameListManagerStub.getGameInPlay.called);
@@ -1412,7 +1414,7 @@ describe('SocketManager service', () => {
             },
             creatorName: '',
             joinerName: '',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 0,
             isRandomBonus: false,
             isLog2990: false,
@@ -1462,7 +1464,7 @@ describe('SocketManager service', () => {
             },
             creatorName: '',
             joinerName: '',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 0,
             isRandomBonus: false,
             isLog2990: false,
@@ -1507,7 +1509,7 @@ describe('SocketManager service', () => {
             },
             creatorName: '',
             joinerName: '',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 0,
             isRandomBonus: false,
             isLog2990: false,
@@ -1542,7 +1544,7 @@ describe('SocketManager service', () => {
             },
             creatorName: '',
             joinerName: '',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 0,
             isRandomBonus: false,
             isLog2990: false,

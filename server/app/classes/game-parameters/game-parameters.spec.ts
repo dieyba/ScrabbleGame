@@ -1,5 +1,6 @@
+import { ObjectId } from 'bson';
 import { expect } from 'chai';
-import { DictionaryType } from '../dictionary/dictionary';
+import { DictionaryInterface } from '../dictionary/dictionary';
 import { Player } from '../player/player';
 import { GameInitInfo, GoalType } from './game-parameters';
 
@@ -7,11 +8,12 @@ import { GameInitInfo, GoalType } from './game-parameters';
 describe('GameParameters', () => {
     let goals = new Array<GoalType>();
     goals = [4, 7];
+    const dictionary: DictionaryInterface = { _id: new ObjectId(), title: 'title', description: 'description', words: ['word'] };
     const gameWaiting = {
         gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
         creatorName: 'Dieyba',
         joinerName: 'Erika',
-        dictionaryType: DictionaryType.Default,
+        dictionary: dictionary,
         totalCountDown: 60,
         isRandomBonus: false,
         gameMode: 2,
@@ -53,10 +55,6 @@ describe('GameParameters', () => {
 
     it('remove player should return the removed player', () => {
         game.players[1].socketId = 'bd72eydbey';
-        game.removePlayer('bd72eydbey')
-        expect(game.players.length).to.equal(2);
-    });
-    it('remove player should return undefined', () => {
         game.removePlayer('bd72eydbey')
         expect(game.players.length).to.equal(2);
     });

@@ -1,5 +1,5 @@
 // import { TestBed } from '@angular/core/testing';
-// import { BOARD_SIZE, ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
+// import { ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
 // import { SquareColor } from '@app/classes/square/square';
 // import { Axis } from '@app/classes/utilities/utilities';
 // import { Vec2 } from '@app/classes/vec2/vec2';
@@ -31,11 +31,11 @@
 //     // });
 //     // Test getLettersFromBoard
 
-//     it('convertPositionToGridIndex should return an error array if the position is outside of the board', () => {
-//         const result = service.convertPositionToGridIndex(errorVector);
-//         expect(result.x).toBe(BOARD_SIZE);
-//         expect(result[1]).toBe(BOARD_SIZE);
-//     });
+//     // it('convertPositionToGridIndex should return an error array if the position is outside of the board', () => {
+//     //     const result = service.convertPositionToGridIndex(errorVector);
+//     //     // expect(result.x).toBe(BOARD_SIZE);
+//     //     expect(result[1]).toBe(BOARD_SIZE);
+//     // });
 //     it('findNextSquare should return the next square in the board that is not occupied', () => {
 //         const entryBoard = new ScrabbleBoard(false);
 //         const resultHorizontal = service.findNextSquare(Axis.H, hSevenPosition, entryBoard);

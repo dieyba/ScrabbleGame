@@ -1,142 +1,163 @@
-// import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
-// import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+// /* eslint-disable @typescript-eslint/no-explicit-any */
+import { HttpClientModule } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 // import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-// import { MatCardModule } from '@angular/material/card';
-// import { MatCheckboxModule } from '@angular/material/checkbox';
-// import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-// import { MatFormFieldModule } from '@angular/material/form-field';
-// import { MatInputModule } from '@angular/material/input';
-// import { MatRadioModule } from '@angular/material/radio';
-// import { MatSelectModule } from '@angular/material/select';
-// import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-// import { Router, RouterModule } from '@angular/router';
-// import { RouterTestingModule } from '@angular/router/testing';
-// import { VirtualPlayerName } from '@app/services/virtual-player-name-manager';
-// import { Observable } from 'rxjs';
-// import { FormComponent } from './form.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Router, RouterModule } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { GameInitFormComponent } from '@app/components/game-init-form/game-init-form.component';
+import { GameListService } from '@app/services/game-list.service/game-list.service';
+import { VirtualPlayerName } from '@app/services/virtual-player-name.service/virtual-player-name.service';
+import { Observable } from 'rxjs';
 
-// describe('FormComponent', () => {
-//     let component: FormComponent;
-//     let fixture: ComponentFixture<FormComponent>;
-//     const list: VirtualPlayerName[] = [{ _id: '0', name: 'dieyna' }, { _id: '0', name: 'kevin' }, { _id: '0', name: 'ariane' }];
-//     let dialogSpy: jasmine.Spy;
-//     let matdialog: jasmine.Spy;
-//     // let dialog: jasmine.SpyObj<MatDialogRef<FormComponent>> = jasmine.createSpyObj('dialog', ['close']);
-//     beforeEach(async () => {
-//         await TestBed.configureTestingModule({
-//             declarations: [FormComponent],
-//             schemas: [CUSTOM_ELEMENTS_SCHEMA],
-//             imports: [
-//                 MatRadioModule,
-//                 MatCardModule,
-//                 MatCheckboxModule,
-//                 MatFormFieldModule,
-//                 MatInputModule,
-//                 RouterTestingModule,
-//                 MatSelectModule,
-//                 FormsModule,
-//                 ReactiveFormsModule,
-//                 MatDialogModule,
-//                 BrowserAnimationsModule,
-//                 RouterModule,
-//             ],
-//             providers: [
-//                 { provide: MAT_DIALOG_DATA, useValue: {} },
-//                 { provide: MatDialogRef, useValue: { close: () => {} } }, // eslint-disable-line @typescript-eslint/no-empty-function
-//                 { provide: Router, useValue: { navigate: () => new Observable() } },
-//                 { provide: MatDialog, useValue: { open: () => new Observable() } },
-//             ],
-//         }).compileComponents();
-//     });
+describe('GameInitFormComponent', () => {
+    let component: GameInitFormComponent;
+    let fixture: ComponentFixture<GameInitFormComponent>;
+    let gameListServiceSpy: jasmine.SpyObj<GameListService>;
+    const list: VirtualPlayerName[] = [
+        { _id: '0', name: 'dieyna' },
+        { _id: '0', name: 'kevin' },
+        { _id: '0', name: 'Arian' },
+    ];
+    let dialogSpy: jasmine.Spy;
+    let matdialog: jasmine.Spy;
+    // let dialog: jasmine.SpyObj<MatDialogRef<GameInitFormComponent>> = jasmine.createSpyObj('dialog', ['close']);
+    beforeEach(async () => {
+        gameListServiceSpy = jasmine.createSpyObj('GameListService', ['createRoom']);
 
-//     beforeEach(() => {
-//         fixture = TestBed.createComponent(FormComponent);
-//         component = fixture.componentInstance;
-//         fixture.detectChanges();
-//     });
+        await TestBed.configureTestingModule({
+            declarations: [GameInitFormComponent],
+            schemas: [CUSTOM_ELEMENTS_SCHEMA],
+            imports: [
+                MatRadioModule,
+                MatCardModule,
+                MatCheckboxModule,
+                MatFormFieldModule,
+                MatInputModule,
+                RouterTestingModule,
+                MatSelectModule,
+                FormsModule,
+                ReactiveFormsModule,
+                MatDialogModule,
+                BrowserAnimationsModule,
+                RouterModule,
+                HttpClientModule,
+                HttpClientTestingModule,
+                MatSnackBarModule,
+                BrowserAnimationsModule,
+            ],
+            providers: [
+                { provide: MAT_DIALOG_DATA, useValue: {} },
+                { provide: MatDialogRef, useValue: { close: () => {} } }, // eslint-disable-line @typescript-eslint/no-empty-function
+                { provide: Router, useValue: { navigate: () => new Observable() } },
+                { provide: MatDialog, useValue: { open: () => new Observable() } },
+                { provide: GameListService, useValue: gameListServiceSpy },
+            ],
+        }).compileComponents();
+    });
 
-//     it('should create', () => {
-//         expect(component).toBeTruthy();
-//     });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(GameInitFormComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-//     it('should call close() ', () => {
-//         const dialogRefSpyObj = jasmine.createSpyObj({ close: true });
-//         dialogSpy = spyOn(TestBed.get(MatDialogRef), 'close').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
-//         component.closeDialog();
-//         expect(dialogSpy).toHaveBeenCalled();
-//     });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 
-//     // it('should call randomPlayer() ', () => {
-//     //     component.selectedPlayer = 'dieyna';
-//     //     const spy = spyOn(component, 'randomPlayer').and.stub();
-//     //     component.name = new FormControl('dieyna');
-//     //     component.changeName(list);
-//     //     expect(spy).toHaveBeenCalled();
-//     // });
+    it('ngOnInit should call createFormControl, createForm and getDatabaseInformation', () => {
+        const createFormControlSpy: jasmine.Spy<jasmine.Func> = spyOn(component, 'createFormControl' as any);
+        const createFormSpy: jasmine.Spy<jasmine.Func> = spyOn(component, 'createForm' as any);
+        const getDatabaseInformation: jasmine.Spy<jasmine.Func> = spyOn(component, 'getDatabaseInformation' as any);
+        component.ngOnInit();
 
-//     // it('should not call randomPlayer() ', () => {
-//     //     component.selectedPlayer = 'kevin';
-//     //     const spy = spyOn(component, 'randomPlayer').and.stub();
-//     //     component.name = new FormControl('dieyna');
-//     //     component.changeName(list);
-//     //     expect(spy).not.toHaveBeenCalled();
-//     // });
+        expect(createFormControlSpy).toHaveBeenCalled();
+        expect(createFormSpy).toHaveBeenCalled();
+        expect(getDatabaseInformation).toHaveBeenCalled();
+    });
 
-//     it('form invalid when empty', () => {
-//         component.submit();
-//         expect(component.myForm.valid).toBeFalsy();
-//     });
+    it('should call close() ', () => {
+        const dialogRefSpyObj = jasmine.createSpyObj({ close: true });
+        dialogSpy = spyOn(TestBed.get(MatDialogRef), 'close').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
+        component.closeDialog();
+        expect(dialogSpy).toHaveBeenCalled();
+    });
 
-//     it('form valid when submit', () => {
-//         component.myForm.setValue({
-//             name: 'dieyna',
-//             timer: '1:00',
-//             bonus: true,
-//             level: 'easy',
-//             dictionaryForm: 'Francais',
-//             opponent: 'Sara',
-//         });
-//         component.submit();
-//         expect(component.myForm.valid).toBeTrue();
-//     });
+    it('randomPlayer should set selectedName with a name of the list', () => {
+        component.selectedPlayer = '';
+        component.randomPlayer(list);
+        expect(component.selectedPlayer).not.toEqual('');
+    });
 
-//     it('should call openDialog', () => {
-//         const dialogRefSpyObj = jasmine.createSpyObj({ close: false });
-//         matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
-//         component.myForm.setValue({
-//             name: 'dieyna',
-//             timer: '1:00',
-//             bonus: true,
-//             level: 'easy',
-//             dictionaryForm: 'Francais',
-//             opponent: 'Sara',
-//         });
-//         component.data.isSolo = false;
-//         component.submit();
-//         expect(matdialog).toHaveBeenCalled();
-//     });
+    it('convert() should open dialog', () => {
+        const dialogRefSpyObj = jasmine.createSpyObj({ close: false });
+        matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
+        component.convert();
+        expect(matdialog).toHaveBeenCalled();
+    });
 
-//     it('should call router', () => {
-//         const routerRefSpyObj = jasmine.createSpyObj({ navigate: '/game' });
-//         const router = spyOn(TestBed.get(Router), 'navigate').and.returnValue(routerRefSpyObj); // eslint-disable-line deprecation/deprecation
-//         component.myForm.setValue({
-//             name: 'dieyna',
-//             timer: '1:00',
-//             bonus: true,
-//             level: 'easy',
-//             dictionaryForm: 'Francais',
-//             opponent: 'Sara',
-//         });
-//         component.data.isSolo = true;
-//         component.submit();
-//         expect(router).toHaveBeenCalled();
-//     });
+    it('should call randomPlayer() if the selected name is equal to the name of the first player', () => {
+        component.selectedPlayer = 'dieyna';
+        const spy = spyOn(component, 'randomPlayer');
+        component.name.setValue('dieyna');
+        component.changeName(list);
+        expect(spy).toHaveBeenCalled();
+    });
 
-//     it('convert() should open dialog', () => {
-//         const dialogRefSpyObj = jasmine.createSpyObj({ close: false });
-//         matdialog = spyOn(TestBed.get(MatDialog), 'open').and.returnValue(dialogRefSpyObj); // eslint-disable-line deprecation/deprecation
-//         component.convert();
-//         expect(matdialog).toHaveBeenCalled();
-//     });
-// });
+    it('should not call randomPlayer() ', () => {
+        component.selectedPlayer = 'kevin';
+        const spy = spyOn(component, 'randomPlayer');
+        component.name.setValue('dieyna');
+        component.changeName(list);
+        expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('form invalid when empty', () => {
+        component.submit();
+        expect(component.myForm.valid).toBeFalsy();
+    });
+
+    it('form valid when submit', () => {
+        component.myForm.setValue({
+            name: 'dieyna',
+            timer: '1:00',
+            bonus: true,
+            level: 'difficult',
+            dictionaryForm: 'Francais',
+            opponent: 'Sara',
+        });
+        component.data.isSolo = true;
+        component.submit();
+        expect(component.myForm.valid).toBeTrue();
+    });
+
+    it('submit should call createRoom when it is multiplayer mode', () => {
+        component.myForm.setValue({
+            name: 'dieyna',
+            timer: '1:00',
+            bonus: true,
+            level: 'easy',
+            dictionaryForm: 'Francais',
+            opponent: 'Sara',
+        });
+        component.data.isSolo = true;
+        component.submit();
+        expect(gameListServiceSpy.createRoom).not.toHaveBeenCalled();
+
+        component.data.isSolo = false;
+        component.submit();
+        expect(gameListServiceSpy.createRoom).toHaveBeenCalled();
+    });
+});

@@ -68,7 +68,7 @@ export class LetterStock {
         return this.letterStock.length === 0;
     }
 
-    private addLettersToStock(letter: ScrabbleLetter, number: number): void {
+    private addLettersToStock(letterChar: string, number: number): void {
         for (let i = 0; i < number; i++) {
             this.letterStock.push(new ScrabbleLetter(letterChar));
         }

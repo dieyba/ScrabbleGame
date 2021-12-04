@@ -65,13 +65,13 @@ describe('ChatDisplayService', () => {
         expect(socketEmitMockSpy).toHaveBeenCalledWith('sendChatEntry', message, message2);
     });
     it('socketOnConnect should handle socket.on event addChatEntry', () => {
-        service['socketOnConnect'];
+        service['socketOnConnect']();
         const serverChatEntry: ServerChatEntry = { senderName: 'dieyba', message: 'salut' };
         socketMock.triggerEvent('addChatEntry', serverChatEntry);
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event addSystemChatEntry', () => {
-        service['socketOnConnect'];
+        service['socketOnConnect']();
         const systemEntry = 'system';
         socketMock.triggerEvent('addSystemChatEntry', systemEntry);
         expect(socketMockSpy).toHaveBeenCalled();

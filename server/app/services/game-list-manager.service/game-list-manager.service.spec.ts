@@ -1,18 +1,21 @@
 /* disable-lint*/
-import { DictionaryType } from '@app/classes/dictionary/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { GameInitInfo } from '@app/classes/game-parameters/game-parameters';
+import { ObjectId } from 'bson';
 import { expect } from 'chai';
+import { DictionaryDBService } from '../dictionary-db.service/dictionary-db.service';
 import { GameListManager } from './game-list-manager.service';
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
 /* eslint-disable  no-unused-expressions */
 describe('GameListManager service', () => {
     let gameListMan: GameListManager;
+    const dictionary: DictionaryInterface = { _id: new ObjectId(), title: 'title', description: 'description', words: ['word'] };
     const gameClassic = {
         gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
         creatorName: 'Dieyba',
         joinerName: 'Erika',
-        dictionaryType: DictionaryType.Default,
+        dictionary: dictionary,
         totalCountDown: 60,
         isRandomBonus: false,
         gameMode: 2,
@@ -22,7 +25,7 @@ describe('GameListManager service', () => {
         gameRoom: { idGame: 2, capacity: 2, playersName: ['Sara', 'Etienne'], creatorId: '', joinerId: '' },
         creatorName: 'Sara',
         joinerName: 'Etienne',
-        dictionaryType: DictionaryType.Default,
+        dictionary: dictionary,
         totalCountDown: 60,
         isRandomBonus: false,
         gameMode: 2,
@@ -31,7 +34,7 @@ describe('GameListManager service', () => {
     const classicGameInPlay = new GameInitInfo(gameClassic)
     const log2990GameInPlay = new GameInitInfo(gameLog2920)
     beforeEach(async () => {
-        gameListMan = new GameListManager();
+        gameListMan = new GameListManager(new DictionaryDBService());
         gameListMan['waitingAreaGames'].push(gameClassic)
         gameListMan['waitingAreaGames'].push(gameLog2920)
         gameListMan['gamesInPlay'].push(classicGameInPlay)
@@ -43,17 +46,17 @@ describe('GameListManager service', () => {
         expect(gameListMan['gamesInPlay'].length).to.be.equal(2);
     });
     it('should return all Log2990Room in waitingArea', () => {
-        const log2990Games = gameListMan.getAllWaitingAreaGames('true');
+        const log2990Games = gameListMan.getAllWaitingAreaGames(true);
         expect(log2990Games.length).to.be.equal(1);
     });
     it('should return all ClassicRoom in waitingArea', () => {
         gameListMan['waitingAreaGames'].push(gameClassic)
-        const log2990Games = gameListMan.getAllWaitingAreaGames('false');
+        const log2990Games = gameListMan.getAllWaitingAreaGames(false);
         expect(log2990Games.length).to.be.equal(2);
     });
-    it('should create a room', () => {
+    it('should create a room', async () => {
         gameListMan['currentId'] = 0
-        const newGame = gameListMan.createWaitingAreaGame(gameClassic, 'dbfdhsdsnjs');
+        const newGame = await gameListMan.createWaitingAreaGame(gameClassic, 'dbfdhsdsnjs');
         expect(newGame.gameRoom.idGame).to.be.equal(0);
         expect(newGame.gameRoom.creatorId).to.be.equal('dbfdhsdsnjs');
         expect(newGame.gameRoom.playersName.length).to.be.equal(1);
@@ -71,7 +74,7 @@ describe('GameListManager service', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: '',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 2,
@@ -120,7 +123,7 @@ describe('GameListManager service', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: '',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dictionary,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 2,

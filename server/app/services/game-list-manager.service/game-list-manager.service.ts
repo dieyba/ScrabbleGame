@@ -34,7 +34,7 @@ export class GameListManager {
     }
 
     async createWaitingAreaGame(game: WaitingAreaGameParameters, creatorSocketId: string): Promise<WaitingAreaGameParameters> {
-        return this.dictionaryDBService
+        return await this.dictionaryDBService
             .getDictionary(game.dictionary.title)
             .then((dictionary) => {
                 game.dictionary = dictionary;

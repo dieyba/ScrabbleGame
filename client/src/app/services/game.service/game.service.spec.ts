@@ -79,7 +79,7 @@ describe('GameService', () => {
             rackLetters: [] as ScrabbleLetter[],
         });
         placeServiceSpy = jasmine.createSpyObj('PlaceService', ['place']);
-        validationServiceSpy = jasmine.createSpyObj('ValidationService', ['updatePlayerScore']);
+        validationServiceSpy = jasmine.createSpyObj('ValidationService', ['updatePlayerScore', 'setDictionary ']);
         wordBuilderServiceSpy = jasmine.createSpyObj('WordBuilderService', ['buildWordsOnBoard']);
         chatDisplayServiceSpy = jasmine.createSpyObj('ChatDisplayService', ['sendMessageToServer', 'createEndGameMessages']);
         goalsServiceSpy = jasmine.createSpyObj('GoalsService', [

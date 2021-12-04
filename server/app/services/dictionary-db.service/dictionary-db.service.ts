@@ -6,8 +6,8 @@ import { Service } from 'typedi';
 
 // CHANGE the URL for your database information
 const DATABASE_URL = 'mongodb+srv://Scrabble304:Scrabble304@cluster0.bvwkn.mongodb.net/database?retryWrites=true&w=majority';
-const DATABASE_NAME = 'Dictionary';
-const DATABASE_COLLECTION = ['Dictionary'];
+export const DATABASE_NAME = 'Dictionary';
+export const DATABASE_COLLECTION = 'Dictionary';
 
 @Service()
 export class DictionaryDBService {
@@ -32,14 +32,9 @@ export class DictionaryDBService {
     }
 
     async getDictionary(name: string): Promise<DictionaryInterface> {
-        return this.dictionaryCollection
-            .findOne({ title: name })
-            .then((dictionary) => {
-                return dictionary as DictionaryInterface;
-            })
-            .catch(() => {
-                throw new Error('Failed to get dictionary');
-            });
+        return this.dictionaryCollection.findOne({ title: name }).then((dictionary) => {
+            return dictionary as DictionaryInterface;
+        });
     }
 
     async getAllDictionaryDescription(): Promise<DictionaryInterface[]> {
@@ -49,9 +44,6 @@ export class DictionaryDBService {
             .toArray()
             .then((dictionaries) => {
                 return dictionaries as DictionaryInterface[];
-            })
-            .catch(() => {
-                throw new Error('Failed to get dictionary');
             });
     }
 
@@ -62,14 +54,9 @@ export class DictionaryDBService {
         if (!(await this.isDictionaryUnique(dictionary))) {
             throw new SyntaxError('Un dictionnaire avec le même nom existe déjà');
         }
-        this.dictionaryCollection
-            .insertOne(dictionary)
-            .then(() => {
-                /* do nothing */
-            })
-            .catch(() => {
-                throw new Error('Failed to post dictionary');
-            });
+        await this.dictionaryCollection.insertOne(dictionary).then(() => {
+            /* do nothing */
+        });
     }
 
     async updateDictionary(dictionaryId: ObjectId, newTitle: string, newDescription: string): Promise<void> {
@@ -80,13 +67,10 @@ export class DictionaryDBService {
 
         const filterSameId: Filter<DictionaryInterface> = { _id: new ObjectId(dictionaryId) };
         const options = { returnNewDocument: true } as FindOneAndUpdateOptions;
-        return this.dictionaryCollection
+        await this.dictionaryCollection
             .findOneAndUpdate(filterSameId, { $set: { title: newTitle, description: newDescription } }, options)
             .then(() => {
                 /* Do nothing */
-            })
-            .catch((error) => {
-                throw error;
             });
     }
 
@@ -99,32 +83,27 @@ export class DictionaryDBService {
         }
 
         const filterSameId: Filter<DictionaryInterface> = { _id: id };
-        return this.dictionaryCollection
-            .findOneAndDelete(filterSameId)
-            .then(() => {
-                /* Do nothing */
-            })
-            .catch((error) => {
-                throw error;
-            });
+        await this.dictionaryCollection.findOneAndDelete(filterSameId).then(() => {
+            /* Do nothing */
+        });
     }
 
     async reset() {
-        return this.dictionaryCollection
-            .deleteMany({})
-            .then(() => {
-                this.populateDictionaryDB();
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
+        return await this.dictionaryCollection.deleteMany({}).then(async () => {
+            await this.populateDictionaryDB();
+        });
     }
 
     async populateDictionaryDB(): Promise<void> {
         if ((await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).countDocuments()) === 0) {
-            const dictionary = dict_path as DictionaryInterface;
-            dictionary._id = new ObjectId();
-            await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(dictionary);
+            const dico = dict_path as DictionaryInterface;
+            const dictionaries: DictionaryInterface = {
+                _id: new ObjectId(),
+                title: dico.title,
+                description: dico.description,
+                words: dico.words,
+            };
+            await this.client.db(DATABASE_NAME).collection(DATABASE_COLLECTION[0]).insertOne(dictionaries);
         }
     }
 
@@ -154,16 +133,12 @@ export class DictionaryDBService {
     }
 
     async isDictionaryUnique(dictionary: DictionaryInterface): Promise<boolean> {
-        return this.getAllDictionaryDescription()
-            .then((dictionaryDescriptions: DictionaryInterface[]) => {
-                for (const dictionaryDescription of dictionaryDescriptions) {
-                    if (dictionary.title === dictionaryDescription.title) return false;
-                }
-                return true;
-            })
-            .catch(() => {
-                throw Error('Ne peut pas vérifier que le dictionnaire est unique');
-            });
+        return await this.getAllDictionaryDescription().then((dictionaryDescriptions: DictionaryInterface[]) => {
+            for (const dictionaryDescription of dictionaryDescriptions) {
+                if (dictionary.title === dictionaryDescription.title) return false;
+            }
+            return true;
+        });
     }
 
     private async isSameTitle(titleToCompare: string): Promise<boolean> {
@@ -180,7 +155,7 @@ export class DictionaryDBService {
     private async isInCollection(dictionaryId: ObjectId): Promise<boolean> {
         let isInCollection = false;
         await this.dictionaryCollection.find().forEach((dictionary) => {
-            if (dictionaryId.equals(dictionary._id)) {
+            if (dictionary._id.equals(dictionaryId)) {
                 isInCollection = true;
             }
         });
