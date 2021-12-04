@@ -12,7 +12,7 @@ describe('PlaceLetterWorthTenPts', () => {
         placeLetterWorthTenPts = new PlaceLetterWorthTenPts();
         placeLetterWorthTenPts.isAchieved = false;
     });
-    
+
     it('should create an instance', () => {
         expect(new PlaceLetterWorthTenPts()).toBeTruthy();
     });
