@@ -24,8 +24,8 @@ import { ValidationService } from '@app/services/validation.service/validation.s
 import { WordBuilderService } from '@app/services/word-builder.service/word-builder.service';
 
 export enum Probability { //    Probabilities for the easy virtual player
-    EndTurn = 0,
-    ExchangeTile = 100,
+    EndTurn = 100,
+    ExchangeTile = 0,
     MakeAMove = 0,
     MaxValue1 = 40,
     MaxValue2 = 30,

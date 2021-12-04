@@ -173,18 +173,14 @@ export class MouseWordPlacerService {
     }
 
     confirmWord() {
-        console.log('currentword: ', this.currentWord, ' and wordstring:', this.wordString);
+        console.log('confirm word: currentword: ', this.currentWord, ' and wordstring:', this.wordString);
         const posVec = this.companionService.convertPositionToGridIndex(this.initialPosition);
         const defaultParams: DefaultCommandParams = { player: this.gameService.game.getLocalPlayer(), serviceCalled: this.gameService };
         const params: PlaceParams = { position: posVec, orientation: this.currentAxis, word: this.wordString };
-        console.log('before remove all letters', this.gameService.game.scrabbleBoard);
-        // console.log(this.gameService.game.getLocalPlayer().letters);
         // Refund letters to rack before placing
         this.removeAllLetters();
         const command = new PlaceCmd(defaultParams, params);
         this.commandInvokerService.executeCommand(command);
-        console.log('start place', this.gameService.game.scrabbleBoard);
-        // console.log('start place', this.gameService.game.getLocalPlayer().letters);
         this.clearOverlay();
     }
 
@@ -216,7 +212,6 @@ export class MouseWordPlacerService {
             this.rackService.rackLetters.push(lastLetter);
             const charPosition = this.wordString.lastIndexOf(stringLetter);
             const partOne = this.wordString.substring(0, charPosition);
-            // const partTwo = this.wordString.substring(charPosition + 1);
             this.wordString = partOne;
         }
         // Draw letter on the end of the canvas
@@ -337,11 +332,20 @@ export class MouseWordPlacerService {
             // Update rack
             this.updateRack();
             // Prepare for next call
-            const nextSquare = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
-            this.currentPosition = nextSquare;
-            const pos = this.companionService.convertPositionToGridIndex(this.currentPosition);
+            const neighbourNextSquare =
+                this.currentAxis === Axis.H
+                    ? new Vec2(this.currentPosition.x + ACTUAL_SQUARE_SIZE, this.currentPosition.y)
+                    : new Vec2(this.currentPosition.x, this.currentPosition.y + ACTUAL_SQUARE_SIZE);
+            this.currentPosition = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
+            const nextPlacePos = this.companionService.convertPositionToGridIndex(this.currentPosition);
+            const lettersFromBoard = this.companionService.getStringLettersFromBoard(
+                this.companionService.convertPositionToGridIndex(neighbourNextSquare),
+                nextPlacePos,
+                this.gridService.scrabbleBoard.squares,
+            );
+            this.wordString += lettersFromBoard;
             // Display arrow if next call is not on the complete right or bottom edge position
-            if (pos.x >= Column.Fifteen || pos.y >= Row.O) return;
+            if (nextPlacePos.x >= Column.Fifteen || nextPlacePos.y >= Row.O) return;
             this.drawArrow(this.currentPosition, this.currentAxis);
             console.log('current word:', this.currentWord);
             console.log('word string:', this.wordString);
