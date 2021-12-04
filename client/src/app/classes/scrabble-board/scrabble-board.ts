@@ -162,7 +162,7 @@ export class ScrabbleBoard {
             return false;
         }
         // verifying if the word is longer than the board's edges
-        return orientation === 'h' ? coord.x + word.length <= Row.Length : coord.y + word.length <= Column.Length;
+        return orientation === 'h' ? coord.x + word.length - 1 <= Row.Length : coord.y + word.length - 1 <= Column.Length;
     }
 
     isWordPassingInCenter(word: string, coord: Vec2, orientation: string): boolean {
@@ -276,10 +276,8 @@ export class ScrabbleBoard {
             if (this.squares[tempCoord.x][tempCoord.y].occupied) {
                 tempString +=
                     this.squares[tempCoord.x][tempCoord.y].letter.value === 0
-                        ? (tempString += this.squares[tempCoord.x][tempCoord.y].letter.whiteLetterCharacter)
-                        : (tempString += this.squares[tempCoord.x][tempCoord.y].letter.character);
-            } else {
-                tempString += ' ';
+                        ? this.squares[tempCoord.x][tempCoord.y].letter.whiteLetterCharacter
+                        : this.squares[tempCoord.x][tempCoord.y].letter.character;
             }
             if (orientation === 'h') {
                 tempCoord.x++;
