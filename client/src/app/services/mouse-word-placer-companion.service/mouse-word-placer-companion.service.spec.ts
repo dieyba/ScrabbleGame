@@ -23,12 +23,11 @@ describe('MouseWordPlacerCompanionService', () => {
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
-    // TODO: fix this test
-    // it('convertPositionToGridIndex should be able to convert a mouse position on the canvas into a position in the board', () => {
-    //     const result = service.convertPositionToGridIndex(hSevenPosition);
-    //     expect(result[0]).toBe(SEVEN);
-    //     expect(result[1]).toBe(H);
-    // });
+    it('convertPositionToGridIndex should be able to convert a mouse position on the canvas into a position in the board', () => {
+        const result = service.convertPositionToGridIndex(hSevenPosition);
+        expect(result.x).toBe(SEVEN);
+        expect(result.y).toBe(H);
+    });
     it('convertPositionToGridIndex should return an error array if the position is outside of the board', () => {
         const result = service.convertPositionToGridIndex(errorVector);
         expect(result.x).toBe(BOARD_SIZE);
