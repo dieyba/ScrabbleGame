@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
-import { SquareColor } from '@app/classes/square/square';
+import { Square, SquareColor } from '@app/classes/square/square';
 import { Axis, isCoordInsideBoard } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
 import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE, BOARD_SIZE } from '@app/services/grid.service/grid.service';
@@ -24,9 +24,9 @@ export class MouseWordPlacerCompanionService {
     findNextSquare(axis: Axis, position: Vec2, board: ScrabbleBoard): Vec2 {
         let newPosition =
             axis === Axis.H ? new Vec2(position.x + ACTUAL_SQUARE_SIZE, position.y) : new Vec2(position.x, position.y + ACTUAL_SQUARE_SIZE);
-        // Next position is out of bound
         const newPositionIndexes = this.convertPositionToGridIndex(newPosition);
-        if (!isCoordInsideBoard(newPositionIndexes)) return position;
+        // Next position is out of bound
+        if (!isCoordInsideBoard(newPositionIndexes)) return newPosition;
         // Find the next square position
         if (board.squares[newPositionIndexes.x][newPositionIndexes.y].occupied) {
             newPosition = this.findNextSquare(axis, newPosition, board);
@@ -45,6 +45,22 @@ export class MouseWordPlacerCompanionService {
             newPosition = this.findPreviousSquare(axis, newPosition, board);
         }
         return newPosition;
+    }
+
+    getStringLettersFromBoard(startCoord: Vec2, endCoord: Vec2, squares: Square[][]): string {
+        const isHorizontal = startCoord.y === endCoord.y;
+        let letters = '';
+        // Add any letter on board until the next square to place letter on
+        while (!this.samePosition(startCoord, endCoord) && squares[startCoord.x][startCoord.y].occupied) {
+            const boardLetter = squares[startCoord.x][startCoord.y].letter;
+            letters += boardLetter.character === '*' ? boardLetter.whiteLetterCharacter : boardLetter.character;
+            if (isHorizontal) {
+                startCoord.x++;
+                continue;
+            }
+            startCoord.y--;
+        }
+        return letters;
     }
 
     samePosition(pos: Vec2, otherPos: Vec2): boolean {

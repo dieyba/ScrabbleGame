@@ -11,7 +11,6 @@ describe('PlaceLetterWorthTenPts', () => {
         placeLetterWorthTenPts = new PlaceLetterWorthTenPts();
         placeLetterWorthTenPts.isAchieved = false;
     });
-
     it('should create an instance', () => {
         expect(new PlaceLetterWorthTenPts()).toBeTruthy();
     });
@@ -52,3 +51,4 @@ describe('PlaceLetterWorthTenPts', () => {
         expect(placeLetterWorthTenPts.achieve([newWord1], newLetters)).toEqual(0);
     });
 });
+

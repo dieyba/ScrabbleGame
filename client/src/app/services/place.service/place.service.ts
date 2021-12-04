@@ -27,10 +27,7 @@ export class PlaceService {
             placeParams.word.length,
             placeParams.orientation,
         );
-        // lettersToPlace: rEPere, rEpere
-        // lettersOnBoard = Pere
-        // rack:r**pere
-        for (const letter of lettersOnBoard.toLowerCase()) {
+        for (const letter of lettersOnBoard) {
             lettersToPlace = lettersToPlace.replace(letter, '');
         }
         // All letter are already placed
@@ -60,6 +57,14 @@ export class PlaceService {
         // Placing letters
         tempCoord.clone(placeParams.position);
         for (const letter of placeParams.word) {
+            // Check if the board already has a letter placed. If so, check if it is the same as the one desired
+            if (this.gridService.scrabbleBoard.squares[tempCoord.x][tempCoord.y].occupied) {
+                const boardLetter = this.gridService.scrabbleBoard.squares[tempCoord.x][tempCoord.y].letter;
+                const boardStringLetter = boardLetter.character === '*' ? boardLetter.whiteLetterCharacter : boardLetter.character;
+                if (boardStringLetter !== letter) {
+                    return ErrorType.SyntaxError;
+                }
+            }
             if (!this.gridService.scrabbleBoard.squares[tempCoord.x][tempCoord.y].occupied) {
                 // Taking letter from player and placing it
                 this.placeLetter(player, letter, tempCoord);

@@ -96,3 +96,4 @@ describe('PlaceLetterOnColorSquare', () => {
         expect(placeLetterOnColorSquare.achieve([newWord1], newLetters)).toEqual(0);
     });
 });
+

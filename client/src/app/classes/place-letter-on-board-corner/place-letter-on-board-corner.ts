@@ -4,6 +4,7 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { Vec2 } from '@app/classes/vec2/vec2';
 
+
 export class PlaceLetterOnBoardCorner extends Goal {
     targetCoordinates: Vec2[];
 

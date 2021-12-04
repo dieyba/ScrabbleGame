@@ -78,3 +78,4 @@ describe('ActivateTwoBonuses', () => {
         expect(activateTwoBonuses.achieve([newWord1], newLetters)).toEqual(0);
     });
 });
+
