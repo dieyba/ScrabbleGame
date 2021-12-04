@@ -58,7 +58,7 @@ export class PlaceService {
         tempCoord.clone(placeParams.position);
         for (const letter of placeParams.word) {
             // Check if the board already has a letter placed. If so, check if it is the same as the one desired
-            /*if (this.gridService.scrabbleBoard.squares[tempCoord.x][tempCoord.y].occupied) {
+            /* if (this.gridService.scrabbleBoard.squares[tempCoord.x][tempCoord.y].occupied) {
                 const boardLetter = this.gridService.scrabbleBoard.squares[tempCoord.x][tempCoord.y].letter;
                 const boardStringLetter = boardLetter.character === '*' ? boardLetter.whiteLetterCharacter : boardLetter.character;
                 if (boardStringLetter !== letter) {

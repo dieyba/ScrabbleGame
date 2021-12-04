@@ -7,7 +7,7 @@ import { DictionaryService } from '@app/services/dictionary.service/dictionary.s
 import { VirtualPlayerNameService } from '@app/services/virtual-player-name.service/virtual-player-name.service';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
-
+/* eslint-disable dot-notation */
 describe('AdminPageComponent', () => {
     let component: AdminPageComponent;
     let fixture: ComponentFixture<AdminPageComponent>;
