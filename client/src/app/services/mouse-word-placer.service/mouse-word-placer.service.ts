@@ -173,7 +173,6 @@ export class MouseWordPlacerService {
     }
 
     confirmWord() {
-        console.log('confirm word: currentword: ', this.currentWord, ' and wordstring:', this.wordString);
         const posVec = this.companionService.convertPositionToGridIndex(this.initialPosition);
         const defaultParams: DefaultCommandParams = { player: this.gameService.game.getLocalPlayer(), serviceCalled: this.gameService };
         const params: PlaceParams = { position: posVec, orientation: this.currentAxis, word: this.wordString };
@@ -225,8 +224,6 @@ export class MouseWordPlacerService {
         if (this.currentWord.length >= 0 && previousSquare.x >= this.initialPosition.x && previousSquare.y >= this.initialPosition.y) {
             // Shift one spot left/up
             this.currentPosition = previousSquare;
-            console.log('current word:', this.currentWord);
-            console.log('word string:', this.wordString);
             this.drawCurrentWord();
             this.overlayContext.clearRect(
                 this.currentPosition.x,
@@ -347,8 +344,6 @@ export class MouseWordPlacerService {
             // Display arrow if next call is not on the complete right or bottom edge position
             if (nextPlacePos.x >= Column.Fifteen || nextPlacePos.y >= Row.O) return;
             this.drawArrow(this.currentPosition, this.currentAxis);
-            console.log('current word:', this.currentWord);
-            console.log('word string:', this.wordString);
         }
     }
 }

@@ -18,7 +18,7 @@ import {
     isValidLetter,
     removeAccents,
     scrabbleLettersToString,
-    trimSpaces
+    trimSpaces,
 } from '@app/classes/utilities/utilities';
 import { ChatDisplayService } from '@app/services/chat-display.service/chat-display.service';
 import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';

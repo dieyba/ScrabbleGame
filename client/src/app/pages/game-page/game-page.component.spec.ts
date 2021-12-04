@@ -28,7 +28,7 @@
 //     let rackServiceSpy: jasmine.SpyObj<RackService>;
 //     let validationServiceSpy: jasmine.SpyObj<ValidationService>;
 //     let gridServiceSpy: jasmine.SpyObj<GridService>;
-//     let gameParametersSpy: jasmine.SpyObj<GameParameters>;    
+//     let gameParametersSpy: jasmine.SpyObj<GameParameters>;
 //     let rendererSpy: jasmine.SpyObj<Renderer2>;
 //     let isClosed = true;
 
@@ -41,6 +41,7 @@
 //     const dialogStub = { open: () => dialogRefStub };
 
 //     beforeEach(async () => {
+// eslint-disable-next-line max-len
 //         gameServiceSpy = jasmine.createSpyObj('GameService', ['startNewGame', 'initializeSoloGame', 'getLocalPlayer', 'canNavBack', 'addRackLetters', 'resetTimer']);
 //         gameParametersSpy = jasmine.createSpyObj('GameParameters', ['getLocalPlayer']);
 //         rackServiceSpy = jasmine.createSpyObj('RackService', ['drawRack', 'deselectForExchange', 'selectForExchange'], {

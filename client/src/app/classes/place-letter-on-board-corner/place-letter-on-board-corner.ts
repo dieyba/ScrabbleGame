@@ -4,7 +4,6 @@ import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { Vec2 } from '@app/classes/vec2/vec2';
 
-
 export class PlaceLetterOnBoardCorner extends Goal {
     targetCoordinates: Vec2[];
 
@@ -37,7 +36,7 @@ export class PlaceLetterOnBoardCorner extends Goal {
     }
     isInCorner(position: Vec2) {
         let isInCorner = false;
-        this.targetCoordinates.forEach(coord => {
+        this.targetCoordinates.forEach((coord) => {
             if (position.x === coord.x && position.y === coord.y) {
                 isInCorner = true;
             }

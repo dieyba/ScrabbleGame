@@ -72,9 +72,9 @@ describe('SidebarComponent', () => {
         }).compileComponents();
 
         gameServiceSpy.game = new GameParameters();
-        //gameServiceSpy.initializeSoloGame(gameInfo, Difficulty.Easy);
+        // gameServiceSpy.initializeSoloGame(gameInfo, Difficulty.Easy);
         gameServiceSpy.game.scrabbleBoard = new ScrabbleBoard(false);
-        gameServiceSpy.game.stock = new LetterStock()
+        gameServiceSpy.game.stock = new LetterStock();
         gameServiceSpy.game.gameMode = GameType.Solo;
         gameServiceSpy.game.isLog2990 = false;
         gameServiceSpy.game.isEndGame = false;
@@ -226,7 +226,7 @@ describe('SidebarComponent', () => {
     //     goalsServiceSpy.privateGoals = [];
     //     goalsServiceSpy.goalsCreationMap = new Map();
     //     goalsServiceSpy.initialize();
-    //     goalsServiceSpy.privateGoals.push(new ActivateTwoBonuses);        
+    //     goalsServiceSpy.privateGoals.push(new ActivateTwoBonuses);
     //     goalsServiceSpy.privateGoals.push(new FormAnExistingWord);
     //     console.log('HI ' + goalsServiceSpy.privateGoals[0].type);
     //     component.localPlayer = new Player('Ariane');
@@ -239,7 +239,7 @@ describe('SidebarComponent', () => {
     //     goalsServiceSpy.privateGoals = [];
     //     goalsServiceSpy.goalsCreationMap = new Map();
     //     goalsServiceSpy.initialize();
-    //     goalsServiceSpy.privateGoals.push(new ActivateTwoBonuses);        
+    //     goalsServiceSpy.privateGoals.push(new ActivateTwoBonuses);
     //     goalsServiceSpy.privateGoals.push(new FormAnExistingWord);
     //     component.opponentPlayer.goal = GoalType.ActivateTwoBonuses;
     //     expect(component.getOpponentGoalDescription()).toEqual(GoalDescriptions.ActivateTwoBonuses);

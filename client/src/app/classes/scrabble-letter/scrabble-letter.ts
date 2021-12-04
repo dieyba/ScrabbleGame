@@ -52,12 +52,14 @@ export const setLetter = (character: string, scrabbleLetter: ScrabbleLetter): Sc
     const result = scrabbleLetter;
     if (character === '') {
         result.character = '';
+        result.value = 0;
         return result;
     }
-    // if a captial letter is passed in, it represents a blank piece, meaning an asterisk
+    // if a capital letter is passed in, it represents a blank piece, meaning an asterisk
     result.character = isAllLowerLetters(character) && isValidLetter(removeAccents(character)) ? removeAccents(character) : '*';
     if (result.character === '*') {
         result.whiteLetterCharacter = character;
+        result.value = 0;
     }
     return scrabbleLetter;
 };

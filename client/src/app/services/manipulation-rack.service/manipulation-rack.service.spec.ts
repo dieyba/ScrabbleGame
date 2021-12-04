@@ -1,16 +1,16 @@
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ERROR_NUMBER } from '@app/classes/utilities';
-import { ManipulationRackService } from './manipulation-rack.service';
-import { RackService } from './rack.service';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
+import { ManipulationRackService } from '@app/services/manipulation-rack.service/manipulation-rack.service';
+import { RackService } from '@app/services/rack.service/rack.service';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 describe('ManipulationRackService', () => {
     let service: ManipulationRackService;
     let rackServiceSpy: jasmine.SpyObj<RackService>;
-    let findFisrtOccurenceSpy: jasmine.Spy<any>;
+    let findFirstOccurrenceSpy: jasmine.Spy<any>;
 
     beforeEach(() => {
         rackServiceSpy = jasmine.createSpyObj(
@@ -25,7 +25,7 @@ describe('ManipulationRackService', () => {
             providers: [{ provide: RackService, useValue: rackServiceSpy }],
         });
         service = TestBed.inject(ManipulationRackService);
-        findFisrtOccurenceSpy = spyOn<any>(service, 'findFisrtOccurence').and.callThrough();
+        findFirstOccurrenceSpy = spyOn<any>(service, 'findFirstOccurrence').and.callThrough();
 
         rackServiceSpy.rackLetters = [
             new ScrabbleLetter('p'),
@@ -37,7 +37,7 @@ describe('ManipulationRackService', () => {
             new ScrabbleLetter('z'),
         ];
 
-        // service.firstOccurence = ERROR_NUMBER;
+        // service.firstOccurrence = ERROR_NUMBER;
         // service.selectedPosition = ERROR_NUMBER;
     });
 
@@ -45,7 +45,7 @@ describe('ManipulationRackService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('handleSelection should call rackService select if the letter at the specifeid posotion is not selected for handling', () => {
+    it('handleSelection should call rackService select if the letter at the specified position is not selected for handling', () => {
         const position = 3;
         rackServiceSpy.handlingSelected[position - 1] = true;
         service.handleSelection(position);
@@ -63,37 +63,37 @@ describe('ManipulationRackService', () => {
         expect(rackServiceSpy.exchangeSelected[position - 1]).toBeFalse();
     });
 
-    it('clearManipValues should set the two properties at -1', () => {
+    it('clearManipulationValues should set the two properties at -1', () => {
         const position = 3;
         service['letterSelectedPosition'] = position;
-        service['firstOccurencePosition'] = position;
-        service.clearManipValues();
+        service['firstOccurrencePosition'] = position;
+        service.clearManipulationValues();
 
         expect(service['letterSelectedPosition']).toEqual(ERROR_NUMBER);
-        expect(service['firstOccurencePosition']).toEqual(ERROR_NUMBER);
+        expect(service['firstOccurrencePosition']).toEqual(ERROR_NUMBER);
     });
 
-    it('findFisrtOccurence should set firstOccurencePosition with the position of the fisrt occurence of the letter specified', () => {
-        service.findFisrtOccurence('j');
-        expect(service['firstOccurencePosition']).toEqual(1);
+    it('findFirstOccurrence should set firstOccurrencePosition with the position of the first occurrence of the letter specified', () => {
+        service.findFirstOccurrence('j');
+        expect(service['firstOccurrencePosition']).toEqual(1);
     });
 
-    it('selectByLetter should call findFisrtOccurence if no letter is selected for handling', () => {
+    it('selectByLetter should call findFirstOccurrence if no letter is selected for handling', () => {
         service['letterSelectedPosition'] = ERROR_NUMBER;
         service.selectByLetter('j');
-        expect(findFisrtOccurenceSpy).toHaveBeenCalled();
+        expect(findFirstOccurrenceSpy).toHaveBeenCalled();
     });
 
-    it('selectByLetter should call findFisrtOccurence if the letter selected is different from the new letter we want to select', () => {
-        service['firstOccurencePosition'] = 3;
+    it('selectByLetter should call findFirstOccurrence if the letter selected is different from the new letter we want to select', () => {
+        service['firstOccurrencePosition'] = 3;
         service.selectByLetter('w');
-        expect(findFisrtOccurenceSpy).toHaveBeenCalled();
+        expect(findFirstOccurrenceSpy).toHaveBeenCalled();
     });
 
-    it('selectByLetter shouldnt call findFisrtOccurence if a letter is selected & if this one is the same as the one we want to select', () => {
-        service['firstOccurencePosition'] = 3;
+    it('selectByLetter should not call findFirstOccurrence if a letter is selected & if this one is the same as the one we want to select', () => {
+        service['firstOccurrencePosition'] = 3;
         service.selectByLetter('d');
-        expect(findFisrtOccurenceSpy).not.toHaveBeenCalled();
+        expect(findFirstOccurrenceSpy).not.toHaveBeenCalled();
     });
 
     it('selectByLetter should call rackService deselectAll if the letter specified is not in the letters of the player', () => {
@@ -111,19 +111,19 @@ describe('ManipulationRackService', () => {
         expect(rackServiceSpy.exchangeSelected[1]).toBeFalse();
     });
 
-    it('selectByLetter should select the first occuerence of a letter if the last occurence of this letter is already selected', () => {
+    it('selectByLetter should select the first occurrence of a letter if the last occurrence of this letter is already selected', () => {
         service['letterSelectedPosition'] = 4;
-        service['firstOccurencePosition'] = 1;
+        service['firstOccurrencePosition'] = 1;
         rackServiceSpy.handlingSelected[4] = true;
         service.selectByLetter('j');
 
         expect(service['letterSelectedPosition']).toEqual(1);
     });
 
-    it('selectByLetter should select the next occurence of a letter if the letter is already selected', () => {
+    it('selectByLetter should select the next occurrence of a letter if the letter is already selected', () => {
         rackServiceSpy.rackLetters[6] = new ScrabbleLetter('j');
         service['letterSelectedPosition'] = 4;
-        service['firstOccurencePosition'] = 1;
+        service['firstOccurrencePosition'] = 1;
         rackServiceSpy.handlingSelected[4] = true;
         service.selectByLetter('j');
 
@@ -172,7 +172,7 @@ describe('ManipulationRackService', () => {
         expect(rackServiceSpy.select).toHaveBeenCalled();
     });
 
-    it('if the last letter is selected, switchRight should deselect it and select the fisrt one of the rack', () => {
+    it('if the last letter is selected, switchRight should deselect it and select the first one of the rack', () => {
         rackServiceSpy.handlingSelected[6] = true;
         service['letterSelectedPosition'] = 6;
         service.switchRight();

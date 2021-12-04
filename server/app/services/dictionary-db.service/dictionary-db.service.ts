@@ -180,7 +180,7 @@ export class DictionaryDBService {
     private async isInCollection(dictionaryId: ObjectId): Promise<boolean> {
         let isInCollection = false;
         await this.dictionaryCollection.find().forEach((dictionary) => {
-            if (dictionary._id === dictionaryId) {
+            if (dictionaryId.equals(dictionary._id)) {
                 isInCollection = true;
             }
         });

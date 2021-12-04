@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 // import { HttpClientModule } from '@angular/common/http';
 // import { ComponentFixture, TestBed } from '@angular/core/testing';
 // import { MatCardModule } from '@angular/material/card';
