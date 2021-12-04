@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { CanvasTestHelper } from '@app/classes/canvas-test-helper/canvas-test-helper';
@@ -9,9 +11,16 @@ import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
 import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
 import { GameService } from '@app/services/game.service/game.service';
-import { BOARD_OFFSET, DEFAULT_HEIGHT, DEFAULT_WIDTH, GridService } from '@app/services/grid.service/grid.service';
+import {
+    ABSOLUTE_BOARD_SIZE,
+    ACTUAL_SQUARE_SIZE,
+    BOARD_OFFSET,
+    DEFAULT_HEIGHT,
+    DEFAULT_WIDTH,
+    GridService
+} from '@app/services/grid.service/grid.service';
 import { MouseWordPlacerCompanionService } from '@app/services/mouse-word-placer-companion.service/mouse-word-placer-companion.service';
-import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE, MouseWordPlacerService } from '@app/services/mouse-word-placer.service/mouse-word-placer.service';
+import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service/mouse-word-placer.service';
 import { RackService, RACK_HEIGHT, RACK_WIDTH } from '@app/services/rack.service/rack.service';
 
 describe('MouseWordPlacerService', () => {
@@ -50,7 +59,7 @@ describe('MouseWordPlacerService', () => {
                 { provide: GameService, useValue: gameSpy },
                 { provide: CommandInvokerService, useValue: cmdSpy },
                 { provide: MouseWordPlacerCompanionService, useValue: companionSpy },
-            ]
+            ],
         });
         gridServiceSpy = TestBed.inject(GridService) as jasmine.SpyObj<GridService>;
         rackServiceSpy = TestBed.inject(RackService) as jasmine.SpyObj<RackService>;
@@ -268,8 +277,8 @@ describe('MouseWordPlacerService', () => {
         expect(clearSpy).toHaveBeenCalled();
     });
     it('drawCurrentWord should call drawLetter for as many letters as there are in the word', () => {
-        const drawLetterSpy = spyOn<any>(service, 'drawLetter').and.callThrough();
-        const posStub: number[] = [SEVEN_INDEX, H_INDEX];
+        const drawLetterSpy = spyOn(service, 'drawLetter' as any).and.callThrough();
+        const posStub = [SEVEN_INDEX, H_INDEX];
         const convertPosSpy = companionServiceSpy.convertPositionToGridIndex;
         convertPosSpy.and.returnValue(posStub);
         gridServiceSpy.scrabbleBoard = new ScrabbleBoard(false);
@@ -278,7 +287,7 @@ describe('MouseWordPlacerService', () => {
         expect(drawLetterSpy).toHaveBeenCalledTimes(service.currentWord.length);
     });
     it('drawCurrentWord should skip occupied spaces (horizontal)', () => {
-        const drawLetterSpy = spyOn<any>(service, 'drawLetter').and.callThrough();
+        const drawLetterSpy = spyOn(service, 'drawLetter' as any).and.callThrough();
         gridServiceSpy.scrabbleBoard.squares[SEVEN_INDEX + 1][H_INDEX].occupied = true;
         const posStub: number[] = [SEVEN_INDEX, H_INDEX];
         const convertPosSpy = companionServiceSpy.convertPositionToGridIndex;
@@ -288,7 +297,7 @@ describe('MouseWordPlacerService', () => {
         expect(drawLetterSpy).toHaveBeenCalledTimes(service.currentWord.length);
     });
     it('drawCurrentWord should skip occupied spaces (vertical)', () => {
-        const drawLetterSpy = spyOn<any>(service, 'drawLetter').and.callThrough();
+        const drawLetterSpy = spyOn(service, 'drawLetter' as any).and.callThrough();
         service.currentAxis = Axis.V;
         gridServiceSpy.scrabbleBoard.squares[SEVEN_INDEX][H_INDEX + 1].occupied = true;
         const posStub: number[] = [SEVEN_INDEX, H_INDEX];
@@ -383,7 +392,7 @@ describe('MouseWordPlacerService', () => {
     });
     it('placeLetter should draw a letter on the overlay if it is inside the board (horizontal)', () => {
         rackServiceSpy.rackLetters.push(new ScrabbleLetter('s', 1));
-        const drawLetterSpy = spyOn<any>(service, 'drawLetter');
+        const drawLetterSpy = spyOn(service, 'drawLetter' as any);
         companionServiceSpy.convertPositionToGridIndex.and.returnValue([SEVEN_INDEX, H_INDEX]);
         companionServiceSpy.findNextSquare.and.returnValue(new Vec2(SEVEN_POS + ACTUAL_SQUARE_SIZE * service.currentWord.length, H_POS));
         service['placeLetter']('s');
@@ -391,7 +400,7 @@ describe('MouseWordPlacerService', () => {
     });
     it('placeLetter should draw a letter on the overlay if it is inside the board (vertical)', () => {
         rackServiceSpy.rackLetters.push(new ScrabbleLetter('s', 1));
-        const drawLetterSpy = spyOn<any>(service, 'drawLetter');
+        const drawLetterSpy = spyOn(service, 'drawLetter' as any);
         service.currentAxis = Axis.V;
         service.currentPosition = new Vec2(SEVEN_POS, H_POS + service.currentWord.length * ACTUAL_SQUARE_SIZE);
         companionServiceSpy.convertPositionToGridIndex.and.returnValue([SEVEN_INDEX, H_INDEX]);
@@ -401,7 +410,7 @@ describe('MouseWordPlacerService', () => {
     });
     it('placeLetter should be able to place a blank letter', () => {
         rackServiceSpy.rackLetters.push(new ScrabbleLetter('*', 0));
-        const drawLetterSpy = spyOn<any>(service, 'drawLetter');
+        const drawLetterSpy = spyOn(service, 'drawLetter' as any);
         service.currentAxis = Axis.V;
         service.currentPosition = new Vec2(SEVEN_POS, H_POS + service.currentWord.length * ACTUAL_SQUARE_SIZE);
         companionServiceSpy.convertPositionToGridIndex.and.returnValue([SEVEN_INDEX, H_INDEX]);
@@ -411,7 +420,7 @@ describe('MouseWordPlacerService', () => {
     });
     it('placeLetter should not place letters when an unsupported key is pressed', () => {
         rackServiceSpy.rackLetters.push(new ScrabbleLetter('s', 1));
-        const drawLetterSpy = spyOn<any>(service, 'drawLetter');
+        const drawLetterSpy = spyOn(service, 'drawLetter' as any);
         service.currentAxis = Axis.V;
         service.currentPosition = new Vec2(SEVEN_POS, H_POS + service.currentWord.length * ACTUAL_SQUARE_SIZE);
         companionServiceSpy.convertPositionToGridIndex.and.returnValue([SEVEN_INDEX, H_INDEX]);
@@ -454,27 +463,27 @@ describe('MouseWordPlacerService', () => {
         expect(drawArrowSpy).not.toHaveBeenCalled();
     });
     it('findPlaceForLetter should call placeLetter if there is space for the letter on the board', () => {
-        const placeLetterSpy = spyOn<any>(service, 'placeLetter');
+        const placeLetterSpy = spyOn(service, 'placeLetter' as any);
         service.currentPosition = new Vec2(SEVEN_POS + service.currentWord.length * ACTUAL_SQUARE_SIZE, H_POS);
         service.findPlaceForLetter('s');
         expect(placeLetterSpy).toHaveBeenCalled();
     });
     it('findPlaceForLetter should not call placeLetter if the position is outside of the board', () => {
-        const placeLetterSpy = spyOn<any>(service, 'placeLetter');
+        const placeLetterSpy = spyOn(service, 'placeLetter' as any);
         // Set current position to be outside of the board (too far right and too far up)
         service.currentPosition = new Vec2(ABSOLUTE_BOARD_SIZE + ACTUAL_SQUARE_SIZE, 0 - ACTUAL_SQUARE_SIZE);
         service.findPlaceForLetter('s');
         expect(placeLetterSpy).not.toHaveBeenCalled();
     });
     it('findPlaceForLetter should not call placeLetter on the edge of the board', () => {
-        const placeLetterSpy = spyOn<any>(service, 'placeLetter');
+        const placeLetterSpy = spyOn(service, 'placeLetter' as any);
         const MAX_POS_X_Y = ABSOLUTE_BOARD_SIZE + BOARD_OFFSET;
         service.currentPosition = new Vec2(MAX_POS_X_Y, MAX_POS_X_Y); // Square bottom right
         service.findPlaceForLetter('s');
         expect(placeLetterSpy).not.toHaveBeenCalled();
     });
     it('findPlaceForLetter should be able to skip ahead of the letters occupying the board (horizontal)', () => {
-        const placeLetterSpy = spyOn<any>(service, 'placeLetter');
+        const placeLetterSpy = spyOn(service, 'placeLetter' as any);
         service.currentPosition = new Vec2(SEVEN_POS + service.currentWord.length * ACTUAL_SQUARE_SIZE, H_POS);
         const pos = [SEVEN_INDEX + service.currentWord.length, H_INDEX];
         gridServiceSpy.scrabbleBoard.squares[pos[0]][pos[1]].letter = new ScrabbleLetter('s', 1); // T E S T ^S => T E S T S S^
@@ -483,7 +492,7 @@ describe('MouseWordPlacerService', () => {
         expect(placeLetterSpy).toHaveBeenCalled();
     });
     it('findPlaceForLetter should be able to skip ahead of the letters occupying the board (vertical)', () => {
-        const placeLetterSpy = spyOn<any>(service, 'placeLetter');
+        const placeLetterSpy = spyOn(service, 'placeLetter' as any);
         service.currentAxis = Axis.V;
         service.currentPosition = new Vec2(SEVEN_POS, H_POS + service.currentWord.length * ACTUAL_SQUARE_SIZE);
         const pos = [SEVEN_INDEX, H_INDEX + service.currentWord.length];
@@ -493,7 +502,7 @@ describe('MouseWordPlacerService', () => {
         expect(placeLetterSpy).toHaveBeenCalled();
     });
     it('findPlaceForLetter should not place a letter if after skipping the occupied spaces, the position is out of bounds', () => {
-        const placeLetterSpy = spyOn<any>(service, 'placeLetter');
+        const placeLetterSpy = spyOn(service, 'placeLetter' as any);
         service.currentAxis = Axis.V;
         gridServiceSpy.scrabbleBoard.squares[BOARD_SIZE - 1][BOARD_SIZE - 1].letter = new ScrabbleLetter('s', 1); // T E S T ^S => T E S T S S^
         gridServiceSpy.scrabbleBoard.squares[BOARD_SIZE - 1][BOARD_SIZE - 1].occupied = true;
@@ -503,4 +512,3 @@ describe('MouseWordPlacerService', () => {
         expect(placeLetterSpy).not.toHaveBeenCalled();
     });
 });
-
