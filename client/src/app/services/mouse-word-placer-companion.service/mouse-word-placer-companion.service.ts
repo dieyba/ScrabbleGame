@@ -4,7 +4,8 @@ import { SquareColor } from '@app/classes/square/square';
 import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
 import { BOARD_SIZE } from '@app/services/grid.service/grid.service';
-import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE } from '@app/services/mouse-word-placer.service/mouse-word-placer.service';
+// import { ABSOLUTE_BOARD_SIZE, ACTUAL_SQUARE_SIZE } from '@app/services/mouse-word-placer.service/mouse-word-placer.service';
+const ABSOLUTE_BOARD_SIZE = 20, ACTUAL_SQUARE_SIZE = 20;
 
 @Injectable({
     providedIn: 'root',

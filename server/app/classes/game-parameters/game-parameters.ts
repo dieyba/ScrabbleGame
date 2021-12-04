@@ -129,9 +129,12 @@ export class GameInitInfo {
     }
 
     getOtherPlayerInRoom(playerId: string): Player | undefined {
+        console.log(this.players.length)
         if (this.players.length === GAME_CAPACITY) {
+            console.log('enter')
             return this.players[0].socketId === playerId ? this.players[1] : this.players[0];
         }
+        console.log('undefined')
         return undefined;
     }
 
@@ -148,10 +151,12 @@ export class GameInitInfo {
     removePlayer(playerId: string): Player | undefined {
         const playerToRemove = this.getPlayerBySocketId(playerId);
         if (playerToRemove !== undefined) {
+            console.log('should remove')
             const indexPlayerToRemove = this.players.indexOf(playerToRemove);
             const removedPlayer = this.players.splice(indexPlayerToRemove, 1)[0];
             return removedPlayer;
         }
+        console.log('undefined')
         return undefined;
     }
 }

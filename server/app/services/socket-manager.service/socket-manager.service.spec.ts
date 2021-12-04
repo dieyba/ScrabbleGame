@@ -1,822 +1,1582 @@
 /* eslint-disable max-lines */
-// /* eslint-disable @typescript-eslint/no-magic-numbers */
-// /* eslint-disable @typescript-eslint/no-unused-expressions */
-// /* eslint-disable no-unused-expressions */
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// /* eslint-disable max-classes-per-file */
-// /* eslint-disable no-unused-vars */
-// /* eslint-disable dot-notation */
-// import { GameParameters } from '@app/classes/game-parameters';
-// import { Player } from '@app/classes/player';
-// import { assert, expect } from 'chai';
-// import * as http from 'http';
-// import * as sinon from 'sinon';
-// import * as io from 'socket.io';
-// import { GameListManager } from './game-list-manager.service';
-// import { PlayerManagerService } from './player-manager.service';
-// import { SocketManagerService } from './socket-manager.service';
-// import { ValidationService } from './validation.service';
-
-// class ServerMock {
-//     events: Map<string, [CallableFunction, SocketMock]> = new Map();
-//     on(eventName: string, cb: CallableFunction) {
-//         this.events.set(eventName, [cb, new SocketMock()]);
-//     }
-
-//     triggerEvent(eventName: string) {
-//         const cbAndSocket = this.events.get(eventName) as [CallableFunction, SocketMock];
-//         cbAndSocket[0](cbAndSocket[1]);
-//     }
-
-//     emit(...args: any[]) {
-//         return;
-//     }
-
-//     to(...args: any[]): ServerMock {
-//         return new ServerMock();
-//     }
-
-//     in(...args: any[]): ServerMock {
-//         return new ServerMock();
-//     }
-// }
-
-// class SocketMock {
-//     id: string = 'Socket mock';
-//     events: Map<string, CallableFunction> = new Map();
-//     on(eventName: string, cb: CallableFunction) {
-//         this.events.set(eventName, cb);
-//     }
-
-//     triggerEvent(eventName: string, ...args: any[]) {
-//         const arrowFunction = this.events.get(eventName) as CallableFunction;
-//         arrowFunction(...args);
-//     }
-
-//     join(...args: any[]) {
-//         return;
-//     }
-
-//     leave(...args: any[]) {
-//         return;
-//     }
-
-//     disconnect() {
-//         return;
-//     }
-// }
-
-// describe('SocketManager service', () => {
-//     let socketManagerService: SocketManagerService;
-//     let validationServiceStub: sinon.SinonStubbedInstance<ValidationService>;
-//     let httpServer: http.Server;
-//     let serverMock: ServerMock;
-
-//     beforeEach(() => {
-//         validationServiceStub = sinon.createStubInstance(ValidationService);
-//         httpServer = http.createServer();
-//         socketManagerService = new SocketManagerService(httpServer);
-
-//         // Mocking the server
-//         serverMock = new ServerMock();
-//         socketManagerService['sio'] = serverMock as unknown as io.Server;
-//     });
-
-//     it('should create socketManagerService', () => {
-//         expect(socketManagerService).to.not.be.undefined;
-//     });
-
-//     it('handleSockets should register the "connection" event', () => {
-//         const serverSpy = sinon.spy(socketManagerService['sio'], 'on');
-//         socketManagerService.handleSockets();
-
-//         serverSpy.restore();
-
-//         sinon.assert.calledWith(serverSpy, 'connection');
-//         expect(serverMock.events.has('connection')).to.be.true;
-//     });
-
-//     it('"word placed" should emit', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable max-classes-per-file */
+/* eslint-disable no-unused-vars */
+/* eslint-disable dot-notation */
+import { DictionaryType } from '@app/classes/dictionary/dictionary';
+import { GameInitInfo, GameType, WaitingAreaGameParameters } from '@app/classes/game-parameters/game-parameters';
+import { Player } from '@app/classes/player/player';
+import { assert, expect } from 'chai';
+import * as http from 'http';
+import * as sinon from 'sinon';
+import * as io from 'socket.io';
+import { GameListManager } from '../game-list-manager.service/game-list-manager.service';
+import { PlayerManagerService } from '../player-manager.service/player-manager.service';
+import { ValidationService } from '../validation.service/validation.service';
+import { SocketManagerService } from './socket-manager.service';
+
+class ServerMock {
+    events: Map<string, [CallableFunction, SocketMock]> = new Map();
+    on(eventName: string, cb: CallableFunction) {
+        this.events.set(eventName, [cb, new SocketMock()]);
+    }
+
+    triggerEvent(eventName: string) {
+        const cbAndSocket = this.events.get(eventName) as [CallableFunction, SocketMock];
+        cbAndSocket[0](cbAndSocket[1]);
+    }
+
+    emit(...args: any[]) {
+        return;
+    }
+
+    to(...args: any[]): ServerMock {
+        return new ServerMock();
+    }
+
+    in(...args: any[]): ServerMock {
+        return new ServerMock();
+    }
+}
+
+class SocketMock {
+    id: string = 'socketID';
+    events: Map<string, CallableFunction> = new Map();
+    on(eventName: string, cb: CallableFunction) {
+        this.events.set(eventName, cb);
+    }
+
+    triggerEvent(eventName: string, ...args: any[]) {
+        const arrowFunction = this.events.get(eventName) as CallableFunction;
+        arrowFunction(...args);
+    }
+
+    join(...args: any[]) {
+        return;
+    }
+
+    leave(...args: any[]) {
+        return;
+    }
+
+    disconnect() {
+        return;
+    }
+}
+
+describe('SocketManager service', () => {
+    let socketManagerService: SocketManagerService;
+    let validationServiceStub: sinon.SinonStubbedInstance<ValidationService>;
+    let httpServer: http.Server;
+    let serverMock: ServerMock;
+
+    beforeEach(() => {
+        validationServiceStub = sinon.createStubInstance(ValidationService);
+        httpServer = http.createServer();
+        socketManagerService = new SocketManagerService(httpServer);
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        // Mocking the server
+        serverMock = new ServerMock();
+        socketManagerService['sio'] = serverMock as unknown as io.Server;
+    });
 
-//         // stub spy and mock
-//         const playerMock = new Player('name', 'socketId');
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub;
+    it('should create socketManagerService', () => {
+        expect(socketManagerService).to.not.be.undefined;
+    });
 
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.getOtherPlayer.returns(playerMock);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+    it('handleSockets should register the "connection" event', () => {
+        const serverSpy = sinon.spy(socketManagerService['sio'], 'on');
+        socketManagerService.handleSockets();
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
+        serverSpy.restore();
 
-//         // "word placed" event
-//         socketMock.triggerEvent('word placed');
+        sinon.assert.calledWith(serverSpy, 'connection');
+        expect(serverMock.events.has('connection')).to.be.true;
+    });
 
-//         assert(gameListManagerStub.getOtherPlayer.called);
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called);
-//         sinon.assert.called(serverMockSpy);
-//     });
+    it('"createWaitingAreaRoom" should call createWaitingAreaRoom and getAllWaitingAreaGames', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//     it('"exchange letters" should emit', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        // spies and mock
+        const createWaitingAreaRoomStub = sinon.stub(socketManagerService as any, 'createWaitingAreaRoom');
+        const getAllWaitingAreaGamesStub = sinon.stub(socketManagerService as any, 'getAllWaitingAreaGames');
 
-//         // stub spy and mock
-//         const playerMock = new Player('name', 'socketId');
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub;
+        socketMock.triggerEvent('createWaitingAreaRoom');
 
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.getOtherPlayer.returns(playerMock);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+        sinon.assert.called(createWaitingAreaRoomStub);
+        sinon.assert.called(getAllWaitingAreaGamesStub);
+    });
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
+    it('"deleteWaitingAreaRoom" should call deleteWaitingAreaRoom and getAllWaitingAreaGames', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         // "exchange letters" event
-//         socketMock.triggerEvent('exchange letters');
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         assert(gameListManagerStub.getOtherPlayer.called);
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called);
-//         sinon.assert.called(serverMockSpy);
-//     });
+        // spies and mock 
 
-//     it('"place word" should emit', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        const deleteWaitingAreaRoomStub = sinon.stub(socketManagerService as any, 'deleteWaitingAreaRoom');
+        const getAllWaitingAreaGamesStub = sinon.stub(socketManagerService as any, 'getAllWaitingAreaGames');
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        socketMock.triggerEvent('deleteWaitingAreaRoom');
 
-//         // stub spy and mock
-//         const playerMock = new Player('name', 'socketId');
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub;
+        sinon.assert.called(deleteWaitingAreaRoomStub);
+        sinon.assert.called(getAllWaitingAreaGamesStub);
+    });
 
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.getOtherPlayer.returns(playerMock);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+    it('"joinWaitingAreaRoom" should call deleteWaitingAreaRoom and getAllWaitingAreaGames', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         // "place word" event
-//         socketMock.triggerEvent('place word');
+        // spies and mock 
 
-//         assert(gameListManagerStub.getOtherPlayer.called);
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called);
-//         sinon.assert.called(serverMockSpy);
-//     });
+        const joinRoomStub = sinon.stub(socketManagerService as any, 'joinRoom');
+        const getAllWaitingAreaGamesStub = sinon.stub(socketManagerService as any, 'getAllWaitingAreaGames');
 
-//     it('The "connection" event should at least register the "disconnection" event in a socket', () => {
-//         // This should register the "connection" event
-//         socketManagerService.handleSockets();
+        socketMock.triggerEvent('joinWaitingAreaRoom');
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
-//         const socketSpy = sinon.spy(socketMock, 'on');
+        sinon.assert.called(joinRoomStub);
+        sinon.assert.called(getAllWaitingAreaGamesStub);
+    });
 
-//         serverMock.triggerEvent('connection');
+    it('"initializeMultiPlayerGame" should call deleteWaitingAreaRoom and getAllWaitingAreaGames', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         socketSpy.restore();
-//         // At least register the "disconnect" event
-//         sinon.assert.calledWith(socketSpy, 'disconnect');
-//     });
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//     it('createRoom should create the room and emit the room created', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        // spies and mock 
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const initializeMultiPlayerGameStub = sinon.stub(socketManagerService as any, 'initializeMultiPlayerGame');
 
-//         // stub and spy
-//         const gameMock = new GameParameters('creator', 0, false, 0);
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.createRoom.returns(gameMock);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+        socketMock.triggerEvent('initializeMultiPlayerGame');
 
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.allPlayers = [new Player('player1', '0'), new Player('player2', '0')];
-//         socketManagerService.playerMan = playerManagerServiceStub;
+        sinon.assert.called(initializeMultiPlayerGameStub);
+    });
 
-//         const serverMockSpy = sinon.spy(serverMock, 'emit');
+    it('"getAllWaitingAreaGames" should call deleteWaitingAreaRoom and getAllWaitingAreaGames', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         // "createRoom" event
-//         socketMock.triggerEvent('createRoom', gameMock);
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         assert(gameListManagerStub.createRoom.called);
-//         sinon.assert.calledWith(serverMockSpy);
-//     });
+        // spies and mock 
 
-//     it('deleteRoom should do nothing if there is no player related to room', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        const getAllWaitingAreaGamesStub = sinon.stub(socketManagerService as any, 'getAllWaitingAreaGames');
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        socketMock.triggerEvent('getAllWaitingAreaGames');
 
-//         // stub, spy and mock
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(undefined as unknown as Player);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        sinon.assert.called(getAllWaitingAreaGamesStub);
+    });
 
-//         const serverMockSpy = sinon.spy(serverMock, 'emit');
+    it('"exchange letters" should do nothing if socket`s player doesn`t exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         // "deleteRoom" event
-//         socketMock.triggerEvent('deleteRoom');
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called);
-//         sinon.assert.neverCalledWith(serverMockSpy, 'roomdeleted');
-//     });
+        // stub spy and mock
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(undefined);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//     it('deleteRoom should delete the room and emit it', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(undefined);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const serverMockSpy = sinon.spy(serverMock, 'to');
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'socketId');
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        // "exchange letters" event
+        socketMock.triggerEvent('exchange letters');
 
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+        assert(gameListManagerStub.getGameInPlay.notCalled);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.notCalled(serverMockSpy);
+    });
 
-//         const serverMockSpy = sinon.spy(serverMock, 'emit');
+    it('"exchange letters" should do nothing if gameInPlay doesn`t exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         // "deleteRoom" event
-//         socketMock.triggerEvent('deleteRoom');
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called);
-//         assert(gameListManagerStub.deleteExistingRoom.called);
-//         sinon.assert.called(serverMockSpy);
-//     });
+        // stub spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//     it('leaveRoom should do nothing if player === undefined', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
-
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(undefined);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         // stub, spy and mock
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(undefined as unknown as Player);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
-
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
-//         const deleteRoomSpy = sinon.spy(socketManagerService as any, 'deleteRoom');
-//         const getAllGamesSpy = sinon.spy(socketManagerService as any, 'getAllGames');
-//         const socketMockSpy = sinon.spy(socketMock, 'leave');
-
-//         // "leaveRoom" event
-//         socketMock.triggerEvent('leaveRoom');
-
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called);
-//         sinon.assert.notCalled(serverMockSpy);
-//         sinon.assert.notCalled(deleteRoomSpy);
-//         sinon.assert.notCalled(getAllGamesSpy);
-//         sinon.assert.notCalled(socketMockSpy);
-//     });
-
-//     it('leaveRoom should delete the room and disconnect the player if the roomGame is undefined', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
-
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
-
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'socketId');
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
-
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.getCurrentGame.returns(undefined as unknown as GameParameters);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
-
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
-//         const deleteRoomSpy = sinon.spy(socketManagerService as any, 'deleteRoom');
-//         const getAllGamesSpy = sinon.spy(socketManagerService as any, 'getAllGames');
-//         const socketMockSpy = sinon.spy(socketMock, 'leave');
-
-//         // "leaveRoom" event
-//         socketMock.triggerEvent('leaveRoom');
-
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called);
-//         sinon.assert.notCalled(serverMockSpy);
-//         sinon.assert.called(deleteRoomSpy);
-//         sinon.assert.called(getAllGamesSpy);
-//         sinon.assert.called(socketMockSpy);
-//     });
+        const serverMockSpy = sinon.spy(serverMock, 'to');
 
-//     it('leaveRoom should delete the room and disconnect the player if there is no one else in the game room', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        // "word placed" event
+        socketMock.triggerEvent('exchange letters');
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        assert(gameListManagerStub.getGameInPlay.called);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.notCalled(serverMockSpy);
+    });
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'socketId');
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+    it('"exchange letters" should emit', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         const gameParametersStub = new GameParameters('creator', 0, false, 0);
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.currentGames = [gameParametersStub as unknown as GameParameters];
-//         gameListManagerStub.getCurrentGame.returns(gameParametersStub);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
-//         const deleteRoomSpy = sinon.spy(socketManagerService as any, 'deleteRoom');
-//         const getAllGamesSpy = sinon.spy(socketManagerService as any, 'getAllGames');
-//         const socketMockSpy = sinon.spy(socketMock, 'leave');
+        // stub spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//         // "leaveRoom" event
-//         socketMock.triggerEvent('leaveRoom');
+        const gameInitInfoStub = sinon.createStubInstance(GameInitInfo);
+        gameInitInfoStub.getOtherPlayerInRoom.returns(playerMock);
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(gameInitInfoStub);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called);
-//         sinon.assert.notCalled(serverMockSpy);
-//         sinon.assert.notCalled(deleteRoomSpy);
-//         sinon.assert.notCalled(getAllGamesSpy);
-//         sinon.assert.called(socketMockSpy);
-//     });
+        const serverMockSpy = sinon.spy(serverMock, 'to');
 
-//     it('leaveRoom should emit "roomLeft" if there is someone left in the room', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        // "exchange letters" event
+        socketMock.triggerEvent('exchange letters');
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        assert(gameListManagerStub.getGameInPlay.called);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.called(serverMockSpy);
+    });
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'socketId');
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+    it('"word placed" should do nothing if socket`s player doesn`t exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         const gameParametersMock = new GameParameters('creator', 0, false, 0);
-//         gameParametersMock.gameRoom.playersName = [playerMock.name, playerMock.name];
-//         // gameParametersMock.players = [playerMock];
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         // gameListManagerStub.currentGames = [gameParametersMock];
-//         gameListManagerStub.getCurrentGame.returns(gameParametersMock);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
-//         const deleteRoomSpy = sinon.spy(socketManagerService as any, 'deleteRoom');
-//         const getAllGamesSpy = sinon.spy(socketManagerService as any, 'getAllGames');
-//         const socketMockSpy = sinon.spy(socketMock, 'leave');
+        // stub spy and mock
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(undefined);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//         sinon.stub(socketManagerService as any, 'displayPlayerQuitMessage');
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(undefined);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         // "leaveRoom" event
-//         socketMock.triggerEvent('leaveRoom');
+        const serverMockSpy = sinon.spy(serverMock, 'to');
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called);
-//         sinon.assert.called(serverMockSpy);
-//         sinon.assert.notCalled(deleteRoomSpy);
-//         sinon.assert.notCalled(getAllGamesSpy);
-//         sinon.assert.called(socketMockSpy);
-//     });
+        // "exchange letters" event
+        socketMock.triggerEvent('word placed');
 
-//     it('disconnect should call "leaveRoom" after 5 seconds', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        assert(gameListManagerStub.getGameInPlay.notCalled);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.notCalled(serverMockSpy);
+    });
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+    it('"word placed" should do nothing if gameInPlay doesn`t exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         // stub, spy and mock
-//         // const leaveRoomspy = sinon.spy((socketManagerService as any).disconnect);
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         // "leaveRoom" event
-//         socketMock.triggerEvent('disconnect');
+        // stub spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//         // assert(leaveRoomspy.called, 'leaveRoom is called'); // TODO check how to make async test
-//     });
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(undefined);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//     it('getAllGames should emit with argument "getAllGames"', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        const serverMockSpy = sinon.spy(serverMock, 'to');
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        // "word placed" event
+        socketMock.triggerEvent('word placed');
 
-//         // stub, spy and mock
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+        assert(gameListManagerStub.getGameInPlay.called);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.notCalled(serverMockSpy);
+    });
 
-//         const serverMockSpy = sinon.spy(serverMock, 'emit');
+    it('"word placed" should emit', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         // "getAllGames" event
-//         socketMock.triggerEvent('getAllGames');
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         sinon.assert.calledWith(serverMockSpy, 'getAllGames');
-//     });
+        // stub spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//     it('addPlayer should call the PlayerManagerService.addPlayer', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        const gameInitInfoStub = sinon.createStubInstance(GameInitInfo);
+        gameInitInfoStub.getOtherPlayerInRoom.returns(playerMock);
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(gameInitInfoStub);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const serverMockSpy = sinon.spy(serverMock, 'to');
 
-//         // stub, spy and mock
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        // "exchange letters" event
+        socketMock.triggerEvent('word placed');
 
-//         const playerMock = new Player('name', 'socketId');
+        assert(gameListManagerStub.getGameInPlay.called);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.called(serverMockSpy);
+    });
 
-//         // "addPlayer" event
-//         socketMock.triggerEvent('addPlayer', playerMock);
+    it('"place word" should do nothing if socket`s player doesn`t exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         assert(playerManagerServiceStub.addPlayer.calledWith(playerMock.name, socketMock.id));
-//     });
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//     it('joinRoom should do nothing if the player who joins and the game room are undefined', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        // stub spy and mock
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(undefined);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(undefined);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         // stub, spy and mock
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(undefined as unknown as Player);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        const serverMockSpy = sinon.spy(serverMock, 'to');
 
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.getGameFromExistingRooms.returns(undefined as unknown as GameParameters);
-//         socketManagerService['gameListMan'] = gameListManagerStub;
+        // "exchange letters" event
+        socketMock.triggerEvent('place word');
 
-//         const gameParametersMock = new GameParameters('creator', 0, false, 0);
+        assert(gameListManagerStub.getGameInPlay.notCalled);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.notCalled(serverMockSpy);
+    });
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
+    it('"place word" should do nothing if gameInPlay doesn`t exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         // "joinRoom" event
-//         socketMock.triggerEvent('joinRoom', gameParametersMock);
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called);
-//         assert(gameListManagerStub.getGameFromExistingRooms.called);
-//         sinon.assert.notCalled(serverMockSpy);
-//     });
+        // stub spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//     it('joinRoom should emit if the player who joins and the game room exist', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(undefined);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const serverMockSpy = sinon.spy(serverMock, 'to');
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'socketId');
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        // "word placed" event
+        socketMock.triggerEvent('place word');
 
-//         const gameParametersMock = new GameParameters('creator', 0, false, 0);
-//         gameParametersMock.opponentPlayer = playerMock;
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.getGameFromExistingRooms.returns(gameParametersMock);
-//         gameListManagerStub.currentGames = [gameParametersMock];
-//         socketManagerService['gameListMan'] = gameListManagerStub;
+        assert(gameListManagerStub.getGameInPlay.called);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.notCalled(serverMockSpy);
+    });
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
+    it('"place word" should emit', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         // "joinRoom" event
-//         socketMock.triggerEvent('joinRoom', gameParametersMock);
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called);
-//         assert(gameListManagerStub.getGameFromExistingRooms.called);
-//         sinon.assert.called(serverMockSpy);
-//     });
+        // stub spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//     it('initializeGame should do nothing if the game room is undefined', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        const gameInitInfoStub = sinon.createStubInstance(GameInitInfo);
+        gameInitInfoStub.getOtherPlayerInRoom.returns(playerMock);
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(gameInitInfoStub);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const serverMockSpy = sinon.spy(serverMock, 'to');
 
-//         // stub, spy and mock
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.getCurrentGame.returns(undefined as unknown as GameParameters);
-//         socketManagerService['gameListMan'] = gameListManagerStub;
+        // "exchange letters" event
+        socketMock.triggerEvent('place word');
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
+        assert(gameListManagerStub.getGameInPlay.called);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.called(serverMockSpy);
+    });
 
-//         // "initializeGame" event
-//         socketMock.triggerEvent('initializeGame', 0);
+    it('"achieve goal" should do nothing if socket`s player doesn`t exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         assert(gameListManagerStub.getCurrentGame.called);
-//         sinon.assert.notCalled(serverMockSpy);
-//     });
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//     it('initializeGame should emit if the game room is defined', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        // stub spy and mock
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(undefined);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(undefined);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'socketId');
-//         const gameParametersMock = new GameParameters('creator', 0, false, 0);
-//         gameParametersMock.players = [playerMock, playerMock];
+        const serverMockSpy = sinon.spy(serverMock, 'to');
 
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.getCurrentGame.returns(gameParametersMock);
-//         socketManagerService['gameListMan'] = gameListManagerStub;
+        // "exchange letters" event
+        socketMock.triggerEvent('achieve goal');
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
+        assert(gameListManagerStub.getGameInPlay.notCalled);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.notCalled(serverMockSpy);
+    });
 
-//         // "initializeGame" event
-//         socketMock.triggerEvent('initializeGame', 0);
+    it('"achieve goal" should do nothing if gameInPlay doesn`t exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         assert(gameListManagerStub.getCurrentGame.called);
-//         sinon.assert.called(serverMockSpy);
-//     });
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//     it('validateWords should validate word and send the result with emit', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        // stub spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(undefined);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         // stub, spy and mock
-//         validationServiceStub.validateWords.returns(true);
-//         socketManagerService['validationService'] = validationServiceStub as unknown as ValidationService;
+        const serverMockSpy = sinon.spy(serverMock, 'to');
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
+        // "word placed" event
+        socketMock.triggerEvent('achieve goal');
 
-//         const wordsToValidate = ['wordOne', 'wordTwo'];
+        assert(gameListManagerStub.getGameInPlay.called);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.notCalled(serverMockSpy);
+    });
 
-//         // "validateWords" event
-//         socketMock.triggerEvent('validateWords', wordsToValidate);
+    it('"achieve goal" should emit', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         expect(validationServiceStub.validateWords.called).to.be.true;
-//         sinon.assert.called(serverMockSpy);
-//     });
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//     it('displayChatEntry should get player with socket.id and emit to the room by using "in"', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        // stub spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const gameInitInfoStub = sinon.createStubInstance(GameInitInfo);
+        gameInitInfoStub.getOtherPlayerInRoom.returns(playerMock);
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(gameInitInfoStub);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'id');
-//         playerMock.roomId = 0;
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        const serverMockSpy = sinon.spy(serverMock, 'to');
 
-//         const serverMockSpy = sinon.spy(serverMock, 'in');
+        // "exchange letters" event
+        socketMock.triggerEvent('achieve goal');
 
-//         const messageMock = 'myMessage';
+        assert(gameListManagerStub.getGameInPlay.called);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.called(serverMockSpy);
+    });
 
-//         // "validateWords" event
-//         socketMock.triggerEvent('sendChatEntry', messageMock);
+    it('The "connection" event should at least register the "disconnection" event in a socket', () => {
+        // This should register the "connection" event
+        socketManagerService.handleSockets();
 
-//         expect(playerManagerServiceStub.getPlayerBySocketID.called).to.be.true;
-//         sinon.assert.called(serverMockSpy);
-//     });
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const socketSpy = sinon.spy(socketMock, 'on');
 
-//     it('displayDifferentChatEntry should not emit if there is no opponent', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        serverMock.triggerEvent('connection');
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        socketSpy.restore();
+        // At least register the "disconnect" event
+        sinon.assert.calledWith(socketSpy, 'disconnect');
+    });
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'id');
-//         playerMock.roomId = 0;
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+    it('createRoom should create the room and emit the room created', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.getOtherPlayer.returns(undefined);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
+        // stub and spy
+        const gameMock = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 2,
+            isLog2990: false,
+        };
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.createWaitingAreaGame.returns(gameMock);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         const messageMock = 'myMessage';
-//         const messageToOpponentMock = 'myOpponentMessage';
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.allPlayers = [new Player('player1', '0'), new Player('player2', '0')];
+        socketManagerService['playerMan'] = playerManagerServiceStub;
 
-//         // "validateWords" event
-//         socketMock.triggerEvent('sendChatEntry', messageMock, messageToOpponentMock);
+        const serverMockSpy = sinon.spy(serverMock, 'emit');
 
-//         expect(playerManagerServiceStub.getPlayerBySocketID.called).to.be.true;
-//         sinon.assert.notCalled(serverMockSpy);
-//     });
+        // "createRoom" event
+        socketMock.triggerEvent('createRoom', gameMock);
 
-//     it('displayDifferentChatEntry should emit twice if there is an opponent', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        assert(gameListManagerStub.createWaitingAreaGame.called);
+        sinon.assert.calledWith(serverMockSpy);
+    });
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+    it('deleteRoom should do nothing if there is no player related to room', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'id');
-//         playerMock.roomId = 0;
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.getOtherPlayer.returns(playerMock);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+        // stub, spy and mock
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(undefined as unknown as Player);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
+        const serverMockSpy = sinon.spy(serverMock, 'emit');
 
-//         const messageMock = 'myMessage';
-//         const messageToOpponentMock = 'myOpponentMessage';
+        // "deleteRoom" event
+        socketMock.triggerEvent('deleteRoom');
 
-//         // "validateWords" event
-//         socketMock.triggerEvent('sendChatEntry', messageMock, messageToOpponentMock);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.neverCalledWith(serverMockSpy, 'roomdeleted');
+    });
 
-//         expect(playerManagerServiceStub.getPlayerBySocketID.called).to.be.true;
-//         sinon.assert.calledTwice(serverMockSpy);
-//     });
+    it('deleteRoom should delete the room and emit it', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//     it('displayPlayerQuitMessage should not emit if there is no opponent', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        // stub, spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'id');
-//         playerMock.roomId = 0;
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         const gameParametersStub = new GameParameters('creator', 0, false, 0);
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.getOtherPlayer.returns(undefined);
-//         gameListManagerStub.getCurrentGame.returns(gameParametersStub);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+        const serverMockSpy = sinon.spy(serverMock, 'emit');
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
+        // "deleteRoom" event
+        socketMock.triggerEvent('deleteRoom');
 
-//         // "playerQuit" event
-//         socketMock.triggerEvent('playerQuit');
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        assert(gameListManagerStub.deleteWaitingAreaGame.called);
+        sinon.assert.called(serverMockSpy);
+    });
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
-//         assert(gameListManagerStub.getOtherPlayer.called, 'getOtherPlayer called');
-//         assert(gameListManagerStub.getCurrentGame.called, 'getCurrentGame called');
-//         sinon.assert.notCalled(serverMockSpy);
-//     });
+    it('leaveRoom should do nothing if player === undefined', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//     it('displayPlayerQuitMessage should emit if there is and opponent', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        // stub, spy and mock
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(undefined as unknown as Player);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'id');
-//         playerMock.roomId = 0;
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+        const deleteRoomSpy = sinon.spy(socketManagerService as any, 'deleteRoom');
+        const getAllGamesSpy = sinon.spy(socketManagerService as any, 'getAllGames');
+        const socketMockSpy = sinon.spy(socketMock, 'leave');
 
-//         const gameParametersStub = new GameParameters('creator', 0, false, 0);
-//         const gameListManagerStub = sinon.createStubInstance(GameListManager);
-//         gameListManagerStub.getOtherPlayer.returns(playerMock);
-//         gameListManagerStub.getCurrentGame.returns(gameParametersStub);
-//         socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+        // "leaveRoom" event
+        socketMock.triggerEvent('leaveRoom');
 
-//         const serverMockSpy = sinon.spy(serverMock, 'to');
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.notCalled(serverMockSpy);
+        sinon.assert.notCalled(deleteRoomSpy);
+        sinon.assert.notCalled(getAllGamesSpy);
+        sinon.assert.notCalled(socketMockSpy);
+    });
 
-//         // "playerQuit" event
-//         socketMock.triggerEvent('playerQuit');
+    it('leaveRoom should delete the room and disconnect the player if the roomGame is undefined', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
-//         assert(gameListManagerStub.getOtherPlayer.called, 'getOtherPlayer called');
-//         assert(gameListManagerStub.getCurrentGame.called, 'getCurrentGame called');
-//         sinon.assert.called(serverMockSpy);
-//     });
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//     it('displaySystemChatEntry should emit', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        // stub, spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getAllWaitingAreaGames.returns(undefined as unknown as WaitingAreaGameParameters[]);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'id');
-//         playerMock.roomId = 0;
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+        const deleteRoomSpy = sinon.spy(socketManagerService as any, 'deleteWaitingAreaRoom');
+        const getAllGamesSpy = sinon.spy(socketManagerService as any, 'getAllWaitingAreaGames');
+        const socketMockSpy = sinon.spy(socketMock, 'leave');
 
-//         const serverMockSpy = sinon.spy(serverMock, 'in');
+        // "leaveRoom" event
+        socketMock.triggerEvent('leaveRoom');
 
-//         // "sendSystemChatEntry" event
-//         socketMock.triggerEvent('sendSystemChatEntry');
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.notCalled(serverMockSpy);
+        sinon.assert.called(deleteRoomSpy);
+        sinon.assert.called(getAllGamesSpy);
+        sinon.assert.called(socketMockSpy);
+    });
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
-//         sinon.assert.called(serverMockSpy);
-//     });
+    it('leaveRoom should delete the room and disconnect the player if there is no one else in the game room', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//     it("changeTurn should not emit if the player doesn't have a room id", () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        // stub, spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'id');
-//         playerMock.roomId = undefined as unknown as number;
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        const gameParametersStub = [{
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 2,
+            isLog2990: false,
+        }];
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        // gameListManagerStub.getAllWaitingAreaGames = [gameParametersStub as unknown as GameParameters];
+        gameListManagerStub.getAllWaitingAreaGames.returns(gameParametersStub);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         const serverMockSpy = sinon.spy(serverMock, 'in');
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+        const deleteRoomSpy = sinon.spy(socketManagerService as any, 'deleteRoom');
+        const getAllGamesSpy = sinon.spy(socketManagerService as any, 'getAllGames');
+        const socketMockSpy = sinon.spy(socketMock, 'leave');
 
-//         // "change turn" event
-//         socketMock.triggerEvent('change turn');
+        // "leaveRoom" event
+        socketMock.triggerEvent('leaveRoom');
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
-//         sinon.assert.notCalled(serverMockSpy);
-//     });
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.notCalled(serverMockSpy);
+        sinon.assert.notCalled(deleteRoomSpy);
+        sinon.assert.notCalled(getAllGamesSpy);
+        sinon.assert.called(socketMockSpy);
+    });
 
-//     it('changeTurn should emit if the player has a room id', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+    it('leaveRoom should emit "roomLeft" if there is someone left in the room', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'id');
-//         playerMock.roomId = 0;
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        // stub, spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
 
-//         const serverMockSpy = sinon.spy(serverMock, 'in');
+        const gameParametersMock = [{
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 2,
+            isLog2990: false,
+        }];
+        gameParametersMock[0].gameRoom.playersName = [playerMock.name, playerMock.name];
+        // gameParametersMock.players = [playerMock];
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        // gameListManagerStub.currentGames = [gameParametersMock];
+        gameListManagerStub.getAllWaitingAreaGames.returns(gameParametersMock);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
 
-//         // "change turn" event
-//         socketMock.triggerEvent('change turn', false, 0);
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+        const deleteRoomSpy = sinon.spy(socketManagerService as any, 'deleteRoom');
+        const getAllGamesSpy = sinon.spy(socketManagerService as any, 'getAllGames');
+        const socketMockSpy = sinon.spy(socketMock, 'leave');
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
-//         sinon.assert.called(serverMockSpy);
+        sinon.stub(socketManagerService as any, 'displayPlayerQuitMessage');
 
-//         // "change turn" event
-//         socketMock.triggerEvent('change turn', true, 0);
+        // "leaveRoom" event
+        socketMock.triggerEvent('leaveRoom');
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
-//         sinon.assert.called(serverMockSpy);
-//     });
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        sinon.assert.called(serverMockSpy);
+        sinon.assert.notCalled(deleteRoomSpy);
+        sinon.assert.notCalled(getAllGamesSpy);
+        sinon.assert.called(socketMockSpy);
+    });
 
-//     it('endGame should emit in room with room id', () => {
-//         // This should register the "connection" event and connect a false client
-//         socketManagerService.handleSockets();
-//         serverMock.triggerEvent('connection');
+    it('disconnect should call "leaveRoom" after 5 seconds', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
 
-//         const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
 
-//         // stub, spy and mock
-//         const playerMock = new Player('name', 'id');
-//         playerMock.roomId = 0;
-//         const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
-//         playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
-//         socketManagerService.playerMan = playerManagerServiceStub as unknown as PlayerManagerService;
+        // stub, spy and mock
+        // const leaveRoomspy = sinon.spy((socketManagerService as any).disconnect);
 
-//         const serverMockSpy = sinon.spy(serverMock, 'in');
+        // "leaveRoom" event
+        socketMock.triggerEvent('disconnect');
 
-//         // "endGame" event
-//         socketMock.triggerEvent('endGame', false, 0);
+        // assert(leaveRoomspy.called, 'leaveRoom is called'); // TODO check how to make async test
+    });
 
-//         assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
-//         sinon.assert.calledWith(serverMockSpy, playerMock.roomId.toString());
-//     });
-// });
+    it('getAllGames should emit with argument "getAllGames"', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+
+        const serverMockSpy = sinon.spy(serverMock, 'emit');
+
+        // "getAllGames" event
+        socketMock.triggerEvent('getAllGames');
+
+        sinon.assert.calledWith(serverMockSpy, 'getAllGames');
+    });
+
+    it('addPlayer should call the PlayerManagerService.addPlayer', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
+
+        const playerMock = new Player('name', 'socketId');
+
+        // "addPlayer" event
+        socketMock.triggerEvent('addPlayer', playerMock);
+
+        assert(playerManagerServiceStub.addPlayer.calledWith(playerMock.name, socketMock.id.toString()));
+    });
+
+    it('joinRoom should do nothing if the player who joins and the game room are undefined', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(undefined as unknown as Player);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
+
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getAllWaitingAreaGames.returns(undefined as unknown as WaitingAreaGameParameters[]);
+        // socketManagerService['gameListMan'] = gameListManagerStub;
+
+        const gameParametersMock = {
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 2,
+            isLog2990: false,
+        };
+
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+
+        // "joinRoom" event
+        socketMock.triggerEvent('joinRoom', gameParametersMock);
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        assert(gameListManagerStub.getAllWaitingAreaGames.called);
+        sinon.assert.notCalled(serverMockSpy);
+    });
+
+    it('joinRoom should emit if the player who joins and the game room exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
+
+        const gameParametersMock = new GameInitInfo({
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 2,
+            isLog2990: false,
+        });
+        gameParametersMock.players[1] = playerMock;
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(gameParametersMock);
+        // let currentGames =gameListManagerStub.getAllWaitingAreaGames() 
+        // currentGames = [gameParametersMock];
+        // socketManagerService['gameListMan'] = gameListManagerStub;
+
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+
+        // "joinRoom" event
+        socketMock.triggerEvent('joinRoom', gameParametersMock);
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        assert(gameListManagerStub.getAllWaitingAreaGames.called);
+        sinon.assert.called(serverMockSpy);
+    });
+
+    it('initializeGame should do nothing if the game room is undefined', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getAllWaitingAreaGames.returns(undefined as unknown as WaitingAreaGameParameters[]);
+        // socketManagerService['gameListMan'] = gameListManagerStub;
+
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+
+        // "initializeGame" event
+        socketMock.triggerEvent('initializeGame', 0);
+
+        assert(gameListManagerStub.getAllWaitingAreaGames.called);
+        sinon.assert.notCalled(serverMockSpy);
+    });
+
+    it('initializeGame should emit if the game room is defined', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerMock = new Player('name', 'socketId');
+        const gameParametersMock = new GameInitInfo({
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 2,
+            isLog2990: false,
+        });
+        gameParametersMock.players = [playerMock, playerMock];
+
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getGameInPlay.returns(gameParametersMock);
+        // socketManagerService['gameListMan'] = gameListManagerStub;
+
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+
+        // "initializeGame" event
+        socketMock.triggerEvent('initializeGame', 0);
+
+        assert(gameListManagerStub.getAllWaitingAreaGames.called);
+        sinon.assert.called(serverMockSpy);
+    });
+
+    it('validateWords should validate word and send the result with emit', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        validationServiceStub.validateWords.returns(true);
+        socketManagerService['validationService'] = validationServiceStub as unknown as ValidationService;
+
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+
+        const wordsToValidate = ['wordOne', 'wordTwo'];
+
+        // "validateWords" event
+        socketMock.triggerEvent('validateWords', wordsToValidate);
+
+        expect(validationServiceStub.validateWords.called).to.be.true;
+        sinon.assert.called(serverMockSpy);
+    });
+
+    it('displayChatEntry should get player with socket.id and emit to the room by using "in"', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerMock = new Player('name', 'id');
+        playerMock.roomId = 0;
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
+
+        const serverMockSpy = sinon.spy(serverMock, 'in');
+
+        const messageMock = 'myMessage';
+
+        // "validateWords" event
+        socketMock.triggerEvent('sendChatEntry', messageMock);
+
+        expect(playerManagerServiceStub.getPlayerBySocketID.called).to.be.true;
+        sinon.assert.called(serverMockSpy);
+    });
+
+    it('displayDifferentChatEntry should not emit if there is no opponent', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerMock = new Player('name', 'id');
+        playerMock.roomId = 0;
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
+
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        // gameListManagerStub.getOtherPlayer.returns(undefined);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+
+        const messageMock = 'myMessage';
+        const messageToOpponentMock = 'myOpponentMessage';
+
+        // "validateWords" event
+        socketMock.triggerEvent('sendChatEntry', messageMock, messageToOpponentMock);
+
+        expect(playerManagerServiceStub.getPlayerBySocketID.called).to.be.true;
+        sinon.assert.notCalled(serverMockSpy);
+    });
+
+    it('displayDifferentChatEntry should emit twice if there is an opponent', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerMock = new Player('name', 'id');
+        playerMock.roomId = 0;
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
+
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        // gameListManagerStub.getOtherPlayer.returns(playerMock);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+
+        const messageMock = 'myMessage';
+        const messageToOpponentMock = 'myOpponentMessage';
+
+        // "validateWords" event
+        socketMock.triggerEvent('sendChatEntry', messageMock, messageToOpponentMock);
+
+        expect(playerManagerServiceStub.getPlayerBySocketID.called).to.be.true;
+        sinon.assert.calledTwice(serverMockSpy);
+    });
+
+    it('displayPlayerQuitMessage should not emit if there is no opponent', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerMock = new Player('name', 'id');
+        playerMock.roomId = 0;
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
+
+        const gameParametersMock = new GameInitInfo({
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 2,
+            isLog2990: false,
+        });
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        // gameListManagerStub.getOtherPlayer.returns(undefined);
+        gameListManagerStub.getGameInPlay.returns(gameParametersMock);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+
+        // "playerQuit" event
+        socketMock.triggerEvent('playerQuit');
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
+        // assert(gameListManagerStub.getOtherPlayer.called, 'getOtherPlayer called');
+        // assert(gameListManagerStub.getCurrentGame.called, 'getCurrentGame called');
+        sinon.assert.notCalled(serverMockSpy);
+    });
+
+    it('displayPlayerQuitMessage should emit if there is and opponent', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerMock = new Player('name', 'id');
+        playerMock.roomId = 0;
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
+
+        const gameParametersMock = new GameInitInfo({
+            gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
+            creatorName: 'Dieyba',
+            joinerName: 'Erika',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 60,
+            isRandomBonus: false,
+            gameMode: 2,
+            isLog2990: false,
+        });
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        // gameListManagerStub.getOtherPlayer.returns(playerMock);
+        gameListManagerStub.getGameInPlay.returns(gameParametersMock);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+
+        const serverMockSpy = sinon.spy(serverMock, 'to');
+
+        // "playerQuit" event
+        socketMock.triggerEvent('playerQuit');
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
+        // assert(gameListManagerStub.getOtherPlayer.called, 'getOtherPlayer called');
+        // assert(gameListManagerStub.getCurrentGame.called, 'getCurrentGame called');
+        sinon.assert.called(serverMockSpy);
+    });
+
+    it('displaySystemChatEntry should emit', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerMock = new Player('name', 'id');
+        playerMock.roomId = 0;
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
+
+        const serverMockSpy = sinon.spy(serverMock, 'in');
+
+        // "sendSystemChatEntry" event
+        socketMock.triggerEvent('sendSystemChatEntry');
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
+        sinon.assert.called(serverMockSpy);
+    });
+
+    it("changeTurn should not emit if the player doesn't have a room id", () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerMock = new Player('name', 'id');
+        playerMock.roomId = undefined as unknown as number;
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
+
+        const serverMockSpy = sinon.spy(serverMock, 'in');
+
+        // "change turn" event
+        socketMock.triggerEvent('change turn');
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
+        sinon.assert.notCalled(serverMockSpy);
+    });
+
+    it('changeTurn should emit if the player has a room id', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerMock = new Player('name', 'id');
+        playerMock.roomId = 0;
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
+
+        const serverMockSpy = sinon.spy(serverMock, 'in');
+
+        // "change turn" event
+        socketMock.triggerEvent('change turn', false, 0);
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
+        sinon.assert.called(serverMockSpy);
+
+        // "change turn" event
+        socketMock.triggerEvent('change turn', true, 0);
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
+        sinon.assert.called(serverMockSpy);
+    });
+
+    it('endGame should emit in room with room id', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+
+        // stub, spy and mock
+        const playerMock = new Player('name', 'id');
+        playerMock.roomId = 0;
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub as unknown as PlayerManagerService;
+
+        const serverMockSpy = sinon.spy(serverMock, 'in');
+
+        // "endGame" event
+        socketMock.triggerEvent('endGame', false, 0);
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called, 'getPlayerBySocketID called');
+        sinon.assert.calledWith(serverMockSpy, playerMock.roomId.toString());
+    });
+
+    it('"getIsLog2990FromId" should return false if socket`s player doesn`t exist', () => {
+        // stub spy and mock
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(undefined);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
+
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getAWaitingAreaGame.returns(undefined);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+
+        // calling "getIsLog2990FromId"
+        const result = socketManagerService['getIsLog2990FromId']('falseId');
+
+        assert(!result);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        assert(gameListManagerStub.getGameInPlay.notCalled);
+    });
+
+    it('"getIsLog2990FromId" should return false if gameInPlay doesn`t exist', () => {
+        // stub spy and mock
+        const playerMock = new Player('name', 'socketId', 0);
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
+
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getAWaitingAreaGame.returns(undefined);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+
+        // calling "getIsLog2990FromId"
+        const result = socketManagerService['getIsLog2990FromId']('falseId');
+
+        assert(!result);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        assert(gameListManagerStub.getGameInPlay.called);
+    });
+
+    it('"getIsLog2990FromId" should emit', () => {
+        // stub spy and mock
+        const playerMock = new Player('name', 'socketId', 0);
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
+
+        const waitingAreaGameParametersMock: WaitingAreaGameParameters = {
+            gameRoom: {
+                idGame: 0,
+                capacity: 0,
+                playersName: [''],
+                creatorId: '',
+                joinerId: '',
+            },
+            creatorName: '',
+            joinerName: '',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 0,
+            isRandomBonus: false,
+            isLog2990: false,
+            gameMode: GameType.Solo,
+        };
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getAWaitingAreaGame.returns(waitingAreaGameParametersMock);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+
+        // calling "getIsLog2990FromId"
+        const result = socketManagerService['getIsLog2990FromId']('falseId');
+
+        assert(result === waitingAreaGameParametersMock.isLog2990);
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        assert(gameListManagerStub.getGameInPlay.called);
+    });
+
+    it('"createWaitingAreaRoom" do nothing if gameInPlay doesn`t exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const socketMockJoinSpy = sinon.spy(socketMock, 'join');
+
+        // stub spy and mock
+        const waitingAreaGameParametersMock: WaitingAreaGameParameters = {
+            gameRoom: {
+                idGame: 0,
+                capacity: 0,
+                playersName: [''],
+                creatorId: '',
+                joinerId: '',
+            },
+            creatorName: '',
+            joinerName: '',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 0,
+            isRandomBonus: false,
+            isLog2990: false,
+            gameMode: GameType.Solo,
+        };
+
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.createWaitingAreaGame.returns(waitingAreaGameParametersMock);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(undefined);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
+
+        // calling "getIsLog2990FromId"
+        socketManagerService['createWaitingAreaRoom'](socketMock as unknown as io.Socket, waitingAreaGameParametersMock);
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        assert(gameListManagerStub.getGameInPlay.called);
+        assert(socketMockJoinSpy.notCalled);
+    });
+
+    it('"createWaitingAreaRoom" do nothing if gameInPlay doesn`t exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const socketMockJoinSpy = sinon.spy(socketMock, 'join');
+
+        const serverMockSpy = sinon.spy(serverMock, 'emit');
+
+        // stub spy and mock
+        const waitingAreaGameParametersMock: WaitingAreaGameParameters = {
+            gameRoom: {
+                idGame: 0,
+                capacity: 0,
+                playersName: [''],
+                creatorId: '',
+                joinerId: '',
+            },
+            creatorName: '',
+            joinerName: '',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 0,
+            isRandomBonus: false,
+            isLog2990: false,
+            gameMode: GameType.Solo,
+        };
+
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.createWaitingAreaGame.returns(waitingAreaGameParametersMock);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+
+        const playerMock = new Player('name', 'socketId', 0);
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
+
+        // calling "getIsLog2990FromId"
+        socketManagerService['createWaitingAreaRoom'](socketMock as unknown as io.Socket, waitingAreaGameParametersMock);
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        assert(gameListManagerStub.getGameInPlay.called);
+        assert(socketMockJoinSpy.called);
+        sinon.assert.called(serverMockSpy);
+    });
+
+    it('"leaveRoom" do nothing if gameInPlay doesn`t exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const socketMockSpy = sinon.spy(socketMock, 'leave');
+
+        // stub spy and mock
+        const playerMock = new Player('name', 'socketId', 0);
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
+
+        // GameListManager stubs
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        const waitingAreaGameParametersMock: WaitingAreaGameParameters = {
+            gameRoom: {
+                idGame: 0,
+                capacity: 0,
+                playersName: [''],
+                creatorId: '',
+                joinerId: '',
+            },
+            creatorName: '',
+            joinerName: '',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 0,
+            isRandomBonus: false,
+            isLog2990: false,
+            gameMode: GameType.Solo,
+        };
+        gameListManagerStub.getAWaitingAreaGame.returns(waitingAreaGameParametersMock);
+        const gameInitInfoStub = sinon.createStubInstance(GameInitInfo);
+        gameListManagerStub.getGameInPlay.returns(gameInitInfoStub);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+
+        const leaveGameInPlayStub = sinon.stub(socketManagerService as any, 'leaveGameInPlay');
+        const leaveWaitingAreaRoomStub = sinon.stub(socketManagerService as any, 'leaveWaitingAreaRoom');
+
+        // calling "getIsLog2990FromId"
+        socketManagerService['leaveRoom'](socketMock as unknown as io.Socket);
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        assert(gameListManagerStub.getGameInPlay.called);
+        assert(leaveGameInPlayStub.called);
+        assert(leaveWaitingAreaRoomStub.notCalled);
+        sinon.assert.called(socketMockSpy);
+    });
+
+    it('"leaveRoom" do nothing if gameInPlay doesn`t exist', () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const socketMockSpy = sinon.spy(socketMock, 'leave');
+
+        // stub spy and mock
+        const playerMock = new Player('name', 'socketId', 0);
+        const playerManagerServiceStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerServiceStub.getPlayerBySocketID.returns(playerMock);
+        socketManagerService['playerMan'] = playerManagerServiceStub;
+
+        // GameListManager stubs
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        const waitingAreaGameParametersMock: WaitingAreaGameParameters = {
+            gameRoom: {
+                idGame: 0,
+                capacity: 0,
+                playersName: [''],
+                creatorId: '',
+                joinerId: '',
+            },
+            creatorName: '',
+            joinerName: '',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 0,
+            isRandomBonus: false,
+            isLog2990: false,
+            gameMode: GameType.Solo,
+        };
+        gameListManagerStub.getAWaitingAreaGame.returns(waitingAreaGameParametersMock);
+        gameListManagerStub.getGameInPlay.returns(undefined);
+        socketManagerService['gameListMan'] = gameListManagerStub as unknown as GameListManager;
+
+        const leaveGameInPlayStub = sinon.stub(socketManagerService as any, 'leaveGameInPlay');
+        const leaveWaitingAreaRoomStub = sinon.stub(socketManagerService as any, 'leaveWaitingAreaRoom');
+
+        // calling "getIsLog2990FromId"
+        socketManagerService['leaveRoom'](socketMock as unknown as io.Socket);
+
+        assert(playerManagerServiceStub.getPlayerBySocketID.called);
+        assert(gameListManagerStub.getGameInPlay.called);
+        assert(leaveGameInPlayStub.notCalled);
+        assert(leaveWaitingAreaRoomStub.called);
+        sinon.assert.called(socketMockSpy);
+    });
+
+    it('"leaveWaitingAreaRoom" do nothing if gameInPlay doesn`t exist', async () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        socketMock.id = 'socketID';
+
+        // stub, mock and spy 
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        const deleteWaitingAreaRoomStub = sinon.stub(socketManagerService as any, 'deleteWaitingAreaRoom');
+
+        const waitingAreaGameParametersMock: WaitingAreaGameParameters = {
+            gameRoom: {
+                idGame: 0,
+                capacity: 0,
+                playersName: [''],
+                creatorId: '',
+                joinerId: 'socketID',
+            },
+            creatorName: '',
+            joinerName: '',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 0,
+            isRandomBonus: false,
+            isLog2990: false,
+            gameMode: GameType.Solo,
+        };
+        // calling "leaveWaitingAreaRoom"
+        socketManagerService['leaveWaitingAreaRoom'](socketMock as unknown as io.Socket, waitingAreaGameParametersMock);
+
+        assert(gameListManagerStub.removeJoinerPlayer.called);
+        assert(deleteWaitingAreaRoomStub.notCalled);
+    });
+
+    it('"leaveWaitingAreaRoom" do nothing if gameInPlay doesn`t exist', async () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        socketMock.id = 'socketID';
+
+        // stub, mock and spy 
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        const deleteWaitingAreaRoomStub = sinon.stub(socketManagerService as any, 'deleteWaitingAreaRoom');
+
+        const waitingAreaGameParametersMock: WaitingAreaGameParameters = {
+            gameRoom: {
+                idGame: 0,
+                capacity: 0,
+                playersName: [''],
+                creatorId: '',
+                joinerId: '',
+            },
+            creatorName: '',
+            joinerName: '',
+            dictionaryType: DictionaryType.Default,
+            totalCountDown: 0,
+            isRandomBonus: false,
+            isLog2990: false,
+            gameMode: GameType.Solo,
+        };
+        // calling "leaveWaitingAreaRoom"
+        socketManagerService['leaveWaitingAreaRoom'](socketMock as unknown as io.Socket, waitingAreaGameParametersMock);
+
+        assert(gameListManagerStub.removeJoinerPlayer.notCalled);
+        assert(deleteWaitingAreaRoomStub.called);
+    });
+
+    it('"deleteWaitingAreaRoom" do nothing if socket`s player doesn`t exist', async () => {
+        // This should register the "connection" event and connect a false client
+        socketManagerService.handleSockets();
+        serverMock.triggerEvent('connection');
+
+        const socketMock = (serverMock.events.get('connection') as unknown as [CallableFunction, SocketMock])[1];
+        const serverMockSpy = sinon.spy(serverMock, 'emit')
+
+        // stub, mock and spy 
+        // const playerMock = new Player('name', 'socketId', 0);
+        const playerManagerStub = sinon.createStubInstance(PlayerManagerService);
+        playerManagerStub.getPlayerBySocketID.returns(undefined);
+
+        const gameListManagerStub = sinon.createStubInstance(GameListManager);
+        gameListManagerStub.getAWaitingAreaGame.returns(undefined);
+
+        // calling "leaveWaitingAreaRoom"
+        socketManagerService['deleteWaitingAreaRoom'](socketMock as unknown as io.Socket);
+
+        assert(playerManagerStub.getPlayerBySocketID.called);
+        assert(gameListManagerStub.getAWaitingAreaGame.notCalled);
+        assert(gameListManagerStub.deleteWaitingAreaGame.notCalled);
+        assert(serverMockSpy.notCalled);
+    });
+});
