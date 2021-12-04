@@ -598,10 +598,10 @@ export class VirtualPlayerService {
         return returnVec;
     }
 
-    allSubsetPermutations(letter: ScrabbleLetter): ScrabbleWord[][] {
+    allSubsetPermutations(letter: ScrabbleLetter, fromRack?: boolean): ScrabbleWord[][] {
         const allPermutations: ScrabbleWord[][] = [];
         for (let i = 2; i <= this.rack.length; i++) {
-            allPermutations[i] = this.movesWithGivenLetter(letter, i);
+            allPermutations[i] = this.movesWithGivenLetter(letter, i, fromRack);
         }
         return allPermutations;
     }
@@ -732,7 +732,7 @@ export class VirtualPlayerService {
         for (const row of this.gridService.scrabbleBoard.squares) {
             for (const square of row) {
                 if (square.letter) {
-                    if (square.letter.tile.occupied) {
+                    if (square.letter.tile.isValidated) {
                         const permutationsOfAllLetters = this.allSubsetPermutations(square.letter);
                         for (const permutations of permutationsOfAllLetters) {
                             if (permutations) {
@@ -780,11 +780,25 @@ export class VirtualPlayerService {
     }
 
     // Returns all valid combinations of the letter + the letters currently in the rack
-    movesWithGivenLetter(letter: ScrabbleLetter, moveLength: number): ScrabbleWord[] {
-        const lettersAvailable: ScrabbleLetter[] = [];
+    movesWithGivenLetter(letter: ScrabbleLetter, moveLength: number, fromRack?: boolean): ScrabbleWord[] {
+        let lettersAvailable: ScrabbleLetter[] = [];
         lettersAvailable[0] = letter;
+        const lettersInArray: boolean[] = [false, false, false, false, false, false, false];
         for (let i = 1; i < moveLength; i++) {
-            lettersAvailable[i] = this.rack[i - 1];
+            if (fromRack) {
+                // Remove the letter from the pool since it is already used
+                lettersAvailable = this.rack;
+                break;
+            }
+            // Randomize length of word
+            let index = this.getRandomIntInclusive(0, this.rack.length - 1);
+            while (lettersInArray[index]) {
+                // If we've already generated this number before
+                if (index !== lettersInArray.length - 1) {
+                    index++;
+                } else index = 0; // Code coverage on this line
+            }
+            lettersAvailable[i] = this.rack[index];
         }
         // check all possible permutations. Maximum of O(8!)
         const permutations = this.permutationsOfLetters(lettersAvailable);
