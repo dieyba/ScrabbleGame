@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { ChatEntryColor, createErrorEntry } from '@app/classes/chat-display-entry/chat-display-entry';
 import { DefaultCommandParams } from '@app/classes/commands/commands';
 import { ErrorType } from '@app/classes/errors';

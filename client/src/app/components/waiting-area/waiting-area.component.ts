@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, HostListener, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { GameInitInfo, GameType } from '@app/classes/game-parameters/game-parameters';
@@ -49,6 +50,7 @@ export class WaitingAreaComponent implements AfterViewInit {
         private dialogRef: MatDialogRef<WaitingAreaComponent>,
         private dialog: MatDialog,
         public gameList: GameListService,
+        private snack: MatSnackBar,
         @Inject(MAT_DIALOG_DATA) public data: DialogData,
     ) {
         this.server = environment.socketUrl;
@@ -206,6 +208,12 @@ export class WaitingAreaComponent implements AfterViewInit {
                 this.nameValid = false;
                 this.gameCancelled = true;
             }
+        });
+        this.socket.on('failToGetDictionary', () => {
+            this.snack.open(
+                'Il y a eu un problème avec la base de donnée des dictionnaires.' + 'Veuillez choisi un autre dictionnaire ou réessayer plus tard',
+                'Fermer',
+            );
         });
     }
 }
