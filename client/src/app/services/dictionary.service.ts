@@ -41,6 +41,7 @@ export class DictionaryService {
     }
 
     delete(dictionaryId: unknown): Observable<DictionaryInterface> {
+        console.log('delete function in client service');
         return this.http.delete<DictionaryInterface>(BASE_URL + '/' + dictionaryId);
     }
 
