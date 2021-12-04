@@ -1,8 +1,8 @@
 import { GoalPoints } from '@app/classes/goal/goal';
+import { createPlaceLetterOnColorSquare, PlaceLetterOnColorSquare } from '@app/classes/place-letter-on-color-square/place-letter-on-color-square';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { SquareColor } from '@app/classes/square/square';
-import { createPlaceLetterOnColorSquare, PlaceLetterOnColorSquare } from '@app/classes/place-letter-on-color-square/place-letter-on-color-square';
 
 describe('PlaceLetterOnColorSquare', () => {
     let placeLetterOnColorSquare: PlaceLetterOnColorSquare;
@@ -96,4 +96,3 @@ describe('PlaceLetterOnColorSquare', () => {
         expect(placeLetterOnColorSquare.achieve([newWord1], newLetters)).toEqual(0);
     });
 });
-

@@ -225,6 +225,7 @@ export class GameService {
                 // Retake letters
                 lettersToAddToRack = this.gridService.removeInvalidLetters(placeParams.position, placeParams.word.length, placeParams.orientation);
             } else {
+                // Take new letters
                 this.validationService.updatePlayerScore(tempScrabbleWords, player);
                 if (this.game.isLog2990) {
                     // TODO: make sure that scrabbleLetter.tile is updated properly every turn because it is needed in goal validation

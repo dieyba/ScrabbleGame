@@ -60,4 +60,3 @@ describe('FormThreeWords', () => {
         expect(createFormThreeWords()).toBeTruthy();
     });
 });
-

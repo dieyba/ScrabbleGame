@@ -47,4 +47,3 @@ describe('FormTwoLettersStarsOnly', () => {
         expect(createFormTwoLettersStarsOnly()).toBeTruthy();
     });
 });
-

@@ -61,4 +61,3 @@ describe('PlaceLetterOnBoardCorner', () => {
         expect(placeLetterOnBoardCorner.achieve([newWord1], newLetters)).toEqual(0);
     });
 });
-

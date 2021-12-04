@@ -25,6 +25,7 @@ describe('ScrabbleWord', () => {
         scrabbleWord.content[1] = new ScrabbleLetter('e', 1);
         scrabbleWord.content[2] = new ScrabbleLetter('s', 2);
         scrabbleWord.content[3] = new ScrabbleLetter('t', 1);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(scrabbleWord.calculateValue()).toEqual(5);
     });
 });

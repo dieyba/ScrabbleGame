@@ -41,6 +41,7 @@
 //     const dialogStub = { open: () => dialogRefStub };
 
 //     beforeEach(async () => {
+// eslint-disable-next-line max-len
 //         gameServiceSpy = jasmine.createSpyObj('GameService', ['startNewGame', 'initializeSoloGame', 'getLocalPlayer', 'canNavBack', 'addRackLetters', 'resetTimer']);
 //         gameParametersSpy = jasmine.createSpyObj('GameParameters', ['getLocalPlayer']);
 //         rackServiceSpy = jasmine.createSpyObj('RackService', ['drawRack', 'deselectForExchange', 'selectForExchange'], {

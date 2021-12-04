@@ -6,7 +6,7 @@ describe('Trie', () => {
     const trie: Trie = new Trie(dict_path as DictionaryInterface);
 
     it('should create an instance', () => {
-        expect(new Trie(dict_path as DictionaryInterface)).toBeTruthy();
+        expect(trie).toBeTruthy();
     });
 
     it('insert should return true when word exists', () => {

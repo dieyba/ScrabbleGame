@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { TestBed } from '@angular/core/testing';
 import { ActivateTwoBonuses } from '@app/classes/activate-two-bonuses/activate-two-bonuses';
 import { GoalPoints, GoalType } from '@app/classes/goal/goal';
@@ -22,7 +23,7 @@ describe('GoalsService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('pickSharedGoals should return a goals that hasnt already been picked', () => {
+    it('pickSharedGoals should return a goals that has not already been picked', () => {
         const sharedGoals = service.pickSharedGoals([GoalType.FormThreeWords]);
         expect(sharedGoals[0]).not.toEqual(GoalType.FormThreeWords);
         expect(sharedGoals[2]).not.toEqual(GoalType.FormThreeWords);
