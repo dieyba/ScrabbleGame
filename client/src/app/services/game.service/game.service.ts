@@ -128,7 +128,7 @@ export class GameService {
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
         this.addRackLetters(this.game.getLocalPlayer().letters);
         this.startCountdown();
-        console.log('stock:', this.game.stock);
+        // console.log('stock:', this.game.stock);
         // console.log('start game', this.game.getLocalPlayer().letters);
     }
 
@@ -246,7 +246,7 @@ export class GameService {
             this.isTurnEndSubject.next(this.isTurnPassed);
             this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
         });
-        console.log('after place:', this.game.scrabbleBoard);
+        // console.log('after place:', this.game.scrabbleBoard);
         // console.log(this.game.getLocalPlayer().letters);
         return errorResult;
     }
