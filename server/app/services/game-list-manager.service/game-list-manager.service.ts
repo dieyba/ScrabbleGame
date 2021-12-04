@@ -13,12 +13,12 @@ export class GameListManager {
         this.currentId = 0;
     }
 
-    getAllWaitingAreaGames(isLog2990: string): WaitingAreaGameParameters[] {
+    getAllWaitingAreaGames(isLog2990: boolean): WaitingAreaGameParameters[] {
         const games: WaitingAreaGameParameters[] = [];
         this.waitingAreaGames.forEach((game) => {
-            if (isLog2990 === 'true' && String(game.isLog2990) === 'true') {
+            if (isLog2990 && game.isLog2990) {
                 games.push(game);
-            } else if (isLog2990 === 'false' && String(game.isLog2990) === 'false') {
+            } else if (!isLog2990 && !game.isLog2990) {
                 games.push(game);
             }
         });

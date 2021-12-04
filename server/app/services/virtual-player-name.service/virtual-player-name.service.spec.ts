@@ -126,7 +126,6 @@ describe('VirtualPlayerNameService', () => {
             names = await virtualPlayerNameService.beginnersCollection.find({}).toArray();
         } catch (error) {
             expect(error).to.not.equals(undefined);
-            // console.log(error);
             // expect(error).to.equal(new Error('Ce nom existe déjà'));
             expect(names[0]).to.equal(nameToUpdate);
             expect(names.length).to.equal(3);
