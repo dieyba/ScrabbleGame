@@ -4,6 +4,7 @@ import { createPlaceLetterWorthTenPts, PlaceLetterWorthTenPts } from '@app/class
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('PlaceLetterWorthTenPts', () => {
     let placeLetterWorthTenPts: PlaceLetterWorthTenPts;
 
@@ -11,7 +12,7 @@ describe('PlaceLetterWorthTenPts', () => {
         placeLetterWorthTenPts = new PlaceLetterWorthTenPts();
         placeLetterWorthTenPts.isAchieved = false;
     });
-
+    
     it('should create an instance', () => {
         expect(new PlaceLetterWorthTenPts()).toBeTruthy();
     });

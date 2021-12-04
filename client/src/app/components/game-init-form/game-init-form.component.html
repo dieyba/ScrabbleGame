@@ -66,8 +66,8 @@
     </form>
 
     <div>
-        <button *ngIf="!myForm.valid" disabled="true" class="play" (click)="submit()" style="opacity: 1">Commencer</button>
-        <button *ngIf="myForm.valid" class="play" (click)="submit()">Commencer</button>
+        <button *ngIf="!myForm.valid || isGameStarted" disabled="true" class="play" (click)="submit()" style="opacity: 1">Commencer</button>
+        <button *ngIf="myForm.valid && !isGameStarted" class="play" (click)="submit()">Commencer</button>
         <button class="cancel" (click)="closeDialog()">Annuler</button>
     </div>
 </div>

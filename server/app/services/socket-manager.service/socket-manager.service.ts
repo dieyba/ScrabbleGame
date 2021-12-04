@@ -230,7 +230,7 @@ export class SocketManagerService {
 
     private getAllWaitingAreaGames(socket: io.Socket, isLog2990: boolean) {
         const senderId = socket.id;
-        this.sio.to(senderId).emit('updateWaitingAreaGames', this.gameListMan.getAllWaitingAreaGames(String(isLog2990)));
+        this.sio.to(senderId).emit('updateWaitingAreaGames', this.gameListMan.getAllWaitingAreaGames(isLog2990));
     }
 
     private joinRoom(socket: io.Socket, joinerName: string, roomToJoinId: number, isLog2990: boolean) {

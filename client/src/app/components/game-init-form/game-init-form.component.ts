@@ -46,6 +46,7 @@ export class GameInitFormComponent implements OnInit, OnDestroy {
     defaultTimer: string;
     defaultDictionary: string;
     defaultBonus: boolean;
+    isGameStarted: boolean = false;
 
     private beginnerNameUrl: string;
     private expertNameUrl: string;
@@ -184,6 +185,7 @@ export class GameInitFormComponent implements OnInit, OnDestroy {
 
     async submit(): Promise<void> {
         if (this.myForm.valid) {
+            this.isGameStarted = true;
             const gameMode = this.data.isSolo ? GameType.Solo : GameType.MultiPlayer;
             const gameParams = new WaitingAreaGameParameters(
                 gameMode,

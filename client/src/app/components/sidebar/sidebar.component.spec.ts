@@ -72,7 +72,6 @@ describe('SidebarComponent', () => {
         }).compileComponents();
 
         gameServiceSpy.game = new GameParameters();
-        // gameServiceSpy.initializeSoloGame(gameInfo, Difficulty.Easy);
         gameServiceSpy.game.scrabbleBoard = new ScrabbleBoard(false);
         gameServiceSpy.game.stock = new LetterStock();
         gameServiceSpy.game.gameMode = GameType.Solo;
@@ -228,10 +227,8 @@ describe('SidebarComponent', () => {
     //     goalsServiceSpy.initialize();
     //     goalsServiceSpy.privateGoals.push(new ActivateTwoBonuses);
     //     goalsServiceSpy.privateGoals.push(new FormAnExistingWord);
-    //     console.log('HI ' + goalsServiceSpy.privateGoals[0].type);
     //     component.localPlayer = new Player('Ariane');
     //     component.localPlayer.goal = GoalType.ActivateTwoBonuses;
-    //     console.log('HI ' + goalsServiceSpy.getGoalOfAPlayer(component.localPlayer));
     //     expect(component.getPrivateGoalDescription()).toEqual(GoalDescriptions.ActivateTwoBonuses);
     // });
 

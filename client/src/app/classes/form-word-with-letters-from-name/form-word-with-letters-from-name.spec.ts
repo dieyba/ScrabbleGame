@@ -1,7 +1,6 @@
 import {
     createFormWordWithLettersFromName,
-    // eslint-disable-next-line prettier/prettier
-    FormWordWithLettersFromName
+    FormWordWithLettersFromName,
 } from '@app/classes/form-word-with-letters-from-name/form-word-with-letters-from-name';
 import { GoalPoints } from '@app/classes/goal/goal';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';

@@ -9,6 +9,7 @@ import { SquareColor } from '@app/classes/square/square';
 import { GoalsService } from '@app/services/goals.service/goals.service';
 import { GoalPoints, GoalType } from './goal';
 
+/* eslint-disable @typescript-eslint/no-magic-numbers  */
 describe('GoalsService', () => {
     let service: GoalsService;
     const stock: LetterStock = new LetterStock();

@@ -9,6 +9,7 @@ import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { SquareColor } from '@app/classes/square/square';
 import { GoalsService } from './goals.service';
 
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('GoalsService', () => {
     let service: GoalsService;
     const stock: LetterStock = new LetterStock();

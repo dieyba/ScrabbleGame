@@ -32,6 +32,8 @@ export class DictionaryTransferComponent implements AfterViewInit, OnDestroy {
     editTitle: FormControl;
     editDescription: FormControl;
     dictionarySubscription: Subscription;
+    isAddDictCardVisible: boolean = false;
+    isDictionarySelected: boolean = false;
 
     constructor(private dictionaryService: DictionaryService, private snack: MatSnackBar) {
         this.selectedDictionary = { _id: '', title: '', description: '', words: [] };
@@ -98,6 +100,7 @@ export class DictionaryTransferComponent implements AfterViewInit, OnDestroy {
 
     onDictionarySelection(pos: number) {
         this.selectedDictionary = this.dictionaryList[pos];
+        this.isDictionarySelected = true;
         this.editTitle.setValue(this.selectedDictionary.title);
         this.editDescription.setValue(this.selectedDictionary.description);
     }
@@ -133,7 +136,6 @@ export class DictionaryTransferComponent implements AfterViewInit, OnDestroy {
             tempDictionary.description = dictionary.description;
             this.dictionaryList.push(tempDictionary);
         }
-        this.selectedDictionary = this.dictionaryList[0];
     }
 
     updateTitleAndDescription(title: string, description: string) {
@@ -182,10 +184,24 @@ export class DictionaryTransferComponent implements AfterViewInit, OnDestroy {
                 this.snack.open(ErrorCaseDictionaryTransfer.DictionaryDeleted, 'Fermer');
             },
         );
+        this.isDictionarySelected = false;
     }
 
     isFileJSON(fileName: string): boolean {
         const fileNameExtension = fileName.split('.', 2)[1];
         return fileNameExtension === 'json';
+    }
+
+    openAddDictCard() {
+        this.isAddDictCardVisible = true;
+    }
+
+    closeAddDictCard() {
+        this.isAddDictCardVisible = false;
+        this.isDictionarySelected = false;
+    }
+
+    closeModifDictCard() {
+        this.isDictionarySelected = false;
     }
 }
