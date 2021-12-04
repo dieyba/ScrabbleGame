@@ -1,0 +1,73 @@
+<div class="container">
+    <form [formGroup]="myForm" class="papy">
+        <mat-form-field hintLabel="characters min: 3 max: 10" appearance="fill" class="papy">
+            <mat-label>Entrez votre nom</mat-label>
+            <input
+                matInput
+                #input
+                maxlength="10"
+                #input2
+                minlength="3"
+                placeholder="Ex. Nougat"
+                formControlName="name"
+                (change)="changeName(beginnerNameList)"
+            />
+            <mat-hint align="end">{{ input.value?.length || 0 }}/10</mat-hint>
+            <div class="error" *ngIf="name.errors?.pattern">Le nom ne doit pas contenir de chiffres et de caractères</div>
+        </mat-form-field>
+
+        <div>
+            <mat-form-field appearance="fill" class="papy">
+                <mat-label>Dictionnaire :</mat-label>
+                <mat-select formControlName="dictionaryForm" [(ngModel)]="defaultDictionary" [placeholder]="defaultDictionary">
+                    <mat-option
+                        *ngFor="let dictionary of dictionaryList"
+                        [value]="dictionary.title"
+                        matTooltip="{{ dictionary.description }}"
+                        matTooltipPosition="left"
+                        >{{ dictionary.title }}</mat-option
+                    >
+                </mat-select>
+                <div class="error" *ngIf="dictionaryForm.invalid">Le champ est requis</div>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field appearance="fill" class="papy">
+                <mat-label>Minuteur :</mat-label>
+                <mat-select formControlName="timer" [(ngModel)]="defaultTimer" [placeholder]="defaultTimer">
+                    <mat-option value="30">0:30 secondes</mat-option>
+                    <mat-option value="60">1:00 minute</mat-option>
+                    <mat-option value="90">1:30 minutes</mat-option>
+                    <mat-option value="120">2:00 minutes</mat-option>
+                    <mat-option value="150">2:30 minutes</mat-option>
+                    <mat-option value="180">3:00 minutes</mat-option>
+                    <mat-option value="210">3:30 minutes</mat-option>
+                    <mat-option value="240">4:00 minutes</mat-option>
+                    <mat-option value="270">4:30 minutes</mat-option>
+                    <mat-option value="300">5:00 minutes</mat-option>
+                </mat-select>
+                <div class="error" *ngIf="timer.invalid">Le champ est requis</div>
+            </mat-form-field>
+        </div>
+
+        <div class="form-check">
+            <mat-checkbox formControlName="bonus" [(ngModel)]="defaultBonus" class="form check-input">Bonus aléatoire</mat-checkbox>
+        </div>
+        <div *ngIf="data.isSolo">
+            <p>Veuillez choisir le niveau de votre adversaire</p>
+            <mat-radio-group formControlName="level">
+                <mat-radio-button value="easy" (click)="randomPlayer(beginnerNameList)"> Joueur Débutant</mat-radio-button>
+                <mat-radio-button value="difficult" (click)="randomPlayer(expertNameList)"> Joueur Expert</mat-radio-button>
+            </mat-radio-group>
+            <p id="opponents">
+                Vous allez jouer contre <strong>{{ selectedPlayer }}</strong>
+            </p>
+        </div>
+    </form>
+
+    <div>
+        <button *ngIf="!myForm.valid" disabled="true" class="play" (click)="submit()" style="opacity: 1">Commencer</button>
+        <button *ngIf="myForm.valid" class="play" (click)="submit()">Commencer</button>
+        <button class="cancel" (click)="closeDialog()">Annuler</button>
+    </div>
+</div>

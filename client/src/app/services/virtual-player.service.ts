@@ -1,7 +1,6 @@
 /* eslint-disable max-lines */
 import { Injectable } from '@angular/core';
 import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
-import { Dictionary, DictionaryType } from '@app/classes/dictionary';
 import { ExchangeCmd } from '@app/classes/exchange-command';
 import { PassTurnCmd } from '@app/classes/pass-command';
 import { PlaceCmd } from '@app/classes/place-command';
@@ -16,6 +15,7 @@ import { CommandInvokerService } from './command-invoker.service';
 import { GameService } from './game.service';
 import { GridService } from './grid.service';
 import { PlaceService } from './place.service';
+import { ValidationService } from './validation.service';
 import { WordBuilderService } from './word-builder.service';
 
 export enum Probability {
@@ -53,6 +53,7 @@ export class VirtualPlayerService {
         private gridService: GridService,
         private placeService: PlaceService,
         private wordBuilderService: WordBuilderService,
+        private validationService: ValidationService,
     ) {
         this.rack = new ScrabbleRack();
     }
@@ -358,8 +359,6 @@ export class VirtualPlayerService {
         return listOfTiles;
     }
     isWordValid(word: string): boolean {
-        // TODO: see where to access dictionary downloaded
-        const dictionary: Dictionary = new Dictionary(DictionaryType.Default);
-        return dictionary.words.includes(word) && word.length >= 2 && !word.includes('-') && !word.includes("'") ? true : false;
+        return this.validationService.isWordValid(word);
     }
 }

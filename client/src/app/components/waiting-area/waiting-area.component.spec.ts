@@ -1,3 +1,12 @@
+/* eslint-disable dot-notation */
+/* eslint-disable max-lines */
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-vars */
+/* eslint-disable dot-notation */
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
+/* eslint-disable max-lines */
+/* eslint-disable  @typescript-eslint/no-unused-expressions */
+/* eslint-disable  no-unused-expressions */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -6,21 +15,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { DictionaryType } from '@app/classes/dictionary';
-import { GameParameters } from '@app/classes/game-parameters';
-import { Player } from '@app/classes/player';
-import { GameListService } from '@app/services/game-list.service';
-import { GameService } from '@app/services/game.service';
-// import { MultiPlayerGameService } from '@app/services/multi-player-game.service';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
+import { GameParameters } from '@app/classes/game-parameters/game-parameters';
+import { Player } from '@app/classes/player/player';
+import { WaitingAreaComponent } from '@app/components/waiting-area/waiting-area.component';
+import { GameListService } from '@app/services/game-list.service/game-list.service';
+import { GameService } from '@app/services/game.service/game.service';
 import { Observable } from 'rxjs';
 import * as io from 'socket.io-client';
-import { WaitingAreaComponent } from './waiting-area.component';
-
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-/* eslint-disable no-unused-vars */
-/* eslint-disable dot-notation */
-/* eslint-disable  @typescript-eslint/no-magic-numbers */
-/* eslint-disable max-lines */
+import dict_path from 'src/assets/dictionary.json';
 class SocketMock {
     id: string = 'Socket mock';
     events: Map<string, CallableFunction> = new Map();
@@ -97,7 +100,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -116,7 +119,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -142,7 +145,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -165,7 +168,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -183,7 +186,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -201,7 +204,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Ari', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Ari',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -218,7 +221,7 @@ describe('WaitingAreaComponent', () => {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -250,13 +253,13 @@ describe('WaitingAreaComponent', () => {
         component.onPopState();
         expect(gameListServiceSpy.someoneLeftRoom).toHaveBeenCalled();
     });
-    it('onBefreUnload should call gameList someoneLeftRoom', () => {
+    it('onBeforeUnload should call gameList someoneLeftRoom', () => {
         component.isStarting = true;
         component.onBeforeUnload();
         expect(gameListServiceSpy.someoneLeftRoom).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event updateInfo', () => {
-        component.socketOnConnect();
+        component['socketOnConnect'];
         const game = new GameParameters();
         game.players[0] = new Player('dieyba');
         game.players[1] = new Player('sara');
@@ -269,12 +272,12 @@ describe('WaitingAreaComponent', () => {
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomdeleted', () => {
-        component.socketOnConnect();
+        component['socketOnConnect'];
         const game = {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -284,12 +287,12 @@ describe('WaitingAreaComponent', () => {
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomcreated', () => {
-        component.socketOnConnect();
+        component['socketOnConnect'];
         const game = {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -299,12 +302,12 @@ describe('WaitingAreaComponent', () => {
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomJoined', () => {
-        component.socketOnConnect();
+        component['socketOnConnect'];
         const game = {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -314,12 +317,12 @@ describe('WaitingAreaComponent', () => {
         expect(socketMockSpy).toHaveBeenCalled();
     });
     it('socketOnConnect should handle socket.on event roomLeft', () => {
-        component.socketOnConnect();
+        component['socketOnConnect'];
         const game = {
             gameRoom: { idGame: 1, capacity: 2, playersName: ['Dieyba', 'Erika'], creatorId: '', joinerId: '' },
             creatorName: 'Dieyba',
             joinerName: 'Erika',
-            dictionaryType: DictionaryType.Default,
+            dictionary: dict_path as DictionaryInterface,
             totalCountDown: 60,
             isRandomBonus: false,
             gameMode: 1,
@@ -330,7 +333,7 @@ describe('WaitingAreaComponent', () => {
     });
 
     it('socketOnConnect should handle socket.on event roomLeft', () => {
-        component.socketOnConnect();
+        component['socketOnConnect'];
         const game = undefined;
         socketMock.triggerEvent('roomLeft', game);
         expect(socketMockSpy).toHaveBeenCalled();

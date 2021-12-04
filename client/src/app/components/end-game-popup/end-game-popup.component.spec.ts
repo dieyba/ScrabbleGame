@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GameListService } from '@app/services/game-list.service';
+import { GameListService } from '@app/services/game-list.service/game-list.service';
 import { EndGamePopupComponent } from './end-game-popup.component';
 
 describe('EndGamePopupComponent', () => {
