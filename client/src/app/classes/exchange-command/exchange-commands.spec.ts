@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { ChatEntryColor, createErrorEntry } from '@app/classes/chat-display-entry/chat-display-entry';
 import { DefaultCommandParams } from '@app/classes/commands/commands';
 import { ErrorType } from '@app/classes/errors';
@@ -65,6 +66,7 @@ describe('ExchangeCmd', () => {
         gameServiceSpy.exchangeLetters.and.returnValue(ErrorType.ImpossibleCommand);
         const errorLetters = 'AAAAAAAA';
         const errorMessage = createErrorEntry(ErrorType.ImpossibleCommand, '!échanger ' + errorLetters);
+        // eslint-disable-next-line dot-notation
         exchange['letters'] = errorLetters;
         exchange.player.isActive = false;
         expect(exchange.execute()).toEqual({ isExecuted: false, executionMessages: [errorMessage] });

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { DictionaryType } from '@app/classes/dictionary/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { GameType } from '@app/classes/game-parameters/game-parameters';
 import { WaitingAreaGameParameters } from '@app/classes/waiting-area-game-parameters/waiting-area-game-parameters';
 import * as io from 'socket.io-client';
@@ -39,12 +39,14 @@ describe('GameListService', () => {
     let socketOnMockSpy: jasmine.SpyObj<any>;
     let socketEmitMockSpy: jasmine.SpyObj<any>;
 
+    const dictionary: DictionaryInterface = { _id: 0, title: 'title', description: 'description', words: ['word'] };
+
     // eslint-disable-next-line max-len
-    const game: WaitingAreaGameParameters = new WaitingAreaGameParameters(GameType.Solo, 2, DictionaryType.Default, 60, false, false, 'Riri', 'Lulu');
+    const game: WaitingAreaGameParameters = new WaitingAreaGameParameters(GameType.Solo, 2, dictionary, 60, false, false, 'Riri', 'Lulu');
     const game2: WaitingAreaGameParameters = new WaitingAreaGameParameters(
         GameType.MultiPlayer,
         2,
-        DictionaryType.English,
+        dictionary,
         60,
         true,
         true,

@@ -1,3 +1,4 @@
+// /* eslint-disable dot-notation */
 // import { TestBed } from '@angular/core/testing';
 // import { PlaceParams } from '@app/classes/commands/commands';
 // import { ErrorType } from '@app/classes/errors';
@@ -7,8 +8,8 @@
 // import { Axis } from '@app/classes/utilities/utilities';
 // import { Vec2 } from '@app/classes/vec2/vec2';
 // import { GridService } from '@app/services/grid.service/grid.service';
+// import { PlaceService } from '@app/services/place.service/place.service';
 // import { RackService } from '@app/services/rack.service/rack.service';
-// import { PlaceService } from './place.service';
 
 // describe('PlaceService', () => {
 //     let service: PlaceService;
@@ -76,12 +77,12 @@
 //         const playerLetters: ScrabbleLetter[] = [];
 //         const letterA = new ScrabbleLetter('a', 1);
 //         const letterStar = new ScrabbleLetter('*', 0);
-//         playerLetters.push(letterA);
-//         playerLetters.push(letterStar);
+//         playerMock.letters.push(letterA);
+//         playerMock.letters.push(letterStar);
 //         const letterToPlace = 'a';
 //         const coord = new Vec2(Column.Eight, Row.H);
 
-//         service.placeLetter(playerLetters, letterToPlace, coord);
+//         service['placeLetter'](playerMock, letterToPlace, coord);
 
 //         // Searching letter in playerLetter
 //         let playerLetter: ScrabbleLetter | undefined;
@@ -101,12 +102,12 @@
 //         const playerLetters: ScrabbleLetter[] = [];
 //         const letterA = new ScrabbleLetter('a', 1);
 //         const letterStar = new ScrabbleLetter('*', 0);
-//         playerLetters.push(letterA);
-//         playerLetters.push(letterStar);
+//         playerMock.letters.push(letterA);
+//         playerMock.letters.push(letterStar);
 //         const letterToPlace = 'A';
 //         const coord = new Vec2(Column.Eight, Row.H);
 
-//         service.placeLetter(playerLetters, letterToPlace, coord);
+//         service['placeLetter'](playerMock, letterToPlace, coord);
 
 //         // Searching letter in playerLetter
 //         let playerLetter: ScrabbleLetter | undefined;
@@ -126,14 +127,14 @@
 //         const playerLetters: ScrabbleLetter[] = [];
 //         const letterA = new ScrabbleLetter('a', 1);
 //         const letterStar = new ScrabbleLetter('*', 0);
-//         playerLetters.push(letterA);
-//         playerLetters.push(letterStar);
+//         playerMock.letters.push(letterA);
+//         playerMock.letters.push(letterStar);
 //         const letterToPlace = 'a';
 //         const coord = new Vec2(Column.Eight, Row.H);
 
 //         // eslint-disable-next-line dot-notation
 //         service['gridService'].scrabbleBoard.squares[coord.x][coord.y].occupied = true; // No need to place a real letter
-//         service.placeLetter(playerLetters, letterToPlace, coord);
+//         service['placeLetter'](playerMock, letterToPlace, coord);
 
 //         // Searching letter in playerLetter
 //         let playerLetter: ScrabbleLetter | undefined;

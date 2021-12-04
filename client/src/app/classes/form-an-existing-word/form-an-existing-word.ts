@@ -6,7 +6,7 @@ import { ValidationService } from '@app/services/validation.service/validation.s
 const MIN_WORD_LENGTH = 5;
 
 export class FormAnExistingWord extends Goal {
-    private validationService: ValidationService;
+    validationService: ValidationService;
     constructor() {
         super();
         this.type = GoalType.FormAnExistingWord;
@@ -21,7 +21,10 @@ export class FormAnExistingWord extends Goal {
         if (this.isAchieved) {
             return 0;
         }
-        const previousValidWordsFormed = this.validationService.validWordsFormed.slice(0, -wordsFormed.length);
+        const previousValidWordsFormed = this.validationService.validWordsFormed;
+        wordsFormed.forEach(() => {
+            previousValidWordsFormed.pop();
+        });
         for (const newWordFormed of wordsFormed) {
             // TODO: see if star letters should be in toLower() in validWordsFormed and newWordFormed
             if (

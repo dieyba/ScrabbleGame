@@ -4,9 +4,9 @@ import { LetterStock } from '@app/classes/letter-stock/letter-stock';
 import { Player } from '@app/classes/player/player';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
+import { ExchangeService } from '@app/services/exchange.service/exchange.service';
 import { DEFAULT_LETTER_COUNT, GameService } from '@app/services/game.service/game.service';
 import { RackService } from '@app/services/rack.service/rack.service';
-import { ExchangeService } from './exchange.service';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 describe('ExchangeService', () => {

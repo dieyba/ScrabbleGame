@@ -37,7 +37,7 @@ describe('ManipulationRackService', () => {
             new ScrabbleLetter('z'),
         ];
 
-        // service.firstOccurence = ERROR_NUMBER;
+        // service.firstOccurrence = ERROR_NUMBER;
         // service.selectedPosition = ERROR_NUMBER;
     });
 
@@ -45,7 +45,7 @@ describe('ManipulationRackService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('handleSelection should call rackService select if the letter at the specifeid posotion is not selected for handling', () => {
+    it('handleSelection should call rackService select if the letter at the specified position is not selected for handling', () => {
         const position = 3;
         rackServiceSpy.handlingSelected[position - 1] = true;
         service.handleSelection(position);
@@ -63,7 +63,7 @@ describe('ManipulationRackService', () => {
         expect(rackServiceSpy.exchangeSelected[position - 1]).toBeFalse();
     });
 
-    it('clearManipValues should set the two properties at -1', () => {
+    it('clearManipulationValues should set the two properties at -1', () => {
         const position = 3;
         service['letterSelectedPosition'] = position;
         service['firstOccurrencePosition'] = position;
@@ -73,7 +73,7 @@ describe('ManipulationRackService', () => {
         expect(service['firstOccurrencePosition']).toEqual(ERROR_NUMBER);
     });
 
-    it('findFirstOccurrence should set firstOccurrencePosition with the position of the fisrt occurence of the letter specified', () => {
+    it('findFirstOccurrence should set firstOccurrencePosition with the position of the first occurrence of the letter specified', () => {
         service.findFirstOccurrence('j');
         expect(service['firstOccurrencePosition']).toEqual(1);
     });
@@ -90,7 +90,7 @@ describe('ManipulationRackService', () => {
         expect(findFirstOccurrenceSpy).toHaveBeenCalled();
     });
 
-    it('selectByLetter shouldnt call findFirstOccurrence if a letter is selected & if this one is the same as the one we want to select', () => {
+    it('selectByLetter should not call findFirstOccurrence if a letter is selected & if this one is the same as the one we want to select', () => {
         service['firstOccurrencePosition'] = 3;
         service.selectByLetter('d');
         expect(findFirstOccurrenceSpy).not.toHaveBeenCalled();
@@ -111,7 +111,7 @@ describe('ManipulationRackService', () => {
         expect(rackServiceSpy.exchangeSelected[1]).toBeFalse();
     });
 
-    it('selectByLetter should select the first occuerence of a letter if the last occurence of this letter is already selected', () => {
+    it('selectByLetter should select the first occurrence of a letter if the last occurrence of this letter is already selected', () => {
         service['letterSelectedPosition'] = 4;
         service['firstOccurrencePosition'] = 1;
         rackServiceSpy.handlingSelected[4] = true;
@@ -120,7 +120,7 @@ describe('ManipulationRackService', () => {
         expect(service['letterSelectedPosition']).toEqual(1);
     });
 
-    it('selectByLetter should select the next occurence of a letter if the letter is already selected', () => {
+    it('selectByLetter should select the next occurrence of a letter if the letter is already selected', () => {
         rackServiceSpy.rackLetters[6] = new ScrabbleLetter('j');
         service['letterSelectedPosition'] = 4;
         service['firstOccurrencePosition'] = 1;
@@ -172,7 +172,7 @@ describe('ManipulationRackService', () => {
         expect(rackServiceSpy.select).toHaveBeenCalled();
     });
 
-    it('if the last letter is selected, switchRight should deselect it and select the fisrt one of the rack', () => {
+    it('if the last letter is selected, switchRight should deselect it and select the first one of the rack', () => {
         rackServiceSpy.handlingSelected[6] = true;
         service['letterSelectedPosition'] = 6;
         service.switchRight();

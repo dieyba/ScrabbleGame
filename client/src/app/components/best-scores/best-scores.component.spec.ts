@@ -26,7 +26,7 @@ describe('BestScoresComponent', () => {
         },
     ] as BestScores[];
     beforeEach(async () => {
-        bestScoresServiceSpy = jasmine.createSpyObj('BestScoresService', ['getBestScores', 'handleErrorSnackBar']);
+        bestScoresServiceSpy = jasmine.createSpyObj('BestScoresService', ['getBestScores', 'handleErrorSnackBar', 'playerName']);
         bestScoresServiceSpy.getBestScores.and.callFake(() => {
             return of(defaultClassicBestScoresValue);
         });
@@ -70,8 +70,7 @@ describe('BestScoresComponent', () => {
         expect(bestScoresServiceSpy.handleErrorSnackBar).toHaveBeenCalled();
     });
 
-    it('closeDialog should close dialog', () => {
-        // eslint-disable-next-line dot-notation
+    it('closeDialog shoud close dialog', () => {
         const spy = spyOn(component['dialogRef'], 'close');
         component.closeDialog();
         expect(spy).toHaveBeenCalledTimes(1);

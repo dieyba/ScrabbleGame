@@ -20,8 +20,13 @@
             <mat-form-field appearance="fill" class="papy">
                 <mat-label>Dictionnaire :</mat-label>
                 <mat-select formControlName="dictionaryForm" [(ngModel)]="defaultDictionary" [placeholder]="defaultDictionary">
-                    <mat-option value="0">{{ dictionaryList[0] }}</mat-option>
-                    <mat-option value="1">{{ dictionaryList[1] }}</mat-option>
+                    <mat-option
+                        *ngFor="let dictionary of dictionaryList"
+                        [value]="dictionary.title"
+                        matTooltip="{{ dictionary.description }}"
+                        matTooltipPosition="left"
+                        >{{ dictionary.title }}</mat-option
+                    >
                 </mat-select>
                 <div class="error" *ngIf="dictionaryForm.invalid">Le champ est requis</div>
             </mat-form-field>
@@ -61,8 +66,8 @@
     </form>
 
     <div>
-        <button *ngIf="!myForm.valid" disabled="true" class="play" (click)="submit()" style="opacity: 1">Commencer</button>
-        <button *ngIf="myForm.valid" class="play" (click)="submit()">Commencer</button>
+        <button *ngIf="!myForm.valid || isGameStarted" disabled="true" class="play" (click)="submit()" style="opacity: 1">Commencer</button>
+        <button *ngIf="myForm.valid && !isGameStarted" class="play" (click)="submit()">Commencer</button>
         <button class="cancel" (click)="closeDialog()">Annuler</button>
     </div>
 </div>

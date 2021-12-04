@@ -39,7 +39,7 @@ describe('BestScoresService', () => {
         );
         expect(spy).toHaveBeenCalledWith(
             'La base de données et/ou le serveur est momentanément indisponible. Veuillez réessayer plus tard!',
-            'Fermer',
+            'close',
         );
     });
 

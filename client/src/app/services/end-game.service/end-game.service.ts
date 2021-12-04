@@ -63,7 +63,7 @@ export class EndGameService {
         } else {
             this.endGameAfterPassedTurns();
         }
-        const URL = String(this.gameService.game.isLog2990) === 'true' ? '/log2990Mode/send' : '/classicMode/send';
+        const URL = this.gameService.game.isLog2990 ? '/log2990Mode/send' : '/classicMode/send';
         this.bestScoresService
             .postBestScore(this.gameService.game.getLocalPlayer().name, this.gameService.game.getLocalPlayer().score, BASE_URL + URL)
             .subscribe(

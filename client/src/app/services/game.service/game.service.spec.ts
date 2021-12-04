@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { TestBed } from '@angular/core/testing';
 import { PlaceParams } from '@app/classes/commands/commands';
-import { Dictionary, DictionaryType } from '@app/classes/dictionary/dictionary';
+import { DictionaryInterface } from '@app/classes/dictionary/dictionary';
 import { ErrorType } from '@app/classes/errors';
 import { FormAnExistingWord } from '@app/classes/form-an-existing-word/form-an-existing-word';
 import { GameInitInfo, GameParameters, GameType } from '@app/classes/game-parameters/game-parameters';
@@ -106,7 +106,8 @@ describe('GameService', () => {
             ],
         });
         service = TestBed.inject(GameService);
-        initInfoSolo = new WaitingAreaGameParameters(GameType.Solo, 2, DictionaryType.Default, 60, false, false, 'Riri', 'Lulu');
+        const dictionary: DictionaryInterface = { _id: 0, title: 'title', description: 'description', words: ['word'] };
+        initInfoSolo = new WaitingAreaGameParameters(GameType.Solo, 2, dictionary, 60, false, false, 'Riri', 'Lulu');
         initInfoMulti = {
             players: [],
             totalCountDown: 60,
@@ -122,7 +123,7 @@ describe('GameService', () => {
         service.game.gameTimer = new GameTimer();
         service.game.stock = new LetterStock();
         service.game.scrabbleBoard = new ScrabbleBoard(false);
-        validationServiceSpy.dictionary = new Dictionary(DictionaryType.Default);
+        validationServiceSpy.dictionary = dictionary;
         socketMock = new SocketMock();
         service['socket'] = socketMock as unknown as io.Socket;
         socketOnMockSpy = spyOn(socketMock, 'on').and.callThrough();

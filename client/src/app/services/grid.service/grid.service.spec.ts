@@ -108,7 +108,8 @@ describe('GridService', () => {
     });
 
     it('removeSquare should call drawSingleSquareColor', () => {
-        const spy = spyOn<any>(service, 'drawSingleSquareColor');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = spyOn<any>(service, 'drawSingleSquareColor' as any);
         service.scrabbleBoard.squares[5][7].letter = new ScrabbleLetter('', 0);
         service.removeSquare(5, 7);
         expect(spy).toHaveBeenCalled();
