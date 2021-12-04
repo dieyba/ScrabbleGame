@@ -199,22 +199,17 @@ export class ScrabbleBoard {
         // Checking if touching word before or after
         const coordBeforeWord = new Vec2();
         const coordAfterWord = new Vec2();
-        // EL: I modified all lines with comments, maybe tests fail now because of this.
         if (orientation === Axis.V) {
             coordBeforeWord.x = coordAfterWord.x = coord.x;
             if (coord.y === 0) coordBeforeWord.y = coord.y;
-            // Modification 1 above and below.
             else coordBeforeWord.y = coord.y - 1;
-            if (coord.y + word.length >= BOARD_SIZE) return false;
-            // Modification 2 above
+            if (coord.y + word.length > BOARD_SIZE) return false;
             coordAfterWord.y = coord.y + word.length;
         } else {
             coordBeforeWord.y = coordAfterWord.y = coord.y;
             if (coord.x === 0) coordBeforeWord.x = coord.x;
-            // Modification 3 above and below.
             else coordBeforeWord.x = coord.x - 1;
-            if (coord.x + word.length >= BOARD_SIZE) return false;
-            // Modification 4 above
+            if (coord.x + word.length > BOARD_SIZE) return false;
             coordAfterWord.x = coord.x + word.length;
         }
 
@@ -276,10 +271,8 @@ export class ScrabbleBoard {
             if (this.squares[tempCoord.x][tempCoord.y].occupied) {
                 tempString +=
                     this.squares[tempCoord.x][tempCoord.y].letter.value === 0
-                        ? (tempString += this.squares[tempCoord.x][tempCoord.y].letter.whiteLetterCharacter)
-                        : (tempString += this.squares[tempCoord.x][tempCoord.y].letter.character);
-            } else {
-                tempString += ' ';
+                        ? this.squares[tempCoord.x][tempCoord.y].letter.whiteLetterCharacter
+                        : this.squares[tempCoord.x][tempCoord.y].letter.character;
             }
             if (orientation === 'h') {
                 tempCoord.x++;
