@@ -205,7 +205,7 @@ export class GameInitFormComponent implements OnInit, OnDestroy {
                 if (dictionary === null) {
                     this.snack.open(
                         'Il y a eu un problème avec la base de donnée des dictionnaires.' +
-                        'Veuillez choisi un autre dictionnaire ou réessayer plus tard',
+                            'Veuillez choisir un autre dictionnaire ou réessayer plus tard',
                         'Fermer',
                     );
                     return;

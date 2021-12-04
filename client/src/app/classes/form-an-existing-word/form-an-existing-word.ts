@@ -22,7 +22,7 @@ export class FormAnExistingWord extends Goal {
             return 0;
         }
         const previousValidWordsFormed = this.validationService.validWordsFormed;
-        wordsFormed.forEach(word => {
+        wordsFormed.forEach(() => {
             previousValidWordsFormed.pop();
         });
         for (const newWordFormed of wordsFormed) {

@@ -1,8 +1,7 @@
+import { createFormTwoLettersStarsOnly, FormTwoLettersStarsOnly } from '@app/classes/form-two-letters-stars-only/form-two-letters-stars-only';
 import { GoalPoints } from '@app/classes/goal/goal';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
-import { createFormTwoLettersStarsOnly, FormTwoLettersStarsOnly } from '@app/classes/form-two-letters-stars-only/form-two-letters-stars-only';
-
 
 describe('FormTwoLettersStarsOnly', () => {
     let formTwoLettersStarsOnly: FormTwoLettersStarsOnly;
@@ -48,4 +47,3 @@ describe('FormTwoLettersStarsOnly', () => {
         expect(createFormTwoLettersStarsOnly()).toBeTruthy();
     });
 });
-

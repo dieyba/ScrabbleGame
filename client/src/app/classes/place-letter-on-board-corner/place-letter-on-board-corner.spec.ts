@@ -1,9 +1,8 @@
 import { GoalPoints } from '@app/classes/goal/goal';
+import { createPlaceLetterOnBoardCorner, PlaceLetterOnBoardCorner } from '@app/classes/place-letter-on-board-corner/place-letter-on-board-corner';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { Square } from '@app/classes/square/square';
-import { createPlaceLetterOnBoardCorner, PlaceLetterOnBoardCorner } from '@app/classes/place-letter-on-board-corner/place-letter-on-board-corner';
-
 
 describe('PlaceLetterOnBoardCorner', () => {
     let placeLetterOnBoardCorner: PlaceLetterOnBoardCorner;
@@ -62,4 +61,3 @@ describe('PlaceLetterOnBoardCorner', () => {
         expect(placeLetterOnBoardCorner.achieve([newWord1], newLetters)).toEqual(0);
     });
 });
-

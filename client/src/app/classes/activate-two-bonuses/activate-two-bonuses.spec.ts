@@ -1,8 +1,8 @@
+import { ActivateTwoBonuses, createActivateTwoBonuses } from '@app/classes/activate-two-bonuses/activate-two-bonuses';
 import { GoalPoints } from '@app/classes/goal/goal';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { Square, SquareColor } from '@app/classes/square/square';
-import { ActivateTwoBonuses, createActivateTwoBonuses } from '@app/classes/activate-two-bonuses/activate-two-bonuses';
 
 describe('ActivateTwoBonuses', () => {
     let activateTwoBonuses: ActivateTwoBonuses;
@@ -78,4 +78,3 @@ describe('ActivateTwoBonuses', () => {
         expect(activateTwoBonuses.achieve([newWord1], newLetters)).toEqual(0);
     });
 });
-

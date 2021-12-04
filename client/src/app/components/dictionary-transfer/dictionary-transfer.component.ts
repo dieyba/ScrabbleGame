@@ -169,8 +169,6 @@ export class DictionaryTransferComponent implements AfterViewInit, OnDestroy {
             this.snack.open(ErrorCaseDictionaryTransfer.Untouchable, 'Fermer');
             return;
         }
-        console.log('all dicos : ', this.dictionaryList);
-        console.log('dictionary to delete : ', this.selectedDictionary);
 
         this.dictionarySubscription = this.dictionaryService.delete(dictionaryToDelete._id).subscribe(
             () => {

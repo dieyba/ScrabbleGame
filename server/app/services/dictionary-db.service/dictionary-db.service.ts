@@ -93,7 +93,6 @@ export class DictionaryDBService {
     async delete(dictionaryId: string): Promise<void> {
         const id = new ObjectId(dictionaryId);
         const isInCollection = await this.isInCollection(id);
-        console.log('is in collection ? ', isInCollection);
 
         if (!isInCollection) {
             throw new Error('Pas dans la base de donnée');
@@ -180,11 +179,7 @@ export class DictionaryDBService {
 
     private async isInCollection(dictionaryId: ObjectId): Promise<boolean> {
         let isInCollection = false;
-        console.log('id to delete : ', dictionaryId.id);
         await this.dictionaryCollection.find().forEach((dictionary) => {
-            console.log('dico name in tab: ', dictionary.title);
-            console.log('dico id  tab: ', dictionary._id);
-            console.log(dictionaryId.equals(dictionary._id));
             if (dictionaryId.equals(dictionary._id)) {
                 isInCollection = true;
             }
