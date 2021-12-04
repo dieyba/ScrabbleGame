@@ -13,14 +13,12 @@ export class Player {
     goal: GoalType;
 
     constructor(initInfo: string) {
-        if (typeof initInfo === 'string') {
-            this.name = initInfo;
-            this.score = 0;
-            this.letters = [];
-            this.isActive = false;
-            this.isWinner = false;
-            this.socketId = ''; // used to know which player is the local player in game service init method
-        }
+        this.name = initInfo;
+        this.score = 0;
+        this.letters = [];
+        this.isActive = false;
+        this.isWinner = false;
+        this.socketId = ''; // used to know which player is the local player in game service init method
     }
 }
 
