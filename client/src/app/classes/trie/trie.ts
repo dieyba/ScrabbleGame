@@ -22,7 +22,7 @@ export class Trie {
             }
             current = current.children.get(character) as Node;
         }
-        return current.isWord = true;
+        return (current.isWord = true);
     }
 
     find(word: string): boolean {

@@ -101,12 +101,6 @@ export class MouseWordPlacerService {
                 this.onBlur();
                 break;
             default:
-                console.log(
-                    'on key down cur pos:',
-                    this.currentPosition,
-                    ' = ',
-                    this.companionService.convertPositionToGridIndex(this.currentPosition),
-                );
                 if (
                     isValidLetter(removeAccents(keyPressed)) &&
                     this.currentPosition.x < ABSOLUTE_BOARD_SIZE &&
@@ -182,18 +176,13 @@ export class MouseWordPlacerService {
     }
 
     confirmWord() {
-        console.log('currentword: ', this.currentWord, ' and wordstring:', this.wordString);
         const posVec = this.companionService.convertPositionToGridIndex(this.initialPosition);
         const defaultParams: DefaultCommandParams = { player: this.gameService.game.getLocalPlayer(), serviceCalled: this.gameService };
         const params: PlaceParams = { position: posVec, orientation: this.currentAxis, word: this.wordString };
-        console.log('before remove all letters', this.gameService.game.scrabbleBoard);
-        // console.log(this.gameService.game.getLocalPlayer().letters);
         // Refund letters to rack before placing
         this.removeAllLetters();
         const command = new PlaceCmd(defaultParams, params);
         this.commandInvokerService.executeCommand(command);
-        console.log('start place', this.gameService.game.scrabbleBoard);
-        // console.log('start place', this.gameService.game.getLocalPlayer().letters);
         this.clearOverlay();
     }
 
@@ -239,8 +228,6 @@ export class MouseWordPlacerService {
         if (this.currentWord.length >= 0 && previousSquare.x >= this.initialPosition.x && previousSquare.y >= this.initialPosition.y) {
             // Shift one spot left/up
             this.currentPosition = previousSquare;
-            console.log('current word:', this.currentWord);
-            console.log('word string:', this.wordString);
             this.drawCurrentWord();
             this.overlayContext.clearRect(
                 this.currentPosition.x,
@@ -355,8 +342,6 @@ export class MouseWordPlacerService {
             //     nextArrow = this.companionService.findNextSquare(this.currentAxis, this.currentPosition, this.gridService.scrabbleBoard);
             this.drawArrow(this.currentPosition, this.currentAxis);
             // Arrow display bug is here, need to fix before final commit. Works for 1st skip but not further ones.
-            console.log('current word:', this.currentWord);
-            console.log('word string:', this.wordString);
         }
     }
 }

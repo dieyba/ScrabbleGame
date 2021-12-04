@@ -1,22 +1,22 @@
 /* eslint-disable max-lines */
 import { Injectable } from '@angular/core';
-import { DefaultCommandParams, PlaceParams } from '@app/classes/commands';
-import { ExchangeCmd } from '@app/classes/exchange-command';
-import { PassTurnCmd } from '@app/classes/pass-command';
-import { PlaceCmd } from '@app/classes/place-command';
-import { Player } from '@app/classes/player';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ScrabbleRack } from '@app/classes/scrabble-rack';
-import { ScrabbleWord } from '@app/classes/scrabble-word';
-import { Axis, ERROR_NUMBER } from '@app/classes/utilities';
-import { Vec2 } from '@app/classes/vec2';
-import { BonusService } from './bonus.service';
-import { CommandInvokerService } from './command-invoker.service';
-import { GameService } from './game.service';
-import { GridService } from './grid.service';
-import { PlaceService } from './place.service';
-import { ValidationService } from './validation.service';
-import { WordBuilderService } from './word-builder.service';
+import { DefaultCommandParams, PlaceParams } from '@app/classes/commands/commands';
+import { ExchangeCmd } from '@app/classes/exchange-command/exchange-command';
+import { PassTurnCmd } from '@app/classes/pass-command/pass-command';
+import { PlaceCmd } from '@app/classes/place-command/place-command';
+import { Player } from '@app/classes/player/player';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { ScrabbleRack } from '@app/classes/scrabble-rack/scrabble-rack';
+import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
+import { Axis, ERROR_NUMBER } from '@app/classes/utilities/utilities';
+import { Vec2 } from '@app/classes/vec2/vec2';
+import { BonusService } from '@app/services/bonus.service/bonus.service';
+import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
+import { GameService } from '@app/services/game.service/game.service';
+import { GridService } from '@app/services/grid.service/grid.service';
+import { PlaceService } from '@app/services/place.service/place.service';
+import { ValidationService } from '@app/services/validation.service/validation.service';
+import { WordBuilderService } from '@app/services/word-builder.service/word-builder.service';
 
 export enum Probability {
     EndTurn = 100, // TODO: put the right probability settings after testing

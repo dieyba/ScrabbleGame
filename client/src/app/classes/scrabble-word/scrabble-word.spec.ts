@@ -1,6 +1,7 @@
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from './scrabble-word';
 
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('ScrabbleWord', () => {
     const scrabbleWord = new ScrabbleWord();
 

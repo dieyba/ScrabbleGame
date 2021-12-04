@@ -28,7 +28,7 @@
 //     let rackServiceSpy: jasmine.SpyObj<RackService>;
 //     let validationServiceSpy: jasmine.SpyObj<ValidationService>;
 //     let gridServiceSpy: jasmine.SpyObj<GridService>;
-//     let gameParametersSpy: jasmine.SpyObj<GameParameters>;    
+//     let gameParametersSpy: jasmine.SpyObj<GameParameters>;
 //     let rendererSpy: jasmine.SpyObj<Renderer2>;
 //     let isClosed = true;
 

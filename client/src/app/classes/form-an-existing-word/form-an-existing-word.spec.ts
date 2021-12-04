@@ -1,11 +1,10 @@
-import { ValidationService } from '@app/services/validation.service/validation.service';
+import { createFormAnExistingWord, FormAnExistingWord } from '@app/classes/form-an-existing-word/form-an-existing-word';
 import { GoalPoints } from '@app/classes/goal/goal';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { Axis } from '@app/classes/utilities/utilities';
 import { Vec2 } from '@app/classes/vec2/vec2';
-import { createFormAnExistingWord, FormAnExistingWord } from '@app/classes/form-an-existing-word/form-an-existing-word';
-
+import { ValidationService } from '@app/services/validation.service/validation.service';
 
 describe('FormAnExistingWord', () => {
     let formAnExistingWord: FormAnExistingWord;
@@ -70,4 +69,3 @@ describe('FormAnExistingWord', () => {
         expect(createFormAnExistingWord()).toBeTruthy();
     });
 });
-

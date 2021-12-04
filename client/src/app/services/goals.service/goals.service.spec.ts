@@ -8,10 +8,10 @@ import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
 import { SquareColor } from '@app/classes/square/square';
 import { GoalsService } from './goals.service';
 
-
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('GoalsService', () => {
     let service: GoalsService;
-    let stock: LetterStock = new LetterStock();
+    const stock: LetterStock = new LetterStock();
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
@@ -29,9 +29,9 @@ describe('GoalsService', () => {
     });
 
     it('pickPrivateGoals should set players goal and increase usedGoal by 1', () => {
-        let player1 = new Player('Ariane');
-        let player2 = new Player('Kevin');
-        let usedGoals = [GoalType.FormThreeWords]
+        const player1 = new Player('Ariane');
+        const player2 = new Player('Kevin');
+        const usedGoals = [GoalType.FormThreeWords];
         service.pickPrivateGoals(usedGoals, [player1, player2]);
         expect(usedGoals.length).toEqual(3);
         expect(player1.goal).not.toEqual(GoalType.FormThreeWords);
@@ -72,16 +72,16 @@ describe('GoalsService', () => {
         service.addPrivateGoal(GoalType.ActivateTwoBonuses);
         const player = new Player('zenn');
         expect(service.getGoalOfAPlayer(player)).not.toBeDefined();
-    })
+    });
 
     it('getGoalByType should return right goal', () => {
         service.addSharedGoal(GoalType.FormWordWithLettersFromName);
         service.addSharedGoal(GoalType.ActivateTwoBonuses);
         expect(service.getGoalByType(GoalType.ActivateTwoBonuses)).toEqual(new ActivateTwoBonuses());
-    })
+    });
 
     it('getGoalByType should return undefined if goal index does not exist', () => {
         service.addSharedGoal(GoalType.FormWordWithLettersFromName);
         expect(service.getGoalByType(undefined as unknown as GoalType)).not.toBeDefined();
-    })
+    });
 });

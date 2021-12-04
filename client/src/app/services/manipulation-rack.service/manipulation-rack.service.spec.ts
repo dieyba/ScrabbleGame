@@ -1,9 +1,9 @@
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
-import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-import { ERROR_NUMBER } from '@app/classes/utilities';
-import { ManipulationRackService } from './manipulation-rack.service';
-import { RackService } from './rack.service';
+import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+import { ERROR_NUMBER } from '@app/classes/utilities/utilities';
+import { ManipulationRackService } from '@app/services/manipulation-rack.service/manipulation-rack.service';
+import { RackService } from '@app/services/rack.service/rack.service';
 
 /* eslint-disable  @typescript-eslint/no-magic-numbers */
 /* eslint-disable  @typescript-eslint/no-explicit-any */

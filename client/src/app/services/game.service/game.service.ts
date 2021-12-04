@@ -71,7 +71,7 @@ export class GameService {
             const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
             this.game.players[starterPlayerIndex].isActive = true;
             this.validationService.setDictionary(initInfo.dictionary);
-            if (String(this.game.isLog2990) === 'true') {
+            if (this.game.isLog2990) {
                 const usedGoals: GoalType[] = [];
                 const sharedGoals = this.goalsService.pickSharedGoals(usedGoals);
                 this.goalsService.pickPrivateGoals(usedGoals, this.game.players);
@@ -128,8 +128,6 @@ export class GameService {
         this.gridService.scrabbleBoard = this.game.scrabbleBoard;
         this.addRackLetters(this.game.getLocalPlayer().letters);
         this.startCountdown();
-        console.log('stock:', this.game.stock);
-        // console.log('start game', this.game.getLocalPlayer().letters);
     }
 
     startCountdown() {
@@ -195,7 +193,6 @@ export class GameService {
     }
 
     async place(player: Player, placeParams: PlaceParams): Promise<ErrorType> {
-        // console.log(this.game.scrabbleBoard);
         if (!player.isActive) {
             return ErrorType.ImpossibleCommand;
         }
@@ -228,10 +225,8 @@ export class GameService {
                 // Retake letters
                 lettersToAddToRack = this.gridService.removeInvalidLetters(placeParams.position, placeParams.word.length, placeParams.orientation);
             } else {
-                console.log('all valid words:', strWords);
-                // Take new letters
                 this.validationService.updatePlayerScore(tempScrabbleWords, player);
-                if (String(this.game.isLog2990) === 'true') {
+                if (this.game.isLog2990) {
                     // TODO: make sure that scrabbleLetter.tile is updated properly every turn because it is needed in goal validation
                     player.score += this.goalsService.achieveGoals(player, tempScrabbleWords, newlyPlacedLetters);
                 }
@@ -246,8 +241,6 @@ export class GameService {
             this.isTurnEndSubject.next(this.isTurnPassed);
             this.synchronizeAfterPlaceCommand(errorResult, placeParams, player);
         });
-        console.log('after place:', this.game.scrabbleBoard);
-        // console.log(this.game.getLocalPlayer().letters);
         return errorResult;
     }
 

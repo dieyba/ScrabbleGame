@@ -13,7 +13,7 @@
                 <div class="row" *ngIf="getPlayer1LetterCount() < 7">
                     <label class="info">Nombre de lettres: {{ getPlayer1LetterCount() }}</label>
                 </div>
-                <div class="row" *ngIf="isLog2990() === 'true'">
+                <div class="row" *ngIf="isLog2990()">
                     <label class="column info goal-title">Objectif privé:</label>
                     <div class="column privateGoals">
                         <div
@@ -57,7 +57,7 @@
                 <div class="row" *ngIf="getPlayer2LetterCount() < 7">
                     <label class="info">Nombre de lettres: {{ getPlayer2LetterCount() }}</label>
                 </div>
-                <div class="row" *ngIf="isLog2990() === 'true'">
+                <div class="row" *ngIf="isLog2990()">
                     <label class="column info goal-title">Objectif privé:</label>
                     <div class="column privateGoals">
                         <div *ngIf="!isPlayer2GoalAchieved()" class="rectangle">
@@ -92,7 +92,7 @@
             <label class="values">{{ getTimer() }}</label>
         </mat-card-content>
     </mat-card>
-    <mat-card *ngIf="isLog2990() === 'true'" class="card">
+    <mat-card *ngIf="isLog2990()" class="card">
         <mat-card-title class="card-title" align="center">Objectifs publics</mat-card-title>
         <mat-card-content>
             <div class="row publicGoals">

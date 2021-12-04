@@ -1,8 +1,9 @@
 import { GoalPoints } from '@app/classes/goal/goal';
+import { createPlaceLetterWorthTenPts, PlaceLetterWorthTenPts } from '@app/classes/place-letter-worth-ten-pts/place-letter-worth-ten-pts';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
-import { createPlaceLetterWorthTenPts, PlaceLetterWorthTenPts } from '@app/classes/place-letter-worth-ten-pts/place-letter-worth-ten-pts';
 
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 describe('PlaceLetterWorthTenPts', () => {
     let placeLetterWorthTenPts: PlaceLetterWorthTenPts;
 
@@ -10,7 +11,7 @@ describe('PlaceLetterWorthTenPts', () => {
         placeLetterWorthTenPts = new PlaceLetterWorthTenPts();
         placeLetterWorthTenPts.isAchieved = false;
     });
-    
+
     it('should create an instance', () => {
         expect(new PlaceLetterWorthTenPts()).toBeTruthy();
     });
@@ -51,4 +52,3 @@ describe('PlaceLetterWorthTenPts', () => {
         expect(placeLetterWorthTenPts.achieve([newWord1], newLetters)).toEqual(0);
     });
 });
-

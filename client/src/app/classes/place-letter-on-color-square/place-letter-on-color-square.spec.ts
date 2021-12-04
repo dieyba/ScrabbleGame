@@ -30,33 +30,33 @@ describe('PlaceLetterOnColorSquare', () => {
     });
 
     it('initialize should set target color and letter (pink)', () => {
-        const letterColor = new ScrabbleLetter('a', 1);
-        letterColor.color = SquareColor.Pink;
-        placeLetterOnColorSquare.initialize(letterColor);
+        const letter = new ScrabbleLetter('a', 1);
+        letter.color = SquareColor.Pink;
+        placeLetterOnColorSquare.initialize(letter);
         expect(placeLetterOnColorSquare.targetLetter).toEqual('a');
         expect(placeLetterOnColorSquare.targetColor).toEqual(SquareColor.Pink);
     });
 
     it('initialize should set target color and letter (teal))', () => {
-        const letterColor = new ScrabbleLetter('a', 1);
-        letterColor.color = SquareColor.Teal;
-        placeLetterOnColorSquare.initialize(letterColor);
+        const letter = new ScrabbleLetter('a', 1);
+        letter.color = SquareColor.Teal;
+        placeLetterOnColorSquare.initialize(letter);
         expect(placeLetterOnColorSquare.targetLetter).toEqual('a');
         expect(placeLetterOnColorSquare.targetColor).toEqual(SquareColor.Teal);
     });
 
     it('initialize should set target color and letter (dark blue)', () => {
-        const letterColor = new ScrabbleLetter('a', 1);
-        letterColor.color = SquareColor.DarkBlue;
-        placeLetterOnColorSquare.initialize(letterColor);
+        const letter = new ScrabbleLetter('a', 1);
+        letter.color = SquareColor.DarkBlue;
+        placeLetterOnColorSquare.initialize(letter);
         expect(placeLetterOnColorSquare.targetLetter).toEqual('a');
         expect(placeLetterOnColorSquare.targetColor).toEqual(SquareColor.DarkBlue);
     });
 
     it('initialize should set target color and letter (none)', () => {
-        const letterColor = new ScrabbleLetter('a', 1);
-        letterColor.color = SquareColor.None;
-        placeLetterOnColorSquare.initialize(letterColor);
+        const letter = new ScrabbleLetter('a', 1);
+        letter.color = SquareColor.None;
+        placeLetterOnColorSquare.initialize(letter);
         expect(placeLetterOnColorSquare.targetLetter).toEqual('a');
         expect(placeLetterOnColorSquare.targetColor).toEqual(SquareColor.None);
     });
@@ -96,4 +96,3 @@ describe('PlaceLetterOnColorSquare', () => {
         expect(placeLetterOnColorSquare.achieve([newWord1], newLetters)).toEqual(0);
     });
 });
-

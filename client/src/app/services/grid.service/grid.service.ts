@@ -261,10 +261,10 @@ export class GridService {
                 this.fill({ type: Colors.Teal, colorType: 'LETTRE', valueType: 'x2' }, i, j);
                 break;
             case SquareColor.Pink:
-                this.fill({ type: Colors.Pink, colorType: 'MOT', valueType: 'x2' }, i, j);
+                this.fill({ type: Colors.Pink, colorType: ' MOT', valueType: 'x2' }, i, j);
                 break;
             case SquareColor.Red:
-                this.fill({ type: Colors.Red, colorType: 'MOT', valueType: 'x3' }, i, j);
+                this.fill({ type: Colors.Red, colorType: ' MOT', valueType: 'x3' }, i, j);
                 break;
             case SquareColor.None:
                 this.gridContext.fillStyle = Colors.None;

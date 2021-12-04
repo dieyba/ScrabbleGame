@@ -1,7 +1,10 @@
+import {
+    createFormWordWithLettersFromName,
+    FormWordWithLettersFromName,
+} from '@app/classes/form-word-with-letters-from-name/form-word-with-letters-from-name';
 import { GoalPoints } from '@app/classes/goal/goal';
 import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
 import { ScrabbleWord } from '@app/classes/scrabble-word/scrabble-word';
-import { createFormWordWithLettersFromName, FormWordWithLettersFromName } from '@app/classes/form-word-with-letters-from-name/form-word-with-letters-from-name';
 
 describe('FormWordWithLettersFromName', () => {
     let formWordWithLettersFromName: FormWordWithLettersFromName;
@@ -26,7 +29,7 @@ describe('FormWordWithLettersFromName', () => {
         const letter3 = new ScrabbleLetter('m', 1);
         const letter4 = new ScrabbleLetter('t', 1);
         const newWord1 = new ScrabbleWord();
-        newWord1.content = [letter1, letter2, letter3, letter1, letter2, letter4]; // aimait 
+        newWord1.content = [letter1, letter2, letter3, letter1, letter2, letter4]; // aimait
         const newlyPlacedLetters = [letter1, letter2, letter1, letter2, letter4];
         expect(formWordWithLettersFromName.achieve([newWord1], newlyPlacedLetters, name)).toEqual(GoalPoints.FormWordWithLettersFromName);
         expect(formWordWithLettersFromName.isAchieved).toBeTruthy();
@@ -50,7 +53,7 @@ describe('FormWordWithLettersFromName', () => {
         const letter3 = new ScrabbleLetter('m', 1);
         const letter4 = new ScrabbleLetter('t', 1);
         const newWord1 = new ScrabbleWord();
-        newWord1.content = [letter1, letter2, letter3, letter1, letter2, letter4]; // aimait 
+        newWord1.content = [letter1, letter2, letter3, letter1, letter2, letter4]; // aimait
         const newlyPlacedLetters = [letter1, letter2, letter1, letter2, letter4];
         formWordWithLettersFromName.isAchieved = true;
         expect(formWordWithLettersFromName.achieve([newWord1], newlyPlacedLetters, name)).toEqual(0);
