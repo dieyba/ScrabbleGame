@@ -1,0 +1,265 @@
+.virtualPlayers {
+    position: relative;
+    overflow: hidden;
+}
+
+.information {
+    position: relative;
+    margin: 3px 10px 10px 10px;
+    font-size: 10pt;
+}
+
+.information2 {
+    position: relative;
+    margin: 10px;
+    font-size: 8pt;
+}
+
+.add {
+    position: relative;
+    bottom: 10px;
+}
+
+.deletUpdate {
+    position: relative;
+    bottom: 50px;
+}
+
+.reset {
+    position: relative;
+    left: 700px;
+}
+
+.text {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 18px;
+}
+
+.lists {
+    display: flex;
+    // margin-right: 500px;
+    // margin-left: 50px;
+}
+
+.beginnerNames {
+    margin-top: 10px;
+    //     overflow-y: scroll;
+    //     height: fit-content;
+    //     max-height: 200px;
+}
+
+.expertNames {
+    margin-top: 10px;
+    //     overflow-y: scroll;
+    //     height: fit-content;
+    //     max-height: 200px;
+}
+
+h2 {
+    // margin-top: 10px;
+    left: 300px;
+    bottom: 8px;
+}
+
+.selected-player {
+    background-color: #dcecff;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+}
+
+.names {
+    margin-top: 10px;
+    overflow-y: scroll;
+    height: fit-content;
+    border-radius: 10px;
+    background-color: white;
+    max-height: 135px;
+}
+
+.column {
+    flex: 50%;
+    position: relative;
+    margin-left: 10px;
+    margin-right: 10px;
+    background-color: #dcecff;
+}
+
+.mat-card {
+    background-color: #dcecff;
+}
+
+.add-mat-card {
+    margin-top: 90px;
+}
+
+.close-btn {
+    float: right;
+    background-color: #dcecff;
+    border-color: #dcecff;
+    border-style: none;
+}
+
+.plus {
+    margin-top: -12px;
+}
+
+.trash {
+    margin-top: -10px;
+}
+
+.edit {
+    margin-top: -8px;
+}
+
+.plus-btn {
+    background-color: #6aa0e0;
+    margin: 5px 10px 15px 0px;
+    float: right;
+}
+
+.plus-btn .toolTipAdd {
+    visibility: hidden;
+    width: 120px;
+    background-color: gray;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    margin-left: -100px;
+    margin-top: -55px;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.plus-btn:hover .toolTipAdd {
+    visibility: visible;
+}
+
+.delete-btn {
+    background-color: #6aa0e0;
+    margin: 5px 10px 15px 0px;
+    float: right;
+}
+
+.delete-btn .toolTipDelete {
+    visibility: hidden;
+    width: 120px;
+    background-color: gray;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    margin-left: -100px;
+    margin-top: -55px;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.delete-btn:hover .toolTipDelete {
+    visibility: visible;
+}
+
+.edit-btn {
+    background-color: #6aa0e0;
+    margin: 5px 10px 15px 0px;
+    float: right;
+}
+
+.edit-btn .toolTipEdit {
+    visibility: hidden;
+    width: 120px;
+    background-color: gray;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    margin-left: -100px;
+    margin-top: -55px;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.edit-btn:hover .toolTipEdit {
+    visibility: visible;
+}
+
+.description {
+    font-size: 14px;
+    margin: 0px 0px 0px 10px;
+}
+
+.name-btn {
+    white-space: nowrap;
+    position: relative;
+    // margin-top: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 18px;
+    border-radius: 5px;
+    background-color: #e4e4e4;
+    border: 1px solid #e4e4e4;
+    padding: 5px 10px;
+}
+
+.input {
+    display: flex;
+    flex-direction: column;
+    margin-top: 50px;
+    width: 350px;
+}
+
+.addName {
+    margin-top: 20px;
+}
+
+.deletUpdate {
+    margin-top: 140px;
+}
+
+hr {
+    border: 0.5px solid #6aa0e0;
+    background-color: #6aa0e0;
+    margin: 0px 0px 10px 10px;
+}
+
+.btn {
+    white-space: nowrap;
+    position: relative;
+    margin: 10px;
+    font-size: 20px;
+    border-radius: 5px;
+    background-color: #6aa0e0;
+    border: 1px solid #6aa0e0;
+    padding: 5px 10px;
+}
+
+.deleteName {
+    position: relative;
+    display: inline-block;
+}
+
+.updateName .toolTipUpdate {
+    visibility: hidden;
+    width: 120px;
+    background-color: gray;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.updateName:hover .toolTipUpdate {
+    visibility: visible;
+}

@@ -1,21 +1,22 @@
+/* eslint-disable max-len */
+// import { HttpClientModule } from '@angular/common/http';
 // import { ComponentFixture, TestBed } from '@angular/core/testing';
-// import { FormControl, FormGroup } from '@angular/forms';
 // import { MatCardModule } from '@angular/material/card';
+// import { MatSnackBarModule } from '@angular/material/snack-bar';
 // import { Router, RouterModule } from '@angular/router';
-// import { Dictionary } from '@app/classes/dictionary';
-// import { GameParameters, GameType } from '@app/classes/game-parameters';
-// import { ScrabbleBoard } from '@app/classes/scrabble-board';
-// import { ScrabbleLetter } from '@app/classes/scrabble-letter';
-// import { VirtualPlayer } from '@app/classes/virtual-player';
+// import { DEFAULT_LOCAL_PLAYER_ID, DEFAULT_OPPONENT_ID, GameParameters, GameType } from '@app/classes/game-parameters/game-parameters';
+// import { LetterStock } from '@app/classes/letter-stock/letter-stock';
+// import { Player } from '@app/classes/player/player';
+// import { ScrabbleBoard } from '@app/classes/scrabble-board/scrabble-board';
+// import { ScrabbleLetter } from '@app/classes/scrabble-letter/scrabble-letter';
+// import { Difficulty, VirtualPlayer } from '@app/classes/virtual-player/virtual-player';
 // import { DEFAULT_HEIGHT, DEFAULT_WIDTH, PlayAreaComponent } from '@app/components/play-area/play-area.component';
-// import { CommandInvokerService } from '@app/services/command-invoker.service';
-// import { ExchangeService } from '@app/services/exchange.service';
-// import { GameService } from '@app/services/game.service';
-// import { GridService } from '@app/services/grid.service';
-// import { LetterStock } from '@app/services/letter-stock.service';
-// import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service';
-// import { RackService, RACK_HEIGHT, RACK_WIDTH } from '@app/services/rack.service';
-// import { DEFAULT_LETTER_COUNT, SoloGameService } from '@app/services/solo-game.service';
+// import { CommandInvokerService } from '@app/services/command-invoker.service/command-invoker.service';
+// import { ExchangeService } from '@app/services/exchange.service/exchange.service';
+// import { DEFAULT_LETTER_COUNT, GameService } from '@app/services/game.service/game.service';
+// import { GridService } from '@app/services/grid.service/grid.service';
+// import { MouseWordPlacerService } from '@app/services/mouse-word-placer.service/mouse-word-placer.service';
+// import { RackService, RACK_HEIGHT, RACK_WIDTH } from '@app/services/rack.service/rack.service';
 // import { BehaviorSubject, Observable } from 'rxjs';
 
 // /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -25,7 +26,6 @@
 //     let fixture: ComponentFixture<PlayAreaComponent>;
 //     let gridServiceSpy: jasmine.SpyObj<GridService>;
 //     let gameServiceSpy: jasmine.SpyObj<GameService>;
-//     let soloGameServiceSpy: jasmine.SpyObj<SoloGameService>;
 //     let rackServiceSpy: jasmine.SpyObj<RackService>;
 //     let commandInvokerServiceSpy: jasmine.SpyObj<CommandInvokerService>;
 //     let mouseWordPlacerServiceSpy: jasmine.SpyObj<MouseWordPlacerService>;
@@ -33,26 +33,23 @@
 
 //     beforeEach(async () => {
 //         TestBed.configureTestingModule({
-//             imports: [MatCardModule, RouterModule],
+//             imports: [MatCardModule, RouterModule, HttpClientModule, MatSnackBarModule],
 //         });
 //         gridServiceSpy = jasmine.createSpyObj('GridService', ['sizeUpLetters', 'sizeDownLetters', 'drawGrid', 'drawColors', 'drawLetter']);
-//         gameServiceSpy = jasmine.createSpyObj('GameService', ['currentGameService', 'initializeGameType']);
+//         gameServiceSpy = jasmine.createSpyObj('GameService', ['currentGameService', 'initializeGameType', 'startNewGame', 'addRackLetters', 'resetTimer']);
 //         commandInvokerServiceSpy = jasmine.createSpyObj('CommandInvokerService', ['executeCommand']);
-//         soloGameServiceSpy = jasmine.createSpyObj('SoloGameService', ['initializeGame', 'createNewGame', 'getLettersSelected']);
 //         mouseWordPlacerServiceSpy = jasmine.createSpyObj('MouseWordPlacerService', ['onKeyDown', 'onBlur', 'onMouseClick', 'confirmWord']);
-//         exchangeServiceSpy = jasmine.createSpyObj('ExchangeService', ['atLeastOneLetterSelected', 'exchange', 'cancelExchange']);
+//         exchangeServiceSpy = jasmine.createSpyObj('ExchangeService', ['atLeastOneLetterSelected', 'exchange', 'cancelExchange', 'atLeastOneLetterSelected']);
 //         // pour les properties, cette faôn de faire empêche les modifs. check sur le lien suivant pour modifer ça.
 //         // https://stackoverflow.com/questions/64560390/jasmine-createspyobj-with-properties
 //         rackServiceSpy = jasmine.createSpyObj('RackService', ['drawRack', 'select', 'deselect', 'deselectAll', 'handleExchangeSelection'], {
 //             ['exchangeSelected']: [false, false, false, false, false, false, false],
 //         });
-//         changeServiceSpy = jasmine.createSpyObj('ExchangeService', ['handleSelection', 'exchange', 'cancelExchange', 'atLeastOneLetterSelected']);
 //         await TestBed.configureTestingModule({
 //             declarations: [PlayAreaComponent],
 //             providers: [
 //                 { provide: GridService, useValue: gridServiceSpy },
 //                 { provide: GameService, useValue: gameServiceSpy },
-//                 { provide: SoloGameService, useValue: soloGameServiceSpy },
 //                 { provide: RackService, useValue: rackServiceSpy },
 //                 { provide: CommandInvokerService, useValue: commandInvokerServiceSpy },
 //                 { provide: MouseWordPlacerService, useValue: mouseWordPlacerServiceSpy },
@@ -61,36 +58,26 @@
 //             ],
 //         }).compileComponents();
 
-//         gridServiceSpy.scrabbleBoard = new ScrabbleBoard(false);
-//         gameServiceSpy.initializeGameType(GameType.Solo);
-//         gameServiceSpy.currentGameService = soloGameServiceSpy;
-//         const form = new FormGroup({
-//             name: new FormControl('dieyna'),
-//             timer: new FormControl('1:00'),
-//             bonus: new FormControl(true),
-//             level: new FormControl('easy'),
-//             dictionaryForm: new FormControl('Francais'),
-//             opponent: new FormControl('Sara'),
-//         });
-//         meServiceSpy.currentGameService.game = new GameParameters(form.controls.name.value, +form.controls.timer.value, form.controls.bonus.value);
-//         gameServiceSpy.currentGameService.game.creatorPlayer = new LocalPlayer(form.controls.name.value);
-//         gameServiceSpy.currentGameService.game.creatorPlayer.isActive = true;
-//         gameServiceSpy.currentGameService.stock = new LetterStock();
-//         gameServiceSpy.currentGameService.game.localPlayer = new LocalPlayer(form.controls.name.value);
-//         gameServiceSpy.currentGameService.game.creatorPlayer = gameServiceSpy.currentGameService.game.localPlayer;
-//         gameServiceSpy.currentGameService.game.opponentPlayer = new VirtualPlayer(form.controls.opponent.value, form.controls.level.value);
-//         const localLetters = gameServiceSpy.currentGameService.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-//         gameServiceSpy.currentGameService.game.localPlayer.letters = localLetters;
-//         const opponentLetters = gameServiceSpy.currentGameService.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
-//         gameServiceSpy.currentGameService.game.opponentPlayer.letters = opponentLetters;
-//         gameServiceSpy.currentGameService.game.dictionary = new Dictionary(+form.controls.dictionaryForm.value);
-//         gameServiceSpy.currentGameService.game.randomBonus = form.controls.bonus.value;
-//         gameServiceSpy.currentGameService.game.totalCountDown = form.controls.timer.value;
-//         gameServiceSpy.currentGameService.game.timerMs = form.controls.timer.value;
-//         gameServiceSpy.currentGameService.game.localPlayer = gameServiceSpy.currentGameService.game.creatorPlayer;
-//         soloGameServiceSpy.virtualPlayerSubject = new BehaviorSubject<boolean>(gameServiceSpy.currentGameService.game.localPlayer.isActive);
-//         soloGameServiceSpy.isVirtualPlayerObservable = soloGameServiceSpy.virtualPlayerSubject.asObservable();
-//         soloGameServiceSpy.virtualPlayerSubject.next(true);
+//         gameServiceSpy.game = new GameParameters();
+//         //gameServiceSpy.initializeSoloGame(gameInfo, Difficulty.Easy);
+//         gameServiceSpy.game.scrabbleBoard = new ScrabbleBoard(false);
+//         gameServiceSpy.game.stock = new LetterStock()
+//         gameServiceSpy.game.gameMode = GameType.Solo;
+//         gameServiceSpy.game.isLog2990 = false;
+//         gameServiceSpy.game.isEndGame = false;
+//         gameServiceSpy.game.gameTimer.initializeTotalCountDown(60);
+//         gameServiceSpy.game.setLocalAndOpponentId(DEFAULT_LOCAL_PLAYER_ID, DEFAULT_OPPONENT_ID);
+//         gameServiceSpy.game.setLocalPlayer(new Player('Ariane'));
+//         gameServiceSpy.game.setOpponent(new VirtualPlayer('Sara', Difficulty.Easy));
+//         gameServiceSpy.game.getLocalPlayer().letters = gameServiceSpy.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+//         gameServiceSpy.game.getOpponent().letters = gameServiceSpy.game.stock.takeLettersFromStock(DEFAULT_LETTER_COUNT);
+//         const starterPlayerIndex = Math.round(Math.random()); // index 0 or 1, initialize randomly which of the two player will start
+//         gameServiceSpy.game.players[starterPlayerIndex].isActive = true;
+//         gameServiceSpy.isTurnEndSubject = new BehaviorSubject<boolean>(gameServiceSpy.isTurnPassed);
+//         gameServiceSpy.isTurnEndObservable = gameServiceSpy.isTurnEndSubject.asObservable();
+//         rackServiceSpy.rackLetters = [];
+//         gridServiceSpy.scrabbleBoard = gameServiceSpy.game.scrabbleBoard;
+//         gameServiceSpy.addRackLetters(gameServiceSpy.game.getLocalPlayer().letters);
 //     });
 
 //     beforeEach(() => {
@@ -142,7 +129,7 @@
 
 //     it('ngAfterViewInit should call drawGrid and drawColors', () => {
 //         component.ngAfterViewInit();
-//         expect(gameServiceSpy.currentGameService.createNewGame).toHaveBeenCalled();
+//         expect(gameServiceSpy.startNewGame).toHaveBeenCalled();
 //         expect(gridServiceSpy.drawGrid).toHaveBeenCalled();
 //         expect(gridServiceSpy.drawColors).toHaveBeenCalled();
 //     });
@@ -203,10 +190,10 @@
 //     });
 
 //     it('lessThanSevenLettersInStock should return true if there is less than seven letters in the letter stock', () => {
-//         soloGameServiceSpy.stock.letterStock = [new ScrabbleLetter('j'), new ScrabbleLetter('p')];
+//         gameServiceSpy.game.stock.letterStock = [new ScrabbleLetter('j'), new ScrabbleLetter('p')];
 //         expect(component.lessThanSevenLettersInStock()).toBeTrue();
 
-//         soloGameServiceSpy.stock.letterStock = [
+//         gameServiceSpy.game.stock.letterStock = [
 //             new ScrabbleLetter('j'),
 //             new ScrabbleLetter('p'),
 //             new ScrabbleLetter('b'),

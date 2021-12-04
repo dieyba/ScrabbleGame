@@ -9,9 +9,9 @@
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width: 640px;
-    height: 640px;
-    margin: 0px 10px 20px 20px;
+    width: 580px;
+    height: 580px;
+    margin: 0px 10px 10px 20px;
     padding: 10px;
 }
 
@@ -22,14 +22,14 @@
 .column {
     flex: 50%;
     position: relative;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .btn {
     white-space: nowrap;
     position: relative;
-    margin-top: 500px;
-    font-size: 20px;
+    margin-top: 478px;
+    font-size: 18px;
     border-radius: 5px;
     background-color: #6aa0e0;
     border: 1px solid #6aa0e0;
@@ -39,8 +39,8 @@
 .echanger {
     white-space: nowrap;
     position: relative;
-    margin-top: 30px;
-    font-size: 20px;
+    margin-top: 10px;
+    font-size: 18px;
     border-radius: 5px;
     background-color: #6aa0e0;
     border: 1px solid #6aa0e0;
@@ -51,7 +51,7 @@
     white-space: nowrap;
     position: relative;
     margin-top: 10px;
-    font-size: 20px;
+    font-size: 18px;
     border-radius: 5px;
     background-color: #6aa0e0;
     border: 1px solid #6aa0e0;
@@ -76,7 +76,7 @@
     border-radius: 5px;
     background-color: #6aa0e0;
     border: 1px solid #6aa0e0;
-    width: 25%;
+    width: 30%;
 }
 
 .size-btn:hover {

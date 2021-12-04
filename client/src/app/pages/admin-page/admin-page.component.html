@@ -1,0 +1,20 @@
+<body>
+    <img class="image" src="https://bit.ly/3m206ss" width="600" height="100" alt="Logo Scrabble" />
+    <div class="reset">
+        <button class="btn" (click)="resetDataBase()">Réinitialiser</button>
+    </div>
+    <div class="page">
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Noms des joueurs virtuels</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-virtual-player-name-manager></app-virtual-player-name-manager>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Dictionnaires</mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-dictionary-transfer></app-dictionary-transfer>
+        </mat-expansion-panel>
+    </div>
+</body>

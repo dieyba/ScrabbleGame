@@ -1,0 +1,92 @@
+.container {
+    display: block;
+    width: 550px;
+    height: 550px;
+}
+
+.papy {
+    width: 100%;
+}
+
+.btn hr.solid {
+    position: relative;
+    left: -30px;
+    top: -15px;
+    width: 238%;
+}
+
+.error {
+    font-size: 10px;
+}
+mat-radio-group {
+    top: 10px;
+    position: relative;
+}
+mat-radio-button {
+    position: relative;
+    margin: 10px;
+    margin-left: 100px;
+    display: inline-block;
+}
+
+#opponents {
+    visibility: hidden;
+}
+
+.check-input {
+    margin: 0 12px;
+}
+
+.play {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    border-radius: 10px;
+    padding: 10px 10px;
+    font-size: 18px;
+    background-color: #6aa0e0;
+    border-color: #6aa0e0;
+    width: 130px;
+    border-width: 2px;
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.play:hover {
+    opacity: 0.6;
+}
+
+.cancel {
+    position: relative;
+    margin-top: 15px;
+    padding: 10px 10px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10px;
+    font-size: 18px;
+    background-color: #6aa0e0;
+    border-color: #6aa0e0;
+    width: 100px;
+    border-width: 2px;
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cancel:hover {
+    opacity: 0.6;
+}
+
+p {
+    top: 25px;
+    font-size: large;
+    display: block;
+    text-align: center;
+    margin-top: 25px;
+}

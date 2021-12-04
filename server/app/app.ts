@@ -1,4 +1,4 @@
-import { HttpException } from '@app/classes/http.exception';
+import { HttpException } from '@app/classes/http.exception/http.exception';
 import { DateController } from '@app/controllers/date.controller';
 import { ExampleController } from '@app/controllers/example.controller';
 import * as cookieParser from 'cookie-parser';
@@ -9,6 +9,9 @@ import * as logger from 'morgan';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
+import { BestScoresController } from './controllers/best-scores.controller/best-scores.controller';
+import { DictionaryDBController } from './controllers/dictionary-db.controller/dictionary-db.controller';
+import { VirtualPlayerNameController } from './controllers/virtual-player-name.controller/virtual-player-name.controller';
 
 @Service()
 export class Application {
@@ -16,7 +19,13 @@ export class Application {
     private readonly internalError: number = StatusCodes.INTERNAL_SERVER_ERROR;
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
-    constructor(private readonly exampleController: ExampleController, private readonly dateController: DateController) {
+    constructor(
+        private readonly exampleController: ExampleController,
+        private readonly dateController: DateController,
+        private readonly dictionaryDBController: DictionaryDBController,
+        private readonly virtualPlayerNameController: VirtualPlayerNameController,
+        private readonly bestScoresController: BestScoresController,
+    ) {
         this.app = express();
 
         this.swaggerOptions = {
@@ -39,6 +48,9 @@ export class Application {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/api/example', this.exampleController.router);
         this.app.use('/api/date', this.dateController.router);
+        this.app.use('/api/dictionary', this.dictionaryDBController.router);
+        this.app.use('/api/VirtualPlayerName', this.virtualPlayerNameController.router);
+        this.app.use('/api/bestScores', this.bestScoresController.router);
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
         });

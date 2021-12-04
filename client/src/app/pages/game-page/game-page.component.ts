@@ -1,8 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { EndGamePopupComponent } from '@app/components/end-game-popup/end-game-popup.component';
-import { SocketHandler } from '@app/modules/socket-handler';
-import { GameService } from '@app/services/game.service';
+import * as SocketHandler from '@app/modules/socket-handler';
+import { GameService } from '@app/services/game.service/game.service';
 import * as io from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
@@ -17,7 +17,6 @@ export class GamePageComponent {
     private socket: io.Socket;
     private readonly server: string;
     constructor(private dialog: MatDialog, private gameService: GameService) {
-        // this.server = 'http://' + window.location.hostname + ':3000';
         this.server = environment.socketUrl;
         this.socket = SocketHandler.requestSocket(this.server);
         history.pushState(null, '', window.location.href);

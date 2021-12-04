@@ -18,7 +18,11 @@
 .chat-box-container {
     background-color: #dcecff;
     height: auto;
-    width: 20vw;
+    width: 400px;
     display: flex;
     flex-direction: column;
+}
+
+.sidebar {
+    width: 280px;
 }

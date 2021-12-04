@@ -1,0 +1,81 @@
+<div class="form-group">
+    <hr />
+    <div class="description">Ajoutez, modifiez, supprimer et téléchargez les dictionnaires.</div>
+    <mat-card>
+        <h2>Dictionnaires</h2>
+        <div class="dictionary-list">
+            <div *ngFor="let dictionary of dictionaryList; index as i">
+                <button class="dict-btn" (click)="onDictionarySelection(i)">{{ dictionary.title }}</button>
+            </div>
+        </div>
+    </mat-card>
+    <mat-card *ngIf="isDictionarySelected">
+        <button class="close-btn" (click)="closeModifDictCard()">
+            <img src="https://img.icons8.com/ios/20/000000/delete-sign--v1.png" />
+        </button>        
+        <h2>Dictionnaire sélectionné</h2>
+        <div class="input">
+            <mat-form-field hintLabel="characters min: 3 max: 20" appearance="fill" *ngIf="selectedDictionary.title !== ''">
+                <mat-label>Modifiez le titre</mat-label>
+                <input matInput #input maxlength="20" #input2 minlength="3" [formControl]="editTitle" />
+                <div class="error" *ngIf="editTitle.errors?.pattern">Le titre ne doit pas contenir des chiffres ou des caractères spéciaux</div>
+            </mat-form-field>
+            <mat-form-field hintLabel="characters min: 10 max: 50" appearance="fill" *ngIf="selectedDictionary.description !== ''">
+                <mat-label>Modifiez la description</mat-label>
+                <input matInput #input maxlength="50" #input2 minlength="10" [formControl]="editDescription" />
+            </mat-form-field>
+        </div>
+    </mat-card>
+    <button mat-fab class="delete-btn" (click)="deleteDictionary(selectedDictionary)" *ngIf="isDictionarySelected">
+        <span class="toolTipDelete">Supprimer {{ selectedDictionary.title }}</span>
+        <img
+            class="trash"
+            src="https://img.icons8.com/external-kiranshastry-lineal-kiranshastry/42/000000/external-delete-multimedia-kiranshastry-lineal-kiranshastry.png"
+        />
+    </button>
+    <button mat-fab class="delete-btn" disabled="true" *ngIf="!isDictionarySelected">
+        <span class="toolTipDelete">Supprimer {{ selectedDictionary.title }}</span>
+        <img
+            class="trash"
+            src="https://img.icons8.com/external-kiranshastry-lineal-kiranshastry/42/000000/external-delete-multimedia-kiranshastry-lineal-kiranshastry.png"
+        />
+    </button>
+    <button mat-fab class="edit-btn" (click)="updateTitleAndDescription(editTitle.value, editDescription.value)" *ngIf="isDictionarySelected">
+        <span class="toolTipEdit">Modifier {{ selectedDictionary.title }}</span>
+        <img class="edit" src="https://img.icons8.com/dotty/40/000000/edit.png" />
+    </button>
+    <button mat-fab class="edit-btn" disabled="true" *ngIf="!isDictionarySelected">
+        <span class="toolTipEdit">Modifier {{ selectedDictionary.title }}</span>
+        <img class="edit" src="https://img.icons8.com/dotty/40/000000/edit.png" />
+    </button>
+    <button mat-fab class="download-btn" (click)="onDownload()" *ngIf="isDictionarySelected">
+        <span class="toolTipDownload">Télécharger un dictionnaire</span>
+        <img class="download" src="https://img.icons8.com/material-sharp/26/000000/download--v1.png" />
+    </button>
+    <button mat-fab class="download-btn" disabled="true" *ngIf="!isDictionarySelected">
+        <span class="toolTipDownload">Télécharger un dictionnaire</span>
+        <img class="download" src="https://img.icons8.com/material-sharp/26/000000/download--v1.png" />
+    </button>
+    <button mat-fab class="plus-btn" (click)="openAddDictCard()">
+        <span class="toolTipAdd">Ajouter un dictionnaire</span>
+        <img class="plus" src="https://img.icons8.com/ios/50/000000/plus-math.png" />
+    </button>
+    <mat-card class="add-dict" *ngIf="isAddDictCardVisible">
+        <button class="close-btn" (click)="closeAddDictCard()">
+            <img src="https://img.icons8.com/ios/20/000000/delete-sign--v1.png" />
+        </button>
+        <h2>Ajouter un dictionnaire</h2>
+        <h4 for="dictionaryFile">Choisissez un dictionnaire à ajouter : </h4>
+        <div class="input-div">
+            <input #inputFile class="custom-file-input" type="file" id="file" accept=".json" name="dictionaryFile" (change)="onUpload($event.target)" />
+        </div>
+        <mat-card style="background-color: white;" *ngIf="lastUploadedDictionary !== undefined">
+            <mat-card-subtitle> Dictionnaire téléversé </mat-card-subtitle>
+            <mat-card-title> {{ lastUploadedDictionary.title }} </mat-card-title>
+            <mat-card-content>
+                <p>Description :</p>
+                <p class="tab">{{ lastUploadedDictionary.description }}</p>
+            </mat-card-content>
+        </mat-card>
+    </mat-card>
+</div>
